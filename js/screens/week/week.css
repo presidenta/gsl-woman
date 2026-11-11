@@ -1,0 +1,112 @@
+/* ЭКРАН «НЕДЕЛЯ». */
+
+.week-nav {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  margin-bottom: var(--sp-4);
+}
+
+.week-nav__title {
+  flex: 1;
+  text-align: center;
+}
+
+.week-nav__title .screen-title {
+  font-size: var(--fs-xl);
+  margin: var(--sp-1) 0 0;
+}
+
+.week-ring {
+  padding: var(--sp-6) var(--sp-5);
+}
+
+.week-ring__status {
+  margin-top: var(--sp-4);
+  text-align: center;
+  color: var(--c-text-dim);
+  font-weight: 600;
+}
+
+.week-days {
+  list-style: none;
+  margin: var(--sp-4) 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+}
+
+.week-day__box {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-4);
+  min-height: 62px;
+  padding: var(--sp-3) var(--sp-4);
+  border: 1px solid var(--c-line);
+  border-radius: var(--r-md);
+  background: var(--c-surface);
+}
+
+button.week-day__box {
+  width: 100%;
+  color: inherit;
+  text-align: left;
+}
+
+.week-day.is-today .week-day__box {
+  border-color: var(--c-gold);
+}
+
+.week-day.is-future {
+  opacity: 0.55;
+}
+
+.week-day__date {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 38px;
+  font-size: var(--fs-xs);
+  color: var(--c-text-faint);
+  text-transform: capitalize;
+}
+
+.week-day__date strong {
+  color: var(--c-text-dim);
+  font-weight: 700;
+}
+
+.week-day__text {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.week-day__title {
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.week-day__status {
+  font-size: var(--fs-xs);
+  color: var(--c-text-faint);
+}
+
+.week-day__status.is-done {
+  color: var(--c-gold);
+}
+
+.week-day__status.is-missed {
+  color: var(--c-rose);
+}
+
+.week-day__mark svg {
+  width: 18px;
+  height: 18px;
+  color: var(--c-gold);
+}

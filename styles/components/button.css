@@ -1,0 +1,122 @@
+/* КНОПКИ.
+   .btn--gold — главное действие экрана: металл с бликом, который раз в несколько секунд пробегает по
+   кнопке. Один такой блик на экране — это «дорого»; если золотых кнопок две, блестеть должна одна. */
+
+.btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-2);
+  min-height: var(--tap);
+  padding: 0 var(--sp-5);
+  border: 1px solid var(--c-line-strong);
+  border-radius: var(--r-pill);
+  background: var(--c-surface);
+  color: var(--c-text);
+  font-size: var(--fs-sm);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  overflow: hidden;
+  transition: transform var(--t-fast) var(--ease), background var(--t-fast) var(--ease),
+    border-color var(--t-fast) var(--ease), opacity var(--t-fast);
+  user-select: none;
+}
+
+.btn:active {
+  transform: scale(0.97);
+}
+
+.btn:disabled {
+  opacity: 0.45;
+  pointer-events: none;
+}
+
+.btn--block {
+  width: 100%;
+}
+
+.btn--gold {
+  border: 0;
+  background: var(--g-gold);
+  background-size: 160% 100%;
+  color: var(--c-on-gold);
+  box-shadow: var(--sh-gold);
+}
+
+.btn--gold::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--g-sheen);
+  transform: translateX(-120%);
+  animation: btn-sheen 5.5s var(--ease) 1.2s infinite;
+  pointer-events: none;
+}
+
+.btn--quiet::after {
+  animation: none;
+}
+
+@keyframes btn-sheen {
+  0% { transform: translateX(-120%); }
+  22% { transform: translateX(120%); }
+  100% { transform: translateX(120%); }
+}
+
+.btn--ghost {
+  background: transparent;
+  border-color: var(--c-line);
+  color: var(--c-text-dim);
+}
+
+.btn--danger {
+  background: transparent;
+  border-color: rgba(233, 140, 140, 0.35);
+  color: #f0b3b0;
+}
+
+.btn--small {
+  min-height: 36px;
+  padding: 0 var(--sp-4);
+  font-size: var(--fs-xs);
+}
+
+/* Круглая кнопка со значком: шестерёнка, стрелки, крестик */
+.icon-btn {
+  display: inline-grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border: 1px solid var(--c-line);
+  border-radius: 50%;
+  background: var(--c-surface);
+  color: var(--c-gold);
+  transition: transform var(--t-fast) var(--ease), background var(--t-fast);
+}
+
+.icon-btn:active {
+  transform: scale(0.92);
+}
+
+.icon-btn:disabled {
+  opacity: 0.3;
+}
+
+.icon-btn svg {
+  width: 20px;
+  height: 20px;
+}
+
+/* Текстовая ссылка-кнопка */
+.link-btn {
+  border: 0;
+  padding: var(--sp-2) 0;
+  background: none;
+  color: var(--c-gold);
+  font-size: var(--fs-sm);
+  font-weight: 700;
+  text-decoration: underline;
+  text-decoration-color: rgba(239, 196, 166, 0.35);
+  text-underline-offset: 4px;
+}

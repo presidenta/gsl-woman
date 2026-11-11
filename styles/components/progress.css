@@ -1,0 +1,84 @@
+/* ПРОГРЕСС: кольцо недели (7 долей) и полоска процента. Цвета состояний — из токенов --c-done,
+   --c-missed, --c-future; само кольцо рисует js/ui/ring.js. */
+
+.ring {
+  position: relative;
+  width: 100%;
+  max-width: 220px;
+  aspect-ratio: 1;
+  margin: 0 auto;
+}
+
+.ring svg {
+  width: 100%;
+  height: 100%;
+}
+
+.ring__center {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.ring__value {
+  font-variant-numeric: var(--num-display);
+  font-family: var(--f-display);
+  font-size: var(--fs-hero);
+  font-weight: 600;
+  line-height: 1;
+}
+
+.ring__label {
+  margin-top: var(--sp-1);
+  font-size: var(--fs-2xs);
+  font-weight: 700;
+  letter-spacing: var(--tracking-caps);
+  text-transform: uppercase;
+  color: var(--c-text-faint);
+}
+
+.ring--small {
+  max-width: 72px;
+}
+
+.ring--small .ring__value {
+  font-size: var(--fs-lg);
+  font-family: var(--f-body);
+  font-weight: 800;
+}
+
+.bar {
+  height: 6px;
+  border-radius: var(--r-pill);
+  background: var(--c-future);
+  overflow: hidden;
+}
+
+.bar__fill {
+  height: 100%;
+  border-radius: inherit;
+  background: var(--g-gold);
+  transition: width var(--t-slow) var(--ease);
+}
+
+/* Отметка уровня: одна, две или три точки — Минимум, 100%, Максимум */
+.level-dots {
+  display: inline-flex;
+  gap: 3px;
+}
+
+.level-dots i {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--c-future);
+}
+
+.level-dots i.on {
+  background: var(--c-gold);
+  box-shadow: 0 0 6px rgba(239, 196, 166, 0.6);
+}

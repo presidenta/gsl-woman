@@ -1,0 +1,101 @@
+/* ДИЗАЙН-ТОКЕНЫ — единственное место, где живут цвета, шрифты, размеры и тени.
+
+   Владелец 11.11.2026: «золото блестящее, но с розовым оттенком». Поэтому основа — розовое золото на
+   тёмной сливе: на чёрном розовый металл выглядит дешевле, на светлом теряет блеск, а глубокий
+   сливовый фон даёт ему светиться. Компоненты и экраны берут ТОЛЬКО эти переменные — чтобы перекрасить
+   приложение, достаточно поменять значения здесь, ничего больше не трогая. */
+
+:root {
+  /* — Фон и поверхности — */
+  --c-bg: #150c11;
+  --c-bg-raise: #1f1218;
+  --c-surface: rgba(255, 228, 216, 0.045);
+  --c-surface-strong: rgba(255, 228, 216, 0.085);
+  --c-line: rgba(241, 196, 172, 0.15);
+  --c-line-strong: rgba(241, 196, 172, 0.34);
+  --c-scrim: rgba(10, 5, 8, 0.66);
+
+  /* — Текст — */
+  --c-text: #f8ece5;
+  --c-text-dim: #d2b3a7;
+  --c-text-faint: #94756b;
+  --c-on-gold: #2b1411;
+
+  /* — Розовое золото: сплошные оттенки для линий, значков и отметок — */
+  --c-gold: #efc4a6;
+  --c-gold-deep: #c98a70;
+  --c-rose: #e9a5a4;
+  --c-champagne: #f6dcc4;
+
+  /* — Состояния дней — */
+  --c-done: #efc4a6;
+  --c-done-max: #fbe2cf;
+  --c-missed: #6f4650;
+  --c-future: rgba(241, 196, 172, 0.12);
+
+  /* — Металл: несколько бликов в одном градиенте дают «блеск», а не плоский цвет — */
+  --g-gold: linear-gradient(118deg, #fde7d6 0%, #f1c0a3 22%, #d48f78 46%, #f8d8c0 63%, #c57f69 84%, #f3cfba 100%);
+  --g-gold-text: linear-gradient(100deg, #fbe0cc 0%, #e9ad93 38%, #fde9da 55%, #d39079 78%, #f6d3bf 100%);
+  --g-gold-soft: linear-gradient(135deg, rgba(253, 231, 214, 0.16), rgba(212, 143, 120, 0.07));
+  --g-rose-glow: radial-gradient(60% 60% at 50% 0%, rgba(233, 165, 164, 0.22), transparent 70%);
+  --g-sheen: linear-gradient(105deg, transparent 30%, rgba(255, 255, 255, 0.55) 48%, transparent 66%);
+  --g-page:
+    radial-gradient(110% 60% at 92% -8%, rgba(233, 165, 164, 0.17), transparent 62%),
+    radial-gradient(90% 55% at -12% 12%, rgba(239, 196, 166, 0.11), transparent 58%),
+    radial-gradient(120% 70% at 50% 110%, rgba(130, 60, 80, 0.22), transparent 60%),
+    var(--c-bg);
+
+  /* — Шрифты: заголовки — антиква с характером, текст — ясный гротеск — */
+  --f-display: 'Cormorant Garamond', 'Times New Roman', serif;
+  --f-body: 'Manrope', system-ui, -apple-system, 'Segoe UI', sans-serif;
+
+  --fs-2xs: 11px;
+  --fs-xs: 12.5px;
+  --fs-sm: 14px;
+  --fs-md: 15.5px;
+  --fs-lg: 18px;
+  --fs-xl: 23px;
+  --fs-2xl: 30px;
+  --fs-3xl: 38px;
+  --fs-hero: 46px;
+
+  /* У Cormorant цифры по умолчанию «старинные»: 1 похожа на I. Числа берут ровные */
+  --num-display: lining-nums tabular-nums;
+
+  --lh-tight: 1.12;
+  --lh-text: 1.55;
+  --tracking-caps: 0.16em;
+
+  /* — Отступы и скругления — */
+  --sp-1: 4px;
+  --sp-2: 8px;
+  --sp-3: 12px;
+  --sp-4: 16px;
+  --sp-5: 22px;
+  --sp-6: 30px;
+  --sp-7: 44px;
+  --gutter: 18px;
+
+  --r-sm: 10px;
+  --r-md: 16px;
+  --r-lg: 24px;
+  --r-xl: 32px;
+  --r-pill: 999px;
+
+  /* — Тени — */
+  --sh-card: inset 0 1px 0 rgba(255, 238, 228, 0.06), 0 22px 44px -28px rgba(0, 0, 0, 0.85);
+  --sh-gold: 0 12px 32px -14px rgba(222, 150, 120, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.45);
+  --sh-sheet: 0 -24px 60px -20px rgba(0, 0, 0, 0.8);
+
+  /* — Движение — */
+  --ease: cubic-bezier(0.2, 0.75, 0.2, 1);
+  --t-fast: 160ms;
+  --t-med: 280ms;
+  --t-slow: 520ms;
+
+  /* — Каркас — */
+  --nav-h: 70px;
+  --header-h: 58px;
+  --content-max: 520px;
+  --tap: 48px;
+}

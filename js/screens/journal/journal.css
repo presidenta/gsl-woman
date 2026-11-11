@@ -1,0 +1,69 @@
+/* ЭКРАН «ЗАПИСИ». */
+
+.journal__lock {
+  display: inline-block;
+  vertical-align: -3px;
+  margin-right: 6px;
+  color: var(--c-gold);
+}
+
+.journal__lock svg {
+  width: 16px;
+  height: 16px;
+}
+
+.journal__week {
+  margin: var(--sp-6) 0 var(--sp-3);
+  font-family: var(--f-body);
+}
+
+.journal__week:first-of-type {
+  margin-top: var(--sp-2);
+}
+
+.entry-card {
+  display: block;
+  width: 100%;
+  color: inherit;
+  text-align: left;
+  margin-bottom: var(--sp-3);
+}
+
+.entry-card + .entry-card {
+  margin-top: 0;
+}
+
+.entry-card__head {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+}
+
+.entry-card__mark svg {
+  width: 16px;
+  height: 16px;
+  color: var(--c-gold);
+}
+
+.entry-card__title {
+  margin-top: var(--sp-2);
+  font-size: var(--fs-xl);
+}
+
+.entry-card__row {
+  display: flex;
+  flex-direction: column;
+  margin-top: var(--sp-3);
+}
+
+.entry-card__label {
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  color: var(--c-text-faint);
+}
+
+.entry-card__value {
+  color: var(--c-text-dim);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}

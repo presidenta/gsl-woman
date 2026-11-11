@@ -1,0 +1,179 @@
+/* ОСНОВА: сброс, фон страницы, типографика и каркас (шапка, область экрана, нижняя панель).
+   Цвета и размеры — только из tokens.css. */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  background: var(--c-bg);
+}
+
+body {
+  margin: 0;
+  min-height: 100dvh;
+  background: var(--g-page);
+  background-attachment: fixed;
+  color: var(--c-text);
+  font-family: var(--f-body);
+  font-size: var(--fs-md);
+  line-height: var(--lh-text);
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+  overflow-x: hidden;
+}
+
+/* Открыт нижний лист — страница под ним не листается */
+body.is-locked {
+  overflow: hidden;
+}
+
+h1, h2, h3, h4, p {
+  margin: 0;
+}
+
+h1, h2, h3 {
+  font-family: var(--f-display);
+  font-weight: 600;
+  line-height: var(--lh-tight);
+  letter-spacing: 0.005em;
+}
+
+button, input, textarea, select {
+  font: inherit;
+  color: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+/* Атрибут hidden должен прятать и кнопки с собственным display (шапка прячет «назад» так) */
+[hidden] {
+  display: none !important;
+}
+
+img, svg {
+  display: block;
+}
+
+:focus-visible {
+  outline: 2px solid var(--c-gold);
+  outline-offset: 3px;
+  border-radius: var(--r-sm);
+}
+
+::selection {
+  background: rgba(239, 196, 166, 0.35);
+}
+
+/* — Помощники — */
+
+.gold-text {
+  background: var(--g-gold-text);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.caps {
+  font-size: var(--fs-2xs);
+  font-weight: 700;
+  letter-spacing: var(--tracking-caps);
+  text-transform: uppercase;
+  color: var(--c-text-faint);
+}
+
+.dim {
+  color: var(--c-text-dim);
+}
+
+.faint {
+  color: var(--c-text-faint);
+}
+
+.visually-hidden {
+  position: absolute !important;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-4);
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+}
+
+.spacer {
+  flex: 1;
+}
+
+/* — Каркас приложения — */
+
+.app {
+  min-height: 100dvh;
+  padding-top: env(safe-area-inset-top);
+}
+
+.app-header {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  height: calc(var(--header-h) + env(safe-area-inset-top));
+  margin-top: calc(-1 * env(safe-area-inset-top));
+  padding: env(safe-area-inset-top) var(--gutter) 0;
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  background: linear-gradient(to bottom, rgba(21, 12, 17, 0.94), rgba(21, 12, 17, 0.72));
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--c-line);
+}
+
+.app-header__brand {
+  font-family: var(--f-display);
+  font-size: var(--fs-xl);
+  font-weight: 600;
+  font-style: italic;
+  letter-spacing: 0.01em;
+}
+
+.app-view {
+  max-width: var(--content-max);
+  margin: 0 auto;
+  padding: var(--sp-5) var(--gutter) calc(var(--nav-h) + env(safe-area-inset-bottom) + var(--sp-6));
+}
+
+.screen-title {
+  font-size: var(--fs-2xl);
+  margin-bottom: var(--sp-2);
+}
+
+.screen-lead {
+  color: var(--c-text-dim);
+  margin-bottom: var(--sp-5);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 1ms !important;
+  }
+}

@@ -1,0 +1,122 @@
+/* КАРТОЧКИ, ЗНАЧКИ И МЕТКИ.
+   .card — основная поверхность. .card--hero — главная карточка экрана: тонкая металлическая рамка
+   (градиент под прозрачной заливкой) и розовое свечение сверху. */
+
+.card {
+  position: relative;
+  padding: var(--sp-5);
+  border: 1px solid var(--c-line);
+  border-radius: var(--r-lg);
+  background: var(--c-surface);
+  box-shadow: var(--sh-card);
+}
+
+.card + .card {
+  margin-top: var(--sp-4);
+}
+
+.card--hero {
+  border: 1px solid transparent;
+  background:
+    var(--g-rose-glow) padding-box,
+    linear-gradient(var(--c-bg-raise), var(--c-bg-raise)) padding-box,
+    var(--g-gold) border-box;
+  overflow: hidden;
+}
+
+.card--soft {
+  background: var(--g-gold-soft);
+}
+
+.card__eyebrow {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  margin-bottom: var(--sp-3);
+}
+
+.card__title {
+  font-family: var(--f-display);
+  font-size: var(--fs-xl);
+  font-weight: 600;
+  line-height: var(--lh-tight);
+}
+
+.card__text {
+  margin-top: var(--sp-2);
+  color: var(--c-text-dim);
+}
+
+.card__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-3);
+  margin-top: var(--sp-5);
+}
+
+/* Значок в кружке у заголовка карточки */
+.card__icon {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: var(--g-gold-soft);
+  border: 1px solid var(--c-line-strong);
+  color: var(--c-gold);
+  flex: none;
+}
+
+.card__icon svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* Метка-пилюля: «Неделя 2», «Минимум», «Сделано» */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 26px;
+  padding: 0 var(--sp-3);
+  border: 1px solid var(--c-line-strong);
+  border-radius: var(--r-pill);
+  font-size: var(--fs-2xs);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--c-gold);
+  white-space: nowrap;
+}
+
+.chip--solid {
+  border: 0;
+  background: var(--g-gold);
+  color: var(--c-on-gold);
+}
+
+.chip--muted {
+  color: var(--c-text-faint);
+  border-color: var(--c-line);
+}
+
+.divider {
+  height: 1px;
+  margin: var(--sp-5) 0;
+  border: 0;
+  background: linear-gradient(90deg, transparent, var(--c-line-strong), transparent);
+}
+
+/* Пустое состояние списка */
+.empty {
+  padding: var(--sp-6) var(--sp-4);
+  text-align: center;
+  color: var(--c-text-faint);
+}
+
+.empty__title {
+  font-family: var(--f-display);
+  font-size: var(--fs-xl);
+  color: var(--c-text-dim);
+  margin-bottom: var(--sp-2);
+}

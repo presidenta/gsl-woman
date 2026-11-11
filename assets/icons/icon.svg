@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- Исходник значка GSL Woman. PNG для телефона делает `npm run icons` (tools/icons.py).
+       Лотос — из обложки презентации тренинга. Рисунок держится в центральном круге (80% стороны):
+       маска Android обрезает края, и лепестки не должны попасть под обрезку. -->
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="38%" r="75%">
+      <stop offset="0" stop-color="#3a1d2a"/>
+      <stop offset="0.55" stop-color="#22111a"/>
+      <stop offset="1" stop-color="#140a10"/>
+    </radialGradient>
+    <linearGradient id="gold" x1="0.15" y1="0" x2="0.85" y2="1">
+      <stop offset="0" stop-color="#fde7d6"/>
+      <stop offset="0.28" stop-color="#f0bea1"/>
+      <stop offset="0.52" stop-color="#cf8a73"/>
+      <stop offset="0.7" stop-color="#f8d8c0"/>
+      <stop offset="1" stop-color="#c27c66"/>
+    </linearGradient>
+    <linearGradient id="goldSoft" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#e9b49b"/>
+      <stop offset="1" stop-color="#a9604f"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="50%" cy="56%" r="40%">
+      <stop offset="0" stop-color="#e9a5a4" stop-opacity="0.38"/>
+      <stop offset="1" stop-color="#e9a5a4" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <rect class="bg" width="512" height="512" fill="url(#bg)"/>
+  <circle class="bg" cx="256" cy="270" r="200" fill="url(#glow)"/>
+
+  <g class="mark">
+    <!-- Нижние лепестки -->
+    <path d="M256 352 C 196 352 132 322 104 270 C 170 262 226 296 256 352 Z" fill="url(#goldSoft)"/>
+    <path d="M256 352 C 316 352 380 322 408 270 C 342 262 286 296 256 352 Z" fill="url(#goldSoft)"/>
+    <!-- Боковые лепестки -->
+    <path d="M256 348 C 196 318 150 262 146 196 C 210 210 248 268 256 348 Z" fill="url(#gold)"/>
+    <path d="M256 348 C 316 318 362 262 366 196 C 302 210 264 268 256 348 Z" fill="url(#gold)"/>
+    <!-- Центральный лепесток -->
+    <path d="M256 128 C 304 186 318 268 256 350 C 194 268 208 186 256 128 Z" fill="url(#gold)"/>
+    <!-- Вода под цветком -->
+    <path d="M168 382 Q 256 404 344 382" fill="none" stroke="url(#gold)" stroke-width="7" stroke-linecap="round"/>
+    <path d="M206 404 Q 256 416 306 404" fill="none" stroke="url(#goldSoft)" stroke-width="5" stroke-linecap="round"/>
+  </g>
+</svg>

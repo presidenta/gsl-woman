@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#150c11">
+  <meta name="color-scheme" content="dark">
+  <!-- Всё своё и только своё: чужие скрипты, шрифты и картинки сюда не загрузятся. Запросы — только
+       к серверу «Кванта» (вход и программа, js/config.js → API_BASE) и к нему же на компьютере при проверке. -->
+  <meta http-equiv="Content-Security-Policy"
+        content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'self' https://game.coreviaflow.com http://localhost:8580; manifest-src 'self'; worker-src 'self'; base-uri 'self'; form-action 'none'">
+  <title>GSL Woman — тренінги для жінок</title>
+  <meta name="description" content="GSL Woman: щоденні завдання тренінгу, теплі нагадування і твоя історія змін.">
+
+  <!-- Значок на экране телефона: подпись — короткое имя из manifest, на iPhone — эта строка -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="GSL Woman">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="format-detection" content="telephone=no">
+  <link rel="apple-touch-icon" href="assets/icons/icon-180.png">
+  <link rel="icon" href="assets/icons/icon-192.png">
+  <link rel="manifest" href="manifest.webmanifest">
+
+  <!-- Дизайн: токены → шрифты → основа → компоненты → экраны. Перекрасить — styles/tokens.css. -->
+  <link rel="stylesheet" href="styles/tokens.css">
+  <link rel="stylesheet" href="styles/fonts.css">
+  <link rel="stylesheet" href="styles/base.css">
+  <link rel="stylesheet" href="styles/components/button.css">
+  <link rel="stylesheet" href="styles/components/card.css">
+  <link rel="stylesheet" href="styles/components/controls.css">
+  <link rel="stylesheet" href="styles/components/overlay.css">
+  <link rel="stylesheet" href="styles/components/nav.css">
+  <link rel="stylesheet" href="styles/components/progress.css">
+  <link rel="stylesheet" href="js/screens/today/today.css">
+  <link rel="stylesheet" href="js/screens/week/week.css">
+  <link rel="stylesheet" href="js/screens/journal/journal.css">
+  <link rel="stylesheet" href="js/screens/path/path.css">
+  <link rel="stylesheet" href="js/screens/settings/settings.css">
+  <link rel="stylesheet" href="js/screens/onboarding/onboarding.css">
+  <link rel="stylesheet" href="js/screens/login/login.css">
+
+  <link rel="preload" href="assets/fonts/manrope-cyrillic.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="assets/fonts/cormorant-cyrillic.woff2" as="font" type="font/woff2" crossorigin>
+
+  <script src="version.js"></script>
+  <script type="module" src="js/main.js"></script>
+</head>
+<body>
+  <div id="app"></div>
+  <noscript>GSL Woman працює з увімкненим JavaScript.</noscript>
+</body>
+</html>

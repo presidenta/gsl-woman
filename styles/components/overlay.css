@@ -1,0 +1,122 @@
+/* ВСПЛЫВАЮЩЕЕ: нижний лист (форма записи, выбор) и короткое сообщение (тост).
+   Лист выезжает снизу — до кнопок в нём дотягивается большой палец одной руки. */
+
+.sheet-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  background: var(--c-scrim);
+  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px);
+  opacity: 0;
+  transition: opacity var(--t-med) var(--ease);
+}
+
+.sheet-backdrop.is-open {
+  opacity: 1;
+}
+
+.sheet {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 61;
+  max-width: var(--content-max);
+  max-height: 92dvh;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--c-line-strong);
+  border-bottom: 0;
+  border-radius: var(--r-xl) var(--r-xl) 0 0;
+  background: var(--g-rose-glow), var(--c-bg-raise);
+  box-shadow: var(--sh-sheet);
+  transform: translateY(104%);
+  transition: transform var(--t-slow) var(--ease);
+}
+
+.sheet:focus {
+  outline: none;
+}
+
+.sheet.is-open {
+  transform: translateY(0);
+}
+
+.sheet__grip {
+  width: 44px;
+  height: 4px;
+  margin: var(--sp-3) auto 0;
+  border-radius: var(--r-pill);
+  background: var(--c-line-strong);
+  flex: none;
+}
+
+.sheet__head {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--sp-3);
+  padding: var(--sp-4) var(--gutter) var(--sp-2);
+  flex: none;
+}
+
+.sheet__title {
+  flex: 1;
+  font-family: var(--f-display);
+  font-size: var(--fs-xl);
+  font-weight: 600;
+  line-height: var(--lh-tight);
+}
+
+.sheet__body {
+  padding: var(--sp-2) var(--gutter) calc(var(--sp-6) + env(safe-area-inset-bottom));
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+/* — Тост — */
+.toast-host {
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: calc(env(safe-area-inset-top) + var(--sp-3));
+  z-index: 80;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sp-2);
+  padding: 0 var(--gutter);
+  pointer-events: none;
+}
+
+.toast {
+  width: 100%;
+  max-width: calc(var(--content-max) - 2 * var(--gutter));
+  padding: var(--sp-3) var(--sp-4);
+  border: 1px solid var(--c-line-strong);
+  border-radius: var(--r-md);
+  background: rgba(31, 18, 24, 0.96);
+  box-shadow: var(--sh-card);
+  pointer-events: auto;
+  transform: translateY(-20px);
+  opacity: 0;
+  transition: transform var(--t-med) var(--ease), opacity var(--t-med);
+}
+
+.toast.is-shown {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+.toast__title {
+  font-family: var(--f-display);
+  font-size: var(--fs-lg);
+  font-weight: 600;
+  color: var(--c-gold);
+}
+
+.toast__text {
+  font-size: var(--fs-sm);
+  color: var(--c-text-dim);
+}

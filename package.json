@@ -1,0 +1,11 @@
+{
+  "name": "gsl-woman",
+  "private": true,
+  "type": "module",
+  "description": "GSL Woman — приложение-напоминание для женского тренинга. Без сборки: чистые модули в браузере.",
+  "scripts": {
+    "test": "node --test tests/*.test.js",
+    "files": "node tools/files.mjs",
+    "icons": "python tools/icons.py"
+  }
+}
