@@ -80,6 +80,7 @@ self.GSL_FILES = [
   './js/ui/icons.js',
   './js/ui/ring.js',
   './js/ui/sheet.js',
+  './js/ui/tick.js',
   './js/ui/toast.js',
   './manifest.webmanifest',
   './styles/base.css',

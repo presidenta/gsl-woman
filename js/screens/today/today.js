@@ -10,6 +10,7 @@ import { levelDots } from '../../ui/ring.js';
 import { toast } from '../../ui/toast.js';
 import { openEntry } from '../entry/entry-sheet.js';
 import { heelsFigure } from '../../ui/heels.js';
+import * as sound from '../../ui/tick.js';
 import { imsgCard } from '../../imsg/imsg-card.js';
 import { loveCard } from '../../love/cards.js';
 
@@ -17,30 +18,54 @@ import { loveCard } from '../../love/cards.js';
    1. Шапка дня: «День N» (без «из скольких» и без номера недели — обучение постоянное, владелец 12.11.2026),
       вид дня, название недели и её прогресс.
    2. «Можно наверстать» — если в этой неделе есть пропуски.
-   3. Утренняя минута с таймером на 60 секунд.
+   3. Утренняя минута: выбор 1, 2 или 3 минуты (Минимум / 100% / Максимум), счёт вверх со звуком каждую секунду.
    4. Дело дня: задание с уровнями / свободный поток / седьмой день с созвоном и отзывом месяца.
    5. Что уже записано сегодня. */
 
 // Таймер утренней минуты живёт вне отрисовки: экран перерисовывается после каждой записи,
 // а идущая минута не должна ни сбрасываться, ни терять отметку «сделано». Таймер сам ставит отметку,
 // а рисует через paintMinute — её подменяет каждая новая отрисовка карточки.
-let minuteEndsAt = 0;
+// Счёт — вверх (владелец 12.11.2026): 1, 2, 3 … до 60, 120 или 180; каждая цифра — звук и опускание на пятки.
+const MINUTE_PICKS = [['min', 1], ['full', 2], ['max', 3]];
+// Пятки касаются пола на 64% секундного цикла рисунка (styles/components/heels.css): цикл сдвигается так,
+// чтобы касание приходилось ровно на смену цифры и звук
+const LANDING = 0.64;
+let minuteStart = 0;
+let minuteTotal = 0;
+let minuteCount = 0;
 let minuteTimer = null;
 let paintMinute = null;
 
 function runMinute(iso, seconds) {
-  minuteEndsAt = Date.now() + seconds * 1000;
+  sound.unlock();
+  minuteStart = Date.now();
+  minuteTotal = seconds;
+  minuteCount = 0;
   clearInterval(minuteTimer);
   minuteTimer = setInterval(() => {
-    paintMinute?.();
-    if (Date.now() < minuteEndsAt) return;
+    const n = Math.min(minuteTotal, Math.floor((Date.now() - minuteStart) / 1000));
+    if (n === minuteCount) return;
+    minuteCount = n;
+    if (n < minuteTotal) {
+      sound.tick(n % 10 === 0);
+      paintMinute?.();
+      return;
+    }
     clearInterval(minuteTimer);
     minuteTimer = null;
-    minuteEndsAt = 0;
+    minuteTotal = 0;
+    sound.finish();
     morningLog.markDone(iso);
     toast({ title: t('morning.done') });
     navigator.vibrate?.(120);
-  }, 250);
+  }, 40);
+}
+
+function stopMinute() {
+  clearInterval(minuteTimer);
+  minuteTimer = null;
+  minuteTotal = 0;
+  paintMinute?.();
 }
 
 function header(plan, summary) {
@@ -91,27 +116,39 @@ function morningCard(ctx, plan) {
   const done = morningLog.isDone(ctx.todayIso);
   const title = m.addon ? `${t('morning.heels.title')} ${t(`morning.addon.${m.addon}.title`)}` : t('morning.heels.title');
 
-  const count = h('span', { class: 'minute__count' }, '60');
+  const count = h('span', { class: 'minute__count' });
+  const unit = h('span', { class: 'faint minute__unit' });
   const fill = h('div', { class: 'bar__fill', style: { width: '0%' } });
-  const button = h('button', { type: 'button', class: 'btn btn--block ' + (done ? 'btn--ghost' : 'btn--gold btn--quiet') });
-  // Живая подсказка ритма: подъём на 2–3 см и опускание на пятки с выдохом — раз в секунду; таймер — справа от неё
-  const dial = h('div', { class: 'minute__dial' }, count, h('span', { class: 'faint minute__unit' }, t('morning.sec')));
+  // Живая подсказка ритма: подъём на носки на 2–3 см и опускание на пятки с выдохом — раз в секунду; счёт — справа
+  const dial = h('div', { class: 'minute__dial' }, count, unit);
   const figure = heelsFigure({ aside: dial });
 
+  // Три кнопки вместо одной (владелец): Минимум — 1 минута, 100% — 2, Максимум — 3
+  const picks = h('div', { class: 'minute__picks' },
+    ...MINUTE_PICKS.map(([level, min]) => h('button', {
+      type: 'button',
+      class: 'minute__pick',
+      onclick: () => { runMinute(ctx.todayIso, min * 60); paint(); },
+    },
+    h('span', { class: 'minute__pick-level' }, t(`levels.${level}`)),
+    h('span', { class: 'minute__pick-time' }, t('morning.mins', { n: min })))),
+  );
+  const runningRow = h('div', { class: 'minute__running' },
+    h('span', { class: 'minute__status' }, t('morning.running')),
+    h('button', { type: 'button', class: 'minute__stop', onclick: stopMinute }, t('morning.stop')),
+  );
+
   function paint() {
-    const left = Math.max(0, Math.ceil((minuteEndsAt - Date.now()) / 1000));
-    const running = left > 0;
-    count.textContent = String(running ? left : m.seconds);
-    fill.style.width = running ? `${((m.seconds - left) / m.seconds) * 100}%` : morningLog.isDone(ctx.todayIso) ? '100%' : '0%';
-    button.disabled = running;
-    figure.setRunning(running);
-    button.textContent = running ? t('morning.running') : morningLog.isDone(ctx.todayIso) ? t('morning.again') : t('morning.start');
+    const running = minuteTotal > 0;
+    count.textContent = running ? String(minuteCount) : '1–3';
+    unit.textContent = running ? t('morning.of', { n: minuteTotal }) : t('morning.min');
+    dial.classList.toggle('is-running', running);
+    fill.style.width = running ? `${(minuteCount / minuteTotal) * 100}%` : morningLog.isDone(ctx.todayIso) ? '100%' : '0%';
+    picks.hidden = running;
+    runningRow.hidden = !running;
+    figure.setRunning(running, (((Date.now() - minuteStart) / 1000) + LANDING) % 1);
   }
 
-  button.addEventListener('click', () => {
-    runMinute(ctx.todayIso, m.seconds);
-    paint();
-  });
   paintMinute = paint;
   paint();
 
@@ -128,7 +165,7 @@ function morningCard(ctx, plan) {
     m.addon ? h('p', { class: 'card__text' }, t(`morning.addon.${m.addon}.text`)) : null,
     figure.node,
     h('div', { class: 'bar minute__bar' }, fill),
-    h('div', { class: 'card__actions' }, button),
+    h('div', { class: 'card__actions' }, picks, runningRow),
   );
 }
 

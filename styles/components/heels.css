@@ -144,6 +144,11 @@
   100% { opacity: 0; transform: translateY(0); }
 }
 
+/* Идёт счёт — цикл сдвинут (--heels-delay из setRunning): касание пятками = смена цифры и звук */
+.heels.is-running :is(.heels__body, .heels__foot, .heels__shade, .heels__ripple, .heels__breath path, .heels__breath circle, .heels__cue) {
+  animation-delay: var(--heels-delay, 0s);
+}
+
 /* «Меньше движения» в системе — неподвижный силуэт и спокойная подпись ритма */
 @media (prefers-reduced-motion: reduce) {
   .heels__body,

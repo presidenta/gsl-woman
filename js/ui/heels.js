@@ -14,7 +14,7 @@ import { t } from '../core/i18n.js';
    Ступня поворачивается вокруг подушечки (73, 190): пятка поднимается на 3 единицы при росте фигуры 182 —
    те самые 2–3 см; тело поднимается вместе с лодыжкой.
 
-   heelsFigure({ aside }) → { node, setRunning(on) }: aside — узел справа (таймер); пока идёт минута — ярче.
+   heelsFigure({ aside }) → { node, setRunning(on, phase) }: aside — узел справа (таймер); пока идёт минута — ярче.
    Движение видно и до старта, чтобы ритм был понятен заранее. С «меньше движения» — неподвижная фигура. */
 
 const SVG_NS = 'http://www.w3.org/2000/svg';
@@ -125,10 +125,11 @@ export function heelsFigure({ aside = null } = {}) {
   );
   return {
     node,
-    setRunning(on) {
-      // Новый старт — анимация с начала цикла, чтобы секунды шли вместе с таймером
+    /* phase — где сейчас секундный цикл (0…1): рисунок сдвигается так, чтобы пятки касались пола ровно на
+       смене цифры и звуке. Новая отрисовка экрана посреди счёта тоже встаёт в такт. */
+    setRunning(on, phase = 0) {
       if (on && !node.classList.contains('is-running')) {
-        node.classList.remove('is-running');
+        node.style.setProperty('--heels-delay', `${-phase}s`);
         void node.offsetWidth;
       }
       node.classList.toggle('is-running', on);
