@@ -14,7 +14,8 @@ export const icons = {
   chevronLeft: wrap('<path d="M14.5 6l-6 6 6 6"/>'),
   chevronRight: wrap('<path d="M9.5 6l6 6-6 6"/>'),
   close: wrap('<path d="M6 6l12 12M18 6L6 18"/>'),
-  logout: wrap('<path d="M14 4.5h3.5a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H14"/><path d="M10 8l-4 4 4 4M6 12h9.5"/>'),
+  // Выйти: дверь с ручкой и стрелка наружу (владелец 12.11.2026: «чтобы было понятно, что дверь»)
+  logout: wrap('<rect x="4" y="3" width="9.5" height="18" rx="1.4"/><circle cx="11" cy="12.2" r="1" fill="currentColor" stroke="none"/><path d="M15.5 12h5.5M18.5 9.2L21.2 12l-2.7 2.8"/>'),
   refresh: wrap('<path d="M19.5 12a7.5 7.5 0 1 1-2.2-5.3"/><path d="M19.5 4.5v4h-4"/>'),
   check: wrap('<path d="M5 12.5l4.5 4.5L19 7.5"/>'),
   plus: wrap('<path d="M12 5v14M5 12h14"/>'),
