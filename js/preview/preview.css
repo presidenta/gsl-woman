@@ -1,0 +1,84 @@
+/* ПРОСМОТР ДНЕЙ (только администратор): тонкая полоска над экраном — подпись мелко, по центру «День N»
+   золотом и стрелки по бокам. Пунктирная рамка — знак служебного инструмента, а не части программы. */
+
+.preview {
+  margin-bottom: var(--sp-4);
+  padding: var(--sp-3) var(--sp-3) var(--sp-2);
+  border: 1px dashed var(--c-line-strong);
+  border-radius: var(--r-md);
+  background: var(--c-surface);
+}
+
+.preview__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-2);
+  padding: 0 var(--sp-1);
+}
+
+.preview__label {
+  color: var(--c-text-faint);
+  font-size: var(--fs-2xs);
+}
+
+.preview__back {
+  flex: none;
+  white-space: nowrap;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--c-gold);
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.preview__row {
+  display: grid;
+  grid-template-columns: auto auto minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: var(--sp-1);
+  margin-top: var(--sp-1);
+}
+
+.preview__day {
+  font-family: var(--f-display);
+  font-size: var(--fs-xl);
+  font-weight: 600;
+  text-align: center;
+  font-variant-numeric: var(--num-display);
+}
+
+.preview__btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--tap);
+  height: 40px;
+  padding: 0;
+  border: 1px solid var(--c-line);
+  border-radius: var(--r-pill);
+  background: none;
+  color: var(--c-champagne);
+}
+
+.preview__btn svg {
+  width: 18px;
+  height: 18px;
+}
+
+.preview__btn--double svg + svg {
+  margin-left: -11px;
+}
+
+.preview__btn:disabled {
+  opacity: 0.3;
+}
+
+@media (hover: hover) {
+  .preview__btn:not(:disabled):hover {
+    border-color: var(--c-gold);
+  }
+}

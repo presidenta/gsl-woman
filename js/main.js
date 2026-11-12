@@ -24,6 +24,7 @@ import { identity } from './account/avatar.js';
 import { brand as brandMark } from './ui/brand.js';
 import * as install from './install/install.js';
 import * as media from './media/photos.js';
+import * as preview from './preview/preview.js';
 
 /* ВХОД В ПРИЛОЖЕНИЕ: каркас (шапка, область экрана, нижняя панель), маршруты, перерисовка при
    изменениях, напоминания и работник. Экраны ничего не знают друг о друге: каждый получает ctx —
@@ -65,7 +66,9 @@ function context() {
     settings: s,
     entries: journal.all(),
     todayIso,
-    day: s.startDate ? programDay(s.startDate, todayIso) : 0,
+    // У администратора — день, который он листает стрелками (js/preview/), у участницы — настоящий
+    day: preview.dayFor(s.startDate ? programDay(s.startDate, todayIso) : 0),
+    realDay: s.startDate ? programDay(s.startDate, todayIso) : 0,
     lang: s.lang,
     version: VERSION,
     account: account.current(),
@@ -199,6 +202,10 @@ function draw() {
     if (a.dataset.route === name) a.setAttribute('aria-current', 'page');
     else a.removeAttribute('aria-current');
   }
+  if (name === 'today' || name === 'week') {
+    const strip = preview.bar(ctx.realDay);
+    if (strip) shell.view.append(strip);
+  }
   screen.render(shell.view, ctx);
   // Пришли из «Кванта» за значком — лист с кнопкой, как только вход и первая настройка позади
   install.offerIfRequested();
@@ -218,6 +225,8 @@ function scheduleDraw() {
     draw();
   });
 }
+
+preview.onChange(() => { draw(); scrollTo({ top: 0 }); });
 
 addEventListener('sheet-closed', () => {
   if (!pending) return;

@@ -184,6 +184,14 @@ export default {
     ios: 'In Safari tap “Share” at the bottom, then “Add to Home Screen”.',
     menu: 'Open the browser menu (⋮) and choose “Install app” or “Add to Home screen”.',
   },
+  preview: {
+    label: 'Day preview · admin only',
+    back: 'Back to today',
+    prevDay: 'Previous day',
+    nextDay: 'Next day',
+    prevWeek: 'A week back',
+    nextWeek: 'A week ahead',
+  },
   settings: {
     title: 'Settings',
     profile: 'About me',

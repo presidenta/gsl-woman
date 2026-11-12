@@ -1,5 +1,5 @@
 import { h, svg } from '../../core/dom.js';
-import { t, setLang } from '../../core/i18n.js';
+import { t } from '../../core/i18n.js';
 import { isoDate, isValidIso } from '../../core/dates.js';
 import * as settings from '../../settings/settings.js';
 import { current as currentAccount } from '../../account/session.js';
@@ -7,9 +7,9 @@ import * as permission from '../../reminders/permission.js';
 import { field } from '../../ui/controls.js';
 import { icons } from '../../ui/icons.js';
 import { brand } from '../../ui/brand.js';
-import { langPicker, timeFields } from '../settings/settings.js';
+import { timeFields } from '../settings/settings.js';
 
-/* ПЕРВЫЙ ВХОД: одна страница без нижней панели — язык, имя, дата старта, время напоминаний.
+/* ПЕРВЫЙ ВХОД: одна страница без нижней панели — имя, дата старта, время напоминаний. Язык — в настройках.
    «Начать путь» сохраняет всё и тут же просит разрешение на уведомления: окно разрешения браузер
    показывает только в ответ на нажатие, и это самый понятный для женщины момент — она сама начинает. */
 
@@ -44,15 +44,6 @@ export function render(view, { onDone }) {
       h('p', { class: 'onboarding__lead' }, t('onboarding.lead')),
 
       h('section', { class: 'card onboarding__form' },
-        h('div', { class: 'field' },
-          h('span', { class: 'field__label' }, t('onboarding.langLabel')),
-          langPicker(draft.lang, (lang) => {
-            // Язык меняется сразу: страница перерисовывается на нём, введённое не теряется
-            draft.lang = lang;
-            settings.update({ lang, name: name.control.value.trim(), startDate: start.control.value || null, times: draft.times });
-            setLang(lang);
-          }),
-        ),
         name.node,
         start.node,
         h('div', { class: 'field' },

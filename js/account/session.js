@@ -19,7 +19,7 @@ export class ApiError extends Error {
   }
 }
 
-/** Сессия вошедшей: { token, userId, displayName, accountNo } или null. */
+/** Сессия вошедшей: { token, userId, displayName, accountNo, role } или null. role: admin — администратор «Кванта». */
 export function current() {
   return read(KEY, null);
 }
@@ -54,7 +54,7 @@ export const isExpired = (err) => err instanceof ApiError && (err.status === 401
 export async function login(loginName, password) {
   const { token, userId } = await request('/api/session/login', { body: { login: loginName, password }, token: null });
   const me = await request('/api/me', { token }).catch(() => null);
-  const session = { token, userId, displayName: me?.displayName || '', accountNo: me?.accountNo || null };
+  const session = { token, userId, displayName: me?.displayName || '', accountNo: me?.accountNo || null, role: me?.role || 'member' };
   write(KEY, session);
   return session;
 }
@@ -67,14 +67,14 @@ export async function redeem(code) {
   return session;
 }
 
-/** Имя могли поправить у администратора — сверяем при каждом открытии с сетью. */
+/** Имя и роль могли поменять у администратора — сверяем при каждом открытии с сетью. */
 export async function refreshProfile() {
   const s = current();
   if (!s) return;
   const me = await request('/api/me').catch(() => null);
   if (!me || current()?.token !== s.token) return;
-  if (me.displayName === s.displayName && me.accountNo === s.accountNo) return;
-  write(KEY, { ...s, displayName: me.displayName || s.displayName, accountNo: me.accountNo || s.accountNo });
+  if (me.displayName === s.displayName && me.accountNo === s.accountNo && (me.role || 'member') === s.role) return;
+  write(KEY, { ...s, displayName: me.displayName || s.displayName, accountNo: me.accountNo || s.accountNo, role: me.role || 'member' });
 }
 
 /** Выйти: сессия закрывается и на сервере (нет сети — всё равно выходим здесь). */

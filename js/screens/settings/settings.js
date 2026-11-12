@@ -5,7 +5,7 @@ import { isValidIso, isValidTime } from '../../core/dates.js';
 import * as settings from '../../settings/settings.js';
 import * as permission from '../../reminders/permission.js';
 import { clearAll } from '../../core/store.js';
-import { segmented, field, switchRow } from '../../ui/controls.js';
+import { field, switchRow } from '../../ui/controls.js';
 import { icons } from '../../ui/icons.js';
 import { toast } from '../../ui/toast.js';
 import { accountCard } from '../../account/avatar.js';
@@ -18,13 +18,15 @@ import * as media from '../../media/photos.js';
 export const LANG_LABELS = { ua: 'Українська', ru: 'Русский', en: 'English' };
 
 /** Выбор языка — общий для настроек и первого входа. */
-export function langPicker(current, onPick) {
-  return segmented({
-    label: t('settings.lang'),
-    options: LANGS.map((l) => ({ value: l, label: LANG_LABELS[l] })),
-    value: current,
-    onChange: onPick,
-  });
+/* Язык — выпадающим списком, как на всех наших сайтах (владелец 12.11.2026: «не три кнопки, а выпадающее
+   меню, и только в настройках — освободи место для чтения и письма»). Свой список телефона: на Android и
+   iPhone он открывается родным окном выбора. */
+export function langSelect(current, onPick) {
+  const id = 'lang-select';
+  const select = h('select', { id, class: 'input select__control', 'aria-label': t('settings.lang') },
+    ...LANGS.map((l) => h('option', { value: l, selected: l === current }, LANG_LABELS[l])));
+  select.addEventListener('change', () => onPick(select.value));
+  return { id, node: h('div', { class: 'select' }, select, svg(icons.chevronRight, 'select__chevron')) };
 }
 
 /** Три поля времени в ряд — тоже общие. */
@@ -88,13 +90,13 @@ export function render(view, ctx) {
     h('section', { class: 'card settings__section' },
       h('h2', { class: 'caps settings__heading' }, t('settings.profile')),
       name.node,
-      h('div', { class: 'field' },
-        h('span', { class: 'field__label' }, t('settings.lang')),
-        langPicker(s.lang, (lang) => {
-          setLang(lang);
-          settings.update({ lang });
-        }),
-      ),
+      (() => {
+        const lang = langSelect(s.lang, (value) => {
+          setLang(value);
+          settings.update({ lang: value });
+        });
+        return h('div', { class: 'field' }, h('label', { class: 'field__label', for: lang.id }, t('settings.lang')), lang.node);
+      })(),
       start.node,
     ),
 

@@ -34,6 +34,8 @@ self.GSL_FILES = [
   './js/media/photo-field.js',
   './js/media/photos.js',
   './js/media/viewer.js',
+  './js/preview/preview.css',
+  './js/preview/preview.js',
   './js/program/index.js',
   './js/program/morning.js',
   './js/program/source.js',

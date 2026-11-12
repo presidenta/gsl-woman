@@ -1,12 +1,11 @@
 import { h, svg } from '../../core/dom.js';
-import { t, setLang } from '../../core/i18n.js';
-import * as settings from '../../settings/settings.js';
+import { t } from '../../core/i18n.js';
 import { field } from '../../ui/controls.js';
 import { icons } from '../../ui/icons.js';
 import { brand } from '../../ui/brand.js';
-import { langPicker } from '../settings/settings.js';
 
 /* ВХОД: до него приложение ничего не показывает — программа приходит только вошедшей (program/source.js).
+   Языка здесь нет — он в настройках (владелец 12.11.2026); до входа — язык телефона.
    Шапка — та же, что у первого входа (классы onboarding__*), чтобы два первых экрана были одним целым.
 
    Три состояния, их выбирает main.js:
@@ -17,7 +16,6 @@ import { langPicker } from '../settings/settings.js';
 let typedLogin = '';     // язык сменили посреди ввода — экран перерисуется, логин не пропадёт
 
 export function render(view, { mode = 'form', message = '', onLogin, onRetry }) {
-  const s = settings.get();
 
   const hero = [
     h('div', { class: 'onboarding__mark' }, svg(icons.sparkle)),
@@ -52,13 +50,6 @@ export function render(view, { mode = 'form', message = '', onLogin, onRetry }) 
   const submit = h('button', { type: 'submit', class: 'btn btn--gold btn--block onboarding__begin' }, t('login.submit'), svg(icons.chevronRight));
 
   const form = h('form', { class: 'card onboarding__form login__form', novalidate: true },
-    h('div', { class: 'field' },
-      h('span', { class: 'field__label' }, t('onboarding.langLabel')),
-      langPicker(s.lang, (lang) => {
-        setLang(lang);
-        settings.update({ lang });
-      }),
-    ),
     loginField.node,
     passField.node,
     error,

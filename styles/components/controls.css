@@ -192,3 +192,29 @@
   font-size: var(--fs-sm);
   font-weight: 600;
 }
+
+/* Выпадающий список (язык): поле как остальные, справа золотая стрелка вниз */
+.select {
+  position: relative;
+}
+
+.select__control {
+  padding-right: calc(var(--sp-4) + 22px);
+  cursor: pointer;
+}
+
+.select__control option {
+  background: var(--c-bg-raise);
+  color: var(--c-text);
+}
+
+.select__chevron {
+  position: absolute;
+  top: 50%;
+  right: var(--sp-4);
+  width: 18px;
+  height: 18px;
+  color: var(--c-gold);
+  transform: translateY(-50%) rotate(90deg);
+  pointer-events: none;
+}
