@@ -2,7 +2,7 @@ import { SLOTS } from '../config.js';
 import { isoDate, addDays, programDay, atTime } from '../core/dates.js';
 import { t, list, getLang } from '../core/i18n.js';
 import { dayPlan } from '../program/index.js';
-import { ideaFor, childIdeas } from '../love/love.js';
+import { ideaFor, groupIdeas } from '../love/love.js';
 
 /* РАСПИСАНИЕ НАПОМИНАНИЙ — что и когда сказать. Только считает, ничего не отправляет.
 
@@ -30,9 +30,11 @@ function morning(plan, s) {
   // Язык любви выбран — каждое утро одно дело на его языке (владелец, 12.11.2026)
   const idea = ideaFor('him', plan.day, getLang());
   if (idea) body += `\n${t('love.notice', { idea: idea.text })}`;
-  // И по строке на каждого ребёнка с выбранным языком — по имени (владелец, 13.11.2026)
-  for (const k of childIdeas(plan.day, getLang())) {
-    body += `\n${t('love.noticeChild', { name: k.child.name || t('love.childN', { n: k.index + 1 }), idea: k.text })}`;
+  // И по строке на каждого ребёнка и каждого из родных с выбранным языком — по имени (владелец, 13.11.2026)
+  for (const [group, label] of [['children', 'love.childN'], ['family', 'love.familyN']]) {
+    for (const k of groupIdeas(group, plan.day, getLang())) {
+      body += `\n${t('love.noticeChild', { name: k.person.name || t(label, { n: k.index + 1 }), idea: k.text })}`;
+    }
   }
   return { title: named, body };
 }

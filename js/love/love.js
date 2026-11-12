@@ -3,8 +3,8 @@ import { langData } from '../program/source.js';
 
 /* ПЯТЬ ЯЗЫКОВ ЛЮБВИ (Гэри Чепмен) — данные и выбор. Тексты (языки, дела, я-сообщения, тест) — на сервере
    вместе с программой: langs.<язык>.love. Здесь только то, что выбрала сама женщина (ключ love в хранилище):
-   язык её мужчины, свой и каждого ребёнка — с именем (владелец 13.11.2026: «детей может быть 2, 3, 4, каждому
-   свой язык любви и свой подход; пишем имя ребёнка и язык; по каждому ребёнку — напоминание»).
+   язык её мужчины, свой, каждого ребёнка и каждого из родных — с именем (владелец 13.11.2026: «детей может быть
+   2, 3, 4, каждому свой язык и свой подход»; «родители, братья, сёстры — отдельный раздел, точно так же»).
 
    Решение владельца 12.11.2026: сначала тест, потом выбор; каждый день — одно дело на языке мужчины и каждого
    ребёнка (карточка «Сегодня» и утреннее напоминание); в дни 4–6 — как сказать о своём языке и поблагодарить
@@ -12,26 +12,36 @@ import { langData } from '../program/source.js';
 
 export const KINDS = ['words', 'time', 'gifts', 'service', 'touch'];
 export const WHO = ['him', 'me'];
-export const MAX_CHILDREN = 8;
+export const MAX_PEOPLE = 8;
+
+/* Группы людей (владелец 13.11.2026: «отдельно мужчина, потом дети, потом родители и другие родственники — три
+   разных раздела»). У группы: сколько человек, у каждого имя («Маша», «Папа», «Брат Вася») и свой язык.
+   ideas — из какого списка дел брать (у языка на сервере: child — детям, family — взрослым родным),
+   quiz — какой тест. */
+export const GROUPS = {
+  children: { ideas: 'child', quiz: 'child' },
+  family: { ideas: 'family', quiz: 'family' },
+};
 
 const KEY = 'love';
 
 const kindOrNull = (k) => (KINDS.includes(k) ? k : null);
 const cleanName = (n) => (typeof n === 'string' ? n.trim().slice(0, 40) : '');
+const cleanList = (list) => (Array.isArray(list)
+  ? list.slice(0, MAX_PEOPLE).map((p) => ({ name: cleanName(p?.name), kind: kindOrNull(p?.kind) }))
+  : []);
 
-/** Выбор: { him, me, children: [{ name, kind }] } — kind из KINDS или null. */
+/** Выбор: { him, me, children: [{ name, kind }], family: [{ name, kind }] } — kind из KINDS или null. */
 export function choices() {
   const saved = read(KEY, {}) || {};
-  let children = Array.isArray(saved.children)
-    ? saved.children.slice(0, MAX_CHILDREN).map((c) => ({ name: cleanName(c?.name), kind: kindOrNull(c?.kind) }))
-    : [];
+  let children = cleanList(saved.children);
   // До 13.11.2026 ребёнок был один (поле child) — он становится первым
   if (!Array.isArray(saved.children) && kindOrNull(saved.child)) children = [{ name: '', kind: saved.child }];
-  return { him: kindOrNull(saved.him), me: kindOrNull(saved.me), children };
+  return { him: kindOrNull(saved.him), me: kindOrNull(saved.me), children, family: cleanList(saved.family) };
 }
 
 function save(next) {
-  write(KEY, { him: next.him, me: next.me, children: next.children });
+  write(KEY, { him: next.him, me: next.me, children: next.children, family: next.family });
 }
 
 export function choose(who, kind) {
@@ -39,23 +49,25 @@ export function choose(who, kind) {
   save({ ...choices(), [who]: kindOrNull(kind) });
 }
 
-/** Сколько детей: лишние строки убираются с конца, новые — пустые. */
-export function setChildCount(n) {
-  const count = Math.max(0, Math.min(MAX_CHILDREN, Math.floor(Number(n) || 0)));
+/** Сколько человек в группе: лишние строки убираются с конца, новые — пустые. */
+export function setCount(group, n) {
+  if (!GROUPS[group]) return;
+  const count = Math.max(0, Math.min(MAX_PEOPLE, Math.floor(Number(n) || 0)));
   const c = choices();
-  const children = c.children.slice(0, count);
-  while (children.length < count) children.push({ name: '', kind: null });
-  save({ ...c, children });
+  const list = c[group].slice(0, count);
+  while (list.length < count) list.push({ name: '', kind: null });
+  save({ ...c, [group]: list });
 }
 
-/** Имя или язык одного ребёнка (patch: { name } и/или { kind }). */
-export function setChild(index, patch) {
+/** Имя или язык одного человека группы (patch: { name } и/или { kind }). */
+export function setPerson(group, index, patch) {
+  if (!GROUPS[group]) return;
   const c = choices();
-  if (!c.children[index]) return;
-  const child = { ...c.children[index] };
-  if ('name' in patch) child.name = cleanName(patch.name);
-  if ('kind' in patch) child.kind = kindOrNull(patch.kind);
-  c.children[index] = child;
+  if (!c[group][index]) return;
+  const person = { ...c[group][index] };
+  if ('name' in patch) person.name = cleanName(patch.name);
+  if ('kind' in patch) person.kind = kindOrNull(patch.kind);
+  c[group][index] = person;
   save(c);
 }
 
@@ -89,17 +101,18 @@ export function ideaFor(who, day, lang) {
   return { kind, name: k.name, text: pickFor(k.him, day) };
 }
 
-/** Дела дня для каждого ребёнка с выбранным языком: [{ index, child, kind, name, text }].
-    Сдвиг по номеру — у двух детей с одним языком в один день разные дела. */
-export function childIdeas(day, lang) {
+/** Дела дня для каждого человека группы с выбранным языком: [{ index, person, kind, name, text }].
+    Сдвиг по номеру — у двоих с одним языком в один день разные дела. */
+export function groupIdeas(group, day, lang) {
   const c = content(lang);
-  if (!c) return [];
-  return choices().children
-    .map((child, index) => ({ child, index }))
-    .filter(({ child }) => child.kind)
-    .map(({ child, index }) => {
-      const k = c.kinds[child.kind];
-      return { index, child, kind: child.kind, name: k.name, text: pickFor(k.child, day, index) };
+  const g = GROUPS[group];
+  if (!c || !g) return [];
+  return choices()[group]
+    .map((person, index) => ({ person, index }))
+    .filter(({ person }) => person.kind)
+    .map(({ person, index }) => {
+      const k = c.kinds[person.kind];
+      return { index, person, kind: person.kind, name: k.name, text: pickFor(k[g.ideas], day, index) };
     });
 }
 

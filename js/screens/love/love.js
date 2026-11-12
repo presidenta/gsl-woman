@@ -2,20 +2,25 @@ import { h, svg, add } from '../../core/dom.js';
 import { t } from '../../core/i18n.js';
 import { icons } from '../../ui/icons.js';
 import { toast } from '../../ui/toast.js';
-import { KINDS, WHO, MAX_CHILDREN, choices, choose, setChild, setChildCount, content, score } from '../../love/love.js';
-import { childLabel } from '../../love/cards.js';
+import { KINDS, GROUPS, MAX_PEOPLE, choices, choose, setCount, setPerson, content, score } from '../../love/love.js';
+import { GROUP_TEXT, personLabel } from '../../love/cards.js';
 
-/* ЭКРАН «ПЯТЬ ЯЗЫКОВ ЛЮБВИ» (#/love): что это такое; язык моего мужчины и мой (выбрать самой или тестом);
-   дети — «Сколько детей», и у каждого своя строка: имя, язык, тест (владелец 13.11.2026); все пять языков.
-   Тест — по вопросу за раз, пять ответов (по одному на каждый язык, порядок сдвинут, чтобы ответы одного языка
-   не стояли всегда на одном месте); в конце — главный язык, второй по силе и кнопка «Это язык …».
-   Тест живёт только на этом экране, в хранилище — итог. */
+/* ЭКРАН «ПЯТЬ ЯЗЫКОВ ЛЮБВИ» (#/love). Отдельные разделы, по порядку (владелец 13.11.2026: «отдельно мужчина,
+   потом дети, потом родители и другие родственники — три разных раздела, отделены»):
+     1. «Мой мужчина» — его язык: выбрать или тест;
+     2. «Мои дети» — «Сколько детей», у каждого имя, язык, тест;
+     3. «Родители и родные» — так же: «Папа», «Брат Вася», «Сестра Клава»…;
+     4. «Мой язык» — для я-сообщений;
+   ниже — что это такое и все пять языков.
+   Тест — по вопросу за раз, пять ответов (по одному на каждый язык, порядок сдвинут); в конце — главный язык,
+   второй по силе и кнопка «Это язык …». Тест живёт только на этом экране, в хранилище — итог. */
 
-let quiz = null; // { who: 'him'|'me'|'child', index?, i, picks } — идёт тест; null — обычный вид
+let quiz = null; // { who: 'him'|'me'|'children'|'family', index?, i, picks } — идёт тест
 let result = null; // { who, index?, ranking } — тест пройден, итог на экране
 
+const QUIZ_OF = { him: 'him', me: 'me', children: GROUPS.children.quiz, family: GROUPS.family.quiz };
+
 function shuffled(i) {
-  // Свой порядок у каждого вопроса, но всегда один и тот же: сдвиг по номеру
   const k = (i * 2 + 1) % KINDS.length;
   return [...KINDS.slice(k), ...KINDS.slice(0, k)];
 }
@@ -43,14 +48,14 @@ function kindSelect(id, c, current, onPick, label) {
   return h('div', { class: 'select' }, select, svg(icons.chevronRight, 'select__chevron'));
 }
 
-function testButton(onClick) {
-  return h('button', { type: 'button', class: 'btn btn--ghost love-who__test', onclick: onClick }, t('love.test'));
-}
+const testButton = (onClick) => h('button', { type: 'button', class: 'btn btn--ghost love-who__test', onclick: onClick }, t('love.test'));
 
-function whoRow(view, ctx, c, who, current) {
+// «Мой мужчина» и «Мой язык» — по отдельной карточке: заголовок, подсказка, язык и тест
+function oneSection(view, ctx, c, who, current) {
   const id = `love-${who}`;
-  return h('div', { class: 'field love-who' },
-    h('label', { class: 'field__label', for: id }, t(`love.who.${who}`)),
+  return h('section', { class: 'card settings__section love-section' },
+    h('h2', { class: 'love-section__title' }, t(`love.${who}Section`)),
+    h('p', { class: 'card__text faint' }, t(`love.${who}Hint`)),
     h('div', { class: 'love-who__row' },
       kindSelect(id, c, current, (k) => choose(who, k), t(`love.who.${who}`)),
       testButton(() => startQuiz(view, ctx, who)),
@@ -58,44 +63,46 @@ function whoRow(view, ctx, c, who, current) {
   );
 }
 
-// Дети: «Сколько детей» и по строке на каждого — имя, язык любви, тест
-function childrenSection(view, ctx, c, kids) {
-  const count = h('select', { id: 'love-kids', class: 'input select__control' },
-    ...Array.from({ length: MAX_CHILDREN + 1 }, (_, n) => h('option', { value: String(n), selected: n === kids.length }, String(n))));
-  count.addEventListener('change', () => setChildCount(count.value));
+// Дети и родные: «Сколько», и по строке на каждого — имя, язык, тест
+function groupSection(view, ctx, c, group, people) {
+  const tx = GROUP_TEXT[group];
+  const count = h('select', { id: `love-${group}-count`, class: 'input select__control' },
+    ...Array.from({ length: MAX_PEOPLE + 1 }, (_, n) => h('option', { value: String(n), selected: n === people.length }, String(n))));
+  count.addEventListener('change', () => setCount(group, count.value));
 
-  return h('section', { class: 'card settings__section' },
-    h('h2', { class: 'caps settings__heading' }, t('love.children')),
-    h('p', { class: 'card__text faint' }, t('love.childrenHint')),
+  return h('section', { class: 'card settings__section love-section' },
+    h('h2', { class: 'love-section__title' }, t(tx.title)),
+    h('p', { class: 'card__text faint' }, t(tx.hint)),
     h('div', { class: 'field love-who' },
-      h('label', { class: 'field__label', for: 'love-kids' }, t('love.childrenCount')),
+      h('label', { class: 'field__label', for: `love-${group}-count` }, t(tx.count)),
       h('div', { class: 'select love-kids__count' }, count, svg(icons.chevronRight, 'select__chevron')),
     ),
-    ...kids.map((kid, i) => {
-      const name = h('input', {
-        id: `love-kid-name-${i}`, class: 'input', type: 'text', maxlength: '40', value: kid.name,
-        placeholder: t('love.childNamePh'), autocomplete: 'off',
-      });
-      name.addEventListener('change', () => setChild(i, { name: name.value }));
+    ...people.map((person, i) => {
+      const id = `love-${group}-name-${i}`;
+      const name = h('input', { id, class: 'input', type: 'text', maxlength: '40', value: person.name, placeholder: t(tx.ph), autocomplete: 'off' });
+      name.addEventListener('change', () => setPerson(group, i, { name: name.value }));
       return h('div', { class: 'love-kid' },
-        h('label', { class: 'field__label', for: `love-kid-name-${i}` }, t('love.childN', { n: i + 1 })),
+        h('label', { class: 'field__label', for: id }, t(tx.n, { n: i + 1 })),
         name,
         h('div', { class: 'love-who__row' },
-          kindSelect(`love-kid-${i}`, c, kid.kind, (k) => setChild(i, { kind: k }), t('love.childLang')),
-          testButton(() => startQuiz(view, ctx, 'child', i)),
+          kindSelect(`love-${group}-${i}`, c, person.kind, (k) => setPerson(group, i, { kind: k }), t(tx.lang)),
+          testButton(() => startQuiz(view, ctx, group, i)),
         ),
       );
     }),
   );
 }
 
+function whoName(who, index) {
+  return personLabel(who, choices()[who][index] || { name: '' }, index);
+}
+
 function quizTitle(who, index) {
-  if (who !== 'child') return t(`love.whoTest.${who}`);
-  return t('love.whoTest.childNamed', { name: childLabel(choices().children[index] || { name: '' }, index) });
+  return GROUPS[who] ? t('love.whoTest.named', { name: whoName(who, index) }) : t(`love.whoTest.${who}`);
 }
 
 function quizView(view, ctx, c) {
-  const list = c.quiz[quiz.who];
+  const list = c.quiz[QUIZ_OF[quiz.who]];
   const q = list[quiz.i];
   return h('section', { class: 'card love-quiz' },
     h('div', { class: 'card__eyebrow' },
@@ -128,9 +135,7 @@ function resultView(view, ctx, c) {
   const [first, second] = result.ranking;
   const main = c.kinds[first.kind];
   const { who, index } = result;
-  const saveText = who === 'child'
-    ? t('love.save.childNamed', { name: childLabel(choices().children[index] || { name: '' }, index) })
-    : t(`love.save.${who}`);
+  const saveText = GROUPS[who] ? t('love.save.named', { name: whoName(who, index) }) : t(`love.save.${who}`);
   return h('section', { class: 'card card--hero love-result' },
     h('div', { class: 'card__eyebrow' },
       h('span', { class: 'card__icon' }, svg(icons.heart)),
@@ -145,7 +150,7 @@ function resultView(view, ctx, c) {
         type: 'button',
         class: 'btn btn--gold btn--block',
         onclick: () => {
-          if (who === 'child') setChild(index, { kind: first.kind });
+          if (GROUPS[who]) setPerson(who, index, { kind: first.kind });
           else choose(who, first.kind);
           result = null;
           toast({ title: t('love.saved') });
@@ -171,13 +176,11 @@ export function render(view, ctx) {
   add(view,
     h('h1', { class: 'screen-title' }, c.title),
     result ? resultView(view, ctx, c) : null,
+    oneSection(view, ctx, c, 'him', mine.him),
+    groupSection(view, ctx, c, 'children', mine.children),
+    groupSection(view, ctx, c, 'family', mine.family),
+    oneSection(view, ctx, c, 'me', mine.me),
     h('section', { class: 'card love-intro' }, h('p', { class: 'card__text' }, c.intro)),
-    h('section', { class: 'card settings__section' },
-      h('h2', { class: 'caps settings__heading' }, t('love.choose')),
-      h('p', { class: 'card__text faint' }, t('love.chooseHint')),
-      ...WHO.map((who) => whoRow(view, ctx, c, who, mine[who])),
-    ),
-    childrenSection(view, ctx, c, mine.children),
     h('section', { class: 'card' },
       h('h2', { class: 'caps settings__heading' }, t('love.kinds')),
       h('ol', { class: 'love-kinds' },

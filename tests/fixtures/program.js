@@ -11,6 +11,7 @@ function lang(tag) {
       kinds: Object.fromEntries(['words', 'time', 'gifts', 'service', 'touch'].map((k) => [k, {
         name: `${tag} ${k}`, about: '…', tell: `Скажи ${k}`,
         him: [0, 1, 2, 3, 4, 5, 6].map((i) => `${k} для него ${i}`), child: [0, 1, 2].map((i) => `${k} ребёнку ${i}`),
+        family: [0, 1, 2, 3, 4].map((i) => `${k} родным ${i}`),
         thanks: [0, 1, 2].map((i) => `${k} спасибо ${i}`),
       }])),
       quiz: { him: [], me: [], child: [] },
