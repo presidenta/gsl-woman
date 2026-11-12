@@ -1,13 +1,13 @@
-/* ПОДЪЁМЫ НА ПЯТКИ: силуэт, пол и подписи (js/ui/heels.js). Цикл — ровно 1 секунда:
-   0–28%  — подъём на носки (тело вверх на 3 единицы, пятка поднимается, носок на полу);
+/* ПОДЪЁМЫ НА ПЯТКИ: фигура, пол, подписи и таймер справа (js/ui/heels.js). Цикл — ровно 1 секунда:
+   0–28%  — подъём на носки (тело вверх и чуть вперёд, ступня поворачивается вокруг подушечки);
    28–55% — задержка вверху;
    55–66% — опускание на пятки;
-   66–100% — стоим; в момент касания — круг под пятками и «выдох». */
+   66–100% — стоим; в момент касания — круг под пятками, воздух изо рта и «выдох». */
 
 .heels {
   position: relative;
   display: grid;
-  grid-template-columns: 112px minmax(0, 1fr);
+  grid-template-columns: 74px minmax(0, 1fr) auto;
   align-items: center;
   gap: var(--sp-3);
   margin-top: var(--sp-4);
@@ -17,8 +17,8 @@
 }
 
 .heels__svg {
-  width: 112px;
-  height: 150px;
+  width: 74px;
+  height: 194px;
   overflow: visible;
   opacity: 0.85;
   transition: opacity var(--t-med);
@@ -32,10 +32,28 @@
   animation: heels-body 1s var(--ease) infinite;
 }
 
-.heels__foot path {
+.heels__foot {
   transform-box: view-box;
-  transform-origin: 73.4px 148.4px;
+  transform-origin: 73px 190px;
   animation: heels-foot 1s var(--ease) infinite;
+}
+
+.heels__shade {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: heels-shade 1s var(--ease) infinite;
+}
+
+/* Выдох: три струйки воздуха изо рта прорисовываются вперёд и тают; точки — последние капли воздуха */
+.heels__breath path {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: heels-breath 1s ease-out infinite;
+}
+
+.heels__breath circle {
+  opacity: 0;
+  animation: heels-breath-dot 1s ease-out infinite;
 }
 
 .heels__ripple {
@@ -79,13 +97,13 @@
 
 @keyframes heels-body {
   0%, 100% { transform: translateY(0); }
-  28%, 55% { transform: translateY(-3px); }
+  28%, 55% { transform: translate(1.2px, -2.4px); }
   66% { transform: translateY(0); }
 }
 
 @keyframes heels-foot {
   0%, 100% { transform: rotate(0deg); }
-  28%, 55% { transform: rotate(-12deg); }
+  28%, 55% { transform: rotate(10.8deg); }
   66% { transform: rotate(0deg); }
 }
 
@@ -93,6 +111,25 @@
   0%, 62% { opacity: 0; transform: scale(0.4); }
   68% { opacity: 0.9; transform: scale(0.7); }
   100% { opacity: 0; transform: scale(1.6); }
+}
+
+@keyframes heels-shade {
+  0%, 100% { opacity: 1; transform: scaleX(1); }
+  28%, 55% { opacity: 0.6; transform: scaleX(0.8); }
+  66% { opacity: 1; transform: scaleX(1); }
+}
+
+@keyframes heels-breath {
+  0%, 58% { stroke-dashoffset: 1; opacity: 0; transform: translateX(0); }
+  64% { opacity: 0.95; }
+  82% { stroke-dashoffset: 0; opacity: 0.85; }
+  100% { stroke-dashoffset: 0; opacity: 0; transform: translateX(3px); }
+}
+
+@keyframes heels-breath-dot {
+  0%, 74% { opacity: 0; transform: translateX(0); }
+  84% { opacity: 0.8; }
+  100% { opacity: 0; transform: translateX(3px); }
 }
 
 @keyframes heels-cue-up {
@@ -110,10 +147,18 @@
 /* «Меньше движения» в системе — неподвижный силуэт и спокойная подпись ритма */
 @media (prefers-reduced-motion: reduce) {
   .heels__body,
-  .heels__foot path,
+  .heels__foot,
+  .heels__shade,
   .heels__ripple,
-  .heels__cue--up {
+  .heels__cue--up,
+  .heels__breath path,
+  .heels__breath circle {
     animation: none;
+  }
+
+  .heels__breath path {
+    stroke-dashoffset: 0;
+    opacity: 0.7;
   }
 
   .heels__cue--down {

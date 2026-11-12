@@ -4,46 +4,112 @@ import { t } from '../core/i18n.js';
 /* ПОДЪЁМЫ НА ПЯТКИ — живая подсказка ритма (владелец 12.11.2026): «человечек поднялся, опустился и выдохнул —
    и так каждую секунду; подниматься на 2–3 сантиметра, не больше; на опускании — выдох».
 
-   Силуэт в профиле, чтобы было видно пятку. Один цикл — ровно секунда (styles/components/heels.css):
-   быстрый подъём на носки, короткая задержка, мягкое опускание — и в этот миг под пятками расходится золотой
-   круг, а рядом вспыхивает «выдох». Высота подъёма — три единицы рисунка ростом 140: те самые 2–3 см.
+   Сборка 19 (владелец): настоящая женская фигура в полный рост — причёска с пучком, лицо в профиль, платье
+   до середины бедра, руки, ноги и ступни целиком, без «палочки» снизу. На опускании изо рта выходит воздух —
+   три струйки уходят вперёд и тают. Таймер стоит справа в этой же панели (aside).
 
-   heelsFigure() → { node, setRunning(on) }: пока идёт минута — ярче; движение показывается и до старта,
-   чтобы ритм был виден заранее. С «меньше движения» в системе — неподвижный силуэт и подпись. */
+   Силуэт в профиль, лицом вправо, чтобы было видно пятку. Один цикл — ровно секунда
+   (styles/components/heels.css): быстрый подъём на носки, короткая задержка, мягкое опускание — в этот миг
+   под пятками расходится золотой круг, изо рта выходит выдох и вспыхивает подпись «выдох».
+   Ступня поворачивается вокруг подушечки (73, 190): пятка поднимается на 3 единицы при росте фигуры 182 —
+   те самые 2–3 см; тело поднимается вместе с лодыжкой.
+
+   heelsFigure({ aside }) → { node, setRunning(on) }: aside — узел справа (таймер); пока идёт минута — ярче.
+   Движение видно и до старта, чтобы ритм был понятен заранее. С «меньше движения» — неподвижная фигура. */
 
 const SVG_NS = 'http://www.w3.org/2000/svg';
 
+// Нога отдельно: ближняя входит в силуэт, дальняя — та же нога, сдвинутая назад и затемнённая
+const LEG = `M68.4 96 C67.8 107 66.6 117 65.4 127 C65.2 129.6 66 132.4 65.6 135 C65 143 64.6 152 64.2 162
+  C64 170 63.6 176 63.4 184 L58.6 184 C58.8 178 58.6 172 57.2 166 C55.4 158 53.4 150 53.8 141
+  C54.2 135 56.2 131 57.2 128 C56.6 120 54.6 110 53.6 102 Z`;
+
+const FOOT = `M58.8 178.5 L63.6 178.5 C64 182 64.8 184 67 185.4 C70.6 186.4 74.6 187 77.4 187.8
+  C78.8 188.2 79.2 189.4 78.2 190 L60 190 C57.6 190 56.6 188.4 57 186.4 C57.4 184 58.4 181.6 58.8 178.5 Z`;
+
+// Голова (лоб, нос, губы, подбородок), шея, грудь, талия, бёдра и ближняя нога — одним контуром
+const BODY = `M58 8 C64 7.2 69 10.5 69.6 15.6 C69.8 17 70 17.6 70.6 18.6 L73.2 22.6
+  C73.4 23.2 72.6 23.6 71.6 23.8 C71.9 24.6 71.9 25.2 71.5 25.6 C71.2 25.9 70.8 26.1 71.2 26.6
+  C71.4 27.3 71.2 28 70.6 28.4 C70.8 29.6 70.4 30.8 69 31.4 C67.6 31.9 66 31.6 64.6 31
+  C64.6 33.4 65 35.6 65.8 37.4 C68 39 69.4 41 70 44 C71.8 47 73 50.6 71.6 53.8
+  C70.8 55.8 68.6 56.8 67 57.2 C65.2 61 63.8 64.6 63.8 67.6 C64 72 66.4 76.4 67.2 81
+  C68.6 87 68.8 92 68.4 97 C67.8 107 66.6 117 65.4 127 C65.2 129.6 66 132.4 65.6 135
+  C65 143 64.6 152 64.2 162 C64 170 63.6 176 63.4 184 L58.6 184 C58.8 178 58.6 172 57.2 166
+  C55.4 158 53.4 150 53.8 141 C54.2 135 56.2 131 57.2 128 C56.6 120 54.6 110 53.6 102
+  C52.2 98 49.8 94 49.6 88 C49.4 82 51.6 76 55 70.4 C56.8 66.6 57.4 62 56.8 57
+  C56.2 51 55 46 55.8 41.4 C56.6 38.6 57.6 35.6 57.8 32 C56 30 53.6 28 52.6 24
+  C51.4 19 52.4 11 58 8 Z`;
+
+const HAIR = `M67.4 11 C63.4 6.6 55 6.8 52.6 12.8 C51.4 17 52 23 54.8 28.6 C56.2 26 56.8 22.2 57.8 19.8
+  C59.8 15.8 63.6 12.8 67.4 11 Z`;
+
+const DRESS = `M65.4 39.2 C68 40.4 69.6 42 70.3 44.2 C72.1 47 73.3 50.6 71.9 54 C71 56 68.9 57 67.3 57.5
+  C65.5 61 64.1 64.6 64.1 67.6 C64.3 72 66.7 76.4 67.5 81 C68.7 87 69.2 92 69.2 97 C70.2 103 71.4 108.6 72.8 114
+  C65 116.8 56 117.4 47.4 115.4 C48.4 109.6 49.6 103 50.2 97.6 C49.6 94.6 49.3 91.4 49.3 88 C49.1 82 51.3 76 54.7 70.4
+  C56.5 66.6 57.1 62 56.5 57 C55.9 51 54.6 46 55.4 41.4 C58.6 42.8 62.2 41.8 65.4 39.2 Z`;
+
+const ARM = `M57.4 41.6 C60.8 39.8 63.2 41.6 63 45 C62.6 52 61.6 59 61 65.6 C61.6 72 63 79 63.8 86.4
+  C64.8 89.4 65.4 93 64.4 96.4 C63.6 98.6 62 98.4 61.8 96.4 C61.4 93.6 60.8 90.6 60.6 88.2
+  C59 81.6 57.6 74 57.4 66.6 C57 59 56.4 51 56.2 45.4 C56.2 43.4 56.6 42.2 57.4 41.6 Z`;
+
 const FIGURE = `
-<svg viewBox="0 0 120 160" aria-hidden="true" class="heels__svg">
+<svg viewBox="30 2 74 194" aria-hidden="true" class="heels__svg">
   <defs>
-    <linearGradient id="heels-gold" gradientUnits="userSpaceOnUse" x1="40" y1="6" x2="86" y2="150">
-      <stop offset="0" stop-color="#fde7d6"/><stop offset=".3" stop-color="#f1c0a3"/>
-      <stop offset=".55" stop-color="#cf8a73"/><stop offset=".78" stop-color="#f8d8c0"/><stop offset="1" stop-color="#c27c66"/>
+    <linearGradient id="heels-skin" gradientUnits="userSpaceOnUse" x1="44" y1="6" x2="82" y2="190">
+      <stop offset="0" stop-color="#fde7d6"/><stop offset=".25" stop-color="#f3c7ab"/>
+      <stop offset=".5" stop-color="#d9957c"/><stop offset=".72" stop-color="#f6d3bb"/><stop offset="1" stop-color="#c98470"/>
     </linearGradient>
-    <linearGradient id="heels-floor" gradientUnits="userSpaceOnUse" x1="14" y1="0" x2="106" y2="0">
+    <linearGradient id="heels-dress" gradientUnits="userSpaceOnUse" x1="48" y1="38" x2="74" y2="116">
+      <stop offset="0" stop-color="#e9a98f"/><stop offset=".45" stop-color="#b8664f"/><stop offset="1" stop-color="#8e4639"/>
+    </linearGradient>
+    <linearGradient id="heels-hair" gradientUnits="userSpaceOnUse" x1="46" y1="6" x2="66" y2="30">
+      <stop offset="0" stop-color="#c47b63"/><stop offset="1" stop-color="#7a3a30"/>
+    </linearGradient>
+    <linearGradient id="heels-floor" gradientUnits="userSpaceOnUse" x1="34" y1="0" x2="100" y2="0">
       <stop offset="0" stop-color="#efc4a6" stop-opacity="0"/><stop offset=".5" stop-color="#efc4a6" stop-opacity=".6"/>
       <stop offset="1" stop-color="#efc4a6" stop-opacity="0"/>
     </linearGradient>
+    <linearGradient id="heels-skin-far" gradientUnits="userSpaceOnUse" x1="50" y1="96" x2="70" y2="190">
+      <stop offset="0" stop-color="#a8695a"/><stop offset=".55" stop-color="#8a5146"/><stop offset="1" stop-color="#6e3d35"/>
+    </linearGradient>
+    <radialGradient id="heels-shadow" cx=".5" cy=".5" r=".5">
+      <stop offset="0" stop-color="#000" stop-opacity=".45"/><stop offset="1" stop-color="#000" stop-opacity="0"/>
+    </radialGradient>
   </defs>
-  <line x1="14" y1="149.5" x2="106" y2="149.5" stroke="url(#heels-floor)" stroke-width="1"/>
-  <ellipse class="heels__ripple" cx="60" cy="149.5" rx="11" ry="2.6" fill="none" stroke="#efc4a6" stroke-width="1"/>
+  <line x1="34" y1="190.4" x2="100" y2="190.4" stroke="url(#heels-floor)" stroke-width="1"/>
+  <ellipse class="heels__shade" cx="66" cy="190.6" rx="15" ry="2.2" fill="url(#heels-shadow)"/>
+  <ellipse class="heels__ripple" cx="60" cy="190.4" rx="10" ry="2.4" fill="none" stroke="#efc4a6" stroke-width="1"/>
+
+  <g class="heels__body"><path d="${LEG}" transform="translate(-2.6 -0.4)" fill="url(#heels-skin-far)"/></g>
+  <g class="heels__foot"><path d="${FOOT}" transform="translate(-2.6 0)" fill="url(#heels-skin-far)"/></g>
+
   <g class="heels__body">
-    <circle cx="52.5" cy="15.5" r="4.6" fill="url(#heels-gold)"/>
-    <ellipse cx="62" cy="20" rx="7.6" ry="8.8" fill="url(#heels-gold)"/>
-    <path d="M59.4 27.5 L64.2 27.5 L64.6 37 L59.2 37 Z" fill="url(#heels-gold)"/>
-    <path d="M56 38.5 C60 36.4 66 36.4 68.2 40 C71.2 44 72.2 48.4 69.2 52.4 C67.2 55.2 66.2 58 66.2 62
-             C70.2 76 74 90 76.4 104 L49.6 104 C51.8 90 55.6 76 57.8 62 C56.6 56 55.2 50 56 44 Z" fill="url(#heels-gold)"/>
-    <path d="M60.4 42 C58.6 54 58.8 66 62.4 80" fill="none" stroke="#3a1f22" stroke-opacity=".35" stroke-width="3.6" stroke-linecap="round"/>
-    <path d="M60.4 42 C58.6 54 58.8 66 62.4 80" fill="none" stroke="url(#heels-gold)" stroke-width="2.6" stroke-linecap="round"/>
-    <path d="M57.6 104 L56.8 143.5" stroke="url(#heels-gold)" stroke-opacity=".6" stroke-width="3.4" stroke-linecap="round"/>
-    <path d="M63.4 104 L62.6 143.5" stroke="url(#heels-gold)" stroke-width="3.4" stroke-linecap="round"/>
+    <path d="${BODY}" fill="url(#heels-skin)"/>
+    <path d="${HAIR}" fill="url(#heels-hair)"/>
+    <circle cx="50.8" cy="15.6" r="4.9" fill="url(#heels-hair)"/>
+    <path d="M47.6 13.6 C49.4 11.6 52.4 11.4 54.2 13.2" fill="none" stroke="#f3c7ab" stroke-opacity=".45" stroke-width=".6" stroke-linecap="round"/>
+    <path d="M66.6 18.6 C67.4 18.2 68.2 18.3 68.8 18.8" fill="none" stroke="#5a2a26" stroke-opacity=".7" stroke-width=".55" stroke-linecap="round"/>
+    <path d="${DRESS}" fill="url(#heels-dress)"/>
+    <g fill="none" stroke="#5a2a26" stroke-opacity=".35" stroke-width=".6" stroke-linecap="round">
+      <path d="M59.6 99 C59.2 104 58.6 110 57.8 116.2"/><path d="M64.6 99.6 C65.4 105 66.2 110.6 66.8 115.8"/>
+      <path d="M54.6 102 C53.6 106.6 52.4 111 51.2 115.6"/>
+    </g>
+    <path d="M57 61.4 C59.4 62.6 61.8 62.8 64 62.2" fill="none" stroke="#f6d3bb" stroke-opacity=".6" stroke-width=".8" stroke-linecap="round"/>
+    <path d="M65.2 122 C64.9 126 64.6 130 64.4 133 M63.6 141 C63.4 152 63 166 62.6 178" fill="none" stroke="#fff3ea" stroke-opacity=".35" stroke-width=".6" stroke-linecap="round"/>
+    <path d="${ARM}" fill="url(#heels-skin)" stroke="#3a1f22" stroke-opacity=".22" stroke-width=".6"/>
+    <g class="heels__breath" fill="none" stroke="#f9e2d2" stroke-linecap="round">
+      <path pathLength="1" d="M73.6 26.4 C77.6 25.2 80.4 28.2 84 27.4 C87.6 26.6 89.2 24.2 92.8 25"/>
+      <path pathLength="1" d="M74 28 C78.4 29.2 81.6 31.6 86 30.8 C89.2 30.2 90.8 31.6 94 32.4" stroke-width=".9"/>
+      <path pathLength="1" d="M73.6 24.6 C77 22.6 80.6 23.4 84.2 21.4" stroke-width=".7"/>
+      <circle cx="96.6" cy="27" r=".9" fill="#f9e2d2" stroke="none"/>
+      <circle cx="98.4" cy="31.6" r=".6" fill="#f9e2d2" stroke="none"/>
+    </g>
   </g>
-  <g class="heels__foot" fill="none" stroke="url(#heels-gold)" stroke-width="3" stroke-linecap="round">
-    <path d="M58.6 146 L73.4 148.4"/>
-  </g>
+
+  <g class="heels__foot"><path d="${FOOT}" fill="url(#heels-skin)"/></g>
 </svg>`;
 
-export function heelsFigure() {
+export function heelsFigure({ aside = null } = {}) {
   const holder = document.createElement('div');
   holder.innerHTML = FIGURE;
   const svg = holder.firstElementChild;
@@ -55,6 +121,7 @@ export function heelsFigure() {
       h('span', { class: 'heels__cue heels__cue--up' }, t('morning.heels.up')),
       h('span', { class: 'heels__cue heels__cue--down' }, t('morning.heels.exhale')),
     ),
+    aside,
   );
   return {
     node,

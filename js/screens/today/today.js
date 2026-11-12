@@ -92,8 +92,9 @@ function morningCard(ctx, plan) {
   const count = h('span', { class: 'minute__count' }, '60');
   const fill = h('div', { class: 'bar__fill', style: { width: '0%' } });
   const button = h('button', { type: 'button', class: 'btn btn--block ' + (done ? 'btn--ghost' : 'btn--gold btn--quiet') });
-  // Живая подсказка ритма: подъём на 2–3 см и опускание на пятки с выдохом — раз в секунду
-  const figure = heelsFigure();
+  // Живая подсказка ритма: подъём на 2–3 см и опускание на пятки с выдохом — раз в секунду; таймер — справа от неё
+  const dial = h('div', { class: 'minute__dial' }, count, h('span', { class: 'faint minute__unit' }, t('morning.sec')));
+  const figure = heelsFigure({ aside: dial });
 
   function paint() {
     const left = Math.max(0, Math.ceil((minuteEndsAt - Date.now()) / 1000));
@@ -119,14 +120,10 @@ function morningCard(ctx, plan) {
       h('span', { class: 'spacer' }),
       done ? h('span', { class: 'chip' }, svg(icons.check, 'chip__icon'), t('morning.done')) : null,
     ),
-    h('div', { class: 'minute__row' },
-      h('div', {},
-        h('h2', { class: 'card__title' }, title),
-        h('p', { class: 'card__text' }, t('morning.heels.text')),
-        m.addon ? h('p', { class: 'card__text' }, t(`morning.addon.${m.addon}.text`)) : null,
-      ),
-      h('div', { class: 'minute__dial' }, count, h('span', { class: 'faint minute__unit' }, t('morning.sec'))),
-    ),
+    // Текст — на всю ширину (владелец, сборка 19): таймер перенесён в панель с фигурой
+    h('h2', { class: 'card__title' }, title),
+    h('p', { class: 'card__text' }, t('morning.heels.text')),
+    m.addon ? h('p', { class: 'card__text' }, t(`morning.addon.${m.addon}.text`)) : null,
     figure.node,
     h('div', { class: 'bar minute__bar' }, fill),
     h('div', { class: 'card__actions' }, button),
@@ -139,6 +136,8 @@ function taskCard(plan) {
     h('div', { class: 'card__eyebrow' }, h('span', { class: 'card__icon' }, svg(icons.crown)), h('span', { class: 'caps' }, t('today.taskLabel'))),
     plan.intro ? h('p', { class: 'task__intro' }, plan.intro) : null,
     h('h2', { class: 'task__title' }, `«${task.title}»`),
+    // Подзаголовок — своей строкой под названием, другим начертанием (владелец: «Магия рук» / «Тайный ритуал соблазна»)
+    task.subtitle ? h('p', { class: 'task__subtitle' }, task.subtitle) : null,
     h('p', { class: 'task__text' }, task.text),
     task.how?.length
       ? h('div', { class: 'task__block' },

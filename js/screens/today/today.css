@@ -35,16 +35,6 @@
 }
 
 /* — Утренняя минута — */
-.minute__row {
-  display: flex;
-  align-items: flex-start;
-  gap: var(--sp-4);
-}
-
-.minute__row > :first-child {
-  flex: 1;
-}
-
 .minute__dial {
   flex: none;
   display: flex;
@@ -92,6 +82,17 @@
 
 .task__title {
   font-size: var(--fs-2xl);
+}
+
+/* Подзаголовок задания: курсив гладким золотом (пёстрый металл на мелких буквах читается пятнами), мельче названия, своей строкой */
+.task__subtitle {
+  margin-top: var(--sp-1);
+  font-family: var(--f-display);
+  font-size: var(--fs-lg);
+  font-style: italic;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  color: var(--c-gold);
 }
 
 .task__text {
