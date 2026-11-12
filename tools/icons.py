@@ -3,6 +3,7 @@
 # затем Pillow уменьшает картинку до нужных размеров:
 #   icon-512 / icon-192 — значок на экран (Android, вкладка), icon-180 — iPhone,
 #   maskable-512 — для круглой/скруглённой маски Android, badge-96 — белый силуэт для строки уведомлений.
+import base64
 import os
 import subprocess
 import sys
@@ -37,6 +38,10 @@ def page(svg, extra_css=''):
 def main():
     with open(os.path.join(ICONS, 'icon.svg'), encoding='utf-8') as f:
         svg = f.read()
+    # Текстура розового золота — внутрь SVG: страница отрисовки лежит во временной папке, ссылка бы не нашлась
+    with open(os.path.join(ROOT, 'assets', 'textures', 'rose-gold.jpg'), 'rb') as f:
+        texture = 'data:image/jpeg;base64,' + base64.b64encode(f.read()).decode()
+    svg = svg.replace('href="../textures/rose-gold.jpg"', f'href="{texture}"')
     with tempfile.TemporaryDirectory() as tmp:
         full = os.path.join(tmp, 'full.png')
         mono = os.path.join(tmp, 'mono.png')
