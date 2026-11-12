@@ -177,3 +177,21 @@ img, svg {
     transition-duration: 1ms !important;
   }
 }
+
+/* Рядом с «кто вошёл» название тише и мельче, в одну строку; на самом узком телефоне его нет —
+   место имени */
+.app-header__brand {
+  flex: none;
+  white-space: nowrap;
+}
+
+.app-header .identity ~ .app-header__brand {
+  font-size: var(--fs-md);
+  opacity: 0.9;
+}
+
+@media (max-width: 359px) {
+  .app-header .identity:not([hidden]) ~ .app-header__brand {
+    display: none;
+  }
+}

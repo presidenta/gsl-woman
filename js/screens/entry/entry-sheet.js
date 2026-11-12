@@ -5,11 +5,14 @@ import * as journal from '../../journal/journal.js';
 import { segmented, field, choiceList } from '../../ui/controls.js';
 import { openSheet, closeSheet } from '../../ui/sheet.js';
 import { toast } from '../../ui/toast.js';
+import { photoField } from '../../media/photo-field.js';
+import * as media from '../../media/photos.js';
 
 /* ФОРМА ЗАПИСИ — нижний лист. Одна форма на все случаи:
    - задание дня: уровень + четыре вопроса (что получилось, с каким мужчиной, что произошло, как);
    - свободный поток: то же плюс выбор, какое из упражнений недели делала;
    - седьмой день: «главное за неделю» и «что обсудить на созвоне», без уровня.
+   Во всех — фото (до шести, камера или галерея: js/media/).
    Новая запись и правка старой — одна и та же форма (entry передан — правка). */
 
 /**
@@ -24,6 +27,7 @@ export function openEntry({ day, kind, exercises = [], levels = null, entry = nu
   const draft = {
     level: entry?.level || 'full',
     exercise: entry ? entry.exercise : exercises.length ? 0 : null,
+    photos: entry?.photos || [],
   };
 
   const parts = [];
@@ -74,14 +78,20 @@ export function openEntry({ day, kind, exercises = [], levels = null, entry = nu
     parts.push(f.node);
   }
 
+  parts.push(photoField({ ids: draft.photos, onChange: (ids) => { draft.photos = ids; } }));
+
+  // Снимки, которые больше никому не нужны (убрали, не сохранили, удалили запись), — стереть
+  const tidy = () => media.prune(journal.photoIds()).catch(() => {});
+
   const save = h('button', { type: 'button', class: 'btn btn--gold btn--block' }, t('common.save'));
   save.addEventListener('click', () => {
     const fields = {};
     for (const key of Object.keys(controls)) fields[key] = controls[key].value;
     const level = isCall ? 'full' : draft.level;
-    if (entry) journal.update(entry.id, { ...fields, level, exercise: draft.exercise });
-    else journal.add({ day, kind, exercise: kind === 'flow' ? draft.exercise : null, level, ...fields });
+    if (entry) journal.update(entry.id, { ...fields, level, exercise: draft.exercise, photos: draft.photos });
+    else journal.add({ day, kind, exercise: kind === 'flow' ? draft.exercise : null, level, photos: draft.photos, ...fields });
     closeSheet();
+    tidy();
     toast({ title: t('entry.saved') });
   });
 
@@ -92,6 +102,7 @@ export function openEntry({ day, kind, exercises = [], levels = null, entry = nu
       if (!confirm(t('entry.deleteConfirm'))) return;
       journal.remove(entry.id);
       closeSheet();
+      tidy();
       toast({ title: t('entry.deleted') });
     });
     actions.append(del);

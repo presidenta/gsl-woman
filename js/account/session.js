@@ -59,6 +59,14 @@ export async function login(loginName, password) {
   return session;
 }
 
+/** Вход без пароля: «Квант» открыл приложение с одноразовым пропуском (#kvant=…). */
+export async function redeem(code) {
+  const s = await request('/api/woman/redeem', { body: { code }, token: null });
+  const session = { token: s.token, userId: s.userId, displayName: s.displayName || '', accountNo: s.accountNo || null };
+  write(KEY, session);
+  return session;
+}
+
 /** Имя могли поправить у администратора — сверяем при каждом открытии с сетью. */
 export async function refreshProfile() {
   const s = current();

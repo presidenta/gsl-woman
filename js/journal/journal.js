@@ -8,7 +8,9 @@ import { LEVELS } from '../config.js';
    Прогресс, кольцо недели и «наверстать» не хранятся отдельно, а каждый раз считаются из записей:
    так они не могут разойтись.
 
-   Записи о мужчинах — личное: они лежат только на этом телефоне и никуда не отправляются. */
+   Записи о мужчинах — личное: они лежат только на этом телефоне и никуда не отправляются.
+
+   photos — номера снимков (сами снимки — в js/media/photos.js, до 6 на запись). */
 
 const KEY = 'entries';
 
@@ -27,6 +29,14 @@ function isEntry(e) {
   return e && typeof e.id === 'string' && Number.isInteger(e.day) && KINDS.includes(e.kind);
 }
 
+const MAX_PHOTOS = 6;
+const cleanPhotos = (list) => (Array.isArray(list) ? list.filter((id) => typeof id === 'string' && id.length <= 40).slice(0, MAX_PHOTOS) : []);
+
+/** Номера всех снимков, на которые ссылаются записи, — остальные можно стирать. */
+export function photoIds() {
+  return all().flatMap((e) => cleanPhotos(e.photos));
+}
+
 function clean(fields) {
   const out = {};
   for (const f of TEXT_FIELDS) out[f] = typeof fields[f] === 'string' ? fields[f].trim().slice(0, 2000) : '';
@@ -42,7 +52,7 @@ export function byId(id) {
 }
 
 /** Новая запись. exercise — номер упражнения недели (для свободной практики), иначе null. */
-export function add({ day, kind, exercise = null, level = 'full', ...fields }, now = new Date()) {
+export function add({ day, kind, exercise = null, level = 'full', photos = [], ...fields }, now = new Date()) {
   const entry = {
     id: newId(),
     day,
@@ -50,6 +60,7 @@ export function add({ day, kind, exercise = null, level = 'full', ...fields }, n
     exercise: Number.isInteger(exercise) ? exercise : null,
     level: LEVELS.includes(level) ? level : 'full',
     ...clean(fields),
+    photos: cleanPhotos(photos),
     createdAt: now.toISOString(),
     updatedAt: now.toISOString(),
   };
@@ -62,6 +73,7 @@ export function update(id, patch, now = new Date()) {
     if (e.id !== id) return e;
     const next = { ...e, ...clean({ ...e, ...patch }), updatedAt: now.toISOString() };
     if (LEVELS.includes(patch.level)) next.level = patch.level;
+    if ('photos' in patch) next.photos = cleanPhotos(patch.photos);
     if ('exercise' in patch) next.exercise = Number.isInteger(patch.exercise) ? patch.exercise : null;
     return next;
   });

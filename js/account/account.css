@@ -1,0 +1,176 @@
+/* АККАУНТ: кружок фото, «кто вошёл» в шапке, карточка в настройках.
+   Кружок — фото в золотом ободке; нет фото — буква металлом на тёмном. */
+
+.avatar {
+  position: relative;
+  display: grid;
+  flex: none;
+  place-items: center;
+  overflow: hidden;
+  border-radius: 50%;
+  background: var(--c-bg-raise);
+  box-shadow: 0 0 0 1.5px var(--c-gold-deep), 0 0 0 3px var(--c-bg), 0 0 0 4px rgba(239, 196, 166, 0.35);
+}
+
+.avatar--sm {
+  width: 36px;
+  height: 36px;
+}
+
+.avatar--lg {
+  width: 76px;
+  height: 76px;
+}
+
+.avatar__letter {
+  font-family: var(--f-display);
+  font-weight: 600;
+  font-style: italic;
+  background: var(--g-gold-text);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.avatar--sm .avatar__letter {
+  font-size: 19px;
+}
+
+.avatar--lg .avatar__letter {
+  font-size: 38px;
+}
+
+.avatar__img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* В шапке */
+.identity {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  min-width: 0;
+  color: inherit;
+  text-decoration: none;
+}
+
+.identity__who {
+  display: grid;
+  min-width: 0;
+  line-height: 1.2;
+}
+
+.identity__name {
+  overflow: hidden;
+  font-size: var(--fs-sm);
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.identity__no {
+  color: var(--c-gold);
+  font-size: var(--fs-2xs);
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  font-variant-numeric: var(--num-display);
+}
+
+/* Карточка в настройках */
+.account {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--sp-4);
+  overflow: hidden;
+}
+
+.account__glow {
+  position: absolute;
+  inset: 0;
+  background: var(--g-rose-glow);
+  pointer-events: none;
+}
+
+.account__photo {
+  position: relative;
+  flex: none;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: none;
+}
+
+.account__cam {
+  position: absolute;
+  right: -2px;
+  bottom: -2px;
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--g-gold);
+  color: var(--c-on-gold);
+  box-shadow: var(--sh-gold), 0 0 0 3px var(--c-bg-raise);
+}
+
+.account__cam svg {
+  width: 15px;
+  height: 15px;
+  stroke-width: 1.9;
+}
+
+.account__who {
+  position: relative;
+  display: grid;
+  flex: 1;
+  min-width: 0;
+  gap: 3px;
+}
+
+.account__name {
+  font-family: var(--f-display);
+  font-size: var(--fs-xl);
+  font-weight: 600;
+  line-height: 1.1;
+  overflow-wrap: anywhere;
+}
+
+.account__no {
+  color: var(--c-gold);
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  font-variant-numeric: var(--num-display);
+}
+
+.account__link {
+  justify-self: start;
+  margin-top: 2px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--c-text-faint);
+  font-size: var(--fs-xs);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.account .btn {
+  position: relative;
+  flex: none;
+  align-self: flex-start;
+}
+
+@media (max-width: 360px) {
+  .account {
+    flex-wrap: wrap;
+  }
+}

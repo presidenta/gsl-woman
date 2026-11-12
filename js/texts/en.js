@@ -6,7 +6,7 @@ export default {
     tagline: 'Trainings for women',
   },
 
-  nav: { today: 'Today', week: 'Week', journal: 'Journal', path: 'Path' },
+  nav: { today: 'Today', week: 'Week', goals: 'Goals', journal: 'Journal', path: 'Path' },
 
   common: {
     save: 'Save',
@@ -139,6 +139,7 @@ export default {
     programFail: 'The programme did not load. The first time you need the internet — after that everything works offline.',
     retry: 'Try again',
     expired: 'Your sign-in has expired — please sign in again. Your entries are safe.',
+    passExpired: 'The link from Quantum has expired — it lives for two minutes. Sign in with your password or open GSL Woman from Quantum again.',
     err: {
       invalid_credentials: 'Wrong login or password.',
       pending_approval: 'Your application has not been approved yet.',
@@ -147,6 +148,39 @@ export default {
       network: 'No connection to the server. Check the internet.',
       other: 'Could not sign in. Please try again.',
     },
+  },
+  goals: {
+    title: 'My goals',
+    lead: 'Write down what you want. When it comes true, mark it in gold.',
+    placeholder: 'New goal',
+    add: 'Add goal',
+    text: 'Goal',
+    edit: 'Goal',
+    done: 'Mark as come true',
+    undo: 'Back to in progress',
+    congrats: 'It came true — congratulations!',
+    doneTitle: 'Came true',
+    doneOn: 'Came true on {date}',
+    deleteConfirm: 'Delete this goal?',
+    emptyTitle: 'Your goals will live here',
+    emptyText: 'Big and small. Write the first one in the line above.',
+  },
+  photos: {
+    label: 'Photos',
+    add: 'Photo',
+    open: 'Open photo',
+    remove: 'Remove photo',
+    failed: 'This photo could not be opened. Try another one.',
+    profile: 'Change profile photo',
+    profileAdd: 'Add photo',
+    profileRemove: 'Remove photo',
+  },
+  install: {
+    title: 'Icon on home screen',
+    lead: 'GSL Woman will open from your home screen with one tap, like a regular app.',
+    button: 'Add the icon',
+    ios: 'In Safari tap “Share” at the bottom, then “Add to Home Screen”.',
+    menu: 'Open the browser menu (⋮) and choose “Install app” or “Add to Home screen”.',
   },
   settings: {
     title: 'Settings',

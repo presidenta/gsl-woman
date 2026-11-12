@@ -1,4 +1,4 @@
-/* НИЖНЯЯ ПАНЕЛЬ: четыре раздела под большим пальцем. Выбранный раздел подсвечен золотой точкой и
+/* НИЖНЯЯ ПАНЕЛЬ: пять разделов под большим пальцем. Выбранный раздел подсвечен золотой точкой и
    цветом значка — без заливки всей кнопки, чтобы панель оставалась лёгкой. */
 
 .app-nav {
@@ -10,7 +10,7 @@
   height: calc(var(--nav-h) + env(safe-area-inset-bottom));
   padding-bottom: env(safe-area-inset-bottom);
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(5, 1fr);
   background: linear-gradient(to top, rgba(21, 12, 17, 0.97), rgba(21, 12, 17, 0.84));
   -webkit-backdrop-filter: blur(16px);
   backdrop-filter: blur(16px);

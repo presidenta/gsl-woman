@@ -1,0 +1,58 @@
+/* «ЗНАЧОК НА ЭКРАН»: сам значок приложения в рамке и одна кнопка. Пришли из «Кванта» по кнопке
+   «Значок на экран» — карточка один раз мягко вспыхивает золотом. */
+
+.install__head {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  margin-bottom: var(--sp-3);
+}
+
+.install__icon {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  padding: 3px;
+  border-radius: 14px;
+  background: var(--g-gold);
+  box-shadow: var(--sh-gold);
+}
+
+.install__icon img {
+  width: 46px;
+  height: 46px;
+  border-radius: 11px;
+}
+
+.install__title {
+  margin-bottom: 2px;
+}
+
+.install__name {
+  font-family: var(--f-display);
+  font-size: var(--fs-lg);
+  font-style: italic;
+  font-weight: 600;
+}
+
+.install__lead {
+  margin-bottom: var(--sp-4);
+}
+
+.install.is-flash {
+  animation: install-flash 2.4s var(--ease);
+}
+
+@keyframes install-flash {
+  0%, 100% { box-shadow: var(--sh-card); }
+  25%, 60% { box-shadow: var(--sh-card), 0 0 0 2px var(--c-gold), 0 0 36px -6px var(--c-gold); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .install.is-flash {
+    animation: none;
+    box-shadow: var(--sh-card), 0 0 0 2px var(--c-gold);
+  }
+}

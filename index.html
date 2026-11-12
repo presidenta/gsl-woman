@@ -8,7 +8,7 @@
   <!-- Всё своё и только своё: чужие скрипты, шрифты и картинки сюда не загрузятся. Запросы — только
        к серверу «Кванта» (вход и программа, js/config.js → API_BASE) и к нему же на компьютере при проверке. -->
   <meta http-equiv="Content-Security-Policy"
-        content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'self' https://game.coreviaflow.com http://localhost:8580; manifest-src 'self'; worker-src 'self'; base-uri 'self'; form-action 'none'">
+        content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: blob:; font-src 'self'; connect-src 'self' https://game.coreviaflow.com http://localhost:8580; manifest-src 'self'; worker-src 'self'; base-uri 'self'; form-action 'none'">
   <title>GSL Woman — тренінги для жінок</title>
   <meta name="description" content="GSL Woman: щоденні завдання тренінгу, теплі нагадування і твоя історія змін.">
 
@@ -39,6 +39,10 @@
   <link rel="stylesheet" href="js/screens/settings/settings.css">
   <link rel="stylesheet" href="js/screens/onboarding/onboarding.css">
   <link rel="stylesheet" href="js/screens/login/login.css">
+  <link rel="stylesheet" href="js/screens/goals/goals.css">
+  <link rel="stylesheet" href="js/account/account.css">
+  <link rel="stylesheet" href="js/media/media.css">
+  <link rel="stylesheet" href="js/install/install.css">
 
   <link rel="preload" href="assets/fonts/manrope-cyrillic.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="assets/fonts/cormorant-cyrillic.woff2" as="font" type="font/woff2" crossorigin>

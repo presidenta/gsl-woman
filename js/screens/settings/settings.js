@@ -8,33 +8,12 @@ import { clearAll } from '../../core/store.js';
 import { segmented, field, switchRow } from '../../ui/controls.js';
 import { icons } from '../../ui/icons.js';
 import { toast } from '../../ui/toast.js';
+import { accountCard } from '../../account/avatar.js';
+import { installCard } from '../../install/install.js';
+import * as media from '../../media/photos.js';
 
-/* ЭКРАН «НАСТРОЙКИ»: аккаунт «Кванта», обо мне (имя, язык), дата старта, время трёх напоминаний, уведомления, данные.
+/* ЭКРАН «НАСТРОЙКИ»: аккаунт «Кванта» (фото, имя, кабинет), значок на экран, обо мне (имя, язык), дата старта, время трёх напоминаний, уведомления, данные.
    Каждое изменение сохраняется сразу — кнопки «Сохранить» здесь нет, как и в спорте. */
-
-/* Аккаунт «Кванта»: кто вошёл и «Выйти». Выход стирает сессию и копию программы, записи остаются
-   на телефоне (main.js → ctx.logout). */
-function accountBlock(ctx) {
-  const a = ctx.account;
-  if (!a) return null;
-  const initial = (a.displayName || '·').trim().charAt(0).toUpperCase();
-  const out = h('button', { type: 'button', class: 'btn btn--quiet btn--small' }, t('settings.logout'));
-  out.addEventListener('click', () => {
-    if (!confirm(t('settings.logoutConfirm'))) return;
-    ctx.logout();
-  });
-  return h('section', { class: 'card settings__section' },
-    h('h2', { class: 'caps settings__heading' }, t('settings.account')),
-    h('div', { class: 'settings__account' },
-      h('span', { class: 'settings__avatar', 'aria-hidden': 'true' }, initial),
-      h('div', { class: 'settings__who' },
-        h('strong', {}, a.displayName || '—'),
-        a.accountNo ? h('span', { class: 'faint' }, t('settings.cabinet', { n: a.accountNo })) : null,
-      ),
-      out,
-    ),
-  );
-}
 
 export const LANG_LABELS = { ua: 'Українська', ru: 'Русский', en: 'English' };
 
@@ -92,8 +71,9 @@ export function render(view, ctx) {
   });
 
   const reset = h('button', { type: 'button', class: 'btn btn--danger btn--block' }, svg(icons.trash), t('settings.reset'));
-  reset.addEventListener('click', () => {
+  reset.addEventListener('click', async () => {
     if (!confirm(t('settings.resetConfirm'))) return;
+    await media.clear();
     clearAll();
     location.hash = '#/today';
     location.reload();
@@ -102,7 +82,8 @@ export function render(view, ctx) {
   view.append(
     h('h1', { class: 'screen-title' }, t('settings.title')),
 
-    accountBlock(ctx),
+    accountCard({ onLogout: ctx.logout }),
+    installCard(),
 
     h('section', { class: 'card settings__section' },
       h('h2', { class: 'caps settings__heading' }, t('settings.profile')),

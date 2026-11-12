@@ -5,6 +5,7 @@ import { dayPlan } from '../../program/index.js';
 import { icons } from '../../ui/icons.js';
 import { levelDots } from '../../ui/ring.js';
 import { openEntry } from '../entry/entry-sheet.js';
+import { photoStrip } from '../../media/photo-field.js';
 
 /* ЭКРАН «ЗАПИСИ»: история женщины по неделям, свежее сверху. Нажатие открывает запись для правки.
    Пустые поля не показываются — запись «просто отметила» выглядит коротко. */
@@ -39,6 +40,7 @@ function entryCard(ctx, e) {
       h('span', { class: 'entry-card__label' }, t(`entry.${label}`)),
       h('span', { class: 'entry-card__value' }, e[key]),
     )),
+    photoStrip(e.photos),
   );
 }
 
