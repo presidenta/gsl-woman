@@ -47,7 +47,7 @@ test('склонение дней', () => {
 test('подстановка и запасной язык', () => {
   setLang('en');
   assert.equal(t('today.dayOf', { day: 3 }), 'Day 3');
-  assert.equal(t('settings.cabinet', { n: 12 }), 'Cabinet No. 12', 'номер не отрывается от «No.» при переносе');
+  assert.equal(t('settings.cabinet', { n: 12 }), 'Cabinet № 12', 'номер держится за «№» при переносе');
   assert.equal(t('нет.такого.ключа'), 'нет.такого.ключа');
 });
 
@@ -55,5 +55,30 @@ test('нигде в надписях нет «полгода», «из 168» и 
   const bad = /полгода|пів року|півроку|six months|half a year|шесть месяцев|шість місяців|\{total\}|выпускн|випускн|graduat|финал|фінал|finale/i;
   for (const [lang, dict] of Object.entries({ ru, ua, en })) {
     assert.ok(!bad.test(JSON.stringify(dict)), lang);
+  }
+});
+
+// Положительные слова везде (владелец, 12.11.2026: «на подсознание работает приставка „не“ — во всех текстах
+// заменить на положительную настройку»): без «не», «нет», «ни», «без», «никуда» и слов с отрицающей приставкой.
+// «Ней», «неделя», «нежный», «безопасность» — разрешены: в них отрицания нет.
+const NEGATIVE = {
+  ru: /(^|[^а-яё])(не|нет|ни|без|никуда|ничего|никого|никаких|никогда|нигде|нельзя|некуда|нечего|непрошен[а-яё]*|незнаком[а-яё]*|недоступ[а-яё]*|небольш[а-яё]*|неудобн[а-яё]*|недосказ[а-яё]*|неспешн[а-яё]*)(?=[^а-яё]|$)/i,
+  ua: /(^|[^а-яіїєґ'’])(не|ні|нема|немає|без|нікуди|нічого|нікого|ніяких|ніколи|ніде|жодн[а-яіїєґ]*|непрохан[а-яіїєґ]*|незнайом[а-яіїєґ]*|недоступ[а-яіїєґ]*|невелик[а-яіїєґ]*|незручн[а-яіїєґ]*|неквапн[а-яіїєґ]*|неможлив[а-яіїєґ]*)(?=[^а-яіїєґ'’]|$)/i,
+  en: /\b(not|no|never|nothing|nobody|nowhere|none|nor|without|don[’']t|doesn[’']t|isn[’']t|aren[’']t|can[’']t|won[’']t|didn[’']t|unsolicited|unavailable|cannot|impossible)\b/i,
+};
+
+/** Все строки объекта с путём к каждой: [путь, строка]. */
+function allStrings(v, where = '') {
+  if (typeof v === 'string') return [[where, v]];
+  if (Array.isArray(v)) return v.flatMap((x, i) => allStrings(x, `${where}[${i}]`));
+  if (v && typeof v === 'object') return Object.entries(v).flatMap(([k, x]) => allStrings(x, where ? `${where}.${k}` : k));
+  return [];
+}
+
+test('тексты интерфейса — только положительные слова, без «не» (владелец, 12.11.2026)', () => {
+  for (const [lang, data] of Object.entries({ ru, ua, en })) {
+    for (const [where, text] of allStrings(data)) {
+      assert.ok(!NEGATIVE[lang].test(text), `${lang}: ${where}: «${text}»`);
+    }
   }
 });
