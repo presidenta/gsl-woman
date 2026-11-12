@@ -25,6 +25,7 @@ export function weekPlan(week, lang) {
     tasks: w.tasks,
     flow: w.flow,
     call: w.call,
+    imsgs: w.imsg || [],
     review: isReviewWeek(week),
     final: week === WEEKS,
   };
@@ -53,6 +54,8 @@ export function dayPlan(day, lang) {
     kind,
     task: kind === 'task' ? plan.tasks[n - 1] : null,
     taskIndex: kind === 'task' ? n - 1 : null,
+    // Я-сообщение — дни 4, 5, 6: пример к заданию дня 1, 2, 3 этой недели (владелец, 12.11.2026)
+    imsg: n >= 4 && n <= 6 ? plan.imsgs[n - 4] || null : null,
     ...plan,
   };
 }

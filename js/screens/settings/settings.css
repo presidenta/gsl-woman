@@ -124,3 +124,27 @@
 @media (prefers-reduced-motion: reduce) {
   .settings__update.is-spinning svg { animation: none; }
 }
+
+/* Вход в «Пять языков любви» — строка-карточка: сердце, название, стрелка */
+.settings__link {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  color: var(--c-text);
+  text-decoration: none;
+}
+
+.settings__link-text {
+  flex: 1;
+  font-family: var(--f-display);
+  font-size: var(--fs-lg);
+  font-weight: 600;
+  color: var(--c-champagne);
+}
+
+.settings__link-chevron svg {
+  display: block;
+  width: 16px;
+  height: 16px;
+  color: var(--c-gold);
+}

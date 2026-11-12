@@ -113,6 +113,12 @@ export function render(view, ctx) {
     accountCard({ onLogout: ctx.logout, update: updateButton() }),
     installCard(),
 
+    h('a', { class: 'card settings__link', href: '#/love' },
+      h('span', { class: 'card__icon' }, svg(icons.heart)),
+      h('span', { class: 'settings__link-text' }, t('love.title')),
+      svg(icons.chevronRight, 'settings__link-chevron'),
+    ),
+
     h('section', { class: 'card settings__section' },
       h('h2', { class: 'caps settings__heading' }, t('settings.profile')),
       name.node,

@@ -20,6 +20,7 @@ import * as settingsScreen from './screens/settings/settings.js';
 import * as onboarding from './screens/onboarding/onboarding.js';
 import * as login from './screens/login/login.js';
 import * as goalsScreen from './screens/goals/goals.js';
+import * as loveScreen from './screens/love/love.js';
 import { identity } from './account/avatar.js';
 import { brand as brandMark } from './ui/brand.js';
 import * as install from './install/install.js';
@@ -51,6 +52,7 @@ router.define('journal', journalScreen);
 router.define('path', path);
 router.define('goals', goalsScreen);
 router.define('settings', settingsScreen);
+router.define('love', loveScreen);
 
 const root = document.getElementById('app');
 let shell = null;
@@ -192,11 +194,13 @@ function draw() {
   // Каркас пересобирается целиком, чтобы смена языка сразу дошла до шапки и панели
   shell = buildShell();
   const name = router.currentRoute() || router.routeName();
-  const screen = { today, week, journal: journalScreen, path, goals: goalsScreen, settings: settingsScreen }[name] || today;
+  const screen = { today, week, journal: journalScreen, path, goals: goalsScreen, settings: settingsScreen, love: loveScreen }[name] || today;
 
   // Шапка: везде — кто вошёл (фото, имя, кабинет) и название; в настройках — «назад» вместо себя
-  shell.back.hidden = name !== 'settings';
-  if (shell.who) shell.who.hidden = name === 'settings';
+  // «Пять языков любви» — тоже подэкран: «назад» вместо себя
+  const sub = name === 'settings' || name === 'love';
+  shell.back.hidden = !sub;
+  if (shell.who) shell.who.hidden = sub;
   shell.gear.hidden = name === 'settings';
   for (const a of shell.nav.querySelectorAll('.app-nav__item')) {
     if (a.dataset.route === name) a.setAttribute('aria-current', 'page');

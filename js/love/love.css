@@ -1,0 +1,157 @@
+/* ПЯТЬ ЯЗЫКОВ ЛЮБВИ: карточка на «Сегодня» (cards.js) и экран #/love (screens/love/love.js). */
+
+/* — Карточка дня — */
+.love-card__kind {
+  color: var(--c-champagne);
+  font-family: var(--f-display);
+  font-size: var(--fs-2xl);
+  font-weight: 600;
+  line-height: 1.1;
+}
+
+.love-card__lead {
+  margin-top: var(--sp-3);
+  color: var(--c-gold);
+}
+
+.love-card__idea {
+  margin-top: var(--sp-1);
+}
+
+.love-card__child {
+  margin-top: var(--sp-3);
+  padding-top: var(--sp-3);
+  border-top: 1px solid var(--c-line);
+}
+
+.love-card__link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  justify-self: start;
+  margin-top: var(--sp-4);
+  color: var(--c-gold);
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.love-card__chevron svg {
+  display: block;
+  width: 14px;
+  height: 14px;
+}
+
+/* — Экран — */
+.love-who + .love-who {
+  margin-top: var(--sp-3);
+}
+
+.love-who__row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: var(--sp-2);
+  align-items: center;
+}
+
+.love-who__test {
+  min-height: 44px;
+  padding-inline: var(--sp-4);
+}
+
+.love-kinds {
+  display: grid;
+  gap: var(--sp-3);
+  margin: var(--sp-3) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.love-kinds li {
+  display: grid;
+  gap: 2px;
+}
+
+.love-kinds strong {
+  color: var(--c-champagne);
+  font-family: var(--f-display);
+  font-size: var(--fs-lg);
+  font-weight: 600;
+}
+
+/* — Тест — */
+.love-quiz__step {
+  margin-top: var(--sp-2);
+  font-size: var(--fs-xs);
+}
+
+.love-quiz .bar {
+  margin-top: var(--sp-2);
+}
+
+.love-quiz__q {
+  margin-top: var(--sp-4);
+}
+
+.love-quiz__answers {
+  display: grid;
+  gap: var(--sp-2);
+  margin-top: var(--sp-4);
+}
+
+.love-quiz__answer {
+  padding: var(--sp-3) var(--sp-4);
+  border: 1px solid var(--c-line-strong);
+  border-radius: var(--r-md);
+  background: var(--g-gold-soft);
+  color: var(--c-text);
+  font: inherit;
+  font-size: var(--fs-md);
+  text-align: left;
+  transition: border-color var(--t-fast), transform var(--t-fast);
+}
+
+.love-quiz__answer:active {
+  transform: scale(0.99);
+  border-color: var(--c-gold);
+}
+
+.love-quiz__cancel {
+  justify-self: start;
+  margin-top: var(--sp-4);
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--c-text-faint);
+  font-size: var(--fs-xs);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* — Итог теста — */
+.love-result__label {
+  margin-top: var(--sp-3);
+  color: var(--c-gold);
+}
+
+.love-result__name {
+  margin-top: var(--sp-1);
+  color: var(--c-champagne);
+  font-family: var(--f-display);
+  font-size: var(--fs-3xl);
+  line-height: 1.05;
+}
+
+.love-result__actions {
+  display: grid;
+  gap: var(--sp-2);
+}
+
+/* Кнопка-ссылка «Пройти тест» — без подчёркивания, как обычная кнопка */
+a.btn {
+  text-decoration: none;
+}
+
+.love-who:first-of-type {
+  margin-top: var(--sp-3);
+}

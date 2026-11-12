@@ -10,6 +10,8 @@ import { levelDots } from '../../ui/ring.js';
 import { toast } from '../../ui/toast.js';
 import { openEntry } from '../entry/entry-sheet.js';
 import { heelsFigure } from '../../ui/heels.js';
+import { imsgCard } from '../../imsg/imsg-card.js';
+import { loveCard } from '../../love/cards.js';
 
 /* ЭКРАН «СЕГОДНЯ» — главный. Сверху вниз, в порядке дня:
    1. Шапка дня: «День N» (без «из скольких» и без номера недели — обучение постоянное, владелец 12.11.2026),
@@ -297,6 +299,8 @@ export function render(view, ctx) {
       catchUp(ctx, summary),
       morningCard(ctx, plan),
       main,
+      imsgCard(ctx, plan),
+      loveCard(ctx, plan),
       recordedToday(ctx, plan),
     ),
   );

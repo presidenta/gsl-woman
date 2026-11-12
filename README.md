@@ -28,6 +28,8 @@ https://presidenta.github.io/gsl-woman/. **Текстов программы в 
 | `js/account/` | Вход аккаунтом «Кванта» (пароль или пропуск из «Кванта»), фото профиля, «кто вошёл» в шапке | Всё про вход и профиль |
 | `js/media/` | Фото к записям: база на телефоне, поле «Фото», просмотр | Всё про снимки |
 | `js/goals/` | Мои цели | Данные целей |
+| `js/imsg/` | Я-сообщение: карточка дней 4–6 | Вид примера, формула |
+| `js/love/` | Пять языков любви: выбор, тест, дело дня | Выбор и подсчёт теста |
 | `js/install/` | «Значок на экран» | Установка на телефон |
 | `js/insights/` | Итоги за неделю, месяц, всё время: реакции мужчин, что получилось, уровни | Что показывать в итогах |
 | `js/preview/` | Просмотр дней стрелками — только администратор | Листать программу владельцу |
@@ -49,7 +51,7 @@ https://presidenta.github.io/gsl-woman/. **Текстов программы в 
 | `assets/` | Шрифты (свои, для офлайна) и значки | `npm run icons` после правки `icon.svg` |
 
 У папок с логикой свой README: [account](js/account/README.md), [program](js/program/README.md),
-[reminders](js/reminders/README.md), [media](js/media/README.md), [goals](js/goals/README.md),
+[reminders](js/reminders/README.md), [media](js/media/README.md), [goals](js/goals/README.md), [imsg](js/imsg/README.md), [love](js/love/README.md),
 [install](js/install/README.md).
 
 ## Как устроено

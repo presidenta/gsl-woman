@@ -2,6 +2,7 @@ import { SLOTS } from '../config.js';
 import { isoDate, addDays, programDay, atTime } from '../core/dates.js';
 import { t, list, getLang } from '../core/i18n.js';
 import { dayPlan } from '../program/index.js';
+import { ideaFor } from '../love/love.js';
 
 /* РАСПИСАНИЕ НАПОМИНАНИЙ — что и когда сказать. Только считает, ничего не отправляет.
 
@@ -26,6 +27,9 @@ function morning(plan, s) {
   if (plan.kind === 'call') body = t(plan.review ? 'notice.morning.callReview' : 'notice.morning.call');
   else if (plan.kind === 'flow') body = t('notice.morning.flow');
   else body = s.showTaskInNotice ? `«${plan.task.title}» — ${plan.task.text}` : t('notice.morning.task');
+  // Язык любви выбран — каждое утро одно дело на его языке (владелец, 12.11.2026)
+  const idea = ideaFor('him', plan.day, getLang());
+  if (idea) body += `\n${t('love.notice', { idea: idea.text })}`;
   return { title: named, body };
 }
 
