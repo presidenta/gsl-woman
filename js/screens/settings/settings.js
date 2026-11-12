@@ -30,14 +30,23 @@ export function langSelect(current, onPick) {
 }
 
 /** Три поля времени в ряд — тоже общие. */
+/* Время трёх напоминаний — строками: слева «Утро» и зачем оно (задание дня), справа время. Три поля в ряд на
+   телефоне вылезали за край: у системного поля времени своя ширина (владелец 12.11.2026). */
 export function timeFields(times, onPick) {
-  return h('div', { class: 'time-grid' },
+  return h('div', { class: 'time-list' },
     ...SLOTS.map((slot) => {
-      const f = field({ label: t(`settings.${slot}`), type: 'time', value: times[slot], required: true });
-      f.control.addEventListener('change', () => {
-        if (isValidTime(f.control.value)) onPick(slot, f.control.value);
+      const id = `time-${slot}`;
+      const input = h('input', { id, class: 'input time-list__input', type: 'time', value: times[slot], required: true });
+      input.addEventListener('change', () => {
+        if (isValidTime(input.value)) onPick(slot, input.value);
       });
-      return f.node;
+      return h('div', { class: 'time-list__row' },
+        h('label', { class: 'time-list__name', for: id },
+          h('strong', {}, t(`settings.${slot}`)),
+          h('span', { class: 'time-list__hint' }, t(`settings.${slot}Hint`)),
+        ),
+        input,
+      );
     }),
   );
 }
@@ -72,7 +81,8 @@ export function render(view, ctx) {
     if (isValidIso(start.control.value)) settings.update({ startDate: start.control.value });
   });
 
-  const reset = h('button', { type: 'button', class: 'btn btn--danger btn--block' }, svg(icons.trash), t('settings.reset'));
+  // Стереть всё — маленькой тихой строкой в самом низу (владелец 12.11.2026: «большая кнопка — прям хочется нажать»)
+  const reset = h('button', { type: 'button', class: 'settings__reset' }, t('settings.reset'));
   reset.addEventListener('click', async () => {
     if (!confirm(t('settings.resetConfirm'))) return;
     await media.clear();
@@ -102,7 +112,6 @@ export function render(view, ctx) {
 
     h('section', { class: 'card settings__section' },
       h('h2', { class: 'caps settings__heading' }, t('settings.times')),
-      h('p', { class: 'field__hint', style: { marginBottom: 'var(--sp-4)' } }, t('settings.timesHint')),
       timeFields(s.times, (slot, value) => {
         settings.update({ times: { [slot]: value } });
         toast({ title: t('entry.saved') });
@@ -121,11 +130,8 @@ export function render(view, ctx) {
       }),
     ),
 
-    h('section', { class: 'card settings__section' },
-      h('h2', { class: 'caps settings__heading' }, t('settings.data')),
-      reset,
-    ),
 
     h('p', { class: 'settings__version faint' }, `${t('app.name')} · ${t('settings.version', { v: ctx.version })}`),
+    h('div', { class: 'settings__danger' }, reset),
   );
 }

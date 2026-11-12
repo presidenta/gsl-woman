@@ -49,7 +49,6 @@ export function render(view, { onDone }) {
         h('div', { class: 'field' },
           h('span', { class: 'field__label' }, t('onboarding.timesLabel')),
           timeFields(draft.times, (slot, value) => { draft.times[slot] = value; }),
-          h('p', { class: 'field__hint' }, t('settings.timesHint')),
         ),
       ),
       begin,
