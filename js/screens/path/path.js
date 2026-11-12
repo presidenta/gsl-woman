@@ -1,7 +1,7 @@
 import { h, add } from '../../core/dom.js';
 import { t } from '../../core/i18n.js';
 import { weekOf, monthOf } from '../../core/dates.js';
-import { outline, credit } from '../../program/index.js';
+import { outline } from '../../program/index.js';
 import { weekSummary } from '../../progress/progress.js';
 
 /* ЭКРАН «ПУТЬ»: шесть месяцев по четыре недели. Текущий месяц раскрыт, в нём подсвечена текущая
@@ -51,7 +51,4 @@ export function render(view, ctx) {
     );
   }
 
-  // Консультант проекта — строкой из программы (сервер), на языке женщины
-  const line = credit(ctx.lang);
-  if (line) add(view, h('p', { class: 'path-credit' }, line));
 }
