@@ -33,10 +33,10 @@ export default {
   kinds: { task: 'New exercise', flow: 'Free flow', call: 'Day of live connection' },
 
   today: {
-    dayOf: 'Day {day} of {total}',
+    dayOf: 'Day {day}',
     week: 'Week {n}',
     month: 'Month {n}',
-    weekProgress: 'Week: {done} of {total}',
+    weekProgress: 'Done this week: {done}',
     taskLabel: 'Today’s task',
     flowLead: 'Practise this week’s exercises freely — choose what feels closest today and notice your reactions.',
     exercisesLabel: 'This week’s exercises',
@@ -54,8 +54,8 @@ export default {
     catchDay: 'Day {day} · {date}',
     beforeTitle: 'Starting soon',
     beforeText: 'Your path begins on {date}. {left} to go.',
-    afterTitle: 'Path completed',
-    afterText: 'Six months behind you. You are a “Woman Plus”.',
+    afterTitle: 'The first part of your path is complete',
+    afterText: 'You are a “Woman Plus”. The path goes on: the next part of the training will open here.',
   },
 
   morning: {
@@ -122,7 +122,7 @@ export default {
 
   path: {
     title: 'Path',
-    lead: 'Six months, twenty-four weeks.',
+    lead: 'The first part of your path, month by month. The training does not end here.',
     current: 'Now',
     ahead: 'Ahead',
     goal: 'Goal of the month',
@@ -215,7 +215,7 @@ export default {
   onboarding: {
     eyebrow: 'Private practicum',
     title: 'Welcome',
-    lead: 'Six months of small steps: one task a day, three warm reminders and your own story in the journal.',
+    lead: 'A path of small steps: one task a day, three warm reminders and your own story in the journal.',
     begin: 'Begin the path',
     langLabel: 'Language',
     nameLabel: 'What should we call you',

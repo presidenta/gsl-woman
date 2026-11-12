@@ -1,6 +1,5 @@
 import { h, svg } from '../../core/dom.js';
 import { t, plural, formatDate } from '../../core/i18n.js';
-import { PROGRAM_DAYS, TASK_DAYS } from '../../config.js';
 import { dateOfDay, daysBetween, weekOf } from '../../core/dates.js';
 import { dayPlan } from '../../program/index.js';
 import { morningFor } from '../../program/morning.js';
@@ -12,7 +11,8 @@ import { toast } from '../../ui/toast.js';
 import { openEntry } from '../entry/entry-sheet.js';
 
 /* ЭКРАН «СЕГОДНЯ» — главный. Сверху вниз, в порядке дня:
-   1. Шапка дня: день из 168, неделя, вид дня, название недели и её прогресс.
+   1. Шапка дня: «День N» (без «из скольких» и без номера недели — обучение постоянное, владелец 12.11.2026),
+      вид дня, название недели и её прогресс.
    2. «Можно наверстать» — если в этой неделе есть пропуски.
    3. Утренняя минута с таймером на 60 секунд.
    4. Дело дня: задание с уровнями / свободный поток / седьмой день с созвоном и отзывом месяца.
@@ -43,15 +43,14 @@ function runMinute(iso, seconds) {
 function header(plan, summary) {
   return h('section', { class: 'card card--hero today-hero' },
     h('div', { class: 'card__eyebrow' },
-      h('span', { class: 'chip chip--solid' }, t('today.dayOf', { day: plan.day, total: PROGRAM_DAYS })),
-      h('span', { class: 'chip' }, t('today.week', { n: plan.week })),
+      h('span', { class: 'chip chip--solid' }, t('today.dayOf', { day: plan.day })),
     ),
     h('p', { class: 'caps' }, `${t('today.month', { n: plan.month })} · ${plan.monthInfo.title}`),
     h('h1', { class: 'today-hero__title' }, plan.title),
     h('p', { class: 'today-hero__kind' }, svg(icons.sparkle, 'today-hero__kind-icon'), t(`kinds.${plan.kind}`)),
     h('div', { class: 'today-hero__progress' },
       h('div', { class: 'bar' }, h('div', { class: 'bar__fill', style: { width: `${summary.percent}%` } })),
-      h('span', { class: 'faint' }, t('today.weekProgress', { done: summary.done, total: TASK_DAYS })),
+      h('span', { class: 'faint' }, t('today.weekProgress', { done: summary.done })),
     ),
   );
 }

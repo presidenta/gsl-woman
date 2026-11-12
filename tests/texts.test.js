@@ -42,6 +42,14 @@ test('склонение дней', () => {
 
 test('подстановка и запасной язык', () => {
   setLang('en');
-  assert.equal(t('today.dayOf', { day: 3, total: 168 }), 'Day 3 of 168');
+  assert.equal(t('today.dayOf', { day: 3 }), 'Day 3');
+  assert.equal(t('settings.cabinet', { n: 12 }), 'Cabinet No. 12');
   assert.equal(t('нет.такого.ключа'), 'нет.такого.ключа');
+});
+
+test('нигде в надписях нет «полгода», «из 168» и финала: обучение постоянное (владелец, 12.11.2026)', () => {
+  const bad = /полгода|пів року|півроку|six months|half a year|шесть месяцев|шість місяців|\{total\}|выпускн|випускн|graduat|финал|фінал|finale/i;
+  for (const [lang, dict] of Object.entries({ ru, ua, en })) {
+    assert.ok(!bad.test(JSON.stringify(dict)), lang);
+  }
 });
