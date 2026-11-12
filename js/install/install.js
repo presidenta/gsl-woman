@@ -2,6 +2,7 @@ import { h, svg } from '../core/dom.js';
 import { t } from '../core/i18n.js';
 import { icons } from '../ui/icons.js';
 import { brand } from '../ui/brand.js';
+import { openSheet, isOpen as sheetOpen } from '../ui/sheet.js';
 
 /* ЗНАЧОК НА ЭКРАН ТЕЛЕФОНА — как у спорта. Chrome сам присылает событие beforeinstallprompt, если сайт
    можно поставить, — тогда кнопка «Поставить значок» ставит его одним нажатием. Нет события (iPhone,
@@ -39,10 +40,42 @@ export function requestHighlight() {
   highlight = true;
 }
 
-/** Карточка для настроек; открыто со значка — null. */
-export function installCard() {
-  if (standalone()) return null;
-  const body = [];
+/* Пришли из «Кванта» по кнопке «Значок на экран» (12.11.2026: «нажимаю — просто открывается приложение,
+   иконка не ставится»). Значок браузер ставит только по нажатию внутри приложения, а при первом открытии
+   женщина сначала проходит вход и первую настройку — до карточки в настройках она не доходила. Поэтому, как
+   только приложение готово, — сразу лист с одной большой кнопкой. Нажатие на неё и есть то касание, которого
+   ждёт браузер. */
+let offerPending = false;
+
+export function requestOffer() {
+  offerPending = true;
+}
+
+/** Показать лист «Значок на экран», если его просили. Зовёт main.js, когда экраны уже на месте. */
+export function offerIfRequested() {
+  if (!offerPending || sheetOpen()) return;
+  offerPending = false;
+  highlight = false;
+  if (standalone()) return;
+  const holder = h('div', { class: 'install-sheet' });
+  const paint = () => holder.replaceChildren(...sheetBody());
+  paint();
+  listeners.add(paint);   // браузер разрешил установку, пока лист открыт, — появится кнопка
+  openSheet({ title: t('install.title'), content: holder, onClose: () => listeners.delete(paint) });
+}
+
+/* Содержимое: значок, название и кнопка — или подсказка, где это в меню браузера. */
+function sheetBody() {
+  return [
+    h('div', { class: 'install__head install__head--sheet' },
+      h('span', { class: 'install__icon' }, h('img', { src: 'assets/icons/icon-192.png', alt: '', width: '44', height: '44' })),
+      h('p', { class: 'install__name' }, brand()),
+    ),
+    ...actionBody(),
+  ];
+}
+
+function actionBody() {
   if (deferred) {
     const btn = h('button', { type: 'button', class: 'btn btn--gold btn--block' }, svg(icons.phoneIcon), t('install.button'));
     btn.addEventListener('click', async () => {
@@ -52,10 +85,15 @@ export function installCard() {
       await e.userChoice.catch(() => null);
       listeners.forEach((fn) => fn());
     });
-    body.push(h('p', { class: 'field__hint install__lead' }, t('install.lead')), btn);
-  } else {
-    body.push(h('p', { class: 'field__hint install__lead' }, isIOS() ? t('install.ios') : t('install.menu')));
+    return [h('p', { class: 'field__hint install__lead' }, t('install.lead')), btn];
   }
+  return [h('p', { class: 'field__hint install__lead' }, isIOS() ? t('install.ios') : t('install.menu'))];
+}
+
+/** Карточка для настроек; открыто со значка — null. */
+export function installCard() {
+  if (standalone()) return null;
+  const body = actionBody();
 
   const card = h('section', { class: 'card settings__section install', id: 'install' },
     h('div', { class: 'install__head' },

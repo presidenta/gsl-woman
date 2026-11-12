@@ -121,7 +121,10 @@ function takeKvantLink() {
   const pass = params.get('kvant');
   const wantInstall = params.has('install');
   if (!pass && !wantInstall) return;
-  if (wantInstall) install.requestHighlight();
+  if (wantInstall) {
+    install.requestHighlight();
+    install.requestOffer();
+  }
   history.replaceState(null, '', location.pathname + location.search + (wantInstall ? '#/settings' : '#/today'));
   if (!pass || account.current()) return;
   gate = { mode: 'loading', message: '' };
@@ -197,6 +200,8 @@ function draw() {
     else a.removeAttribute('aria-current');
   }
   screen.render(shell.view, ctx);
+  // Пришли из «Кванта» за значком — лист с кнопкой, как только вход и первая настройка позади
+  install.offerIfRequested();
 }
 
 /* Перерисовка после изменений в хранилище. Пока открыт лист записи — откладываем: под ним
