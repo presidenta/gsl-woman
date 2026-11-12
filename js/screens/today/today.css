@@ -252,3 +252,42 @@
 :root:lang(en) .say__text {
   quotes: '“' '”';
 }
+
+/* Формула «комплимент — программа — комплимент»: три строки, слева тонкая золотая нить, у каждой части
+   подпись мелкими капителями. Программа — чуть ярче: это то, чего ты хочешь. */
+.task__kpk-hint {
+  margin: calc(-1 * var(--sp-1)) 0 var(--sp-3);
+  color: var(--c-text-dim);
+  font-size: var(--fs-sm);
+  line-height: var(--lh-text);
+}
+
+.kpk {
+  display: grid;
+  gap: var(--sp-2);
+  margin: var(--sp-2) 0 0;
+  padding: 0 0 0 var(--sp-3);
+  border-left: 1px solid var(--c-line-strong);
+  list-style: none;
+}
+
+.kpk__part {
+  display: grid;
+  gap: 1px;
+}
+
+.kpk__tag {
+  color: var(--c-gold-deep);
+  font-size: var(--fs-2xs);
+  font-weight: 700;
+  letter-spacing: var(--tracking-caps);
+  text-transform: uppercase;
+}
+
+.kpk__part--program .kpk__tag {
+  color: var(--c-gold);
+}
+
+.kpk__part--program .say__text {
+  color: var(--c-text);
+}

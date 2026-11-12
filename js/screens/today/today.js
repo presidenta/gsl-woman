@@ -153,10 +153,8 @@ function taskCard(plan) {
     task.say?.length
       ? h('div', { class: 'task__block' },
         h('p', { class: 'caps task__block-title' }, t('today.sayTitle')),
-        h('ul', { class: 'task__say' }, ...task.say.map((s) => h('li', { class: 'say' },
-          h('span', { class: 'say__label' }, s.label),
-          h('q', { class: 'say__text' }, s.text),
-        ))),
+        task.say.some((s) => s.kpk) ? h('p', { class: 'task__kpk-hint' }, t('today.kpkHint')) : null,
+        h('ul', { class: 'task__say' }, ...task.say.map(sayItem)),
       )
       : null,
     h('div', { class: 'card__actions' },
@@ -166,6 +164,25 @@ function taskCard(plan) {
         onclick: () => openEntry({ day: plan.day, kind: 'task', levels: task.levels }),
       }, svg(icons.plus), t('today.record')),
     ),
+  );
+}
+
+/* Фраза: просто слова — или по формуле «комплимент — программа — комплимент» (kpk): три части строками,
+   у каждой своя подпись, чтобы женщина видела, как строится фраза, и училась собирать свои. */
+function sayItem(s) {
+  if (s.kpk?.length === 3) {
+    const tags = [t('today.kpkCompliment'), t('today.kpkProgram'), t('today.kpkCompliment')];
+    return h('li', { class: 'say say--kpk' },
+      h('span', { class: 'say__label' }, s.label),
+      h('ol', { class: 'kpk' }, ...s.kpk.map((part, i) => h('li', { class: `kpk__part kpk__part--${i === 1 ? 'program' : 'compliment'}` },
+        h('span', { class: 'kpk__tag' }, tags[i]),
+        h('q', { class: 'say__text' }, part),
+      ))),
+    );
+  }
+  return h('li', { class: 'say' },
+    h('span', { class: 'say__label' }, s.label),
+    h('q', { class: 'say__text' }, s.text),
   );
 }
 
