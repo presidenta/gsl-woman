@@ -6,6 +6,7 @@ import { current as currentAccount } from '../../account/session.js';
 import * as permission from '../../reminders/permission.js';
 import { field } from '../../ui/controls.js';
 import { icons } from '../../ui/icons.js';
+import { brand } from '../../ui/brand.js';
 import { langPicker, timeFields } from '../settings/settings.js';
 
 /* ПЕРВЫЙ ВХОД: одна страница без нижней панели — язык, имя, дата старта, время напоминаний.
@@ -38,7 +39,7 @@ export function render(view, { onDone }) {
     h('div', { class: 'onboarding' },
       h('div', { class: 'onboarding__mark' }, svg(icons.sparkle)),
       h('p', { class: 'caps onboarding__eyebrow' }, t('onboarding.eyebrow')),
-      h('h1', { class: 'onboarding__brand gold-text' }, t('app.name')),
+      h('h1', { class: 'onboarding__brand gold-text' }, brand()),
       h('p', { class: 'onboarding__tagline' }, t('app.tagline')),
       h('p', { class: 'onboarding__lead' }, t('onboarding.lead')),
 

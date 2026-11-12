@@ -195,3 +195,18 @@ img, svg {
     display: none;
   }
 }
+
+/* «GSL Woman+»: плюс над строкой, прямой, чуть меньше букв — как на значке */
+.brand {
+  white-space: nowrap;
+}
+
+.brand__plus {
+  display: inline-block;
+  margin-left: 0.06em;
+  font-size: 0.74em;
+  font-style: normal;
+  font-weight: 600;
+  vertical-align: 0.5em;
+  line-height: 0;
+}

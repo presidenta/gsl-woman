@@ -2,7 +2,7 @@
 
 export default {
   app: {
-    name: 'GSL Woman',
+    name: 'GSL Woman+',
     tagline: 'Trainings for women',
   },
 
@@ -36,6 +36,8 @@ export default {
     dayOf: 'Day {day}',
     week: 'Week {n}',
     month: 'Month {n}',
+    howTitle: 'How to do it',
+    sayTitle: 'What to say',
     weekProgress: 'Done this week: {done}',
     taskLabel: 'Today’s task',
     flowLead: 'Practise this week’s exercises freely — choose what feels closest today and notice your reactions.',
@@ -43,7 +45,7 @@ export default {
     record: 'Record the result',
     recordMore: 'Add another entry',
     recordedToday: 'Recorded today',
-    callTitle: 'Call with Ladomir',
+    callTitle: 'Call with your mentor',
     callLead: 'Day seven is the week review. Look at what worked and bring your questions to the call.',
     callMark: 'Review the week',
     callDone: 'Week reviewed',
@@ -54,8 +56,8 @@ export default {
     catchDay: 'Day {day} · {date}',
     beforeTitle: 'Starting soon',
     beforeText: 'Your path begins on {date}. {left} to go.',
-    afterTitle: 'The first part of your path is complete',
-    afterText: 'You are a “Woman Plus”. The path goes on: the next part of the training will open here.',
+    afterTitle: 'The “New Me” stage is complete',
+    afterText: 'You are a “Woman Plus”. The path goes on: the next stage will open here.',
   },
 
   morning: {
@@ -122,7 +124,7 @@ export default {
 
   path: {
     title: 'Path',
-    lead: 'The first part of your path, month by month. The training does not end here.',
+    lead: '“New Me” is the beginning of your path. Step by step, month by month.',
     current: 'Now',
     ahead: 'Ahead',
     goal: 'Goal of the month',
@@ -213,7 +215,7 @@ export default {
   },
 
   onboarding: {
-    eyebrow: 'Private practicum',
+    eyebrow: 'The “New Me” programme',
     title: 'Welcome',
     lead: 'A path of small steps: one task a day, three warm reminders and your own story in the journal.',
     begin: 'Begin the path',
@@ -229,8 +231,8 @@ export default {
       titleNamed: 'Good morning, {name}',
       task: 'Today’s task is waiting for you. Start with a minute of energy.',
       flow: 'Free flow: practise this week’s exercises your way.',
-      call: 'Today is the week review and your call with Ladomir.',
-      callReview: 'Today is the month review, your call with Ladomir and a live testimonial.',
+      call: 'Today is the week review and your call with your mentor.',
+      callReview: 'Today is the month review, your call with your mentor and a live testimonial.',
     },
     noon: {
       body: 'How is the task going?',

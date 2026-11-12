@@ -62,6 +62,7 @@ self.GSL_FILES = [
   './js/texts/en.js',
   './js/texts/ru.js',
   './js/texts/ua.js',
+  './js/ui/brand.js',
   './js/ui/controls.js',
   './js/ui/icons.js',
   './js/ui/ring.js',

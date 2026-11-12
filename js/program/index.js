@@ -57,6 +57,11 @@ export function dayPlan(day, lang) {
   };
 }
 
+/** Строка о консультанте проекта (экран «Путь»); программа не пришла — пусто. */
+export function credit(lang) {
+  return data(lang)?.credit || '';
+}
+
 /** Короткое имя дела дня — для заголовка напоминания и записи. */
 export function dayTitle(plan) {
   if (!plan) return '';

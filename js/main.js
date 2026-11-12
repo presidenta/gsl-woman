@@ -21,6 +21,7 @@ import * as onboarding from './screens/onboarding/onboarding.js';
 import * as login from './screens/login/login.js';
 import * as goalsScreen from './screens/goals/goals.js';
 import { identity } from './account/avatar.js';
+import { brand as brandMark } from './ui/brand.js';
 import * as install from './install/install.js';
 import * as media from './media/photos.js';
 
@@ -77,7 +78,7 @@ function context() {
 function buildShell() {
   const back = h('button', { type: 'button', class: 'icon-btn', 'aria-label': t('common.back'), onclick: () => router.go('today') }, svg(icons.back));
   const gear = h('a', { class: 'icon-btn', href: '#/settings', 'aria-label': t('common.settings') }, svg(icons.gear));
-  const brand = h('div', { class: 'app-header__brand gold-text' }, t('app.name'));
+  const brand = h('div', { class: 'app-header__brand gold-text' }, brandMark());
   const who = identity();
   const view = h('main', { class: 'app-view', id: 'view', tabindex: '-1' });
   const nav = h('nav', { class: 'app-nav', 'aria-label': t('app.name') },

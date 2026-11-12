@@ -1,5 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-  <!-- Исходник значка GSL Woman. PNG для телефона делает `npm run icons` (tools/icons.py).
+  <!-- Исходник значка GSL Woman+ (лотос и золотой плюс — «Жінка-Плюс», 12.11.2026). PNG для телефона делает `npm run icons` (tools/icons.py).
        Лотос — из обложки презентации тренинга. Рисунок держится в центральном круге (80% стороны):
        маска Android обрезает края, и лепестки не должны попасть под обрезку. -->
   <defs>
@@ -37,6 +37,8 @@
     <path d="M256 348 C 316 318 362 262 366 196 C 302 210 264 268 256 348 Z" fill="url(#gold)"/>
     <!-- Центральный лепесток -->
     <path d="M256 128 C 304 186 318 268 256 350 C 194 268 208 186 256 128 Z" fill="url(#gold)"/>
+    <!-- Плюс: «Woman+», «Жінка-Плюс». В безопасном круге маски Android -->
+    <path d="M362 112 V 176 M330 144 H 394" fill="none" stroke="url(#gold)" stroke-width="17" stroke-linecap="round"/>
     <!-- Вода под цветком -->
     <path d="M168 382 Q 256 404 344 382" fill="none" stroke="url(#gold)" stroke-width="7" stroke-linecap="round"/>
     <path d="M206 404 Q 256 416 306 404" fill="none" stroke="url(#goldSoft)" stroke-width="5" stroke-linecap="round"/>

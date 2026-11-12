@@ -3,6 +3,7 @@ import { t, setLang } from '../../core/i18n.js';
 import * as settings from '../../settings/settings.js';
 import { field } from '../../ui/controls.js';
 import { icons } from '../../ui/icons.js';
+import { brand } from '../../ui/brand.js';
 import { langPicker } from '../settings/settings.js';
 
 /* ВХОД: до него приложение ничего не показывает — программа приходит только вошедшей (program/source.js).
@@ -21,7 +22,7 @@ export function render(view, { mode = 'form', message = '', onLogin, onRetry }) 
   const hero = [
     h('div', { class: 'onboarding__mark' }, svg(icons.sparkle)),
     h('p', { class: 'caps onboarding__eyebrow' }, t('onboarding.eyebrow')),
-    h('h1', { class: 'onboarding__brand gold-text' }, t('app.name')),
+    h('h1', { class: 'onboarding__brand gold-text' }, brand()),
     h('p', { class: 'onboarding__tagline' }, t('app.tagline')),
   ];
 

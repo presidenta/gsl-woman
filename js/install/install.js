@@ -1,6 +1,7 @@
 import { h, svg } from '../core/dom.js';
 import { t } from '../core/i18n.js';
 import { icons } from '../ui/icons.js';
+import { brand } from '../ui/brand.js';
 
 /* ЗНАЧОК НА ЭКРАН ТЕЛЕФОНА — как у спорта. Chrome сам присылает событие beforeinstallprompt, если сайт
    можно поставить, — тогда кнопка «Поставить значок» ставит его одним нажатием. Нет события (iPhone,
@@ -61,7 +62,7 @@ export function installCard() {
       h('span', { class: 'install__icon' }, h('img', { src: 'assets/icons/icon-192.png', alt: '', width: '44', height: '44' })),
       h('div', {},
         h('h2', { class: 'caps settings__heading install__title' }, t('install.title')),
-        h('p', { class: 'install__name' }, t('app.name')),
+        h('p', { class: 'install__name' }, brand()),
       ),
     ),
     ...body,

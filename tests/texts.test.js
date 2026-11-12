@@ -23,8 +23,12 @@ test('пулы комплиментов одной длины', () => {
   assert.equal(en.compliments.length, ru.compliments.length);
 });
 
-test('название приложения — GSL Woman во всех языках', () => {
-  for (const d of [ru, ua, en]) assert.equal(d.app.name, 'GSL Woman');
+test('название приложения — GSL Woman+ во всех языках (плюс — от «Жінка-Плюс», 12.11.2026)', () => {
+  for (const d of [ru, ua, en]) assert.equal(d.app.name, 'GSL Woman+');
+});
+
+test('нигде в надписях нет имени ведущего: созвоны — с наставником', () => {
+  for (const [lang, d] of Object.entries({ ru, ua, en })) assert.ok(!/Ладомир|Ladomir/.test(JSON.stringify(d)), lang);
 });
 
 test('склонение дней', () => {

@@ -1,7 +1,7 @@
 {
   "id": "./",
-  "name": "GSL Woman — тренінги для жінок",
-  "short_name": "GSL Woman",
+  "name": "GSL Woman+ — тренінги для жінок",
+  "short_name": "GSL Woman+",
   "description": "Щоденні завдання тренінгу, теплі нагадування і твоя історія змін.",
   "start_url": "./#/today",
   "scope": "./",

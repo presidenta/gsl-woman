@@ -135,6 +135,12 @@ function taskCard(plan) {
     plan.intro ? h('p', { class: 'task__intro' }, plan.intro) : null,
     h('h2', { class: 'task__title' }, `«${task.title}»`),
     h('p', { class: 'task__text' }, task.text),
+    task.how?.length
+      ? h('div', { class: 'task__block' },
+        h('p', { class: 'caps task__block-title' }, t('today.howTitle')),
+        h('ol', { class: 'task__how' }, ...task.how.map((step) => h('li', {}, step))),
+      )
+      : null,
     h('ul', { class: 'task__levels' },
       ...['min', 'full', 'max'].map((l, i) =>
         h('li', {},
@@ -144,6 +150,15 @@ function taskCard(plan) {
         ),
       ),
     ),
+    task.say?.length
+      ? h('div', { class: 'task__block' },
+        h('p', { class: 'caps task__block-title' }, t('today.sayTitle')),
+        h('ul', { class: 'task__say' }, ...task.say.map((s) => h('li', { class: 'say' },
+          h('span', { class: 'say__label' }, s.label),
+          h('q', { class: 'say__text' }, s.text),
+        ))),
+      )
+      : null,
     h('div', { class: 'card__actions' },
       h('button', {
         type: 'button',
