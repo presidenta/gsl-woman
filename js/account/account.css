@@ -86,12 +86,12 @@
   position: relative;
   display: grid;
   grid-template-columns: auto minmax(0, 1fr) auto;
-  grid-template-areas: 'photo who actions';
+  grid-template-areas: 'photo who actions' 'photo links links';
   align-items: center;
   padding-top: var(--sp-5);
   padding-bottom: var(--sp-5);
   column-gap: var(--sp-4);
-  row-gap: var(--sp-3);
+  row-gap: 6px;
   overflow: hidden;
 }
 
@@ -144,6 +144,7 @@
   grid-area: who;
   position: relative;
   display: grid;
+  align-self: end;
   min-width: 0;
   gap: 3px;
 }
@@ -164,6 +165,55 @@
   letter-spacing: 0.12em;
   text-transform: uppercase;
   font-variant-numeric: var(--num-display);
+}
+
+/* Фото есть: «📷 Сменить фото · Убрать» — одна тонкая строка под кабинетом; нет — «Добавить фото» */
+.account__links {
+  grid-area: links;
+  position: relative;
+  display: flex;
+  align-items: center;
+  align-self: start;
+  gap: 8px;
+  white-space: nowrap;
+}
+
+.account__links .account__link {
+  margin-top: 0;
+  text-decoration: none;
+}
+
+.account__links .account__link:hover,
+.account__links .account__link:focus-visible {
+  text-decoration: underline;
+}
+
+/* Нажатие на фото — лёгкий отклик: фото само по себе кнопка «сменить» */
+.account__photo .avatar {
+  transition: transform var(--t-fast, 0.15s) var(--ease, ease);
+}
+
+.account__photo:active .avatar {
+  transform: scale(0.97);
+}
+
+.account__links .account__link--change {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--c-gold);
+}
+
+.account__link-icon svg {
+  display: block;
+  width: 13px;
+  height: 13px;
+  stroke-width: 2;
+}
+
+.account__dot {
+  color: var(--c-text-faint);
+  font-size: var(--fs-xs);
 }
 
 .account__link {

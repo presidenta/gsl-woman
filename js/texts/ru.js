@@ -187,6 +187,8 @@ export default {
     profile: 'Поменять фото профиля',
     profileAdd: 'Добавить фото',
     profileRemove: 'Убрать фото',
+    profileChange: 'Сменить фото',
+    profileRemoveShort: 'Убрать',
   },
   install: {
     title: 'Значок на экран',

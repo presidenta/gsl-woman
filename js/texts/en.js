@@ -185,6 +185,8 @@ export default {
     profile: 'Change profile photo',
     profileAdd: 'Add photo',
     profileRemove: 'Remove photo',
+    profileChange: 'Change photo',
+    profileRemoveShort: 'Remove',
   },
   install: {
     title: 'Icon on home screen',

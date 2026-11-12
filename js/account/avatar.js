@@ -66,22 +66,31 @@ export function identity() {
   );
 }
 
-/** Карточка «Аккаунт» в настройках: большое фото с камерой, имя, кабинет, «Выйти». */
+/** Карточка «Аккаунт» в настройках: большое фото, имя, кабинет, «Выйти».
+    Фотоаппарат на кружке — только пока фото нет (владелец 12.11.2026: значок перекрывал фотографию).
+    Фото есть — кружок чистый, нажатие на него меняет фото, а под кабинетом тонкая строка
+    «📷 Сменить фото · Убрать», как в кабинетах дорогих сервисов. */
 export function accountCard({ onLogout, update = null }) {
   const a = current();
   if (!a) return null;
+  const has = hasPhoto();
   const photo = h('button', { type: 'button', class: 'account__photo', 'aria-label': t('photos.profile'), onclick: pickPhoto },
     avatar('lg'),
-    h('span', { class: 'account__cam' }, svg(icons.camera)),
+    has ? null : h('span', { class: 'account__cam' }, svg(icons.camera)),
   );
   const out = h('button', { type: 'button', class: 'icon-btn account__icon', 'aria-label': t('settings.logout'), title: t('settings.logout') }, svg(icons.logout));
   out.addEventListener('click', () => {
     if (!confirm(t('settings.logoutConfirm'))) return;
     onLogout();
   });
-  const dropPhoto = hasPhoto()
-    ? h('button', { type: 'button', class: 'account__link', onclick: () => clearPhoto() }, t('photos.profileRemove'))
-    : h('button', { type: 'button', class: 'account__link', onclick: pickPhoto }, t('photos.profileAdd'));
+  const dropPhoto = has
+    ? h('div', { class: 'account__links' },
+      h('button', { type: 'button', class: 'account__link account__link--change', onclick: pickPhoto },
+        svg(icons.camera, 'account__link-icon'), t('photos.profileChange')),
+      h('span', { class: 'account__dot', 'aria-hidden': 'true' }, '·'),
+      h('button', { type: 'button', class: 'account__link', onclick: () => clearPhoto() }, t('photos.profileRemoveShort')),
+    )
+    : h('div', { class: 'account__links' }, h('button', { type: 'button', class: 'account__link', onclick: pickPhoto }, t('photos.profileAdd')));
 
   return h('section', { class: 'card account' },
     h('div', { class: 'account__glow', 'aria-hidden': 'true' }),
@@ -89,8 +98,9 @@ export function accountCard({ onLogout, update = null }) {
     h('div', { class: 'account__who' },
       h('strong', { class: 'account__name' }, a.displayName || '—'),
       a.accountNo ? h('span', { class: 'account__no' }, t('settings.cabinet', { n: a.accountNo })) : null,
-      dropPhoto,
     ),
+    // Ссылки про фото — своим рядом сетки под именем: тянутся и под значками справа, не переносятся
+    dropPhoto,
     // «Обновить» и «Выйти» — два маленьких круглых значка в правом верхнем углу карточки, как в кабинетах дорогих
     // сервисов (владелец 12.11.2026: «маленькие кнопочки: обновить — кружочек, выйти — дверь со стрелочкой»)
     h('div', { class: 'account__actions' }, update, out),
