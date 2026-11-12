@@ -4,6 +4,7 @@
 #   icon-512 / icon-192 — значок на экран (Android, вкладка), icon-180 — iPhone,
 #   maskable-512 — для круглой/скруглённой маски Android, badge-96 — белый силуэт для строки уведомлений.
 import base64
+import io
 import os
 import subprocess
 import sys
@@ -39,8 +40,13 @@ def main():
     with open(os.path.join(ICONS, 'icon.svg'), encoding='utf-8') as f:
         svg = f.read()
     # Текстура розового золота — внутрь SVG: страница отрисовки лежит во временной папке, ссылка бы не нашлась
-    with open(os.path.join(ROOT, 'assets', 'textures', 'rose-gold.jpg'), 'rb') as f:
-        texture = 'data:image/jpeg;base64,' + base64.b64encode(f.read()).decode()
+    # Металл для значка — светлее и контрастнее, чем в кнопках: маленький значок на рабочем столе тёмным не читается
+    from PIL import ImageEnhance
+    tex = Image.open(os.path.join(ROOT, 'assets', 'textures', 'rose-gold.jpg')).convert('RGB')
+    tex = ImageEnhance.Contrast(ImageEnhance.Brightness(tex).enhance(1.22)).enhance(1.12)
+    buf = io.BytesIO()
+    tex.save(buf, 'JPEG', quality=92)
+    texture = 'data:image/jpeg;base64,' + base64.b64encode(buf.getvalue()).decode()
     svg = svg.replace('href="../textures/rose-gold.jpg"', f'href="{texture}"')
     with tempfile.TemporaryDirectory() as tmp:
         full = os.path.join(tmp, 'full.png')

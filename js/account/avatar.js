@@ -74,7 +74,7 @@ export function accountCard({ onLogout, update = null }) {
     avatar('lg'),
     h('span', { class: 'account__cam' }, svg(icons.camera)),
   );
-  const out = h('button', { type: 'button', class: 'btn btn--quiet btn--small' }, t('settings.logout'));
+  const out = h('button', { type: 'button', class: 'btn btn--quiet btn--small' }, svg(icons.logout), t('settings.logout'));
   out.addEventListener('click', () => {
     if (!confirm(t('settings.logoutConfirm'))) return;
     onLogout();

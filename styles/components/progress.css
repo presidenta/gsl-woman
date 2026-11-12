@@ -61,7 +61,7 @@
 .bar__fill {
   height: 100%;
   border-radius: inherit;
-  background: var(--g-gold);
+  background: var(--g-gold-smooth);
   transition: width var(--t-slow) var(--ease);
 }
 

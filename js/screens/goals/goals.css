@@ -35,7 +35,7 @@
   padding: 0;
   border: 0;
   border-radius: 50%;
-  background: var(--g-gold);
+  background: var(--g-gold-smooth);
   background-size: 200% 100%;
   color: var(--c-on-gold);
   box-shadow: var(--sh-gold);
@@ -101,7 +101,7 @@
 
 .goal__mark.is-done {
   border-color: transparent;
-  background: var(--g-gold);
+  background: var(--g-gold-smooth);
   color: var(--c-on-gold);
   box-shadow: var(--sh-gold);
 }

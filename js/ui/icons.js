@@ -14,6 +14,7 @@ export const icons = {
   chevronLeft: wrap('<path d="M14.5 6l-6 6 6 6"/>'),
   chevronRight: wrap('<path d="M9.5 6l6 6-6 6"/>'),
   close: wrap('<path d="M6 6l12 12M18 6L6 18"/>'),
+  logout: wrap('<path d="M14 4.5h3.5a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H14"/><path d="M10 8l-4 4 4 4M6 12h9.5"/>'),
   refresh: wrap('<path d="M19.5 12a7.5 7.5 0 1 1-2.2-5.3"/><path d="M19.5 4.5v4h-4"/>'),
   check: wrap('<path d="M5 12.5l4.5 4.5L19 7.5"/>'),
   plus: wrap('<path d="M12 5v14M5 12h14"/>'),

@@ -36,14 +36,19 @@
   width: 100%;
 }
 
+/* Металл живой и пёстрый, поэтому под надписью — мягкое тёмное свечение (первый слой фона): буквы читаются на
+   любом месте снимка. Буквы — светлые в тёмном контуре, как «прорезанное золото» «Кванта». */
 .btn--gold {
   border: 0;
-  background: var(--g-gold);
-  background-size: 160% 100%;
+  background: radial-gradient(58% 95% at 50% 50%, rgba(43, 20, 17, 0.42), rgba(43, 20, 17, 0.12) 62%, transparent 82%),
+    var(--g-gold);
+  background-size: 100% 100%, 160% 100%, 160% 100%;
   color: var(--c-on-metal);
+  font-size: var(--fs-md);
   font-weight: 800;
+  letter-spacing: 0.03em;
   text-shadow: var(--sh-cut);
-  box-shadow: var(--sh-gold);
+  box-shadow: var(--sh-gold), inset 0 1px 0 rgba(255, 255, 255, 0.5);
 }
 
 /* Значок в золотой кнопке — тем же контуром, что буквы */
