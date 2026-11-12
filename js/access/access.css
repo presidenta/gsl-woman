@@ -1,0 +1,40 @@
+/* Экран «Доступ закрыт» (main.js → drawClosed): по центру, замок в золотом круге, две кнопки. */
+.access-closed {
+  display: grid;
+  min-height: 100dvh;
+  place-items: center;
+  padding: var(--sp-5);
+}
+
+.access-closed__card {
+  display: grid;
+  gap: var(--sp-3);
+  width: min(100%, 420px);
+  text-align: center;
+}
+
+.access-closed__lock {
+  display: grid;
+  place-items: center;
+  justify-self: center;
+  width: 64px;
+  height: 64px;
+  border: 1px solid var(--c-line-strong);
+  border-radius: 50%;
+  background: var(--g-gold-soft);
+  color: var(--c-gold);
+}
+
+.access-closed__lock svg {
+  width: 28px;
+  height: 28px;
+}
+
+.access-closed__until {
+  color: var(--c-gold);
+}
+
+.access-closed__actions {
+  display: grid;
+  gap: var(--sp-2);
+}

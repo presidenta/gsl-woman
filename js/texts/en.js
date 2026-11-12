@@ -157,6 +157,7 @@ export default {
     passExpired: 'The link from Quantum has expired — it lives for two minutes. Sign in with your password or open GSL Woman from Quantum again.',
     err: {
       invalid_credentials: 'Wrong login or password.',
+      access_expired: 'Access to GSL Woman+ is closed. The Quantum administrator opens it.',
       pending_approval: 'Your application is awaiting approval.',
       blocked: 'This account is blocked.',
       access_expired: 'Your access period has ended.',
@@ -299,6 +300,13 @@ export default {
     thanks: 'Thank him when he does it',
     loveInvite: 'Discover your own love language — and ready phrases will appear here: how to tell him about it and how to thank him.',
     loveBtn: 'Take the test',
+  },
+  access: {
+    title: 'Access to GSL Woman+ is closed',
+    text: 'Your access period has ended or the administrator has closed access. All your entries are saved on this phone. Connect to the internet and tap “Check” — the app opens as soon as access is extended.',
+    until: 'Access was until {date}',
+    check: 'Check',
+    stillClosed: 'Access is still closed. Write to the Quantum administrator.',
   },
   notice: {
     morning: {

@@ -15,6 +15,8 @@ self.GSL_FILES = [
   './assets/textures/rose-gold.jpg',
   './files.js',
   './index.html',
+  './js/access/access.css',
+  './js/access/access.js',
   './js/account/account.css',
   './js/account/avatar.js',
   './js/account/session.js',

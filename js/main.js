@@ -7,6 +7,7 @@ import { register as registerWorker } from './core/updates.js';
 import * as settings from './settings/settings.js';
 import * as journal from './journal/journal.js';
 import * as account from './account/session.js';
+import * as access from './access/access.js';
 import * as program from './program/source.js';
 import * as reminders from './reminders/local.js';
 import { isOpen as sheetOpen } from './ui/sheet.js';
@@ -112,10 +113,38 @@ async function loadProgram() {
     await program.refresh();
     gate = { mode: 'form', message: '' };
   } catch (err) {
-    if (account.isExpired(err)) return expire();
-    if (!program.loaded()) gate = { mode: 'failed', message: '' };
+    if (account.isClosed(err)) access.close();
+    else if (account.isExpired(err)) return expire();
+    else if (!program.loaded()) gate = { mode: 'failed', message: '' };
   }
   draw();
+}
+
+/* Доступ закрыт (срок вышел на телефоне или сервер ответил access_expired): свой экран вместо приложения,
+   записи целы. «Проверить» спрашивает сервер — продлили, и всё открывается само. */
+function drawClosed() {
+  shell = null;
+  const until = access.until();
+  const check = h('button', { type: 'button', class: 'btn btn--gold btn--block' }, t('access.check'));
+  check.addEventListener('click', async () => {
+    check.disabled = true;
+    await account.refreshProfile();
+    if (access.isOpen()) loadProgram();
+    else toast({ title: t('access.stillClosed') });
+    check.disabled = false;
+    draw();
+  });
+  const out = h('button', { type: 'button', class: 'btn btn--ghost btn--block' }, t('settings.logout'));
+  out.addEventListener('click', logout);
+  mount(root, h('main', { class: 'app access-closed' },
+    h('section', { class: 'card card--hero access-closed__card' },
+      h('div', { class: 'access-closed__lock', 'aria-hidden': 'true' }, svg(icons.lock)),
+      h('h1', { class: 'card__title' }, t('access.title')),
+      until ? h('p', { class: 'caps access-closed__until' }, t('access.until', { date: new Date(until).toLocaleDateString() })) : null,
+      h('p', { class: 'card__text' }, t('access.text')),
+      h('div', { class: 'card__actions access-closed__actions' }, check, out),
+    ),
+  ));
 }
 
 /* Пришли из «Кванта»: #kvant=<пропуск> — войти без пароля; #install — сразу «Значок на экран».
@@ -177,6 +206,12 @@ function drawGate() {
 function draw() {
   const ctx = context();
   setLang(ctx.lang);
+
+  // Доступ к GSL Woman+ закрыт — решает телефон по сохранённой дате, как «Квант» (access/)
+  if (ctx.account && !access.isOpen()) {
+    drawClosed();
+    return;
+  }
 
   if (!ctx.account || !program.loaded()) {
     drawGate();
@@ -253,7 +288,20 @@ function checkDayChange() {
   }
 }
 setInterval(checkDayChange, 60_000);
-document.addEventListener('visibilitychange', () => document.visibilityState === 'visible' && checkDayChange());
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState !== 'visible') return;
+  checkDayChange();
+  checkAccess();
+});
+
+/* Сверка срока доступа с сервером — при открытии и при возвращении в приложение, не чаще раза в 10 минут.
+   Дату телефон проверяет сам каждую минуту (checkDayChange → перерисовка → access.isOpen). */
+let accessCheckedAt = 0;
+function checkAccess() {
+  if (!account.current() || Date.now() - accessCheckedAt < 10 * 60_000) return;
+  accessCheckedAt = Date.now();
+  account.refreshProfile();
+}
 
 takeKvantLink();
 // Вкладка уже открыта, а «Квант» прислал новую ссылку — та же обработка (до маршрутов: они читают адрес после)
@@ -267,13 +315,14 @@ router.start((name, screen) => {
 });
 
 reminders.start({
-  context: () => ({ settings: settings.get(), entries: journal.all() }),
+  // Закрытое приложение не напоминает о себе (как «Квант»: закрытое приложение не будит человека)
+  context: () => ({ settings: access.isOpen() ? settings.get() : null, entries: journal.all() }),
   inApp: (item) => toast({ title: item.title, text: item.body, ms: 8000, onClick: () => router.go('today') }),
 });
 
 if (account.current()) {
   if (gate.mode !== 'loading') loadProgram();
-  account.refreshProfile();
+  checkAccess();
 }
 
 // Chrome разрешил поставить значок — показать кнопку в настройках
