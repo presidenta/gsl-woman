@@ -7,6 +7,8 @@ import { weekSummary } from '../../progress/progress.js';
 import { icons } from '../../ui/icons.js';
 import { weekRing, levelDots } from '../../ui/ring.js';
 import { openEntry } from '../entry/entry-sheet.js';
+import { summarize } from '../../insights/insights.js';
+import { summaryCard } from '../../insights/summary-card.js';
 
 /* ЭКРАН «НЕДЕЛЯ»: кольцо из семи дней с процентом в центре, под ним — дни списком. Стрелками
    листаются прошлые недели (вперёд — не дальше текущей). Пропущенный день текущей недели можно
@@ -75,5 +77,7 @@ export function render(view, ctx) {
       h('p', { class: 'week-ring__status' }, status),
     ),
     h('ul', { class: 'week-days' }, ...summary.days.map((d) => dayRow(ctx, d, summary))),
+    // Итоги недели: реакции мужчин по дням и что получилось
+    summaryCard(summarize(ctx.entries, { from: (shown - 1) * 7 + 1, to: shown * 7 }, ctx.lang), { title: t('insights.title.week') }),
   );
 }

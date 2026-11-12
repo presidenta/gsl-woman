@@ -9,6 +9,7 @@ import { icons } from '../../ui/icons.js';
 import { levelDots } from '../../ui/ring.js';
 import { toast } from '../../ui/toast.js';
 import { openEntry } from '../entry/entry-sheet.js';
+import { heelsFigure } from '../../ui/heels.js';
 
 /* ЭКРАН «СЕГОДНЯ» — главный. Сверху вниз, в порядке дня:
    1. Шапка дня: «День N» (без «из скольких» и без номера недели — обучение постоянное, владелец 12.11.2026),
@@ -91,6 +92,8 @@ function morningCard(ctx, plan) {
   const count = h('span', { class: 'minute__count' }, '60');
   const fill = h('div', { class: 'bar__fill', style: { width: '0%' } });
   const button = h('button', { type: 'button', class: 'btn btn--block ' + (done ? 'btn--ghost' : 'btn--gold btn--quiet') });
+  // Живая подсказка ритма: подъём на 2–3 см и опускание на пятки с выдохом — раз в секунду
+  const figure = heelsFigure();
 
   function paint() {
     const left = Math.max(0, Math.ceil((minuteEndsAt - Date.now()) / 1000));
@@ -98,6 +101,7 @@ function morningCard(ctx, plan) {
     count.textContent = String(running ? left : m.seconds);
     fill.style.width = running ? `${((m.seconds - left) / m.seconds) * 100}%` : morningLog.isDone(ctx.todayIso) ? '100%' : '0%';
     button.disabled = running;
+    figure.setRunning(running);
     button.textContent = running ? t('morning.running') : morningLog.isDone(ctx.todayIso) ? t('morning.again') : t('morning.start');
   }
 
@@ -123,6 +127,7 @@ function morningCard(ctx, plan) {
       ),
       h('div', { class: 'minute__dial' }, count, h('span', { class: 'faint minute__unit' }, t('morning.sec'))),
     ),
+    figure.node,
     h('div', { class: 'bar minute__bar' }, fill),
     h('div', { class: 'card__actions' }, button),
   );

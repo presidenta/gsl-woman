@@ -1,0 +1,155 @@
+/* ИТОГИ: три цифры золотом, полоса уровней, реакции мужчин — цитатами, что получилось — строками. */
+
+.insight__title {
+  margin-bottom: var(--sp-4);
+  color: var(--c-gold);
+}
+
+.insight__empty {
+  color: var(--c-text-dim);
+}
+
+.insight__stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--sp-2);
+}
+
+.insight__stat {
+  display: grid;
+  justify-items: center;
+  gap: 2px;
+  padding: var(--sp-3) var(--sp-1);
+  border: 1px solid var(--c-line);
+  border-radius: var(--r-md);
+  background: var(--c-surface);
+  text-align: center;
+}
+
+.insight__stat strong {
+  font-family: var(--f-display);
+  font-size: var(--fs-3xl);
+  font-weight: 600;
+  line-height: 1;
+  font-variant-numeric: var(--num-display);
+}
+
+.insight__stat span {
+  color: var(--c-text-faint);
+  font-size: var(--fs-2xs);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  line-height: 1.25;
+}
+
+.insight__levels {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: var(--sp-2) var(--sp-3);
+  margin: var(--sp-4) 0 0;
+  padding: var(--sp-3) 0 0;
+  border-top: 1px solid var(--c-line);
+  list-style: none;
+}
+
+.insight__levels li {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  font-size: var(--fs-sm);
+}
+
+.insight__levels strong {
+  color: var(--c-champagne);
+  font-variant-numeric: var(--num-display);
+}
+
+.insight__block {
+  margin-top: var(--sp-5);
+}
+
+.insight__subtitle {
+  margin-bottom: var(--sp-3);
+  font-family: var(--f-display);
+  font-size: var(--fs-lg);
+  font-weight: 600;
+}
+
+.insight__list {
+  display: grid;
+  gap: var(--sp-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.insight__item {
+  display: grid;
+  gap: 3px;
+  padding-left: var(--sp-3);
+  border-left: 1px solid var(--c-line-strong);
+}
+
+.insight__meta {
+  color: var(--c-text-faint);
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  letter-spacing: 0.03em;
+}
+
+.insight__quote {
+  color: var(--c-champagne);
+  font-family: var(--f-display);
+  font-size: var(--fs-lg);
+  font-style: italic;
+  line-height: 1.35;
+  quotes: '«' '»';
+}
+
+:root:lang(en) .insight__quote {
+  quotes: '“' '”';
+}
+
+.insight__text {
+  color: var(--c-text);
+  line-height: var(--lh-text);
+}
+
+.insight__more {
+  padding-left: var(--sp-3);
+}
+
+.insight__more-btn {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--c-gold);
+  font-size: var(--fs-sm);
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* Переключатель срока на экране «Записи» */
+.journal__period {
+  margin-bottom: var(--sp-4);
+}
+
+/* Поле «Реакция мужчины» в форме — главное: золотая подпись; не заполнено при сохранении — рамка ярче */
+.field--key .field__label {
+  color: var(--c-gold);
+}
+
+.field--key.is-invalid .textarea {
+  border-color: var(--c-rose);
+  box-shadow: 0 0 0 3px rgba(233, 165, 164, 0.18);
+}
+
+/* В карточке записи реакция — цитатой */
+.entry-card__row--key .entry-card__value {
+  color: var(--c-champagne);
+  font-family: var(--f-display);
+  font-size: var(--fs-lg);
+  font-style: italic;
+}

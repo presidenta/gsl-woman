@@ -62,9 +62,10 @@ export function openEntry({ day, kind, exercises = [], levels = null, entry = nu
   const isCall = kind === 'call';
   const questions = isCall
     ? [['worked', 'callWorked', 'callWorkedPh'], ['happened', 'callHappened', 'callHappenedPh']]
-    : [['worked', 'worked', 'workedPh'], ['man', 'man', 'manPh'], ['happened', 'happened', 'happenedPh'], ['how', 'how', 'howPh']];
+    : [['worked', 'worked', 'workedPh'], ['man', 'man', 'manPh'], ['reaction', 'reaction', 'reactionPh'], ['happened', 'happened', 'happenedPh'], ['how', 'how', 'howPh']];
 
   const controls = {};
+  const nodes = {};
   for (const [key, label, ph] of questions) {
     const f = field({
       label: t(`entry.${label}`),
@@ -75,6 +76,8 @@ export function openEntry({ day, kind, exercises = [], levels = null, entry = nu
       value: entry?.[key] || '',
     });
     controls[key] = f.control;
+    nodes[key] = f.node;
+    if (key === 'reaction') f.node.classList.add('field--key');
     parts.push(f.node);
   }
 
@@ -85,6 +88,13 @@ export function openEntry({ day, kind, exercises = [], levels = null, entry = nu
 
   const save = h('button', { type: 'button', class: 'btn btn--gold btn--block' }, t('common.save'));
   save.addEventListener('click', () => {
+    // Реакция мужчины — главное в записи задания и практики: без неё не сохраняем, мягко подсказываем
+    if (controls.reaction && !controls.reaction.value.trim()) {
+      nodes.reaction.classList.add('is-invalid');
+      controls.reaction.focus();
+      toast({ title: t('entry.reactionNeeded') });
+      return;
+    }
     const fields = {};
     for (const key of Object.keys(controls)) fields[key] = controls[key].value;
     const level = isCall ? 'full' : draft.level;

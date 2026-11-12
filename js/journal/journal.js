@@ -10,13 +10,14 @@ import { LEVELS } from '../config.js';
 
    Записи о мужчинах — личное: они лежат только на этом телефоне и никуда не отправляются.
 
+   reaction — реакция мужчины: что он сказал и сделал (владелец 12.11.2026: «обязательно, чтобы записывала»).
    photos — номера снимков (сами снимки — в js/media/photos.js, до 6 на запись). */
 
 const KEY = 'entries';
 
 /** Виды записи: задание дня 1–3, свободная практика дней 4–6, итог и созвон дня 7. */
 export const KINDS = ['task', 'flow', 'call'];
-export const TEXT_FIELDS = ['worked', 'man', 'happened', 'how'];
+export const TEXT_FIELDS = ['worked', 'man', 'reaction', 'happened', 'how'];
 
 const newId = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
 

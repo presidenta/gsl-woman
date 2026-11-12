@@ -1,0 +1,124 @@
+/* ПОДЪЁМЫ НА ПЯТКИ: силуэт, пол и подписи (js/ui/heels.js). Цикл — ровно 1 секунда:
+   0–28%  — подъём на носки (тело вверх на 3 единицы, пятка поднимается, носок на полу);
+   28–55% — задержка вверху;
+   55–66% — опускание на пятки;
+   66–100% — стоим; в момент касания — круг под пятками и «выдох». */
+
+.heels {
+  position: relative;
+  display: grid;
+  grid-template-columns: 112px minmax(0, 1fr);
+  align-items: center;
+  gap: var(--sp-3);
+  margin-top: var(--sp-4);
+  padding: var(--sp-2) var(--sp-3);
+  border-radius: var(--r-md);
+  background: radial-gradient(70% 90% at 30% 60%, rgba(239, 196, 166, 0.09), transparent 70%);
+}
+
+.heels__svg {
+  width: 112px;
+  height: 150px;
+  overflow: visible;
+  opacity: 0.85;
+  transition: opacity var(--t-med);
+}
+
+.heels.is-running .heels__svg {
+  opacity: 1;
+}
+
+.heels__body {
+  animation: heels-body 1s var(--ease) infinite;
+}
+
+.heels__foot path {
+  transform-box: view-box;
+  transform-origin: 73.4px 148.4px;
+  animation: heels-foot 1s var(--ease) infinite;
+}
+
+.heels__ripple {
+  transform-box: fill-box;
+  transform-origin: center;
+  opacity: 0;
+  animation: heels-ripple 1s ease-out infinite;
+}
+
+.heels__cues {
+  position: relative;
+  min-height: 2.6em;
+}
+
+.heels__cue {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  translate: 0 -50%;
+  font-family: var(--f-display);
+  font-size: var(--fs-2xl);
+  font-style: italic;
+  font-weight: 600;
+  white-space: nowrap;
+  opacity: 0;
+}
+
+.heels__cue--up {
+  color: var(--c-text-dim);
+  font-size: var(--fs-lg);
+  animation: heels-cue-up 1s linear infinite;
+}
+
+.heels__cue--down {
+  background: var(--g-gold-text);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: heels-cue-down 1s linear infinite;
+}
+
+@keyframes heels-body {
+  0%, 100% { transform: translateY(0); }
+  28%, 55% { transform: translateY(-3px); }
+  66% { transform: translateY(0); }
+}
+
+@keyframes heels-foot {
+  0%, 100% { transform: rotate(0deg); }
+  28%, 55% { transform: rotate(-12deg); }
+  66% { transform: rotate(0deg); }
+}
+
+@keyframes heels-ripple {
+  0%, 62% { opacity: 0; transform: scale(0.4); }
+  68% { opacity: 0.9; transform: scale(0.7); }
+  100% { opacity: 0; transform: scale(1.6); }
+}
+
+@keyframes heels-cue-up {
+  0% { opacity: 0; }
+  12%, 45% { opacity: 0.85; }
+  58%, 100% { opacity: 0; }
+}
+
+@keyframes heels-cue-down {
+  0%, 60% { opacity: 0; transform: translateY(4px); }
+  68%, 88% { opacity: 1; transform: translateY(0); }
+  100% { opacity: 0; transform: translateY(0); }
+}
+
+/* «Меньше движения» в системе — неподвижный силуэт и спокойная подпись ритма */
+@media (prefers-reduced-motion: reduce) {
+  .heels__body,
+  .heels__foot path,
+  .heels__ripple,
+  .heels__cue--up {
+    animation: none;
+  }
+
+  .heels__cue--down {
+    animation: none;
+    opacity: 1;
+    font-size: var(--fs-md);
+  }
+}
