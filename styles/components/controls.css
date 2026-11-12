@@ -90,7 +90,8 @@
 
 .segmented__option[aria-checked='true'] {
   background: var(--g-gold);
-  color: var(--c-on-gold);
+  color: var(--c-on-metal);
+  text-shadow: var(--sh-cut);
   box-shadow: var(--sh-gold);
 }
 

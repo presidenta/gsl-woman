@@ -16,9 +16,9 @@ import { checkNow } from '../../core/updates.js';
 /* ЭКРАН «НАСТРОЙКИ»: аккаунт «Кванта» (фото, имя, кабинет), значок на экран, обо мне (имя, язык), дата старта, время трёх напоминаний, уведомления, данные.
    Каждое изменение сохраняется сразу — кнопки «Сохранить» здесь нет, как и в спорте. */
 
-/* Версия и «Обновить» — одним рядом внизу настроек: видно, какая версия стоит, и одним нажатием подтянуть
-   новую. Новая есть — страница сама перезагрузится на неё (core/updates.js). */
-function updateRow(ctx) {
+/* «Обновить» — в карточке аккаунта над «Выйти»: одним нажатием подтянуть новую версию. Новая есть —
+   страница сама перезагрузится на неё (core/updates.js). Номер версии — внизу настроек. */
+function updateButton() {
   const btn = h('button', { type: 'button', class: 'btn btn--quiet btn--small settings__update' }, svg(icons.refresh), t('update.check'));
   btn.addEventListener('click', async () => {
     btn.disabled = true;
@@ -28,10 +28,7 @@ function updateRow(ctx) {
     btn.disabled = false;
     toast({ title: t(`update.${result}`), ms: result === 'updating' ? 8000 : 4000 });
   });
-  return h('div', { class: 'settings__version-row' },
-    h('p', { class: 'settings__version faint' }, `${t('app.name')} · ${t('settings.version', { v: ctx.version })}`),
-    btn,
-  );
+  return btn;
 }
 
 export const LANG_LABELS = { ua: 'Українська', ru: 'Русский', en: 'English' };
@@ -113,7 +110,7 @@ export function render(view, ctx) {
   view.append(
     h('h1', { class: 'screen-title' }, t('settings.title')),
 
-    accountCard({ onLogout: ctx.logout }),
+    accountCard({ onLogout: ctx.logout, update: updateButton() }),
     installCard(),
 
     h('section', { class: 'card settings__section' },
@@ -150,7 +147,7 @@ export function render(view, ctx) {
     ),
 
 
-    updateRow(ctx),
+    h('p', { class: 'settings__version faint' }, `${t('app.name')} · ${t('settings.version', { v: ctx.version })}`),
     h('div', { class: 'settings__danger' }, reset),
   );
 }

@@ -40,8 +40,15 @@
   border: 0;
   background: var(--g-gold);
   background-size: 160% 100%;
-  color: var(--c-on-gold);
+  color: var(--c-on-metal);
+  font-weight: 800;
+  text-shadow: var(--sh-cut);
   box-shadow: var(--sh-gold);
+}
+
+/* Значок в золотой кнопке — тем же контуром, что буквы */
+.btn--gold svg {
+  filter: var(--f-cut);
 }
 
 .btn--gold::after {

@@ -84,10 +84,22 @@
 /* Карточка в настройках */
 .account {
   position: relative;
-  display: flex;
-  align-items: center;
-  gap: var(--sp-4);
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  grid-template-areas: 'photo who' 'photo actions';
+  align-items: start;
+  column-gap: var(--sp-4);
+  row-gap: var(--sp-3);
   overflow: hidden;
+}
+
+.account__glow {
+  grid-area: 1 / 1 / -1 / -1;
+}
+
+.account__photo {
+  grid-area: photo;
+  align-self: center;
 }
 
 .account__glow {
@@ -127,9 +139,9 @@
 }
 
 .account__who {
+  grid-area: who;
   position: relative;
   display: grid;
-  flex: 1;
   min-width: 0;
   gap: 3px;
 }
@@ -139,7 +151,8 @@
   font-size: var(--fs-xl);
   font-weight: 600;
   line-height: 1.1;
-  overflow-wrap: anywhere;
+  overflow-wrap: break-word;
+  hyphens: auto;
 }
 
 .account__no {
@@ -163,14 +176,16 @@
   text-underline-offset: 3px;
 }
 
-.account .btn {
+.account__actions {
+  grid-area: actions;
   position: relative;
-  flex: none;
-  align-self: flex-start;
+  display: grid;
+  justify-items: start;
+  gap: var(--sp-2);
 }
 
-@media (max-width: 360px) {
-  .account {
-    flex-wrap: wrap;
-  }
+.account__actions .btn {
+  min-width: 9.5em;
 }
+
+

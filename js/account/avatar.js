@@ -67,7 +67,7 @@ export function identity() {
 }
 
 /** Карточка «Аккаунт» в настройках: большое фото с камерой, имя, кабинет, «Выйти». */
-export function accountCard({ onLogout }) {
+export function accountCard({ onLogout, update = null }) {
   const a = current();
   if (!a) return null;
   const photo = h('button', { type: 'button', class: 'account__photo', 'aria-label': t('photos.profile'), onclick: pickPhoto },
@@ -91,6 +91,7 @@ export function accountCard({ onLogout }) {
       a.accountNo ? h('span', { class: 'account__no' }, t('settings.cabinet', { n: a.accountNo })) : null,
       dropPhoto,
     ),
-    out,
+    // «Обновить» — над «Выйти» (владелец 12.11.2026): оба действия с аккаунтом и приложением в одном месте
+    h('div', { class: 'account__actions' }, update, out),
   );
 }
