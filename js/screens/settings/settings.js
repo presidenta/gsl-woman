@@ -11,9 +11,28 @@ import { toast } from '../../ui/toast.js';
 import { accountCard } from '../../account/avatar.js';
 import { installCard } from '../../install/install.js';
 import * as media from '../../media/photos.js';
+import { checkNow } from '../../core/updates.js';
 
 /* ЭКРАН «НАСТРОЙКИ»: аккаунт «Кванта» (фото, имя, кабинет), значок на экран, обо мне (имя, язык), дата старта, время трёх напоминаний, уведомления, данные.
    Каждое изменение сохраняется сразу — кнопки «Сохранить» здесь нет, как и в спорте. */
+
+/* Версия и «Обновить» — одним рядом внизу настроек: видно, какая версия стоит, и одним нажатием подтянуть
+   новую. Новая есть — страница сама перезагрузится на неё (core/updates.js). */
+function updateRow(ctx) {
+  const btn = h('button', { type: 'button', class: 'btn btn--quiet btn--small settings__update' }, svg(icons.refresh), t('update.check'));
+  btn.addEventListener('click', async () => {
+    btn.disabled = true;
+    btn.classList.add('is-spinning');
+    const result = await checkNow();
+    btn.classList.remove('is-spinning');
+    btn.disabled = false;
+    toast({ title: t(`update.${result}`), ms: result === 'updating' ? 8000 : 4000 });
+  });
+  return h('div', { class: 'settings__version-row' },
+    h('p', { class: 'settings__version faint' }, `${t('app.name')} · ${t('settings.version', { v: ctx.version })}`),
+    btn,
+  );
+}
 
 export const LANG_LABELS = { ua: 'Українська', ru: 'Русский', en: 'English' };
 
@@ -131,7 +150,7 @@ export function render(view, ctx) {
     ),
 
 
-    h('p', { class: 'settings__version faint' }, `${t('app.name')} · ${t('settings.version', { v: ctx.version })}`),
+    updateRow(ctx),
     h('div', { class: 'settings__danger' }, reset),
   );
 }

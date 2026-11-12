@@ -95,3 +95,32 @@
 .account + .install {
   margin-top: var(--sp-4);
 }
+
+/* Версия и «Обновить»: строка по центру, кнопка маленькая; пока проверяем — значок крутится */
+.settings__version-row {
+  display: grid;
+  justify-items: center;
+  gap: var(--sp-2);
+  margin-top: var(--sp-6);
+}
+
+.settings__version-row .settings__version {
+  margin-top: 0;
+}
+
+.settings__update svg {
+  width: 16px;
+  height: 16px;
+}
+
+.settings__update.is-spinning svg {
+  animation: settings-spin 0.9s linear infinite;
+}
+
+@keyframes settings-spin {
+  to { transform: rotate(360deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .settings__update.is-spinning svg { animation: none; }
+}

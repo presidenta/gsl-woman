@@ -45,3 +45,20 @@ export function register({ onUpdated }) {
     else reload();
   });
 }
+
+/* «Обновить» в настройках (владелец 12.11.2026: «как знать, что обновилось? одно действие — чтобы подтягивало
+   новую версию»). Спрашиваем сайт о новом работнике: есть — он встаёт сам (skipWaiting), срабатывает
+   controllerchange выше, и страница перезагружается на новую версию. Нет — честно отвечаем «последняя».
+   Вернёт: 'updating' — новая версия ставится; 'latest' — уже последняя; 'offline' — сайт недоступен. */
+export async function checkNow() {
+  if (!('serviceWorker' in navigator) || !isSecureContext) return 'latest';
+  const reg = await navigator.serviceWorker.getRegistration();
+  if (!reg) return 'latest';
+  try {
+    await reg.update();
+  } catch {
+    return 'offline';
+  }
+  if (reg.installing || reg.waiting) return 'updating';
+  return 'latest';
+}

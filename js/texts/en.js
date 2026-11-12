@@ -280,7 +280,13 @@ export default {
     },
   },
 
-  update: { ready: 'The app has been updated' },
+  update: {
+    ready: 'The app has been updated',
+    check: 'Update',
+    updating: 'A new version is loading — the app will restart now.',
+    latest: 'You have the latest version.',
+    offline: 'The site is unavailable right now — check the internet.',
+  },
 
   plural: {
     days: ['day', 'days'],
