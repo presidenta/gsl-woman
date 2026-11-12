@@ -1,4 +1,4 @@
-import { h, svg } from '../../core/dom.js';
+import { h, svg, add } from '../../core/dom.js';
 import { t, setLang } from '../../core/i18n.js';
 import { LANGS, SLOTS } from '../../config.js';
 import { isValidIso, isValidTime } from '../../core/dates.js';
@@ -19,7 +19,7 @@ import { checkNow } from '../../core/updates.js';
 /* «Обновить» — в карточке аккаунта над «Выйти»: одним нажатием подтянуть новую версию. Новая есть —
    страница сама перезагрузится на неё (core/updates.js). Номер версии — внизу настроек. */
 function updateButton() {
-  const btn = h('button', { type: 'button', class: 'btn btn--quiet btn--small settings__update' }, svg(icons.refresh), t('update.check'));
+  const btn = h('button', { type: 'button', class: 'icon-btn account__icon settings__update', 'aria-label': t('update.check'), title: t('update.check') }, svg(icons.refresh));
   btn.addEventListener('click', async () => {
     btn.disabled = true;
     btn.classList.add('is-spinning');
@@ -107,7 +107,7 @@ export function render(view, ctx) {
     location.reload();
   });
 
-  view.append(
+  add(view,
     h('h1', { class: 'screen-title' }, t('settings.title')),
 
     accountCard({ onLogout: ctx.logout, update: updateButton() }),

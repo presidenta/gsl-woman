@@ -74,7 +74,7 @@ export function accountCard({ onLogout, update = null }) {
     avatar('lg'),
     h('span', { class: 'account__cam' }, svg(icons.camera)),
   );
-  const out = h('button', { type: 'button', class: 'btn btn--quiet btn--small' }, svg(icons.logout), t('settings.logout'));
+  const out = h('button', { type: 'button', class: 'icon-btn account__icon', 'aria-label': t('settings.logout'), title: t('settings.logout') }, svg(icons.logout));
   out.addEventListener('click', () => {
     if (!confirm(t('settings.logoutConfirm'))) return;
     onLogout();
@@ -91,7 +91,8 @@ export function accountCard({ onLogout, update = null }) {
       a.accountNo ? h('span', { class: 'account__no' }, t('settings.cabinet', { n: a.accountNo })) : null,
       dropPhoto,
     ),
-    // «Обновить» — над «Выйти» (владелец 12.11.2026): оба действия с аккаунтом и приложением в одном месте
+    // «Обновить» и «Выйти» — два маленьких круглых значка в правом верхнем углу карточки, как в кабинетах дорогих
+    // сервисов (владелец 12.11.2026: «маленькие кнопочки: обновить — кружочек, выйти — дверь со стрелочкой»)
     h('div', { class: 'account__actions' }, update, out),
   );
 }

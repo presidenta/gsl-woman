@@ -236,7 +236,7 @@ export default {
     showTask: 'Task text in notifications',
     showTaskHint: 'Anyone who looks at your lock screen will see it. When off, a neutral phrase arrives instead.',
     account: 'Account',
-    cabinet: 'Cabinet No. {n}',
+    cabinet: 'Cabinet No. {n}',
     logout: 'Sign out',
     logoutConfirm: 'Sign out? Your entries stay on this phone; the programme opens again after you sign in.',
     reset: 'Erase all my data',

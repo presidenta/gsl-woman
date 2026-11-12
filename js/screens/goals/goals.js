@@ -1,4 +1,4 @@
-import { h, svg } from '../../core/dom.js';
+import { h, svg, add } from '../../core/dom.js';
 import { t, formatDate } from '../../core/i18n.js';
 import * as goals from '../../goals/goals.js';
 import { field } from '../../ui/controls.js';
@@ -66,14 +66,14 @@ export function render(view) {
     else input.focus();
   });
 
-  view.append(
+  add(view,
     h('h1', { class: 'screen-title' }, t('goals.title')),
     h('p', { class: 'screen-lead' }, t('goals.lead')),
     form,
   );
 
   if (!list.length) {
-    view.append(h('div', { class: 'card empty goals__empty' },
+    add(view, h('div', { class: 'card empty goals__empty' },
       h('div', { class: 'goals__emblem' }, svg(icons.goals)),
       h('div', { class: 'empty__title' }, t('goals.emptyTitle')),
       h('p', {}, t('goals.emptyText')),
@@ -81,9 +81,9 @@ export function render(view) {
     return;
   }
 
-  if (open.length) view.append(h('ul', { class: 'goals__list' }, ...open.map(goalRow)));
+  if (open.length) add(view, h('ul', { class: 'goals__list' }, ...open.map(goalRow)));
   if (done.length) {
-    view.append(
+    add(view,
       h('h2', { class: 'caps goals__heading' }, t('goals.doneTitle'), h('span', { class: 'goals__count' }, String(done.length))),
       h('ul', { class: 'goals__list' }, ...done.map(goalRow)),
     );

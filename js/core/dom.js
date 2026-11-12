@@ -37,6 +37,12 @@ export function svg(markup, className = '') {
 }
 
 /** Очистить контейнер и положить новое содержимое. */
+/** Добавить в конец, пропуская пустое (null, undefined, false). Обычный el.append(null) печатает слово «null» —
+    так 12.11.2026 на телефоне под карточкой аккаунта вылезло «null» вместо скрытой карточки «Значок на экран». */
+export function add(el, ...children) {
+  append(el, children);
+}
+
 export function mount(container, ...children) {
   container.replaceChildren();
   append(container, children);

@@ -1,4 +1,4 @@
-import { h, svg } from '../../core/dom.js';
+import { h, svg, add } from '../../core/dom.js';
 import { t } from '../../core/i18n.js';
 import { field } from '../../ui/controls.js';
 import { icons } from '../../ui/icons.js';
@@ -26,7 +26,7 @@ export function render(view, { mode = 'form', message = '', onLogin, onRetry }) 
 
   if (mode !== 'form') {
     const failed = mode === 'failed';
-    view.append(h('div', { class: 'onboarding login' },
+    add(view, h('div', { class: 'onboarding login' },
       ...hero,
       h('p', { class: `login__status${failed ? ' login__status--error' : ''}`, role: 'status' },
         failed ? t('login.programFail') : t('login.loading')),
@@ -83,7 +83,7 @@ export function render(view, { mode = 'form', message = '', onLogin, onRetry }) 
   submit.setAttribute('form', 'login-form');
   form.id = 'login-form';
 
-  view.append(h('div', { class: 'onboarding login' },
+  add(view, h('div', { class: 'onboarding login' },
     ...hero,
     h('p', { class: 'onboarding__lead' }, t('login.lead')),
     form,

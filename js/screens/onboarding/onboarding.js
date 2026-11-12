@@ -1,4 +1,4 @@
-import { h, svg } from '../../core/dom.js';
+import { h, svg, add } from '../../core/dom.js';
 import { t } from '../../core/i18n.js';
 import { isoDate, isValidIso } from '../../core/dates.js';
 import * as settings from '../../settings/settings.js';
@@ -35,7 +35,7 @@ export function render(view, { onDone }) {
     onDone();
   });
 
-  view.append(
+  add(view,
     h('div', { class: 'onboarding' },
       h('div', { class: 'onboarding__mark' }, svg(icons.sparkle)),
       h('p', { class: 'caps onboarding__eyebrow' }, t('onboarding.eyebrow')),

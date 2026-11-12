@@ -1,4 +1,4 @@
-import { h, svg } from '../../core/dom.js';
+import { h, svg, add } from '../../core/dom.js';
 import { t, formatDate } from '../../core/i18n.js';
 import { weekOf, dateOfDay, dayInWeek } from '../../core/dates.js';
 import { dayPlan } from '../../program/index.js';
@@ -51,13 +51,13 @@ const PERIODS = ['week', 'month', 'all'];
 let period = 'week';
 
 export function render(view, ctx) {
-  view.append(
+  add(view,
     h('h1', { class: 'screen-title' }, t('journal.title')),
     h('p', { class: 'screen-lead' }, svg(icons.lock, 'journal__lock'), t('journal.lead')),
   );
 
   if (!ctx.entries.length) {
-    view.append(h('div', { class: 'card empty' },
+    add(view, h('div', { class: 'card empty' },
       h('div', { class: 'empty__title' }, t('journal.emptyTitle')),
       h('p', {}, t('journal.emptyText')),
     ));
@@ -66,7 +66,7 @@ export function render(view, ctx) {
 
   // Срок: неделя, месяц или всё время — итоги сверху, записи этого срока ниже (владелец 12.11.2026)
   const range = periodRange(period, ctx.day);
-  view.append(
+  add(view,
     h('div', { class: 'journal__period' }, segmented({
       label: t('insights.period'),
       options: PERIODS.map((p) => ({ value: p, label: t(`insights.${p}`) })),
@@ -84,9 +84,9 @@ export function render(view, ctx) {
     const w = weekOf(e.day);
     if (w !== week) {
       week = w;
-      view.append(h('h2', { class: 'journal__week caps' }, t('journal.weekHeader', { n: w })));
+      add(view, h('h2', { class: 'journal__week caps' }, t('journal.weekHeader', { n: w })));
     }
     const card = entryCard(ctx, e);
-    if (card) view.append(card);
+    if (card) add(view, card);
   }
 }

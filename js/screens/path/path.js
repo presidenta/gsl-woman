@@ -1,4 +1,4 @@
-import { h } from '../../core/dom.js';
+import { h, add } from '../../core/dom.js';
 import { t } from '../../core/i18n.js';
 import { weekOf, monthOf } from '../../core/dates.js';
 import { outline, credit } from '../../program/index.js';
@@ -30,13 +30,13 @@ export function render(view, ctx) {
   const currentWeek = ctx.day >= 1 ? weekOf(ctx.day) : 0;
   const currentMonth = currentWeek ? monthOf(currentWeek) : 1;
 
-  view.append(
+  add(view,
     h('h1', { class: 'screen-title' }, t('path.title')),
     h('p', { class: 'screen-lead' }, t('path.lead')),
   );
 
   for (const m of outline(ctx.lang)) {
-    view.append(
+    add(view,
       h('details', { class: 'card path-month', open: m.month === currentMonth },
         h('summary', { class: 'path-month__summary' },
           h('span', { class: 'path-month__num gold-text' }, String(m.month)),
@@ -53,5 +53,5 @@ export function render(view, ctx) {
 
   // Консультант проекта — строкой из программы (сервер), на языке женщины
   const line = credit(ctx.lang);
-  if (line) view.append(h('p', { class: 'path-credit' }, line));
+  if (line) add(view, h('p', { class: 'path-credit' }, line));
 }

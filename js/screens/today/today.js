@@ -1,4 +1,4 @@
-import { h, svg } from '../../core/dom.js';
+import { h, svg, add } from '../../core/dom.js';
 import { t, plural, formatDate } from '../../core/i18n.js';
 import { dateOfDay, daysBetween, weekOf } from '../../core/dates.js';
 import { dayPlan } from '../../program/index.js';
@@ -283,7 +283,7 @@ function outside(ctx) {
 export function render(view, ctx) {
   const plan = dayPlan(ctx.day, ctx.lang);
   if (!plan) {
-    view.append(outside(ctx));
+    add(view, outside(ctx));
     return;
   }
   const summary = weekSummary(weekOf(ctx.day), ctx.entries, ctx.day);
@@ -292,7 +292,7 @@ export function render(view, ctx) {
   else if (plan.kind === 'flow') main = flowCard(plan);
   else main = callCard(plan, summary);
 
-  view.append(
+  add(view,
     h('div', { class: 'stack' },
       header(plan, summary),
       catchUp(ctx, summary),

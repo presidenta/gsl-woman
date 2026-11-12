@@ -1,4 +1,4 @@
-import { h, svg } from '../../core/dom.js';
+import { h, svg, add } from '../../core/dom.js';
 import { t, formatDate, weekdayShort } from '../../core/i18n.js';
 import { WEEKS } from '../../config.js';
 import { weekOf, dateOfDay } from '../../core/dates.js';
@@ -63,7 +63,7 @@ export function render(view, ctx) {
   else if (summary.lagDays) status = t('week.lag', { percent: summary.lagPercent });
   else status = t('week.onTrack');
 
-  view.append(
+  add(view,
     h('div', { class: 'week-nav' },
       prev,
       h('div', { class: 'week-nav__title' },

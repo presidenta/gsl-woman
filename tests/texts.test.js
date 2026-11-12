@@ -47,7 +47,7 @@ test('склонение дней', () => {
 test('подстановка и запасной язык', () => {
   setLang('en');
   assert.equal(t('today.dayOf', { day: 3 }), 'Day 3');
-  assert.equal(t('settings.cabinet', { n: 12 }), 'Cabinet No. 12');
+  assert.equal(t('settings.cabinet', { n: 12 }), 'Cabinet No. 12', 'номер не отрывается от «No.» при переносе');
   assert.equal(t('нет.такого.ключа'), 'нет.такого.ключа');
 });
 
