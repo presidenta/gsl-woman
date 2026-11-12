@@ -12,6 +12,7 @@ self.GSL_FILES = [
   './assets/icons/icon-192.png',
   './assets/icons/icon-512.png',
   './assets/icons/maskable-512.png',
+  './assets/textures/rose-gold.jpg',
   './files.js',
   './index.html',
   './js/account/account.css',
