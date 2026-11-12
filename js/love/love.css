@@ -229,3 +229,35 @@ a.btn {
   color: var(--c-gold);
   font-size: var(--fs-xs);
 }
+
+/* «Зачем знать свой язык?» — ссылка золотом, по нажатию — четыре коротких пункта */
+.love-why {
+  margin-top: var(--sp-2);
+}
+
+.love-why__link {
+  display: inline-block;
+  color: var(--c-gold);
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+  list-style: none;
+}
+
+.love-why__link::-webkit-details-marker {
+  display: none;
+}
+
+.love-why__list {
+  display: grid;
+  gap: var(--sp-2);
+  margin: var(--sp-3) 0 0;
+  padding: var(--sp-3) var(--sp-4);
+  border-left: 1px solid var(--c-line-strong);
+  list-style: none;
+  color: var(--c-text);
+  font-size: var(--fs-sm);
+  line-height: var(--lh-text);
+}

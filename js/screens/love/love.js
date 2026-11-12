@@ -1,5 +1,5 @@
 import { h, svg, add } from '../../core/dom.js';
-import { t } from '../../core/i18n.js';
+import { t, list } from '../../core/i18n.js';
 import { icons } from '../../ui/icons.js';
 import { toast } from '../../ui/toast.js';
 import { KINDS, GROUPS, MAX_PEOPLE, choices, choose, setCount, setPerson, content, score } from '../../love/love.js';
@@ -56,6 +56,13 @@ function oneSection(view, ctx, c, who, current) {
   return h('section', { class: 'card settings__section love-section' },
     h('h2', { class: 'love-section__title' }, t(`love.${who}Section`)),
     h('p', { class: 'card__text faint' }, t(`love.${who}Hint`)),
+    // «Мой язык»: зачем его знать — ссылкой, раскрывается по нажатию (владелец 13.11.2026: «коротко и ясно»)
+    who === 'me'
+      ? h('details', { class: 'love-why' },
+        h('summary', { class: 'love-why__link' }, t('love.meWhy')),
+        h('ul', { class: 'love-why__list' }, ...list('love.meWhyList').map((x) => h('li', {}, x))),
+      )
+      : null,
     h('div', { class: 'love-who__row' },
       kindSelect(id, c, current, (k) => choose(who, k), t(`love.who.${who}`)),
       testButton(() => startQuiz(view, ctx, who)),
