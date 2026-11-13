@@ -12,6 +12,16 @@ const cloveBud = `
   <circle cx="0" cy="-5.2" r="3.9" fill="#a5643c"/>
   <path d="M-2.2 -6.6 a2.4 2.4 0 0 1 3 -.9" stroke="#d29a6c" stroke-width=".9" fill="none" stroke-linecap="round"/>`;
 
+// Цветок ромашки: белые лепестки вокруг жёлтой серединки (рисунок с центром в 0,0)
+const daisy = (r = 1) => {
+  let petals = '';
+  for (let i = 0; i < 12; i++) petals += `<ellipse cx="0" cy="${-9 * r}" rx="${2.6 * r}" ry="${6 * r}" fill="#fffaf0" stroke="#e8dcc0" stroke-width=".5" transform="rotate(${i * 30})"/>`;
+  return `${petals}<circle r="${5 * r}" fill="#f2c23a"/><circle r="${3 * r}" cx="${-1 * r}" cy="${-1 * r}" fill="#f8d968" opacity=".8"/>`;
+};
+
+// Семечко фенхеля: вытянутое, с рёбрышками
+const seed = `<ellipse rx="2.2" ry="6" fill="#a9a463"/><path d="M-.8 -5.4 L-.8 5.4 M.8 -5.4 L.8 5.4" stroke="#7d7a43" stroke-width=".5"/>`;
+
 const ICON = {
   lemon: `
     <circle cx="24" cy="24" r="19" fill="#f2c62e"/>
@@ -69,6 +79,40 @@ const ICON = {
   clove: `
     <g transform="translate(19 16) rotate(-22) scale(1.05)">${cloveBud}</g>
     <g transform="translate(30 19) rotate(24) scale(.95)">${cloveBud}</g>`,
+  // Семена чиа и льна (сборка 43): чиа — мелкие пёстрые, лён — блестящие коричневые
+  chia: `
+    <ellipse cx="24" cy="30" rx="15" ry="9" fill="#dfe4dc" opacity=".35"/>
+    <g fill="#4a4a4f"><ellipse cx="16" cy="28" rx="2.2" ry="1.6"/><ellipse cx="22" cy="33" rx="2.2" ry="1.6" transform="rotate(20 22 33)"/><ellipse cx="28" cy="27" rx="2.2" ry="1.6" transform="rotate(-25 28 27)"/><ellipse cx="33" cy="32" rx="2.2" ry="1.6"/><ellipse cx="20" cy="23" rx="2" ry="1.5" transform="rotate(40 20 23)"/><ellipse cx="30" cy="36" rx="2" ry="1.5"/></g>
+    <g fill="#b9b7ae"><ellipse cx="25" cy="31" rx="2.1" ry="1.5" transform="rotate(-10 25 31)"/><ellipse cx="18" cy="34" rx="1.9" ry="1.4"/><ellipse cx="32" cy="24" rx="1.9" ry="1.4" transform="rotate(30 32 24)"/></g>
+    <g fill="#fff" opacity=".6"><circle cx="15.4" cy="27.4" r=".5"/><circle cx="27.4" cy="26.4" r=".5"/><circle cx="32.4" cy="31.4" r=".5"/></g>`,
+  flax: `
+    <g transform="translate(16 26) rotate(-30)"><ellipse rx="3" ry="5.6" fill="#8a5a2b"/><ellipse cx="-.8" cy="-1.6" rx=".9" ry="2.2" fill="#d7a867" opacity=".8"/></g>
+    <g transform="translate(25 32) rotate(20)"><ellipse rx="3" ry="5.6" fill="#7a4c22"/><ellipse cx="-.8" cy="-1.6" rx=".9" ry="2.2" fill="#d7a867" opacity=".8"/></g>
+    <g transform="translate(33 23) rotate(60)"><ellipse rx="3" ry="5.6" fill="#94622f"/><ellipse cx="-.8" cy="-1.6" rx=".9" ry="2.2" fill="#e0b273" opacity=".8"/></g>
+    <g transform="translate(23 17) rotate(-70)"><ellipse rx="2.8" ry="5.2" fill="#835426"/><ellipse cx="-.7" cy="-1.5" rx=".8" ry="2" fill="#d7a867" opacity=".8"/></g>`,
+  // Вечерний стакан (сборка 43)
+  chamomile: `
+    <g transform="translate(19 21) scale(.95)">${daisy()}</g>
+    <g transform="translate(33 31) scale(.62)">${daisy()}</g>
+    <path d="M24 40 C25 34 28 31 31 29" stroke="#7aa35a" stroke-width="1.4" fill="none" stroke-linecap="round"/>`,
+  melissa: `
+    <path d="M24 41C13 39 7.5 28.5 12 14.5 24 16.5 30 27 24 41Z" fill="#a8d36a"/>
+    <path d="M24 41C18.5 32.5 15 24.5 12 14.5" stroke="#6f9b3e" stroke-width="1.3" fill="none" stroke-linecap="round"/>
+    <path d="M25 41c9.5-3 16-12 13-24C28 19 22 29.5 25 41Z" fill="#c2e384"/>
+    <path d="M25 41c5-8.5 9-15.5 13-24" stroke="#7fa94a" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+    <g stroke="#e8f6c8" stroke-width=".9" fill="none" stroke-linecap="round" opacity=".85"><path d="M14 22l3 1.5M16 28l3 1M33 23l-3 1.5M31 29l-3 1"/></g>`,
+  linden: `
+    <path d="M10 36 C14 24 24 14 38 9 C36 22 26 33 10 36Z" fill="#e9e3b4"/>
+    <path d="M10 36 C20 28 28 20 38 9" stroke="#c9c087" stroke-width="1" fill="none"/>
+    <g fill="#f6dc7a"><circle cx="26" cy="31" r="3.4"/><circle cx="32" cy="27" r="3"/><circle cx="30" cy="35" r="2.8"/><circle cx="36" cy="33" r="2.6"/></g>
+    <g fill="#d9a93a"><circle cx="26" cy="31" r="1.1"/><circle cx="32" cy="27" r="1"/><circle cx="30" cy="35" r=".9"/><circle cx="36" cy="33" r=".9"/></g>
+    <path d="M24 22 L26 31 M24 22 L32 27 M24 22 L30 35 M24 22 L36 33" stroke="#b5a764" stroke-width=".7"/>`,
+  fennel: `
+    <g transform="translate(16 24) rotate(-30)">${seed}</g>
+    <g transform="translate(25 28) rotate(15)">${seed}</g>
+    <g transform="translate(33 22) rotate(-10)">${seed}</g>
+    <g transform="translate(22 15) rotate(55)">${seed}</g>
+    <g transform="translate(31 34) rotate(70)">${seed}</g>`,
 };
 
 /** Значок составляющей 48×48 (столбик и полёт в стакан). */
@@ -122,6 +166,45 @@ export const INSIDE = {
       <g transform="translate(60 102) rotate(32) scale(1.15)">${cloveBud}</g>
       <g transform="translate(146 96) rotate(-38) scale(1.1)">${cloveBud}</g>
       <g transform="translate(104 128) rotate(12) scale(1.05)">${cloveBud}</g>
+    </g>`,
+  },
+  // Чиа — облачко геля с семенами внизу, лён — семена медленно плывут
+  chia: {
+    layer: 'under',
+    svg: `<g class="wf wf--cloud">
+      <ellipse cx="100" cy="222" rx="46" ry="14" fill="#e8ece4" opacity=".22"/>
+      <g fill="#4a4a4f"><circle cx="78" cy="220" r="1.8"/><circle cx="92" cy="214" r="1.6"/><circle cx="106" cy="224" r="1.8"/><circle cx="120" cy="216" r="1.6"/><circle cx="86" cy="228" r="1.5"/><circle cx="130" cy="226" r="1.5"/><circle cx="100" cy="208" r="1.4"/></g>
+      <g fill="none" stroke="#fff" stroke-opacity=".35" stroke-width=".7"><circle cx="78" cy="220" r="3.4"/><circle cx="106" cy="224" r="3.4"/><circle cx="120" cy="216" r="3.2"/></g>
+    </g>`,
+  },
+  flax: {
+    layer: 'under',
+    svg: `<g class="wf wf--drift">
+      <g transform="translate(74 168) rotate(30)"><ellipse rx="2.6" ry="4.8" fill="#8a5a2b"/></g>
+      <g transform="translate(116 178) rotate(-25)"><ellipse rx="2.6" ry="4.8" fill="#7a4c22"/></g>
+      <g transform="translate(134 154) rotate(70)"><ellipse rx="2.6" ry="4.8" fill="#94622f"/></g>
+      <g transform="translate(92 196) rotate(-60)"><ellipse rx="2.6" ry="4.8" fill="#835426"/></g>
+    </g>`,
+  },
+  // Вечерний стакан: ромашки и мелисса — на поверхности, липовый цвет и семена фенхеля — под водой
+  chamomile: {
+    layer: 'surface',
+    svg: `<g class="wf wf--bob"><g transform="translate(120 70) scale(1.05 .7)">${daisy(1.1)}</g><g transform="translate(92 73) scale(.75 .5)">${daisy(1.1)}</g></g>`,
+  },
+  melissa: {
+    layer: 'surface',
+    svg: `<g class="wf wf--bob wf--late"><g transform="translate(66 68) rotate(28) scale(.9) translate(-24 -24)">${ICON.melissa}</g></g>`,
+  },
+  linden: {
+    layer: 'under',
+    svg: `<g class="wf wf--drift"><g transform="translate(96 150) rotate(-18) scale(1.5) translate(-24 -24)">${ICON.linden}</g></g>`,
+  },
+  fennel: {
+    layer: 'under',
+    svg: `<g class="wf wf--drift wf--late">
+      <g transform="translate(72 120) rotate(30)">${seed}</g><g transform="translate(128 134) rotate(-20)">${seed}</g>
+      <g transform="translate(98 190) rotate(60)">${seed}</g><g transform="translate(140 206) rotate(10)">${seed}</g>
+      <g transform="translate(66 214) rotate(-40)">${seed}</g>
     </g>`,
   },
   cinnamon: {

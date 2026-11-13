@@ -6,7 +6,7 @@ import { MORNING } from './habits.js';
 /* КАРТОЧКА «УТРО» в итогах: по строке на привычку — значок, сколько дней из срока, полоса, кружок на каждый
    день (золотой — сделано) и сколько дней подряд сейчас. Экраны «Записи» (срок на выбор) и «Неделя». */
 
-const ICON = { water: icons.cup, minute: icons.sun, kegel: icons.pulse, steps: icons.footprints };
+const ICON = { water: icons.cup, minute: icons.sun, kegel: icons.pulse, steps: icons.footprints, night: icons.moon };
 
 function row(s, habit) {
   const n = s[habit];

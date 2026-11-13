@@ -17,13 +17,14 @@ import * as circles from './circles.js';
 
    Очки и рейтинги (отложены) потом посчитаются из этих же отметок: шаги с doneBy/doneAt, вклады по дням. */
 
-export const TRACKS = ['water', 'minute', 'kegel', 'steps'];
+export const TRACKS = ['water', 'minute', 'kegel', 'steps', 'night'];
 const DONE = {
   water: (iso) => waterLog.isDone(iso),
   minute: (iso) => morningLog.isDone(iso),
   kegel: kegelDone,
   // В цели «шаги» засчитывается день от 100% (6000)
   steps: (iso) => ['full', 'max'].includes(stepsLevel(stepsOf(iso))),
+  night: (iso) => waterLog.night.isDone(iso),
 };
 
 export const goalsOf = (circleId) => circles.items(circleId, 'goal')
@@ -103,7 +104,7 @@ export const removeGoal = (circle, goal) => circles.drop(circle.id, 'goal', goal
 
 /* Привязка счётчиков к привычкам: отметил стакан воды — +1 в «14 стаканов на двоих». Сверяем сегодня и вчера
    (вчерашнее можно отметить задним числом) при каждой правке отметок привычек. */
-const HABIT_KEYS = new Set(['waterlog', 'morning', 'kegel', 'steps', 'circle-data', 'circles']);
+const HABIT_KEYS = new Set(['waterlog', 'waternight', 'morning', 'kegel', 'steps', 'circle-data', 'circles']);
 
 export function reconcile() {
   const days = [isoDate(), addDays(isoDate(), -1)];

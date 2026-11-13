@@ -99,7 +99,7 @@ test('желания: отметки обоих, совпадения — оба
   assert.ok(s.length >= 2);
   const found = wishes.matches(pair, week);
   assert.deepEqual(found.map((w) => [w.key, w.match]), [['want.nature.park', 'both'], ['want.together.dinner', 'soft']]);
-  assert.deepEqual(wishes.marksOf('close'), ['resonates', 'think'], 'в «Близости» — только «откликается» и «подумаю»');
+  assert.deepEqual(wishes.marksOf('close'), ['yes', 'maybe'], 'везде — только «Да» и «Возможно»');
   wishes.setMark(pair, week, 'want.nature.park', 'yes');
   assert.equal(wishes.marks('c1', week)['want.nature.park'][SHE], undefined, 'то же ещё раз — отметка снята');
   assert.ok(wishes.addOwn(pair, 'want', 'nature', 'Пикник у озера'));

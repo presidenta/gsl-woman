@@ -20,6 +20,8 @@ const DEFAULTS = {
   alarms: { morning: true, noon: false, evening: false },
   // Что человек кладёт в утренний стакан тёплой воды (js/water/, 13.11.2026)
   water: [],
+  // Стакан воды на ночь (сборка 43)
+  waterNight: [],
 };
 
 export function get() {
@@ -35,6 +37,7 @@ export function get() {
     times,
     alarms: { ...DEFAULTS.alarms, ...(saved.alarms && typeof saved.alarms === 'object' ? saved.alarms : {}) },
     water: Array.isArray(saved.water) ? saved.water.filter((x) => typeof x === 'string').slice(0, 12) : [],
+    waterNight: Array.isArray(saved.waterNight) ? saved.waterNight.filter((x) => typeof x === 'string').slice(0, 12) : [],
   };
 }
 

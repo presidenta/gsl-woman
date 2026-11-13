@@ -2,7 +2,7 @@ import { h, svg } from '../core/dom.js';
 import { t, list } from '../core/i18n.js';
 import { icons } from '../ui/icons.js';
 import { foldCard } from '../ui/fold.js';
-import { ITEMS, GOLDEN, chosen, setItem, setItems } from './water.js';
+import { KINDS, GOLDEN, chosenOf, setItem, setItems } from './water.js';
 import * as waterLog from './water-log.js';
 import { icon } from './art.js';
 import { glassNode, surfaceOf } from './glass.js';
@@ -30,14 +30,16 @@ const FRESH_MS = 1600;
 const GONE_MS = 900;
 const GOLDEN_GAP_MS = 170;
 
-let fresh = null; // { items, at } — только что упали: всплеск и появление
-let gone = null; // { item, at } — только что убрана: тает
-let flying = new Set();
-let infoOpen = false; // «Состав и польза» раскрыт — переживает перерисовку экрана
+/* Состояние — у каждого стакана своё (утро и ночь стоят на одном экране): fresh — только что упали (всплеск),
+   gone — только что убрана (тает), flying — летят сейчас, info — раскрыт «Состав и польза». */
+const state = {};
+const st = (kind) => (state[kind] ||= { fresh: null, gone: null, flying: new Set(), info: false });
 
 const reduced = () => globalThis.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
 const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-const nameOf = (k) => t(`morning.water.items.${k}.name`);
+const base = (kind) => KINDS[kind].texts;
+const nameOf = (k, kind) => t(`${base(kind)}.items.${k}.name`);
+const root = (kind) => `.water[data-kind="${kind}"]`;
 
 function artSpan(k, cls) {
   const el = h('span', { class: cls, 'aria-hidden': 'true' });
@@ -46,15 +48,15 @@ function artSpan(k, cls) {
 }
 
 // Где сейчас на странице значок составляющей и поверхность воды
-const chipArt = (k) => document.querySelector(`.water-chip[data-item="${k}"] .water-chip__art`);
-const surfaceNow = () => {
-  const el = document.querySelector('.water .wg');
+const chipArt = (k, kind) => document.querySelector(`${root(kind)} .water-chip[data-item="${k}"] .water-chip__art`);
+const surfaceNow = (kind) => {
+  const el = document.querySelector(`${root(kind)} .wg`);
   return el ? surfaceOf(el) : null;
 };
 
 /** Полёт значка по дуге: от значка у стакана к поверхности воды. */
-function fly(fromEl) {
-  const to = surfaceNow();
+function fly(fromEl, kind) {
+  const to = surfaceNow(kind);
   if (!fromEl || !to) return Promise.resolve();
   const a = fromEl.getBoundingClientRect();
   const sx = a.left + a.width / 2;
@@ -86,73 +88,75 @@ function fly(fromEl) {
   return anim.finished.catch(() => {}).then(() => clone.remove());
 }
 
-function mark(k, on) {
-  const chip = document.querySelector(`.water-chip[data-item="${k}"]`);
+function mark(k, on, kind) {
+  const chip = document.querySelector(`${root(kind)} .water-chip[data-item="${k}"]`);
   if (!chip) return;
   chip.classList.toggle('is-on', on);
   chip.setAttribute('aria-checked', String(on));
 }
 
-async function toggle(k) {
-  if (flying.has(k)) return;
-  const add = !chosen().includes(k);
-  mark(k, add);
+async function toggle(k, kind) {
+  const s = st(kind);
+  if (s.flying.has(k)) return;
+  const add = !chosenOf(kind).includes(k);
+  mark(k, add, kind);
   if (!add) {
-    gone = { item: k, at: Date.now() };
-    setItem(k, false);
+    s.gone = { item: k, at: Date.now() };
+    setItem(k, false, kind);
     return;
   }
   if (!reduced()) {
-    flying.add(k);
-    await fly(chipArt(k));
-    flying.delete(k);
+    s.flying.add(k);
+    await fly(chipArt(k, kind), kind);
+    s.flying.delete(k);
   }
-  fresh = { items: [k], at: Date.now() };
-  setItem(k, true);
+  s.fresh = { items: [k], at: Date.now() };
+  setItem(k, true, kind);
 }
 
 /** «Золотая смесь»: недостающие из трёх летят в стакан друг за другом. */
 async function addGolden() {
-  const missing = GOLDEN.filter((k) => !chosen().includes(k) && !flying.has(k));
+  const s = st('morning');
+  const missing = GOLDEN.filter((k) => !chosenOf('morning').includes(k) && !s.flying.has(k));
   if (!missing.length) return;
-  missing.forEach((k) => mark(k, true));
+  missing.forEach((k) => mark(k, true, 'morning'));
   if (!reduced()) {
-    missing.forEach((k) => flying.add(k));
+    missing.forEach((k) => s.flying.add(k));
     // Стакан мог уйти выше экрана, пока человек читал состав, — сначала показываем его
-    document.querySelector('.water__stage')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    document.querySelector(`${root('morning')} .water__stage`)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
     await wait(480);
-    await Promise.all(missing.map((k, i) => wait(i * GOLDEN_GAP_MS).then(() => fly(chipArt(k)))));
-    missing.forEach((k) => flying.delete(k));
+    await Promise.all(missing.map((k, i) => wait(i * GOLDEN_GAP_MS).then(() => fly(chipArt(k, 'morning'), 'morning'))));
+    missing.forEach((k) => s.flying.delete(k));
   }
-  fresh = { items: missing, at: Date.now() };
+  s.fresh = { items: missing, at: Date.now() };
   setItems(missing, true);
 }
 
-function chip(k, on) {
-  const amount = t(`morning.water.items.${k}.amount`);
+function chip(k, on, kind) {
+  const amount = t(`${base(kind)}.items.${k}.amount`);
   return h('button', {
     type: 'button',
     class: `water-chip${on ? ' is-on' : ''}`,
     role: 'checkbox',
     'aria-checked': String(on),
-    'aria-label': `${nameOf(k)} — ${amount}`,
+    'aria-label': `${nameOf(k, kind)} — ${amount}`,
     dataset: { item: k },
-    onclick: () => toggle(k),
+    onclick: () => toggle(k, kind),
   },
   h('span', { class: 'water-chip__medal' },
     artSpan(k, 'water-chip__art'),
     h('span', { class: 'water-chip__check', 'aria-hidden': 'true' }, svg(icons.check)),
   ),
-  h('span', { class: 'water-chip__name', 'aria-hidden': 'true' }, nameOf(k)),
+  h('span', { class: 'water-chip__name', 'aria-hidden': 'true' }, nameOf(k, kind)),
   );
 }
 
 // Под стаканом — что в нём сейчас, одной строкой
-function nowLine(items) {
-  if (!items.length) return h('p', { class: 'water__now' }, t('morning.water.plain'));
+function nowLine(items, kind) {
+  if (!items.length) return h('p', { class: 'water__now' }, t(`${base(kind)}.plain`));
   return h('p', { class: 'water__now' },
-    h('span', { class: 'caps water__now-label' }, t('morning.water.mine')),
-    h('span', {}, items.map((k) => nameOf(k).toLowerCase()).join(' · ')),
+    h('span', { class: 'caps water__now-label' }, t(`${base(kind)}.mine`)),
+    h('span', {}, items.map((k) => nameOf(k, kind).toLowerCase()).join(' · ')),
   );
 }
 
@@ -170,109 +174,116 @@ function goldenBlock(items) {
   );
 }
 
-function infoItem(k, on) {
-  const base = `morning.water.items.${k}`;
+function infoItem(k, on, kind) {
+  const b = base(kind);
+  const key = `${b}.items.${k}`;
   return h('article', { class: `water-info__item${on ? ' is-on' : ''}` },
     h('div', { class: 'water-info__head' },
       artSpan(k, 'water-info__art'),
       h('div', { class: 'water-info__titles' },
-        h('h3', { class: 'water-info__name' }, nameOf(k), on ? h('span', { class: 'water-info__in' }, t('morning.water.inGlass')) : null),
+        h('h3', { class: 'water-info__name' }, nameOf(k, kind), on ? h('span', { class: 'water-info__in' }, t(`${b}.inGlass`)) : null),
         h('p', { class: 'water-info__dose' },
-          h('span', { class: 'water-info__dose-label' }, t('morning.water.dose')),
-          t(`${base}.amount`),
+          h('span', { class: 'water-info__dose-label' }, t(`${b}.dose`)),
+          t(`${key}.amount`),
         ),
       ),
     ),
-    h('p', { class: 'water-info__benefit' }, t(`${base}.benefit`)),
-    h('ul', { class: 'water-info__points' }, ...list(`${base}.points`).map((p) => h('li', {}, p))),
+    h('p', { class: 'water-info__benefit' }, t(`${key}.benefit`)),
+    h('ul', { class: 'water-info__points' }, ...list(`${key}.points`).map((p) => h('li', {}, p))),
     h('p', { class: 'water-info__care' },
-      h('span', { class: 'water-info__care-label' }, t('morning.water.careLabel')),
-      t(`${base}.care`),
+      h('span', { class: 'water-info__care-label' }, t(`${b}.careLabel`)),
+      t(`${key}.care`),
     ),
   );
 }
 
 // «Состав и польза» — свёрнут; стрелка раскрывает: золотая смесь, каждая составляющая, общая оговорка
-function info(items) {
+function info(items, kind) {
+  const b = base(kind);
+  const s = st(kind);
   const box = h('details', { class: 'water-info' },
     h('summary', { class: 'water-info__summary' },
       h('span', { class: 'water-info__mark', 'aria-hidden': 'true' }, svg(icons.sparkle)),
       h('span', { class: 'water-info__heading' },
-        h('span', { class: 'water-info__title' }, t('morning.water.info')),
-        h('span', { class: 'water-info__hint' }, t('morning.water.infoHint')),
+        h('span', { class: 'water-info__title' }, t(`${b}.info`)),
+        h('span', { class: 'water-info__hint' }, t(`${b}.infoHint`)),
       ),
       h('span', { class: 'fold__arrow water-info__arrow' }, svg(icons.chevronRight, 'fold__chevron')),
     ),
     h('div', { class: 'water-info__body' },
-      goldenBlock(items),
-      ...ITEMS.map((k) => infoItem(k, items.includes(k))),
-      h('p', { class: 'faint water__care' }, t('morning.water.care')),
+      kind === 'morning' ? goldenBlock(items) : null,
+      ...KINDS[kind].items.map((k) => infoItem(k, items.includes(k), kind)),
+      h('p', { class: 'faint water__care' }, t(`${b}.care`)),
     ),
   );
-  box.open = infoOpen;
-  box.addEventListener('toggle', () => { infoOpen = box.open; });
+  box.open = s.info;
+  box.addEventListener('toggle', () => { s.info = box.open; });
   return box;
 }
 
-export function waterCard(ctx) {
-  const items = chosen(ctx.settings.water);
-  const names = items.map((k) => nameOf(k).toLowerCase()).join(', ');
-  const freshItems = fresh && Date.now() - fresh.at < FRESH_MS ? fresh.items : [];
+/** Карточка стакана: kind — morning (утро, до минуты) или night (на ночь, в конце дня). */
+export function waterCard(ctx, kind = 'morning') {
+  const b = base(kind);
+  const s = st(kind);
+  const all = KINDS[kind].items;
+  const items = chosenOf(kind, ctx.settings[KINDS[kind].setting]);
+  const names = items.map((k) => nameOf(k, kind).toLowerCase()).join(', ');
   const glass = glassNode(items, {
-    fresh: freshItems,
-    gone: gone && Date.now() - gone.at < GONE_MS ? gone.item : null,
-    label: t('morning.water.glass', { list: names || t('morning.water.plainShort') }),
+    kind,
+    fresh: s.fresh && Date.now() - s.fresh.at < FRESH_MS ? s.fresh.items : [],
+    gone: s.gone && Date.now() - s.gone.at < GONE_MS ? s.gone.item : null,
+    label: t(`${b}.glass`, { list: names || t(`${b}.plainShort`) }),
   });
-  const done = waterLog.isDone(ctx.todayIso);
-  const on = (k) => items.includes(k) || flying.has(k);
+  const log = waterLog.logOf(kind);
+  const done = log.isDone(ctx.todayIso);
+  const on = (k) => items.includes(k) || s.flying.has(k);
+  const half = Math.ceil(all.length / 2);
 
   const glassSlot = h('div', { class: 'water__glass' });
   const stage = h('div', { class: 'water__stage' },
-    h('div', { class: 'water__side', role: 'group', 'aria-label': t('morning.water.pick') }, ...ITEMS.slice(0, 4).map((k) => chip(k, on(k)))),
+    h('div', { class: 'water__side', role: 'group', 'aria-label': t(`${b}.pick`) }, ...all.slice(0, half).map((k) => chip(k, on(k), kind))),
     h('div', { class: 'water__center' },
       glassSlot,
       // Идеальная температура (владелец 13.11.2026): тёплая, как тело — 37–40 °C; в такой и мёд сохраняет пользу
       h('p', { class: 'water__temp' },
         svg(icons.thermo, 'water__temp-icon'),
-        h('strong', { class: 'water__temp-value' }, t('morning.water.temp')),
-        h('span', { class: 'water__temp-hint' }, t('morning.water.tempHint')),
+        h('strong', { class: 'water__temp-value' }, t(`${b}.temp`)),
+        h('span', { class: 'water__temp-hint' }, t(`${b}.tempHint`)),
       ),
     ),
-    h('div', { class: 'water__side', role: 'group', 'aria-label': t('morning.water.pick') }, ...ITEMS.slice(4).map((k) => chip(k, on(k)))),
+    h('div', { class: 'water__side', role: 'group', 'aria-label': t(`${b}.pick`) }, ...all.slice(half).map((k) => chip(k, on(k), kind))),
   );
 
   const drink = h('button', {
     type: 'button',
     class: `btn btn--block water__drink${done ? ' is-done' : ' btn--gold'}`,
     'aria-pressed': String(done),
-    onclick: () => waterLog.setDone(ctx.todayIso, !done),
-  }, svg(icons.check, 'water__drink-icon'), done ? t('morning.water.drunk') : t('morning.water.drink'));
+    onclick: () => log.setDone(ctx.todayIso, !done),
+  }, svg(icons.check, 'water__drink-icon'), done ? t(`${b}.drunk`) : t(`${b}.drink`));
 
   const fold = foldCard({
-    id: 'water',
-    cls: 'water',
-    icon: icons.cup,
-    title: t('morning.water.title'),
-    lead: t('morning.water.short'),
-    status: done ? h('span', { class: 'fold__done', title: t('morning.water.drunk') }, svg(icons.check)) : null,
+    id: kind === 'night' ? 'water-night' : 'water',
+    cls: `water water--${kind}`,
+    icon: kind === 'night' ? icons.moon : icons.cup,
+    title: t(`${b}.title`),
+    lead: t(`${b}.short`),
+    status: done ? h('span', { class: 'fold__done', title: t(`${b}.drunk`) }, svg(icons.check)) : null,
     body: [
-      h('p', { class: 'card__text water__lead' }, t('morning.water.lead')),
-      h('p', { class: 'water__pick' }, t('morning.water.pick')),
+      h('p', { class: 'card__text water__lead' }, t(`${b}.lead`)),
+      h('p', { class: 'water__pick' }, t(`${b}.pick`)),
       stage,
-      nowLine(items),
+      nowLine(items, kind),
       h('div', { class: 'card__actions' }, drink),
-      info(items),
+      info(items, kind),
     ],
-    // Один стакан на странице: свёрнута — он в шапке, раскрыта — в центре, между составляющими
+    // Один стакан на карточку: свёрнута — он в шапке, раскрыта — в центре, между составляющими
     onToggle: (open) => (open ? glassSlot : fold.thumb).append(glass.node),
   });
+  fold.node.dataset.kind = kind;
   return fold.node;
 }
 
 /** Для проверок: забыть отметки полёта. */
 export function _reset() {
-  fresh = null;
-  gone = null;
-  flying = new Set();
-  infoOpen = false;
+  for (const k of Object.keys(state)) delete state[k];
 }

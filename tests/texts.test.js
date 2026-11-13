@@ -47,10 +47,12 @@ test('мужская часть — по-мужски: реакция женщи
   assert.equal(t('app.name'), 'GSL Woman+');
 });
 
-test('у обеих частей — стакан тёплой воды: восемь составляющих, у каждой доза, польза по пунктам и «бережно»', () => {
+test('у обеих частей — стакан тёплой воды: десять составляющих (с семенами чиа и льна), у каждой доза, польза по пунктам и «бережно»; вечерний стакан — свой состав', () => {
   for (const [name, d] of Object.entries(SETS)) {
     const w = d.morning.water;
-    assert.deepEqual(Object.keys(w.items), ['lemon', 'ginger', 'mint', 'cinnamon', 'honey', 'turmeric', 'pepper', 'clove'], name);
+    assert.deepEqual(Object.keys(w.items), ['lemon', 'ginger', 'mint', 'cinnamon', 'chia', 'honey', 'turmeric', 'pepper', 'clove', 'flax'], name);
+    assert.deepEqual(Object.keys(d.night.items), ['chamomile', 'melissa', 'linden', 'fennel', 'honey', 'cinnamon'], `${name}: на ночь`);
+    assert.match(w.items.chia.amount, /15–30/, `${name}: чиа — сколько замачивать`);
     for (const it of Object.values(w.items)) {
       assert.ok(it.name && it.amount && it.benefit && it.care, name);
       assert.ok(Array.isArray(it.points) && it.points.length >= 3, `${name}: польза — пунктами`);

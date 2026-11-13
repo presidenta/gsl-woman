@@ -80,7 +80,6 @@ function emptyState(view, ctx, which) {
       h('button', { type: 'button', class: 'btn btn--ghost btn--block', onclick: () => { joining = !joining; ctx.rerender(); } }, t(`${base}.join`)),
     ),
     joining ? joinForm(view, ctx) : null,
-    h('p', { class: 'faint us-mentor' }, t('us.mentor')),
   );
 }
 
@@ -136,7 +135,7 @@ function pairView(view, ctx, circle) {
   if (!circles.isComplete(circle)) return [memberList(circle), codeCard(ctx, circle), leaveButton(ctx, circle)];
   const tabs = ['chat', 'wishes'];
   return [
-    h('section', { class: 'card us-head' }, memberList(circle), h('p', { class: 'faint us-mentor' }, t('us.mentor'))),
+    h('section', { class: 'card us-head' }, memberList(circle)),
     segmented({ label: t('us.pair'), options: tabs.map((k) => ({ value: k, label: t(`us.tabs.${k}`) })), value: pairTab, onChange: (v) => { pairTab = v; ctx.rerender(); } }),
     pairTab === 'wishes' ? wishesView(circle, ctx.rerender) : chatView(circle),
     h('a', { class: 'love-card__link us-goals-link', href: '#/goals' }, t('us.goalsLink'), svg(icons.chevronRight, 'love-card__chevron')),
@@ -148,7 +147,7 @@ function familyView(view, ctx, circle) {
   const parents = circle.members.filter((m) => m.role === 'parent');
   const tabs = ['chat', 'dreams'];
   return [
-    h('section', { class: 'card us-head' }, memberList(circle), h('p', { class: 'faint us-mentor' }, t('us.mentor'))),
+    h('section', { class: 'card us-head' }, memberList(circle)),
     childrenBlock(circle, fail),
     parents.length < 2 && circle.role === 'parent' ? codeCard(ctx, circle) : null,
     segmented({ label: t('us.family'), options: tabs.map((k) => ({ value: k, label: t(`us.tabs.${k}`) })), value: familyTab, onChange: (v) => { familyTab = v; ctx.rerender(); } }),

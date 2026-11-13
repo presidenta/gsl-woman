@@ -14,7 +14,8 @@ const NS = 'http://www.w3.org/2000/svg';
 const SURFACE = 74;
 const CYCLE = 12; // секунд: длины всех движений делят его нацело (water.css)
 
-let lastColor = null;
+// Прежний цвет воды — у каждого стакана свой (утро и ночь на одном экране)
+const lastColor = {};
 
 // Волна шириной 400: период 100 — сдвиг на 100 или 200 незаметен, движение бесконечное
 const wave = (y, amp) => {
@@ -38,11 +39,13 @@ export function surfaceOf(svg) {
  * Стакан с составляющими items. fresh — только что упавшие (всплеск и появление; одна или список — «золотая
  * смесь» падает тремя), gone — только что убранная (тает). Вернёт { node, svg, surface() }.
  */
-export function glassNode(items, { fresh = null, gone = null, label = '' } = {}) {
+export function glassNode(items, { fresh = null, gone = null, label = '', kind = 'morning' } = {}) {
   const freshList = [].concat(fresh || []);
   const color = waterColor(items);
-  const from = lastColor || color;
-  lastColor = color;
+  const from = lastColor[kind] || color;
+  lastColor[kind] = color;
+  // id градиентов и обрезки — свои у каждого стакана: два стакана на экране иначе спутали бы заливки
+  const P = kind === 'night' ? 'wgn' : 'wg';
 
   const phase = -((performance.now() / 1000) % CYCLE);
   const parts = (layer) => {
@@ -57,38 +60,38 @@ export function glassNode(items, { fresh = null, gone = null, label = '' } = {})
   const markup = `
 <svg viewBox="0 -44 200 300" class="wg" role="img" aria-label="${label.replace(/"/g, '&quot;')}" xmlns="${NS}">
   <defs>
-    <clipPath id="wg-inner"><path d="${INNER}"/></clipPath>
-    <linearGradient id="wg-water" x1="0" y1="0" x2="0" y2="1">
+    <clipPath id="${P}-inner"><path d="${INNER}"/></clipPath>
+    <linearGradient id="${P}-water" x1="0" y1="0" x2="0" y2="1">
       <stop class="wg-top" offset="0"/>
       <stop class="wg-bottom" offset="1"/>
     </linearGradient>
-    <linearGradient id="wg-back" x1="0" y1="0" x2="1" y2="0">
+    <linearGradient id="${P}-back" x1="0" y1="0" x2="1" y2="0">
       <stop offset="0" stop-color="#fff" stop-opacity=".07"/><stop offset=".5" stop-color="#fff" stop-opacity=".02"/>
       <stop offset="1" stop-color="#fff" stop-opacity=".06"/>
     </linearGradient>
-    <linearGradient id="wg-shine" x1="0" y1="0" x2="1" y2="0">
+    <linearGradient id="${P}-shine" x1="0" y1="0" x2="1" y2="0">
       <stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset=".5" stop-color="#fff" stop-opacity=".5"/>
       <stop offset="1" stop-color="#fff" stop-opacity="0"/>
     </linearGradient>
-    <linearGradient id="wg-base" x1="0" y1="0" x2="0" y2="1">
+    <linearGradient id="${P}-base" x1="0" y1="0" x2="0" y2="1">
       <stop offset="0" stop-color="#fff" stop-opacity=".22"/><stop offset="1" stop-color="#fff" stop-opacity=".05"/>
     </linearGradient>
-    <radialGradient id="wg-glow" cx=".5" cy=".62" r=".55">
+    <radialGradient id="${P}-glow" cx=".5" cy=".62" r=".55">
       <stop class="wg-glow-in" offset="0"/><stop class="wg-glow-out" offset="1"/>
     </radialGradient>
   </defs>
 
-  <ellipse cx="100" cy="150" rx="104" ry="120" fill="url(#wg-glow)"/>
+  <ellipse cx="100" cy="150" rx="104" ry="120" fill="url(#${P}-glow)"/>
   <ellipse cx="100" cy="248" rx="62" ry="6" fill="#000" opacity=".35"/>
-  <path d="${GLASS} Z" fill="url(#wg-back)"/>
+  <path d="${GLASS} Z" fill="url(#${P}-back)"/>
 
   ${parts('behind')}
 
-  <g clip-path="url(#wg-inner)">
+  <g clip-path="url(#${P}-inner)">
     ${parts('under')}
     <g class="wg-waves">
-      <path class="wg-wave wg-wave--back" d="${wave(SURFACE - 2, 3.2)}" fill="url(#wg-water)" opacity=".55"/>
-      <path class="wg-wave wg-wave--front" d="${wave(SURFACE, 4.2)}" fill="url(#wg-water)"/>
+      <path class="wg-wave wg-wave--back" d="${wave(SURFACE - 2, 3.2)}" fill="url(#${P}-water)" opacity=".55"/>
+      <path class="wg-wave wg-wave--front" d="${wave(SURFACE, 4.2)}" fill="url(#${P}-water)"/>
       <path class="wg-wave wg-wave--line" d="${wave(SURFACE, 4.2).replace(/ V250 H0 Z$/, '')}" fill="none" stroke="#fff" stroke-opacity=".38" stroke-width="1.2"/>
     </g>
     <path class="wg-light" d="M60 90 L78 90 L66 240 L48 240 Z" fill="#fff" opacity=".07"/>
@@ -105,8 +108,8 @@ export function glassNode(items, { fresh = null, gone = null, label = '' } = {})
 
   <path d="${GLASS}" fill="none" stroke="#fff" stroke-opacity=".42" stroke-width="1.6" stroke-linejoin="round"/>
   <ellipse cx="100" cy="30" rx="70" ry="5.2" fill="none" stroke="#fff" stroke-opacity=".5" stroke-width="1.4"/>
-  <path d="M47 236 Q48 246 57 246 L143 246 Q152 246 153 236 L152.2 228 Q100 236 47.8 228 Z" fill="url(#wg-base)"/>
-  <path d="M40 46 L52 222" stroke="url(#wg-shine)" stroke-width="7" stroke-linecap="round" opacity=".55"/>
+  <path d="M47 236 Q48 246 57 246 L143 246 Q152 246 153 236 L152.2 228 Q100 236 47.8 228 Z" fill="url(#${P}-base)"/>
+  <path d="M40 46 L52 222" stroke="url(#${P}-shine)" stroke-width="7" stroke-linecap="round" opacity=".55"/>
   <path d="M157 52 L148 210" stroke="#fff" stroke-opacity=".18" stroke-width="2" stroke-linecap="round"/>
 </svg>`;
 

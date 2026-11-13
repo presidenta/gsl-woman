@@ -8,9 +8,18 @@ import { t } from '../core/i18n.js';
    настройками (sync/) и наутро уже стоит в стакане — менять каждый день незачем. Тексты — morning.water.items.<ключ>
    в js/texts обеих частей; рисунки — js/water/art.js. Выпил ли человек стакан сегодня — water-log.js. */
 
-/** Составляющие по порядку: первые четыре стоят слева от стакана, остальные — справа. Справа — «золотая смесь»
-    подряд: мёд, куркума и перец (с перцем куркума усваивается в разы лучше), и гвоздика. */
-export const ITEMS = ['lemon', 'ginger', 'mint', 'cinnamon', 'honey', 'turmeric', 'pepper', 'clove'];
+/** Составляющие по порядку: первая половина стоит слева от стакана, вторая — справа. Справа — «золотая смесь»
+    подряд: мёд, куркума и перец (с перцем куркума усваивается в разы лучше). Семена чиа и льна (сборка 43) — внизу
+    сторон: их замачивают заранее (чиа 15–30 минут, молотый лён 10–15, цельный — с вечера). */
+export const ITEMS = ['lemon', 'ginger', 'mint', 'cinnamon', 'chia', 'honey', 'turmeric', 'pepper', 'clove', 'flax'];
+
+/* Два стакана (сборка 43): утренний — бодрит, вечерний — успокаивает (владелец 13.11.2026: «стакан воды на ночь —
+   успокаивающий, другой состав»). У каждого свои составляющие, свой выбор в настройках и свои тексты. */
+export const KINDS = {
+  morning: { items: ITEMS, setting: 'water', texts: 'morning.water' },
+  night: { items: ['chamomile', 'melissa', 'linden', 'fennel', 'honey', 'cinnamon'], setting: 'waterNight', texts: 'night' },
+};
+const kindOf = (kind) => KINDS[kind] || KINDS.morning;
 
 /** «Золотая смесь» — собирается одной кнопкой в «Состав и польза». */
 export const GOLDEN = ['honey', 'turmeric', 'pepper'];
@@ -27,32 +36,37 @@ const TINTS = {
   cinnamon: [170, 96, 40, 0.45],
   mint: [150, 214, 150, 0.3],
   clove: [130, 72, 40, 0.12],
+  chia: [200, 200, 190, 0.1],
+  flax: [190, 150, 100, 0.14],
+  chamomile: [250, 214, 110, 0.4],
+  melissa: [176, 214, 140, 0.25],
+  linden: [242, 222, 150, 0.32],
+  fennel: [222, 212, 160, 0.15],
 };
 
-/** Что сейчас в стакане — только знакомые ключи, в порядке столбика. */
-export function chosen(list = settings.get().water) {
+/** Что сейчас в стакане вида kind — только знакомые ключи, в порядке столбика. */
+export function chosenOf(kind, list = settings.get()[kindOf(kind).setting]) {
   const set = new Set(Array.isArray(list) ? list : []);
-  return ITEMS.filter((k) => set.has(k));
+  return kindOf(kind).items.filter((k) => set.has(k));
 }
 
-/** Положить или убрать составляющую. */
-export function setItem(item, on) {
-  const now = new Set(chosen());
-  if (on) now.add(item);
-  else now.delete(item);
-  settings.update({ water: ITEMS.filter((k) => now.has(k)) });
-}
+/** Утренний стакан (как было до вечернего). */
+export const chosen = (list = settings.get().water) => chosenOf('morning', list);
 
-/** Положить или убрать сразу несколько (золотая смесь). */
-export function setItems(list, on) {
-  const now = new Set(chosen());
+/** Положить или убрать сразу несколько (золотая смесь) — в стакан вида kind. */
+export function setItems(list, on, kind = 'morning') {
+  const { items, setting } = kindOf(kind);
+  const now = new Set(chosenOf(kind));
   for (const k of list) {
-    if (!ITEMS.includes(k)) continue;
+    if (!items.includes(k)) continue;
     if (on) now.add(k);
     else now.delete(k);
   }
-  settings.update({ water: ITEMS.filter((k) => now.has(k)) });
+  settings.update({ [setting]: items.filter((k) => now.has(k)) });
 }
+
+/** Положить или убрать одну составляющую. */
+export const setItem = (item, on, kind = 'morning') => setItems([item], on, kind);
 
 /** Цвет воды по составляющим: верх светлее, низ гуще; чем больше красящего, тем насыщеннее. */
 export function waterColor(items) {
@@ -78,7 +92,8 @@ export function waterColor(items) {
 }
 
 /** Короткая строка для виджета и напоминаний: «тёплая вода: лимон, мёд». */
-export function label(items = chosen()) {
-  if (!items.length) return t('morning.water.plainShort');
-  return t('morning.water.withList', { list: items.map((k) => t(`morning.water.items.${k}.name`).toLowerCase()).join(', ') });
+export function label(items = chosen(), kind = 'morning') {
+  const base = kindOf(kind).texts;
+  if (!items.length) return t(`${base}.plainShort`);
+  return t(`${base}.withList`, { list: items.map((k) => t(`${base}.items.${k}.name`).toLowerCase()).join(', ') });
 }

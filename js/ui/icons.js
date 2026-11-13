@@ -21,6 +21,8 @@ export const icons = {
   // «Мы» — два кольца, связанные вместе (пара и семья)
   rings: wrap('<circle cx="9" cy="12.5" r="5.5"/><circle cx="15" cy="12.5" r="5.5"/>'),
   send: wrap('<path d="M4 12l16-7-6.5 16-2.8-6.6z"/><path d="M10.7 14.4L20 5"/>'),
+  // Стакан воды на ночь (сборка 43)
+  moon: wrap('<path d="M19.5 14.6A8 8 0 1 1 9.4 4.5a6.3 6.3 0 0 0 10.1 10.1z"/><path d="M16.5 4.5v2M15.5 5.5h2"/>'),
   chevronLeft: wrap('<path d="M14.5 6l-6 6 6 6"/>'),
   chevronRight: wrap('<path d="M9.5 6l6 6-6 6"/>'),
   close: wrap('<path d="M6 6l12 12M18 6L6 18"/>'),

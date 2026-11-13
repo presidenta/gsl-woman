@@ -41,6 +41,8 @@ export const COLLECTIONS = [
   { key: 'waterlog', kind: 'water', type: 'map', empty: {} },
   // Кегель и шаги — по дням (habits/logs.js), с 42
   { key: 'kegel', kind: 'kegel', type: 'map', empty: {} },
+  // Стакан воды на ночь (water/water-log.js), с 43
+  { key: 'waternight', kind: 'waternight', type: 'map', empty: {} },
   { key: 'steps', kind: 'steps', type: 'map', empty: {} },
   { key: 'settings', kind: 'settings', type: 'single', empty: null },
   { key: 'love', kind: 'love', type: 'single', empty: null },

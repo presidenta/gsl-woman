@@ -8,15 +8,16 @@ import { kegelDone, stepsDone } from '../habits/logs.js';
    Ничего не хранит: читает отметки дней — стакан (water/water-log.js, ставит человек кнопкой) и минута
    (journal/morning-log.js, ставится сама, когда минута дошла до конца). */
 
-/** «Утро» — стакан воды и минута; «День» — Кегель и шаги от минимума (сборка 42). */
+/** «Утро» — стакан воды и минута; «День» — Кегель, шаги от минимума (сборка 42) и стакан на ночь (43). */
 export const MORNING = ['water', 'minute'];
-export const DAY = ['kegel', 'steps'];
+export const DAY = ['kegel', 'steps', 'night'];
 export const HABITS = [...MORNING, ...DAY];
 const DONE = {
   water: (iso) => waterLog.isDone(iso),
   minute: (iso) => morningLog.isDone(iso),
   kegel: kegelDone,
   steps: stepsDone,
+  night: (iso) => waterLog.night.isDone(iso),
 };
 const STREAK_MAX = 400;
 

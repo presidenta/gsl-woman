@@ -6,8 +6,8 @@ import ua from './catalog/ua.js';
 import en from './catalog/en.js';
 
 /* ЖЕЛАНИЯ НА ВЫХОДНЫЕ (владелец 13.11.2026, ТЗ раздел 5). Неделя — календарная; у каждого свои отметки на неделю.
-   «Хочу» — Да / Может быть / Пас; «Близость» — только «Откликается» / «Подумаю» (без отказа вообще); «Дарю» — что я
-   хочу сделать для тебя. Отметки партнёра видны, совпадения подсвечиваются.
+   Отметки — только «Да» и «Возможно» (владелец 13.11.2026: «всё остальное — обсуждать; не выбрал — и всё»), во всех
+   разделах. «Для тебя» — что я хочу сделать для тебя. Отметки партнёра видны, совпадения подсвечиваются.
 
    Записи в контуре пары:
      mark — id «неделя.участник.желание», data { week, wish, mark } — правит только автор;
@@ -17,13 +17,15 @@ const CATALOG = { ru, ua, en };
 export const MODES = ['want', 'give'];
 export const WANT_SECTIONS = ['rest', 'nature', 'together', 'body', 'fun', 'home', 'close'];
 export const GIVE_SECTIONS = ['care', 'close'];
-export const MARKS = ['yes', 'maybe', 'no'];
-export const CLOSE_MARKS = ['resonates', 'think'];
-const POSITIVE = new Set(['yes', 'resonates']);
+export const MARKS = ['yes', 'maybe'];
+const POSITIVE = new Set(['yes']);
+// Отметки сборки 42 («пас», «откликается», «подумаю») — к новым двум; «пас» просто снимается
+const LEGACY = { resonates: 'yes', think: 'maybe', no: null };
+const normal = (m) => (m in LEGACY ? LEGACY[m] : m);
 
 const catalog = () => CATALOG[getLang()] || CATALOG.ru;
 export const sectionsOf = (mode) => (mode === 'give' ? GIVE_SECTIONS : WANT_SECTIONS);
-export const marksOf = (section) => (section === 'close' ? CLOSE_MARKS : MARKS);
+export const marksOf = () => MARKS;
 
 /** Желания раздела: готовые (ключ «режим.раздел.ключ») и свои. */
 export function list(circleId, mode, section) {
@@ -42,7 +44,8 @@ export function marks(circleId, week) {
   const out = {};
   for (const m of circles.items(circleId, 'mark')) {
     if (m.data?.week !== week) continue;
-    (out[m.data.wish] ||= {})[m.author] = m.data.mark;
+    const mark = m.data.mark === 'give' ? 'give' : normal(m.data.mark);
+    if (mark) (out[m.data.wish] ||= {})[m.author] = mark;
   }
   return out;
 }
