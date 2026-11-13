@@ -1,15 +1,31 @@
 import { LANGS, FALLBACK_LANG } from '../config.js';
-import ua from '../texts/ua.js';
-import ru from '../texts/ru.js';
-import en from '../texts/en.js';
+import womanUa from '../texts/woman/ua.js';
+import womanRu from '../texts/woman/ru.js';
+import womanEn from '../texts/woman/en.js';
+import manUa from '../texts/man/ua.js';
+import manRu from '../texts/man/ru.js';
+import manEn from '../texts/man/en.js';
 
 /* ЯЗЫКИ ИНТЕРФЕЙСА: t('today.title', { n: 3 }).
 
-   Тексты лежат в js/texts/<язык>.js деревом; ключ — путь через точку. Нет слова в выбранном языке —
+   Тексты лежат в js/texts/<часть>/<язык>.js деревом; ключ — путь через точку. Нет слова в выбранном языке —
    берётся русское (он полный всегда), нет и там — показывается сам ключ, чтобы пропуск был виден сразу,
-   а не прятался пустым местом. Тексты программы (задания) — отдельно, в js/program/data/. */
+   а не прятался пустым местом. Тексты программы (задания) — отдельно, на сервере (program/source.js).
 
-const DICTS = { ua, ru, en };
+   У каждой части GSL (W+M)⁺ свои тексты (владелец 13.11.2026: «тексты мужские должны быть отдельны»):
+   js/texts/woman/ — женская, js/texts/man/ — мужская; ключи одинаковые (сверяет tests/texts.test.js). Какая часть,
+   говорит side/side.js через setSide. */
+
+const SETS = {
+  woman: { ua: womanUa, ru: womanRu, en: womanEn },
+  man: { ua: manUa, ru: manRu, en: manEn },
+};
+let DICTS = SETS.woman;
+
+/** Тексты своей части: woman | man (side/side.js). */
+export function setSide(side) {
+  DICTS = SETS[side] || SETS.woman;
+}
 const LOCALES = { ua: 'uk-UA', ru: 'ru-RU', en: 'en-GB' };
 
 let lang = FALLBACK_LANG;

@@ -7,7 +7,8 @@ import * as permission from '../../reminders/permission.js';
 import { clearAll } from '../../core/store.js';
 import * as sync from '../../sync/sync.js';
 import { nativeCard } from './native-card.js';
-import { field, switchRow } from '../../ui/controls.js';
+import { field, switchRow, segmented } from '../../ui/controls.js';
+import * as side from '../../side/side.js';
 import { icons } from '../../ui/icons.js';
 import { toast } from '../../ui/toast.js';
 import { accountCard } from '../../account/avatar.js';
@@ -107,6 +108,23 @@ function syncText() {
   return text;
 }
 
+/* ЧАСТЬ ПРИЛОЖЕНИЯ — только администратору (владелец 13.11.2026: пол меняет только администратор). Себе он меняет
+   его здесь, чтобы смотреть обе части: сервер сохраняет (gsl/gender.js), приложение перекрашивается, приходит
+   программа другой части, а данные телефона сверяются уже с ней — записи каждой части лежат отдельно. */
+function partCard(ctx) {
+  if (ctx.account?.role !== 'admin') return null;
+  return h('section', { class: 'card settings__section' },
+    h('h2', { class: 'caps settings__heading' }, t('settings.part')),
+    h('p', { class: 'faint settings__hint' }, t('settings.partHint')),
+    segmented({
+      label: t('settings.part'),
+      value: side.SIDES[side.get() || 'woman'].gender,
+      options: [{ value: 'female', label: t('settings.partWoman') }, { value: 'male', label: t('settings.partMan') }],
+      onChange: (gender) => ctx.switchSide(gender).catch(() => toast({ title: t('gender.fail') })),
+    }),
+  );
+}
+
 export function render(view, ctx) {
   const s = ctx.settings;
 
@@ -132,6 +150,7 @@ export function render(view, ctx) {
     h('h1', { class: 'screen-title' }, t('settings.title')),
 
     accountCard({ onLogout: ctx.logout, update: updateButton() }),
+    partCard(ctx),
     nativeCard(),
     installCard(),
 

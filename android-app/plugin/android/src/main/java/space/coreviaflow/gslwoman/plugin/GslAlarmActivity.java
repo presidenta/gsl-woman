@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.drawable.GradientDrawable;
 import android.media.AudioAttributes;
@@ -27,7 +26,7 @@ import android.widget.TextView;
 /**
  * Будильник на весь экран (как в «Кванте»): поверх блокировки, звук будильника по кругу, вибрация. «Открыть» —
  * в приложение, «Готово» — закрыть. Звук сам смолкает через три минуты. Разметка собрана кодом — своих ресурсов
- * экран не требует. Цвета — GSL Woman+: слива и розовое золото.
+ * экран не требует. Цвета — своей части (GslTheme): у женской слива и розовое золото, у мужской графит и золото.
  */
 public class GslAlarmActivity extends Activity {
     private static final long RING_MS = 3 * 60 * 1000;
@@ -62,16 +61,17 @@ public class GslAlarmActivity extends Activity {
     }
 
     private Button button(String text, boolean gold) {
+        GslTheme th = GslTheme.of(this);
         Button b = new Button(this);
         b.setText(text);
         b.setAllCaps(false);
         b.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18);
         b.setTypeface(Typeface.DEFAULT_BOLD);
-        b.setTextColor(gold ? Color.parseColor("#150c11") : Color.parseColor("#efc4a6"));
+        b.setTextColor(gold ? th.onGold : th.gold);
         GradientDrawable bg = new GradientDrawable();
         bg.setCornerRadius(dp(28));
-        if (gold) bg.setColors(new int[] { Color.parseColor("#f6d3bb"), Color.parseColor("#d39079") });
-        else bg.setStroke(dp(1), Color.parseColor("#efc4a6"));
+        if (gold) bg.setColors(new int[] { th.goldLight, th.goldDeep });
+        else bg.setStroke(dp(1), th.gold);
         if (gold) bg.setOrientation(GradientDrawable.Orientation.LEFT_RIGHT);
         b.setBackground(bg);
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, dp(56));
@@ -89,20 +89,22 @@ public class GslAlarmActivity extends Activity {
         root.setOrientation(LinearLayout.VERTICAL);
         root.setGravity(Gravity.CENTER);
         root.setPadding(dp(28), dp(40), dp(28), dp(40));
+        // Цвета своей части (GslTheme): розовое золото на сливе у женской, классическое на графите у мужской
+        GslTheme th = GslTheme.of(this);
         GradientDrawable bg = new GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM,
-            new int[] { Color.parseColor("#2a1520"), Color.parseColor("#150c11") });
+            new int[] { th.bgTop, th.bgBottom });
         root.setBackground(bg);
 
         TextView brand = new TextView(this);
-        brand.setText("GSL Woman+");
-        brand.setTextColor(Color.parseColor("#c98a70"));
+        brand.setText(GslTheme.brand(this));
+        brand.setTextColor(th.brand);
         brand.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
         brand.setLetterSpacing(0.15f);
         brand.setGravity(Gravity.CENTER);
 
         TextView head = new TextView(this);
         head.setText(title == null ? "" : title);
-        head.setTextColor(Color.parseColor("#f6dcc4"));
+        head.setTextColor(th.head);
         head.setTextSize(TypedValue.COMPLEX_UNIT_SP, 30);
         head.setTypeface(Typeface.SERIF, Typeface.BOLD);
         head.setGravity(Gravity.CENTER);
@@ -110,7 +112,7 @@ public class GslAlarmActivity extends Activity {
 
         TextView text = new TextView(this);
         text.setText(body == null ? "" : body);
-        text.setTextColor(Color.parseColor("#e8d2c4"));
+        text.setTextColor(th.text);
         text.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18);
         text.setLineSpacing(0, 1.25f);
         text.setGravity(Gravity.CENTER);

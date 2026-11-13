@@ -13,7 +13,7 @@
         android:id="@+id/gsl_w_eyebrow"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="GSL Woman+"
+        android:text="GSL"
         android:textColor="#C98A70"
         android:textSize="11sp"
         android:letterSpacing="0.12"

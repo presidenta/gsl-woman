@@ -1,5 +1,6 @@
 import { h } from '../core/dom.js';
 import { t } from '../core/i18n.js';
+import * as side from '../side/side.js';
 
 /* ПОДЪЁМЫ НА ПЯТКИ — живая подсказка ритма (владелец 12.11.2026): «человечек поднялся, опустился и выдохнул —
    и так каждую секунду; подниматься на 2–3 сантиметра, не больше; на опускании — выдох».
@@ -109,9 +110,103 @@ const FIGURE = `
   <g class="heels__foot"><path d="${FOOT}" fill="url(#heels-skin)"/></g>
 </svg>`;
 
+
+/* МУЖСКАЯ ФИГУРА — для мужской части GSL (W+M)⁺ (владелец 13.11.2026: «утреннее напоминание такое же, как у женщин,
+   только фигурку мужчины поставить»). Та же система координат и те же классы, что у женской: стопа поворачивается
+   вокруг той же подушечки (73, 190), тело поднимается так же — анимация (styles/components/heels.css) одна на обе.
+   Мужчина в профиль: короткая стрижка, рубашка с коротким рукавом, ремень, брюки, босые стопы. Цвета — классическое
+   золото и графит, как оформление мужской части. */
+const MAN_HEAD = `M57 7.5 C63.5 6.4 69.4 9.6 70.2 15.4 C70.4 16.8 70.6 17.6 71.2 18.6 L73.8 22.8
+  C74 23.4 73.2 23.8 72.2 24 C72.5 24.8 72.5 25.4 72.1 25.8 C71.8 26.1 71.4 26.3 71.8 26.8
+  C72 27.5 71.8 28.2 71.2 28.6 C71.6 30.2 71.4 31.8 70.4 32.6 C69 33.6 67 33.6 65.4 33
+  C65.4 35 65.8 37 66.4 39.4 L56.4 40.2 C57 37 57.6 34 57.4 31.6 C55.2 29.6 53.2 27 52.4 23
+  C51.4 17.6 52 10.6 57 7.5 Z`;
+
+const MAN_HAIR = `M68.6 11.6 C66 7.2 58.6 6 54.4 9.4 C51.6 12 51.4 18 52.6 23.4 C53.6 24.6 54.6 25.2 55.6 25
+  C55.4 21.6 55.8 18 57.4 15.6 C60.4 13 64.8 12 68.6 11.6 Z`;
+
+const MAN_SHIRT = `M56 39.6 C59.6 38.6 63.4 38.4 66.8 38.6 C70.6 40 73.2 43 74 47.4 C74.6 52 74 56.4 72.8 60.4
+  C72 64.6 71.6 69 71.4 73.4 C71.2 80 70.8 88 70.4 96.4 C64 98 58 98 53.4 96.8 C53.4 89 53.2 82 52.8 76
+  C52 68 51.4 60 51.6 52.6 C51.8 47 53.4 42 56 39.6 Z`;
+
+const MAN_LEG = `M53.4 95.6 L70.6 95.6 C70.8 104 70 114 69 124 C68.4 130 68.2 136 67.6 142
+  C66.8 154 65.8 166 65 180.6 L58.2 180.6 C58 172 57.6 164 56.6 156 C55.6 148 55 140 55.4 132
+  C55.2 124 54 116 53.6 108 Z`;
+
+const MAN_ARM = `M58.4 42 C62.2 40.4 65 42.4 64.8 46 C64.4 53 63.4 60 62.8 66.6 C63.4 73 64.8 80 65.6 87.4
+  C66.6 90.4 67.2 94 66.2 97.6 C65.4 99.8 63.6 99.6 63.4 97.6 C63 94.6 62.4 91.6 62.2 89.2
+  C60.6 82.6 59 75 58.8 67.6 C58.4 60 57.6 52 57.4 46.4 C57.4 44.4 57.8 42.8 58.4 42 Z`;
+
+const MAN_SLEEVE = `M57 41.4 C61.6 39.2 65.8 41.2 65.8 46 C65.6 51 64.8 56 64.4 60.8 C62 61.6 59.6 61.6 57.4 61
+  C57 55 56.6 49 57 41.4 Z`;
+
+const FIGURE_MAN = `
+<svg viewBox="30 2 74 194" aria-hidden="true" class="heels__svg">
+  <defs>
+    <linearGradient id="heels-m-skin" gradientUnits="userSpaceOnUse" x1="44" y1="6" x2="82" y2="190">
+      <stop offset="0" stop-color="#f6e2c2"/><stop offset=".3" stop-color="#e3bf8e"/>
+      <stop offset=".55" stop-color="#c49461"/><stop offset=".78" stop-color="#ecd0a4"/><stop offset="1" stop-color="#b8875a"/>
+    </linearGradient>
+    <linearGradient id="heels-m-skin-far" gradientUnits="userSpaceOnUse" x1="50" y1="150" x2="70" y2="190">
+      <stop offset="0" stop-color="#9c7448"/><stop offset="1" stop-color="#6e4f30"/>
+    </linearGradient>
+    <linearGradient id="heels-m-shirt" gradientUnits="userSpaceOnUse" x1="50" y1="38" x2="76" y2="98">
+      <stop offset="0" stop-color="#f7dc84"/><stop offset=".45" stop-color="#c99a32"/><stop offset="1" stop-color="#7d5c17"/>
+    </linearGradient>
+    <linearGradient id="heels-m-legs" gradientUnits="userSpaceOnUse" x1="52" y1="96" x2="72" y2="182">
+      <stop offset="0" stop-color="#7a6e58"/><stop offset=".55" stop-color="#554c3c"/><stop offset="1" stop-color="#3a3428"/>
+    </linearGradient>
+    <linearGradient id="heels-m-legs-far" gradientUnits="userSpaceOnUse" x1="52" y1="96" x2="72" y2="182">
+      <stop offset="0" stop-color="#4a4234"/><stop offset="1" stop-color="#2a251d"/>
+    </linearGradient>
+    <linearGradient id="heels-m-hair" gradientUnits="userSpaceOnUse" x1="50" y1="6" x2="68" y2="26">
+      <stop offset="0" stop-color="#6b5236"/><stop offset="1" stop-color="#2f2216"/>
+    </linearGradient>
+    <linearGradient id="heels-m-floor" gradientUnits="userSpaceOnUse" x1="34" y1="0" x2="100" y2="0">
+      <stop offset="0" stop-color="#e3c77c" stop-opacity="0"/><stop offset=".5" stop-color="#e3c77c" stop-opacity=".6"/>
+      <stop offset="1" stop-color="#e3c77c" stop-opacity="0"/>
+    </linearGradient>
+    <radialGradient id="heels-m-shadow" cx=".5" cy=".5" r=".5">
+      <stop offset="0" stop-color="#000" stop-opacity=".5"/><stop offset="1" stop-color="#000" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <line x1="34" y1="190.4" x2="100" y2="190.4" stroke="url(#heels-m-floor)" stroke-width="1"/>
+  <ellipse class="heels__shade" cx="66" cy="190.6" rx="15" ry="2.2" fill="url(#heels-m-shadow)"/>
+  <ellipse class="heels__ripple" cx="60" cy="190.4" rx="10" ry="2.4" fill="none" stroke="#e3c77c" stroke-width="1"/>
+
+  <g class="heels__body"><path d="${MAN_LEG}" transform="translate(-2.6 -0.4)" fill="url(#heels-m-legs-far)"/></g>
+  <g class="heels__foot"><path d="${FOOT}" transform="translate(-2.6 0)" fill="url(#heels-m-skin-far)"/></g>
+
+  <g class="heels__body">
+    <path d="${MAN_LEG}" fill="url(#heels-m-legs)" stroke="#e3c77c" stroke-opacity=".38" stroke-width=".5"/>
+    <path d="M62.2 99 C62 120 61.6 150 61.2 179" fill="none" stroke="#f6e7b8" stroke-opacity=".16" stroke-width=".6" stroke-linecap="round"/>
+    <path d="${MAN_HEAD}" fill="url(#heels-m-skin)"/>
+    <path d="${MAN_HAIR}" fill="url(#heels-m-hair)"/>
+    <ellipse cx="59.6" cy="21.6" rx="1.5" ry="2.4" fill="url(#heels-m-skin)" stroke="#5a3d22" stroke-opacity=".4" stroke-width=".4"/>
+    <path d="M66.4 18.4 C67.3 17.9 68.3 18 69 18.6" fill="none" stroke="#3a2a18" stroke-opacity=".8" stroke-width=".6" stroke-linecap="round"/>
+    <path d="${MAN_SHIRT}" fill="url(#heels-m-shirt)"/>
+    <path d="M59.4 39.4 C61.6 41.6 64.2 41.8 66.4 39.8" fill="none" stroke="#4a3610" stroke-opacity=".55" stroke-width=".6" stroke-linecap="round"/>
+    <path d="M71.6 46 C71.2 60 70.6 76 70 92" fill="none" stroke="#fff3c8" stroke-opacity=".35" stroke-width=".6" stroke-linecap="round"/>
+    <path d="M53.4 94.4 L70.7 94.4 L70.6 97.4 L53.4 97.4 Z" fill="#3a2c10"/>
+    <rect x="66.4" y="94.6" width="2.6" height="2.6" rx=".4" fill="none" stroke="#e3c77c" stroke-width=".5"/>
+    <path d="${MAN_ARM}" fill="url(#heels-m-skin)" stroke="#3a2a18" stroke-opacity=".2" stroke-width=".6"/>
+    <path d="${MAN_SLEEVE}" fill="url(#heels-m-shirt)" stroke="#4a3610" stroke-opacity=".35" stroke-width=".5"/>
+    <g class="heels__breath" fill="none" stroke="#f6ecd2" stroke-linecap="round">
+      <path pathLength="1" d="M74.2 26.6 C78.2 25.4 81 28.4 84.6 27.6 C88.2 26.8 89.8 24.4 93.4 25.2"/>
+      <path pathLength="1" d="M74.6 28.2 C79 29.4 82.2 31.8 86.6 31 C89.8 30.4 91.4 31.8 94.6 32.6" stroke-width=".9"/>
+      <path pathLength="1" d="M74.2 24.8 C77.6 22.8 81.2 23.6 84.8 21.6" stroke-width=".7"/>
+      <circle cx="97.2" cy="27.2" r=".9" fill="#f6ecd2" stroke="none"/>
+      <circle cx="99" cy="31.8" r=".6" fill="#f6ecd2" stroke="none"/>
+    </g>
+  </g>
+
+  <g class="heels__foot"><path d="${FOOT}" fill="url(#heels-m-skin)"/></g>
+</svg>`;
+
 export function heelsFigure({ aside = null } = {}) {
   const holder = document.createElement('div');
-  holder.innerHTML = FIGURE;
+  // Своя фигура у каждой части: женщина — у GSL Woman+, мужчина — у GSL Man+ (side/side.js)
+  holder.innerHTML = side.get() === 'man' ? FIGURE_MAN : FIGURE;
   const svg = holder.firstElementChild;
   svg.setAttribute('xmlns', SVG_NS);
 

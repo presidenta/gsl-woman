@@ -51,12 +51,20 @@ public class GslWidget extends AppWidgetProvider {
 
     static RemoteViews render(Context c) {
         RemoteViews v = new RemoteViews(c.getPackageName(), R.layout.gsl_widget);
+        // Цвета своей части: розовое золото у женской, классическое у мужской (GslTheme). Видимость и цвет — всегда
+        // ставятся явно в обе стороны: лаунчер переиспользует прежний вид виджета
+        GslTheme th = GslTheme.of(c);
+        v.setInt(R.id.gsl_w_root, "setBackgroundResource", th.widgetBg);
+        v.setTextColor(R.id.gsl_w_eyebrow, th.brand);
+        v.setTextColor(R.id.gsl_w_title, th.head);
+        v.setTextColor(R.id.gsl_w_body, th.text);
         JSONObject d = today(c);
         if (d == null) {
-            v.setTextViewText(R.id.gsl_w_title, GslStore.label(c, "widgetEmptyTitle", "GSL Woman+"));
+            v.setTextViewText(R.id.gsl_w_eyebrow, GslTheme.brand(c));
+            v.setTextViewText(R.id.gsl_w_title, GslStore.label(c, "widgetEmptyTitle", GslTheme.brand(c)));
             v.setTextViewText(R.id.gsl_w_body, GslStore.label(c, "widgetEmpty", "Откройте приложение — здесь появится день программы."));
         } else {
-            v.setTextViewText(R.id.gsl_w_eyebrow, d.optString("eyebrow", "GSL Woman+"));
+            v.setTextViewText(R.id.gsl_w_eyebrow, d.optString("eyebrow", GslTheme.brand(c)));
             v.setTextViewText(R.id.gsl_w_title, d.optString("title", ""));
             JSONArray lines = d.optJSONArray("lines");
             StringBuilder sb = new StringBuilder();

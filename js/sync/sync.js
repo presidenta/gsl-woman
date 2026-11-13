@@ -1,6 +1,7 @@
 import { read, write, subscribe } from '../core/store.js';
 import { current, request as apiRequest, isClosed } from '../account/session.js';
 import * as access from '../access/access.js';
+import * as side from '../side/side.js';
 import * as media from '../media/photos.js';
 import { syncPhotos, _use as usePhotos } from './photos.js';
 
@@ -141,7 +142,7 @@ function onLocalChange(key) {
   const c = BY_KEY[key];
   if (!c || applying) return;
   const s = active || state();
-  if (!s.userId || s.userId !== current()?.userId) return;
+  if (!s.userId || s.userId !== owner()) return;
   diff(s, c, new Date().toISOString());
   if (!active) save(s);
   schedule();
@@ -180,7 +181,7 @@ function apply(s, changes) {
 /* ---------- Обмен с сервером ---------- */
 
 async function exchange(s, changes) {
-  const res = await requestFn('/api/woman/sync', { body: { cursor: s.cursor, changes } });
+  const res = await requestFn(`${side.api()}/sync`, { body: { cursor: s.cursor, changes } });
   return res || { cursor: s.cursor, changes: [], more: false };
 }
 
@@ -237,14 +238,24 @@ function wipeForOther() {
   for (const c of COLLECTIONS) writeLocal(c, c.empty);
 }
 
+/* Чьи данные на этом телефоне: кабинет и часть GSL (W+M)⁺ (side/side.js → ownerKey). У женской части — просто
+   кабинет, как было всегда; у мужской — «кабинет:man». Администратор переключил часть — для телефона это как
+   другой человек: данные прежней части уже на сервере, здесь их убираем и забираем свои. */
+function owner() {
+  const id = current()?.userId;
+  return id ? side.ownerKey(id) : null;
+}
+
 async function run() {
   const session = current();
-  if (!session?.userId || !access.isOpen()) return;
+  // Пол ещё не выбран — какой части данные, неизвестно: ждём (screens/gender/)
+  if (!session?.userId || !access.isOpen() || side.needsChoice(session)) return;
+  const me = owner();
   const s = state();
   active = s;
   try {
     s.status = 'syncing';
-    if (s.userId && s.userId !== session.userId) {
+    if (s.userId && s.userId !== me) {
       wipeForOther();
       // И фото прежней: снимки, её фото профиля и что согласовано по фото
       await media.clear();
@@ -252,7 +263,7 @@ async function run() {
       write('photo-sync', {});
       s.userId = null;
     }
-    if (!s.userId) await adopt(s, session.userId);
+    if (!s.userId) await adopt(s, me);
     // Сверить всё с тенью: правка, о которой не пришёл сигнал, тоже уйдёт
     const when = new Date().toISOString();
     for (const c of COLLECTIONS) diff(s, c, when);

@@ -166,6 +166,27 @@ function morningCard(ctx, plan) {
     figure.node,
     h('div', { class: 'bar minute__bar' }, fill),
     h('div', { class: 'card__actions' }, picks, runningRow),
+    waterBlock(m.water),
+  );
+}
+
+/* Стакан тёплой воды после минуты (владелец 13.11.2026) — пожелание, а не задание: без отметки и записи. Вариант дня
+   — из program/morning.js, бережная подсказка (мёд, зубы, желудок, лекарства) — мелко внизу. */
+function waterBlock(kind) {
+  return h('div', { class: 'water' },
+    h('div', { class: 'water__head' },
+      h('span', { class: 'water__icon' }, svg(icons.cup)),
+      h('div', {},
+        h('p', { class: 'water__title' }, t('morning.water.title')),
+        h('p', { class: 'water__lead' }, t('morning.water.lead')),
+      ),
+    ),
+    h('div', { class: 'water__today' },
+      h('span', { class: 'caps water__label' }, t('morning.water.today')),
+      h('strong', { class: 'water__kind' }, t(`morning.water.kinds.${kind}.title`)),
+      h('p', { class: 'water__text' }, t(`morning.water.kinds.${kind}.text`)),
+    ),
+    h('p', { class: 'faint water__care' }, t('morning.water.care')),
   );
 }
 

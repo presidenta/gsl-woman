@@ -1,52 +1,90 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-  <!-- Исходник значка GSL Woman+ (лотос и золотой плюс — «Жінка-Плюс», 12.11.2026). Металл высветлен, у лепестков
-       светлая кромка — цветок чёткий и сияющий на тёмном (владелец: «цветок тёмный, сделай чётче»). PNG для телефона делает `npm run icons` (tools/icons.py).
-       Лотос — из обложки презентации тренинга. Рисунок держится в центральном круге (80% стороны):
-       маска Android обрезает края, и лепестки не должны попасть под обрезку. -->
+  <!-- Исходник значка GSL (W+M)⁺ (владелец 13.11.2026: «нарисовать фигурки мужчины и женщины, а внизу подпись GSL,
+       W и M сокращённо и плюс»). Одно приложение на две части: слева женщина в розовом золоте (как GSL Woman+), справа
+       мужчина в классическом золоте (как GSL Man+), держатся за руки; над ними — золотой плюс («Плюс»-статус).
+       Подпись под значком на телефоне — «GSL (W+M)⁺» (manifest.webmanifest, android-app/capacitor.config.json).
+       Рисунок держится в центральном круге (80% стороны): маска Android обрезает края. PNG делает `npm run icons`
+       (tools/icons.py): он же собирает значки для APK (android-app/launcher-icon/). -->
   <defs>
-    <radialGradient id="bg" cx="50%" cy="38%" r="75%">
-      <stop offset="0" stop-color="#3a1d2a"/>
-      <stop offset="0.55" stop-color="#22111a"/>
-      <stop offset="1" stop-color="#140a10"/>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="0.35">
+      <stop offset="0" stop-color="#2c1522"/>
+      <stop offset="0.5" stop-color="#1a1116"/>
+      <stop offset="1" stop-color="#15130e"/>
+    </linearGradient>
+    <radialGradient id="vignette" cx="50%" cy="46%" r="70%">
+      <stop offset="0.55" stop-color="#000" stop-opacity="0"/>
+      <stop offset="1" stop-color="#000" stop-opacity="0.45"/>
     </radialGradient>
-    <linearGradient id="gold" x1="0.15" y1="0" x2="0.85" y2="1">
-      <stop offset="0" stop-color="#fde7d6"/>
-      <stop offset="0.28" stop-color="#f0bea1"/>
-      <stop offset="0.52" stop-color="#cf8a73"/>
-      <stop offset="0.7" stop-color="#f8d8c0"/>
-      <stop offset="1" stop-color="#c27c66"/>
-    </linearGradient>
-    <linearGradient id="goldSoft" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#e9b49b"/>
-      <stop offset="1" stop-color="#a9604f"/>
-    </linearGradient>
-    <!-- Розовое золото — тот же снимок жидкого металла, что в кнопках и буквах приложения
-         (assets/textures/rose-gold.jpg). tools/icons.py встраивает его сюда перед отрисовкой. -->
-    <pattern id="rose" patternUnits="userSpaceOnUse" x="40" y="96" width="432" height="336">
-      <image href="../textures/rose-gold.jpg" width="432" height="336" preserveAspectRatio="xMidYMid slice"/>
-    </pattern>
-    <radialGradient id="glow" cx="50%" cy="56%" r="40%">
-      <stop offset="0" stop-color="#e9a5a4" stop-opacity="0.38"/>
+    <radialGradient id="glowRose" cx="36%" cy="58%" r="34%">
+      <stop offset="0" stop-color="#e9a5a4" stop-opacity="0.34"/>
       <stop offset="1" stop-color="#e9a5a4" stop-opacity="0"/>
     </radialGradient>
+    <radialGradient id="glowGold" cx="64%" cy="58%" r="34%">
+      <stop offset="0" stop-color="#d4af37" stop-opacity="0.3"/>
+      <stop offset="1" stop-color="#d4af37" stop-opacity="0"/>
+    </radialGradient>
+    <!-- Запасные градиенты (без текстур) -->
+    <linearGradient id="roseFlat" x1="0.1" y1="0" x2="0.9" y2="1">
+      <stop offset="0" stop-color="#fde7d6"/><stop offset="0.3" stop-color="#f0bea1"/>
+      <stop offset="0.55" stop-color="#cf8a73"/><stop offset="0.75" stop-color="#f8d8c0"/><stop offset="1" stop-color="#c27c66"/>
+    </linearGradient>
+    <linearGradient id="goldFlat" x1="0.1" y1="0" x2="0.9" y2="1">
+      <stop offset="0" stop-color="#fff1bf"/><stop offset="0.3" stop-color="#f2c658"/>
+      <stop offset="0.55" stop-color="#b8832a"/><stop offset="0.75" stop-color="#f7d774"/><stop offset="1" stop-color="#9c7418"/>
+    </linearGradient>
+    <linearGradient id="duo" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#f6d3bb"/><stop offset="0.5" stop-color="#fbe6c8"/><stop offset="1" stop-color="#f2c658"/>
+    </linearGradient>
+    <!-- Металл фигур — градиентом с бликами, а не снимком: на маленьком значке снимок металла темнеет пятнами
+         (полоска золота «Кванта» на высокой фигуре уходит в коричневый), а градиент читается чисто -->
+    <linearGradient id="rose" gradientUnits="userSpaceOnUse" x1="120" y1="120" x2="262" y2="392">
+      <stop offset="0" stop-color="#fde3d0"/><stop offset="0.28" stop-color="#eeb497"/>
+      <stop offset="0.5" stop-color="#c9826b"/><stop offset="0.7" stop-color="#f6d0b6"/><stop offset="1" stop-color="#b9705b"/>
+    </linearGradient>
+    <linearGradient id="gold" gradientUnits="userSpaceOnUse" x1="262" y1="120" x2="400" y2="392">
+      <stop offset="0" stop-color="#fff0b8"/><stop offset="0.28" stop-color="#f0c650"/>
+      <stop offset="0.5" stop-color="#b98a26"/><stop offset="0.7" stop-color="#f7d870"/><stop offset="1" stop-color="#a77d1c"/>
+    </linearGradient>
   </defs>
 
   <rect class="bg" width="512" height="512" fill="url(#bg)"/>
-  <circle class="bg" cx="256" cy="270" r="200" fill="url(#glow)"/>
+  <rect class="bg" width="512" height="512" fill="url(#glowRose)"/>
+  <rect class="bg" width="512" height="512" fill="url(#glowGold)"/>
+  <rect class="bg" width="512" height="512" fill="url(#vignette)"/>
+  <ellipse class="bg" cx="256" cy="396" rx="150" ry="10" fill="#000" opacity="0.45"/>
 
-  <g class="mark">
-    <!-- Нижние лепестки -->
-    <path d="M256 352 C 196 352 132 322 104 270 C 170 262 226 296 256 352 Z" fill="url(#rose)" stroke="#fff1e6" stroke-opacity=".7" stroke-width="3" stroke-linejoin="round"/>
-    <path d="M256 352 C 316 352 380 322 408 270 C 342 262 286 296 256 352 Z" fill="url(#rose)" stroke="#fff1e6" stroke-opacity=".7" stroke-width="3" stroke-linejoin="round"/>
-    <!-- Боковые лепестки -->
-    <path d="M256 348 C 196 318 150 262 146 196 C 210 210 248 268 256 348 Z" fill="url(#rose)" stroke="#fff1e6" stroke-opacity=".7" stroke-width="3" stroke-linejoin="round"/>
-    <path d="M256 348 C 316 318 362 262 366 196 C 302 210 264 268 256 348 Z" fill="url(#rose)" stroke="#fff1e6" stroke-opacity=".7" stroke-width="3" stroke-linejoin="round"/>
-    <!-- Центральный лепесток -->
-    <path d="M256 128 C 304 186 318 268 256 350 C 194 268 208 186 256 128 Z" fill="url(#rose)" stroke="#fff1e6" stroke-opacity=".7" stroke-width="3" stroke-linejoin="round"/>
-    <!-- Плюс: «Woman+», «Жінка-Плюс». В безопасном круге маски Android -->
-    <path d="M362 112 V 176 M330 144 H 394" fill="none" stroke="url(#rose)" stroke-width="17" stroke-linecap="round"/>
-    <!-- Вода под цветком -->
-    <path d="M168 382 Q 256 404 344 382" fill="none" stroke="url(#rose)" stroke-width="7" stroke-linecap="round"/>
-    <path d="M206 404 Q 256 416 306 404" fill="none" stroke="url(#rose)" stroke-width="5" stroke-linecap="round"/>
+  <g class="mark" stroke-linejoin="round">
+    <!-- Плюс над ними — «в степени», как в названии -->
+    <rect x="248" y="92" width="16" height="48" rx="5" fill="url(#duo)" stroke="#fff6e6" stroke-opacity=".6" stroke-width="2"/>
+    <rect x="232" y="108" width="48" height="16" rx="5" fill="url(#duo)" stroke="#fff6e6" stroke-opacity=".6" stroke-width="2"/>
+
+    <!-- ЖЕНЩИНА: голова с пучком, платье-клёш, ноги; правой рукой держит его руку -->
+    <g fill="url(#rose)" stroke="#fff1e6" stroke-opacity=".75" stroke-width="3">
+      <circle cx="170" cy="138" r="12"/>
+      <circle cx="186" cy="160" r="29"/>
+      <path d="M179 186 h14 v16 h-14 z"/>
+      <path d="M160 202 C168 195 204 195 212 202 L219 214 C214 230 208 244 205 254 C222 284 238 314 252 344 L120 344 C134 314 150 284 167 254 C164 244 158 230 153 214 Z"/>
+      <rect x="167" y="340" width="14" height="52" rx="6"/>
+      <rect x="191" y="340" width="14" height="52" rx="6"/>
+    </g>
+    <g fill="none" stroke="url(#rose)" stroke-width="15" stroke-linecap="round">
+      <path d="M157 214 L139 292"/>
+      <path d="M216 214 L249 276"/>
+    </g>
+
+    <!-- МУЖЧИНА: голова, широкие плечи, брюки; левой рукой держит её руку -->
+    <g fill="url(#gold)" stroke="#fff6dc" stroke-opacity=".75" stroke-width="3">
+      <circle cx="326" cy="154" r="31"/>
+      <path d="M318 182 h16 v16 h-16 z"/>
+      <path d="M278 208 C282 199 302 194 326 194 C350 194 370 199 374 208 L366 250 L360 288 L292 288 L286 250 Z"/>
+      <path d="M292 284 L323 284 L321 392 L300 392 Z"/>
+      <path d="M329 284 L360 284 L352 392 L331 392 Z"/>
+    </g>
+    <g fill="none" stroke="url(#gold)" stroke-width="18" stroke-linecap="round">
+      <path d="M371 214 L386 296"/>
+      <path d="M281 214 L261 276"/>
+    </g>
+    <!-- Руки встречаются: одна ладонь в другой -->
+    <circle cx="255" cy="278" r="11" fill="url(#duo)" stroke="#fff6e6" stroke-opacity=".7" stroke-width="2"/>
   </g>
 </svg>

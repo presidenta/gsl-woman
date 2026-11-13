@@ -1,0 +1,81 @@
+/* «КТО ТЫ?» — выбор пола при первом входе (gender.js). Шапка — от входа (onboarding__*), здесь только две карточки
+   выбора: знак ♀ / ♂ в золотом круге, подпись и цвет своей части. Цвета — только токены: выбранная карточка уже в
+   цвете своей части (side.apply перекрашивает страницу). */
+
+.gender__ask {
+  margin-top: var(--sp-6);
+  color: var(--c-champagne);
+  font-family: var(--f-display);
+  font-size: var(--fs-2xl);
+  font-weight: 600;
+}
+
+.gender__choices {
+  display: grid;
+  gap: var(--sp-3);
+  margin: var(--sp-5) 0 var(--sp-4);
+}
+
+.gender__card {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-4);
+  width: 100%;
+  padding: var(--sp-4) var(--sp-5);
+  border: 1px solid var(--c-line);
+  color: var(--c-text);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color var(--t-fast) var(--ease), box-shadow var(--t-fast) var(--ease), transform var(--t-fast) var(--ease);
+}
+
+.gender__card:active {
+  transform: scale(0.99);
+}
+
+.gender__card.is-picked {
+  border-color: var(--c-gold);
+  box-shadow: 0 0 0 1px var(--c-gold), 0 0 28px -8px rgba(var(--rgb-gold), 0.55);
+}
+
+.gender__mark {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--g-gold-soft);
+  border: 1px solid var(--c-line-strong);
+  color: var(--c-gold);
+}
+
+.gender__card.is-picked .gender__mark {
+  background: var(--g-gold-smooth);
+  color: var(--c-on-gold);
+}
+
+.gender__mark-svg,
+.gender__mark-svg svg {
+  display: block;
+  width: 30px;
+  height: 30px;
+}
+
+.gender__text {
+  display: grid;
+  gap: 2px;
+}
+
+.gender__title {
+  font-family: var(--f-display);
+  font-size: var(--fs-xl);
+  font-weight: 600;
+  color: var(--c-champagne);
+}
+
+.gender__hint {
+  color: var(--c-text-dim);
+  font-size: var(--fs-sm);
+}

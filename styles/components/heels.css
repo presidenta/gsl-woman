@@ -13,7 +13,7 @@
   margin-top: var(--sp-4);
   padding: var(--sp-2) var(--sp-3);
   border-radius: var(--r-md);
-  background: radial-gradient(70% 90% at 30% 60%, rgba(239, 196, 166, 0.09), transparent 70%);
+  background: radial-gradient(70% 90% at 30% 60%, rgba(var(--rgb-gold), 0.09), transparent 70%);
 }
 
 .heels__svg {

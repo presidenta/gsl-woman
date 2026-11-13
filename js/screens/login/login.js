@@ -17,11 +17,12 @@ let typedLogin = '';     // язык сменили посреди ввода �
 
 export function render(view, { mode = 'form', message = '', onLogin, onRetry }) {
 
+  // Название общее на две части — GSL (W+M)⁺: до входа ещё неизвестно, кто входит (владелец 13.11.2026)
   const hero = [
     h('div', { class: 'onboarding__mark' }, svg(icons.sparkle)),
-    h('p', { class: 'caps onboarding__eyebrow' }, t('onboarding.eyebrow')),
-    h('h1', { class: 'onboarding__brand gold-text' }, brand()),
-    h('p', { class: 'onboarding__tagline' }, t('app.tagline')),
+    h('p', { class: 'caps onboarding__eyebrow' }, t('login.eyebrow')),
+    h('h1', { class: 'onboarding__brand gold-text' }, brand('', t('app.shared'))),
+    h('p', { class: 'onboarding__tagline' }, t('app.sharedTagline')),
   ];
 
   if (mode !== 'form') {

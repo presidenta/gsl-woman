@@ -1,4 +1,5 @@
 import { t } from '../core/i18n.js';
+import * as side from '../side/side.js';
 import { subscribe } from '../core/store.js';
 import { isoDate, addDays, programDay, weekOf } from '../core/dates.js';
 import { buildPlan } from '../reminders/plan.js';
@@ -68,7 +69,7 @@ export function widgetDays({ settings }, now = new Date()) {
     const title = plan.kind === 'task' ? `«${plan.task.title}»` : t(`kinds.${plan.kind}`);
     const m = morningFor(day);
     const minute = m.addon ? `${t('morning.heels.title')} ${t(`morning.addon.${m.addon}.title`)}` : t('morning.heels.title');
-    const lines = [`☀ ${minute}`];
+    const lines = [`☀ ${minute}`, `💧 ${t(`morning.water.kinds.${m.water}.title`)}`];
     const him = ideaFor('him', day, lang);
     if (him) lines.push(`♡ ${him.text}`);
     for (const group of ['children', 'family']) {
@@ -89,7 +90,10 @@ export async function push(ctx) {
   await call('labels', {
     open: t('native.open'), done: t('native.done'),
     channelRemind: t('native.channelRemind'), channelAlarm: t('native.channelAlarm'),
-    widgetEmptyTitle: 'GSL Woman+', widgetEmpty: t('native.widgetEmpty'),
+    widgetEmptyTitle: t('app.name'), widgetEmpty: t('native.widgetEmpty'),
+    // Цвет виджета и экрана будильника — по части: woman — розовое золото, man — классическое (android-app/plugin)
+    side: side.get() || 'woman',
+    brand: t('app.name'),
   });
   await call('schedule', { items: nativeItems(ctx) });
   await call('setWidget', { days: widgetDays(ctx) });

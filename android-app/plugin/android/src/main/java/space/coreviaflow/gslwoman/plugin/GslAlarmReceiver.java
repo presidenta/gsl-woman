@@ -28,7 +28,7 @@ public class GslAlarmReceiver extends BroadcastReceiver {
         if (key == null) return;
         JSONObject item = GslStore.item(c, key);
         if (item == null) return;
-        show(c, key, item.optString("title", "GSL Woman+"), item.optString("body", ""), item.optBoolean("loud", false));
+        show(c, key, item.optString("title", GslTheme.brand(c)), item.optString("body", ""), item.optBoolean("loud", false));
     }
 
     static void channels(Context c) {

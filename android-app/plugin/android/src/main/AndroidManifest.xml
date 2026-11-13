@@ -40,7 +40,7 @@
             android:theme="@android:style/Theme.DeviceDefault.NoActionBar" />
 
         <!-- Виджет на экран телефона -->
-        <receiver android:name=".GslWidget" android:exported="true" android:label="GSL Woman+">
+        <receiver android:name=".GslWidget" android:exported="true" android:label="GSL (W+M)⁺">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>

@@ -9,7 +9,7 @@
   overflow: hidden;
   border-radius: 50%;
   background: var(--c-bg-raise);
-  box-shadow: 0 0 0 1.5px var(--c-gold-deep), 0 0 0 3px var(--c-bg), 0 0 0 4px rgba(239, 196, 166, 0.35);
+  box-shadow: 0 0 0 1.5px var(--c-gold-deep), 0 0 0 3px var(--c-bg), 0 0 0 4px rgba(var(--rgb-gold), 0.35);
 }
 
 .avatar--sm {
@@ -242,9 +242,9 @@
 .account__icon {
   width: 36px;
   height: 36px;
-  border: 1px solid rgba(239, 196, 166, 0.4);
+  border: 1px solid rgba(var(--rgb-gold), 0.4);
   border-radius: 11px;
-  background: rgba(18, 12, 15, 0.94);
+  background: rgba(var(--rgb-bg), 0.94);
   color: var(--c-champagne);
   transition: border-color 0.2s, box-shadow 0.3s;
 }
@@ -258,13 +258,13 @@
 @media (hover: hover) {
   .account__icon:hover {
     border-color: var(--c-gold);
-    box-shadow: 0 0 12px rgba(239, 196, 166, 0.4);
+    box-shadow: 0 0 12px rgba(var(--rgb-gold), 0.4);
   }
 }
 
 .account__icon:active {
   border-color: var(--c-gold);
-  box-shadow: 0 0 14px rgba(239, 196, 166, 0.55);
+  box-shadow: 0 0 14px rgba(var(--rgb-gold), 0.55);
 }
 
 /* Телефон: фото и значки компактнее, чтобы имя и «Кабинет № 1» стояли целиком */

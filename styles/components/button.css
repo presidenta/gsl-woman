@@ -40,7 +40,7 @@
    любом месте снимка. Буквы — светлые в тёмном контуре, как «прорезанное золото» «Кванта». */
 .btn--gold {
   border: 0;
-  background: radial-gradient(58% 95% at 50% 50%, rgba(43, 20, 17, 0.42), rgba(43, 20, 17, 0.12) 62%, transparent 82%),
+  background: radial-gradient(58% 95% at 50% 50%, rgba(var(--rgb-on-gold), 0.42), rgba(var(--rgb-on-gold), 0.12) 62%, transparent 82%),
     var(--g-gold);
   background-size: 100% 100%, 160% 100%, 160% 100%;
   color: var(--c-on-metal);
@@ -129,6 +129,6 @@
   font-size: var(--fs-sm);
   font-weight: 700;
   text-decoration: underline;
-  text-decoration-color: rgba(239, 196, 166, 0.35);
+  text-decoration-color: rgba(var(--rgb-gold), 0.35);
   text-underline-offset: 4px;
 }

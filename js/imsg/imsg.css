@@ -65,7 +65,7 @@
 .imsg__line--old .imsg__text {
   color: var(--c-text-dim);
   text-decoration: line-through;
-  text-decoration-color: rgba(239, 196, 166, 0.45);
+  text-decoration-color: rgba(var(--rgb-gold), 0.45);
   text-decoration-thickness: 1px;
 }
 

@@ -22,6 +22,8 @@ import * as path from './screens/path/path.js';
 import * as settingsScreen from './screens/settings/settings.js';
 import * as onboarding from './screens/onboarding/onboarding.js';
 import * as login from './screens/login/login.js';
+import * as genderScreen from './screens/gender/gender.js';
+import * as side from './side/side.js';
 import * as goalsScreen from './screens/goals/goals.js';
 import * as loveScreen from './screens/love/love.js';
 import { identity } from './account/avatar.js';
@@ -34,8 +36,13 @@ import * as preview from './preview/preview.js';
    изменениях, напоминания и работник. Экраны ничего не знают друг о друге: каждый получает ctx —
    свежие настройки, записи и день программы — и рисует себя в отведённое место.
 
-   Порядок ворот: вход аккаунтом «Кванта» → программа с его сервера (один раз, потом с телефона) →
-   первый вход (имя, старт, время) → экраны. Без входа приложение не показывает ничего из программы.
+   Порядок ворот: вход аккаунтом «Кванта» → «Кто ты?» (пол, один раз — GSL (W+M)⁺, side/) → программа своей
+   части с его сервера (один раз, потом с телефона) → первый вход (имя, старт, время) → экраны. Без входа
+   приложение не показывает ничего из программы.
+
+   Часть приложения — женская или мужская — по полу из сессии (side/side.js): цвет, тексты, программа, адреса
+   синхронизации и фото. Сменилась (выбрал пол, администратор переключил, администратор «Кванта» поменял пол) —
+   своя программа загружается заново, данные телефона сверяются со своей частью на сервере (sync/).
 
    Добавить экран: папка в js/screens/, строка router.define и при желании пункт в NAV. */
 
@@ -78,6 +85,8 @@ function context() {
     version: VERSION,
     account: account.current(),
     logout,
+    // Администратор смотрит другую часть (настройки): свой пол он меняет сам (сервер — gsl/gender.js)
+    switchSide: chooseGender,
     rerender: draw,
     go: router.go,
   };
@@ -107,6 +116,11 @@ function buildShell() {
 /* Программа: нет на телефоне — ждём её на экране входа; есть — молча сверяем отпечаток (вышла правка —
    придёт новый текст, и экран перерисуется сам через хранилище). Сессию больше не принимают — на вход. */
 async function loadProgram() {
+  // Пол ещё не выбран — чья программа, неизвестно: сначала «Кто ты?»
+  if (side.needsChoice(account.current())) {
+    draw();
+    return;
+  }
   if (!program.loaded()) {
     gate = { mode: 'loading', message: '' };
     draw();
@@ -176,8 +190,20 @@ function takeKvantLink() {
 
 async function onLogin(loginName, password) {
   await account.login(loginName, password);
+  side.follow(account.current());
   loadProgram();
   // Вошла — сразу забрать с сервера всё, что она вводила на других устройствах (sync/)
+  sync.now();
+}
+
+/* Пол выбран (экран «Кто ты?») или администратор переключил часть: сервер сохраняет, сессия берёт пол, дальше —
+   программа своей части и сверка данных. Отказ (нет сети, пол уже выбран) — исключение: экран покажет почему. */
+async function chooseGender(gender) {
+  await sync.now().catch(() => {});
+  await account.chooseGender(gender);
+  side.follow(account.current());
+  gate = { mode: 'form', message: '' };
+  loadProgram();
   sync.now();
 }
 
@@ -209,6 +235,11 @@ function drawGate() {
 
 function draw() {
   const ctx = context();
+  // Часть по полу из сессии: цвет и тексты — до всего остального. Сменилась — своя программа и свои данные
+  if (side.follow(ctx.account) && ctx.account && !side.needsChoice(ctx.account)) {
+    loadProgram();
+    sync.now();
+  }
   setLang(ctx.lang);
 
   // Доступ к GSL Woman+ закрыт — решает телефон по сохранённой дате, как «Квант» (access/)
@@ -217,7 +248,21 @@ function draw() {
     return;
   }
 
-  if (!ctx.account || !program.loaded()) {
+  if (!ctx.account) {
+    drawGate();
+    return;
+  }
+
+  // Пол ещё не выбран — до приложения только «Кто ты?» (владелец: «при входе обязательно указать пол»)
+  if (side.needsChoice(ctx.account)) {
+    shell = null;
+    const view = h('main', { class: 'app' });
+    mount(root, view);
+    genderScreen.render(view, { onChoose: chooseGender });
+    return;
+  }
+
+  if (!program.loaded()) {
     drawGate();
     return;
   }

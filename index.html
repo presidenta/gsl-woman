@@ -9,13 +9,13 @@
        к серверу «Кванта» (вход и программа, js/config.js → API_BASE) и к нему же на компьютере при проверке. -->
   <meta http-equiv="Content-Security-Policy"
         content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: blob:; font-src 'self'; connect-src 'self' https://game.coreviaflow.com http://localhost:8580; manifest-src 'self'; worker-src 'self'; base-uri 'self'; form-action 'none'">
-  <title>GSL Woman+ — тренінги для жінок</title>
-  <meta name="description" content="GSL Woman+: щоденні завдання тренінгу, теплі нагадування і твоя історія змін.">
+  <title>GSL (W+M)⁺ — тренінги для жінок і чоловіків</title>
+  <meta name="description" content="GSL (W+M)⁺: GSL Woman+ і GSL Man+ — щоденні завдання тренінгу, нагадування і твоя історія змін.">
 
   <!-- Значок на экране телефона: подпись — короткое имя из manifest, на iPhone — эта строка -->
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="GSL Woman+">
+  <meta name="apple-mobile-web-app-title" content="GSL (W+M)⁺">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="format-detection" content="telephone=no">
   <link rel="apple-touch-icon" href="assets/icons/icon-180.png">
@@ -24,6 +24,8 @@
 
   <!-- Дизайн: токены → шрифты → основа → компоненты → экраны. Перекрасить — styles/tokens.css. -->
   <link rel="stylesheet" href="styles/tokens.css">
+  <!-- Мужская часть GSL (W+M)⁺: те же токены в классическом золоте, включается <html data-side="man"> (js/side/) -->
+  <link rel="stylesheet" href="styles/side-man.css">
   <link rel="stylesheet" href="styles/fonts.css">
   <link rel="stylesheet" href="styles/base.css">
   <link rel="stylesheet" href="styles/components/button.css">
@@ -40,6 +42,7 @@
   <link rel="stylesheet" href="js/screens/settings/settings.css">
   <link rel="stylesheet" href="js/screens/onboarding/onboarding.css">
   <link rel="stylesheet" href="js/screens/login/login.css">
+  <link rel="stylesheet" href="js/screens/gender/gender.css">
   <link rel="stylesheet" href="js/imsg/imsg.css">
   <link rel="stylesheet" href="js/access/access.css">
   <link rel="stylesheet" href="js/love/love.css">
@@ -54,10 +57,12 @@
   <link rel="preload" href="assets/fonts/cormorant-cyrillic.woff2" as="font" type="font/woff2" crossorigin>
 
   <script src="version.js"></script>
+  <!-- Цвет своей части до первой отрисовки (женская или мужская) — js/side/early.js -->
+  <script src="js/side/early.js"></script>
   <script type="module" src="js/main.js"></script>
 </head>
 <body>
   <div id="app"></div>
-  <noscript>GSL Woman працює з увімкненим JavaScript.</noscript>
+  <noscript>GSL (W+M)⁺ працює з увімкненим JavaScript.</noscript>
 </body>
 </html>

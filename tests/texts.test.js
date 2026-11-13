@@ -1,10 +1,17 @@
-// Тексты интерфейса: во всех трёх языках одни и те же ключи, ничего не забыто.
+// Тексты интерфейса двух частей GSL (W+M)⁺: во всех трёх языках обеих частей одни и те же ключи, ничего не забыто.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import ru from '../js/texts/ru.js';
-import ua from '../js/texts/ua.js';
-import en from '../js/texts/en.js';
-import { setLang, plural, t } from '../js/core/i18n.js';
+import ru from '../js/texts/woman/ru.js';
+import ua from '../js/texts/woman/ua.js';
+import en from '../js/texts/woman/en.js';
+import manRu from '../js/texts/man/ru.js';
+import manUa from '../js/texts/man/ua.js';
+import manEn from '../js/texts/man/en.js';
+import { setLang, setSide, plural, t } from '../js/core/i18n.js';
+
+// Все шесть наборов: женская и мужская часть, по три языка
+const SETS = { ru, ua, en, 'man.ru': manRu, 'man.ua': manUa, 'man.en': manEn };
+const langOf = (name) => name.replace('man.', '');
 
 function keys(obj, prefix = '') {
   return Object.entries(obj).flatMap(([k, v]) =>
@@ -12,23 +19,43 @@ function keys(obj, prefix = '') {
   );
 }
 
-test('ключи совпадают во всех языках', () => {
+test('ключи совпадают во всех языках обеих частей', () => {
   const base = keys(ru).sort();
-  assert.deepEqual(keys(ua).sort(), base, 'ua');
-  assert.deepEqual(keys(en).sort(), base, 'en');
+  for (const [name, d] of Object.entries(SETS)) assert.deepEqual(keys(d).sort(), base, name);
 });
 
 test('пулы комплиментов одной длины', () => {
-  assert.equal(ua.compliments.length, ru.compliments.length);
-  assert.equal(en.compliments.length, ru.compliments.length);
+  for (const [name, d] of Object.entries(SETS)) assert.equal(d.compliments.length, ru.compliments.length, name);
 });
 
-test('название приложения — GSL Woman+ во всех языках (плюс — от «Жінка-Плюс», 12.11.2026)', () => {
+test('названия: GSL Woman+ у женской части, GSL Man+ у мужской, общее GSL (W+M)+ у обеих (владелец 13.11.2026)', () => {
   for (const d of [ru, ua, en]) assert.equal(d.app.name, 'GSL Woman+');
+  for (const d of [manRu, manUa, manEn]) assert.equal(d.app.name, 'GSL Man+');
+  for (const d of Object.values(SETS)) assert.equal(d.app.shared, 'GSL (W+M)+');
+});
+
+test('мужская часть — по-мужски: реакция женщины, её язык любви, «сделал»', () => {
+  assert.equal(manRu.entry.reaction, 'Реакция женщины');
+  assert.equal(manRu.love.himSection, 'Моя женщина');
+  assert.equal(manRu.entry.howPh, 'Что я сделал и что почувствовал');
+  assert.equal(manUa.love.himSection, 'Моя жінка');
+  assert.equal(manEn.love.himSection, 'My woman');
+  setSide('man');
+  setLang('ru');
+  assert.equal(t('app.name'), 'GSL Man+');
+  setSide('woman');
+  assert.equal(t('app.name'), 'GSL Woman+');
+});
+
+test('у обеих частей — стакан тёплой воды: семь вариантов и бережная подсказка', () => {
+  for (const [name, d] of Object.entries(SETS)) {
+    assert.equal(Object.keys(d.morning.water.kinds).length, 7, name);
+    assert.ok(d.morning.water.title && d.morning.water.lead && d.morning.water.care, name);
+  }
 });
 
 test('нигде в надписях нет имени ведущего: созвоны — с наставником', () => {
-  for (const [lang, d] of Object.entries({ ru, ua, en })) assert.ok(!/Ладомир|Ladomir/.test(JSON.stringify(d)), lang);
+  for (const [name, d] of Object.entries(SETS)) assert.ok(!/Ладомир|Ладомир|Ladomir/.test(JSON.stringify(d)), name);
 });
 
 test('склонение дней', () => {
@@ -53,8 +80,8 @@ test('подстановка и запасной язык', () => {
 
 test('нигде в надписях нет «полгода», «из 168» и финала: обучение постоянное (владелец, 12.11.2026)', () => {
   const bad = /полгода|пів року|півроку|six months|half a year|шесть месяцев|шість місяців|\{total\}|выпускн|випускн|graduat|финал|фінал|finale/i;
-  for (const [lang, dict] of Object.entries({ ru, ua, en })) {
-    assert.ok(!bad.test(JSON.stringify(dict)), lang);
+  for (const [name, dict] of Object.entries(SETS)) {
+    assert.ok(!bad.test(JSON.stringify(dict)), name);
   }
 });
 
@@ -75,10 +102,10 @@ function allStrings(v, where = '') {
   return [];
 }
 
-test('тексты интерфейса — только положительные слова, без «не» (владелец, 12.11.2026)', () => {
-  for (const [lang, data] of Object.entries({ ru, ua, en })) {
+test('тексты интерфейса обеих частей — только положительные слова, без «не» (владелец, 12.11.2026)', () => {
+  for (const [name, data] of Object.entries(SETS)) {
     for (const [where, text] of allStrings(data)) {
-      assert.ok(!NEGATIVE[lang].test(text), `${lang}: ${where}: «${text}»`);
+      assert.ok(!NEGATIVE[langOf(name)].test(text), `${name}: ${where}: «${text}»`);
     }
   }
 });

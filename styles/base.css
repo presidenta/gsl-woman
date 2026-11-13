@@ -68,7 +68,7 @@ img, svg {
 }
 
 ::selection {
-  background: rgba(239, 196, 166, 0.35);
+  background: rgba(var(--rgb-gold), 0.35);
 }
 
 /* — Помощники — */
@@ -138,7 +138,7 @@ img, svg {
   display: flex;
   align-items: center;
   gap: var(--sp-3);
-  background: linear-gradient(to bottom, rgba(21, 12, 17, 0.94), rgba(21, 12, 17, 0.72));
+  background: linear-gradient(to bottom, rgba(var(--rgb-bg), 0.94), rgba(var(--rgb-bg), 0.72));
   -webkit-backdrop-filter: blur(14px);
   backdrop-filter: blur(14px);
   border-bottom: 1px solid var(--c-line);

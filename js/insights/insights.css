@@ -143,7 +143,7 @@
 
 .field--key.is-invalid .textarea {
   border-color: var(--c-rose);
-  box-shadow: 0 0 0 3px rgba(233, 165, 164, 0.18);
+  box-shadow: 0 0 0 3px rgba(var(--rgb-rose), 0.18);
 }
 
 /* В карточке записи реакция — цитатой */

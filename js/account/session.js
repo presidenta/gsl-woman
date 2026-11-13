@@ -20,7 +20,9 @@ export class ApiError extends Error {
   }
 }
 
-/** Сессия вошедшей: { token, userId, displayName, accountNo, role } или null. role: admin — администратор «Кванта». */
+/** Сессия вошедшего: { token, userId, displayName, accountNo, role, gender } или null. role: admin — администратор
+    «Кванта». gender: female | male | null (ещё не выбран — экран «Кто ты?», screens/gender/); поля нет совсем —
+    сессия старше GSL (W+M)⁺, то есть женская (side/side.js). */
 export function current() {
   return read(KEY, null);
 }
@@ -56,27 +58,49 @@ export const isClosed = (err) => err instanceof ApiError && err.code === 'access
 /** Сервер больше не принимает сессию: вышла из аккаунта на другом устройстве или блок — нужен вход. */
 export const isExpired = (err) => err instanceof ApiError && (err.status === 401 || err.status === 403) && !isClosed(err);
 
-// Профиль со сроком именно этого приложения (сервер, access/apps.js)
-const ME = '/api/me?app=gsl-woman';
+/* Профиль со сроком своей части (сервер, access/apps.js): gsl — GSL (W+M)⁺, срок той галочки, что открывает часть
+   по полу человека (gsl-woman или gsl-man). Ответ несёт и сам пол (gender). */
+const ME = '/api/me?app=gsl';
 
-/** Вход логином и паролем «Кванта». Имя и номер кабинета берём сразу — для карточки в настройках. */
+// Пол из профиля: female | male | null; профиль не пришёл — поля в сессии нет (часть решит side.js)
+const genderOf = (me) => (me && 'gender' in me ? me.gender ?? null : undefined);
+
+function withGender(session, me) {
+  const g = genderOf(me);
+  return g === undefined ? session : { ...session, gender: g };
+}
+
+/** Вход логином и паролем «Кванта». Имя, номер кабинета и пол берём сразу. */
 export async function login(loginName, password) {
-  // app — сервер проверяет доступ к GSL Woman+, а не к «Кванту»
-  const { token, userId } = await request('/api/session/login', { body: { login: loginName, password, app: 'gsl-woman' }, token: null });
+  // app: gsl — сервер проверяет галочку своей части по полу, а не «Квант»
+  const { token, userId } = await request('/api/session/login', { body: { login: loginName, password, app: 'gsl' }, token: null });
   const me = await request(ME, { token }).catch(() => null);
   if (me && 'accessUntil' in me) access.remember(me.accessUntil);
-  const session = { token, userId, displayName: me?.displayName || '', accountNo: me?.accountNo || null, role: me?.role || 'member' };
+  const session = withGender({ token, userId, displayName: me?.displayName || '', accountNo: me?.accountNo || null, role: me?.role || 'member' }, me);
   write(KEY, session);
   return session;
 }
 
+/** Выбрать пол (экран «Кто ты?» или администратор — в настройках). Сервер: один раз; администратор — всегда.
+    Уже выбран другой — ApiError gender_locked. Потом сверяем срок уже своей части. */
+export async function chooseGender(gender) {
+  const s = current();
+  if (!s) return null;
+  const r = await request('/api/me/gender', { body: { gender } });
+  if (current()?.token !== s.token) return null;
+  write(KEY, { ...current(), gender: r?.gender ?? gender });
+  await refreshProfile();
+  return r?.gender ?? gender;
+}
+
 /** Вход без пароля: «Квант» открыл приложение с одноразовым пропуском (#kvant=…). */
 export async function redeem(code) {
+  // Обмен пропуска сервер проверяет по полу (GSL), адрес — любой из двух частей
   const s = await request('/api/woman/redeem', { body: { code }, token: null });
-  const session = { token: s.token, userId: s.userId, displayName: s.displayName || '', accountNo: s.accountNo || null };
-  write(KEY, session);
   const me = await request(ME, { token: s.token }).catch(() => null);
   if (me && 'accessUntil' in me) access.remember(me.accessUntil);
+  const session = withGender({ token: s.token, userId: s.userId, displayName: s.displayName || '', accountNo: s.accountNo || null, role: me?.role || 'member' }, me);
+  write(KEY, session);
   return session;
 }
 
@@ -94,8 +118,11 @@ export async function refreshProfile() {
   }
   if (!me || current()?.token !== s.token) return;
   if ('accessUntil' in me) access.remember(me.accessUntil);
-  if (me.displayName === s.displayName && me.accountNo === s.accountNo && (me.role || 'member') === s.role) return;
-  write(KEY, { ...s, displayName: me.displayName || s.displayName, accountNo: me.accountNo || s.accountNo, role: me.role || 'member' });
+  const gender = genderOf(me);
+  const sameGender = gender === undefined || ('gender' in s && s.gender === gender);
+  if (me.displayName === s.displayName && me.accountNo === s.accountNo && (me.role || 'member') === s.role && sameGender) return;
+  // Пол мог поменять администратор — сессия берёт его, и приложение переключит часть само (side/side.js)
+  write(KEY, withGender({ ...s, displayName: me.displayName || s.displayName, accountNo: me.accountNo || s.accountNo, role: me.role || 'member' }, me));
 }
 
 /** Выйти: сессия закрывается и на сервере (нет сети — всё равно выходим здесь). */

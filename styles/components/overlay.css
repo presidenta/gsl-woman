@@ -96,7 +96,7 @@
   padding: var(--sp-3) var(--sp-4);
   border: 1px solid var(--c-line-strong);
   border-radius: var(--r-md);
-  background: rgba(31, 18, 24, 0.96);
+  background: rgba(var(--rgb-raise), 0.96);
   box-shadow: var(--sh-card);
   pointer-events: auto;
   transform: translateY(-20px);

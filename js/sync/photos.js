@@ -1,4 +1,5 @@
 import { read, write } from '../core/store.js';
+import * as side from '../side/side.js';
 import { API_BASE } from '../config.js';
 import { current, request as apiRequest } from '../account/session.js';
 import * as media from '../media/photos.js';
@@ -49,17 +50,17 @@ async function fitted(row) {
 
 async function upload(id, role, row) {
   const { blob, w, h } = await fitted(row);
-  await rawFn(`/api/woman/photos/${encodeURIComponent(id)}?role=${role}&w=${w}&h=${h}`, { method: 'POST', body: blob, type: 'image/jpeg' });
+  await rawFn(`${side.api()}/photos/${encodeURIComponent(id)}?role=${role}&w=${w}&h=${h}`, { method: 'POST', body: blob, type: 'image/jpeg' });
 }
 
 async function download(serverId, localId, p) {
-  const blob = await rawFn(`/api/woman/photos/${encodeURIComponent(serverId)}`);
+  const blob = await rawFn(`${side.api()}/photos/${encodeURIComponent(serverId)}`);
   await media.put(localId, blob, p.width, p.height);
 }
 
 /** Свести фото устройства с сервером. Ошибка одного снимка не мешает остальным. */
 export async function syncPhotos() {
-  const list = await requestFn('/api/woman/photos');
+  const list = await requestFn(`${side.api()}/photos`);
   if (!Array.isArray(list)) return;
   const onServer = new Map(list.map((p) => [p.id, p]));
   const here = new Set(await media.ids());
@@ -77,7 +78,7 @@ export async function syncPhotos() {
   }
   for (const p of list) {
     if (p.role === 'entry' && !wanted.has(p.id)) {
-      await rawFn(`/api/woman/photos/${encodeURIComponent(p.id)}`, { method: 'DELETE' }).catch(() => {});
+      await rawFn(`${side.api()}/photos/${encodeURIComponent(p.id)}`, { method: 'DELETE' }).catch(() => {});
     }
   }
 
@@ -107,7 +108,7 @@ export async function syncPhotos() {
       }
     } else if (!flag && server && st.avatarSid === server.id) {
       // Убрала здесь то, что было согласовано, — убрать и на сервере
-      await rawFn(`/api/woman/photos/${encodeURIComponent(server.id)}`, { method: 'DELETE' });
+      await rawFn(`${side.api()}/photos/${encodeURIComponent(server.id)}`, { method: 'DELETE' });
       st.avatarSid = null;
     }
   } catch { /* следующий раз */ }
