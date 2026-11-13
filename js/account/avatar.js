@@ -70,7 +70,7 @@ export function identity() {
     Фотоаппарат на кружке — только пока фото нет (владелец 12.11.2026: значок перекрывал фотографию).
     Фото есть — кружок чистый, нажатие на него меняет фото, а под кабинетом тонкая строка
     «📷 Сменить фото · Убрать», как в кабинетах дорогих сервисов. */
-export function accountCard({ onLogout, update = null }) {
+export function accountCard({ onLogout, update = null, footer = null }) {
   const a = current();
   if (!a) return null;
   const has = hasPhoto();
@@ -104,5 +104,7 @@ export function accountCard({ onLogout, update = null }) {
     // «Обновить» и «Выйти» — два маленьких круглых значка в правом верхнем углу карточки, как в кабинетах дорогих
     // сервисов (владелец 12.11.2026: «маленькие кнопочки: обновить — кружочек, выйти — дверь со стрелочкой»)
     h('div', { class: 'account__actions' }, update, out),
+    // Нижний ряд за тонкой чертой — копия на сервере (настройки → syncFooter)
+    footer,
   );
 }

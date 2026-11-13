@@ -336,7 +336,8 @@ export default {
     stillClosed: 'Access is still closed. Write to the Quantum administrator.',
   },
   sync: {
-    saved: 'Server copy saved: {when}',
+    saved: 'Synced · {when}',
+    check: 'Sync now',
     first: 'The server copy appears after the first internet connection',
     offline: 'The connection dropped — the copy goes to the server as soon as you are online',
     pending: 'waiting to send: {n}',

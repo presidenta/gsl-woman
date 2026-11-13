@@ -87,8 +87,9 @@ function notificationsBlock(ctx) {
   return body;
 }
 
-/* Копия на сервере (sync/): когда сохранилось, сколько ждёт отправки. Нажатие — сохранить сейчас. */
-function syncLine() {
+/* Копия на сервере (sync/) — постоянный нижний ряд карточки аккаунта: когда последний раз сохранено, сколько ждёт
+   отправки; «Сверить» — обменяться с сервером сейчас. */
+function syncFooter() {
   const st = sync.status();
   let text;
   if (st.status === 'offline') text = t('sync.offline');
@@ -100,13 +101,18 @@ function syncLine() {
     text = t('sync.saved', { when });
   }
   if (st.pending) text += ` · ${t('sync.pending', { n: st.pending })}`;
-  const btn = h('button', { type: 'button', class: 'settings__sync' }, svg(icons.refresh, 'settings__sync-icon'), h('span', {}, text));
+  const btn = h('button', { type: 'button', class: 'account__foot-btn' }, t('sync.check'));
   btn.addEventListener('click', async () => {
     btn.disabled = true;
     await sync.now();
     toast({ title: t('sync.done') });
+    btn.disabled = false;
   });
-  return btn;
+  return h('div', { class: `account__foot${st.status === 'offline' ? ' account__foot--offline' : ''}` },
+    h('span', { class: 'account__foot-icon' }, svg(icons.cloud)),
+    h('span', { class: 'account__foot-text' }, text),
+    btn,
+  );
 }
 
 export function render(view, ctx) {
@@ -133,8 +139,7 @@ export function render(view, ctx) {
   add(view,
     h('h1', { class: 'screen-title' }, t('settings.title')),
 
-    accountCard({ onLogout: ctx.logout, update: updateButton() }),
-    syncLine(),
+    accountCard({ onLogout: ctx.logout, update: updateButton(), footer: syncFooter() }),
     installCard(),
 
     h('a', { class: 'card settings__link', href: '#/love' },
