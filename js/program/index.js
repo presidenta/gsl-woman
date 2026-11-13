@@ -40,6 +40,19 @@ function kindOf(n, tasksCount) {
   return n <= Math.min(tasksCount, TASK_DAYS) ? 'task' : 'flow';
 }
 
+/* Я-СООБЩЕНИЕ — КАЖДЫЙ ДЕНЬ (владелец 13.11.2026: «чтобы каждый день была хотя бы одна фраза, каждый день попадала
+   на глаза»; до 40 — только дни 4–6):
+   - дни 4, 5, 6 — пример к заданию дня 1, 2, 3 этой недели (владелец, 12.11.2026), как и было;
+   - дни 1, 2, 3 — повторение: фразы дней 4, 5, 6 прошлой недели (в первую неделю — этой);
+   - день 7 — одна из фраз недели, по кругу от номера недели. */
+function imsgOf(week, n, imsgs, lang) {
+  if (n >= 4 && n <= 6) return imsgs[n - 4] || null;
+  if (n === WEEK_DAYS) return imsgs.length ? imsgs[(week - 1) % imsgs.length] : null;
+  const prev = week > 1 ? data(lang)?.weeks[week - 2]?.imsg || [] : [];
+  const pool = prev.length ? prev : imsgs;
+  return pool.length ? pool[(n - 1) % pool.length] : null;
+}
+
 /** День программы со всем, что нужно экрану «Сегодня». Вне программы — null. */
 export function dayPlan(day, lang) {
   if (!inProgram(day)) return null;
@@ -54,8 +67,7 @@ export function dayPlan(day, lang) {
     kind,
     task: kind === 'task' ? plan.tasks[n - 1] : null,
     taskIndex: kind === 'task' ? n - 1 : null,
-    // Я-сообщение — дни 4, 5, 6: пример к заданию дня 1, 2, 3 этой недели (владелец, 12.11.2026)
-    imsg: n >= 4 && n <= 6 ? plan.imsgs[n - 4] || null : null,
+    imsg: imsgOf(week, n, plan.imsgs, lang),
     ...plan,
   };
 }
