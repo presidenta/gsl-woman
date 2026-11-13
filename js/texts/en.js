@@ -343,6 +343,9 @@ export default {
     done: 'In sync with the server',
   },
   native: {
+    oldText: 'The widget and the alarm come with the new version of the app — install it. Your entries and sign-in stay.',
+    update: 'Update the app',
+    updateHint: 'The phone browser opens and downloads the file. Open it and tap “Install” — the new version goes on top. Then come back here.',
     title: 'Widget and alarm',
     webText: 'A home-screen widget, the alarm and reminders while the app is closed live in the GSL Woman+ app for Android.',
     get: 'Download for Android',

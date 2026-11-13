@@ -5,7 +5,7 @@ import { icons } from '../../ui/icons.js';
 import { toast } from '../../ui/toast.js';
 import { switchRow } from '../../ui/controls.js';
 import * as settings from '../../settings/settings.js';
-import { isApp, call, APK_URL } from '../../native/native.js';
+import { isApp, isOldApp, call, APK_URL, APK_URL_EXTERNAL } from '../../native/native.js';
 
 /* НАСТРОЙКИ → «ВИДЖЕТ И БУДИЛЬНИК» (владелец 13.11.2026). В приложении для Android:
    - что разрешено телефоном — уведомления, точные будильники, будильник поверх экрана — и кнопка «Включить» там,
@@ -25,6 +25,16 @@ function statusRow(ok, title, onFix) {
 export function nativeCard() {
   const card = h('section', { class: 'card settings__section native-card' },
     h('h2', { class: 'caps settings__heading' }, t('native.title')));
+
+  // Приложение прежней версии: виджета и будильника в нём нет — обновить; загрузку откроет браузер телефона
+  if (isOldApp()) {
+    card.append(
+      h('p', { class: 'card__text' }, t('native.oldText')),
+      h('a', { class: 'btn btn--gold btn--block native-card__get', href: APK_URL_EXTERNAL, target: '_blank', rel: 'noopener' }, t('native.update')),
+      h('p', { class: 'faint native-card__hint' }, t('native.updateHint')),
+    );
+    return card;
+  }
 
   if (!isApp()) {
     card.append(

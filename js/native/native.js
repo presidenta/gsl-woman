@@ -20,12 +20,19 @@ import { getLang } from '../core/i18n.js';
    Пока приложение открыто, «внутренние» напоминания (reminders/local.js) молчат — чтобы не было двойных. */
 
 export const APK_URL = 'https://presidenta.github.io/quantum-diary/app/gsl-woman.apk';
+/* Тот же файл с другого адреса — для кнопки внутри приложения: окно приложения скачивать файлы не умеет, а ссылку
+   на чужой адрес (github.com) приложение отдаёт обычному браузеру телефона — он и скачает (владелец 13.11.2026:
+   «не работает кнопка Скачать для Android»). */
+export const APK_URL_EXTERNAL = 'https://github.com/presidenta/quantum-diary/raw/main/app/gsl-woman.apk';
 const DAYS = 7;
 
 const plugin = () => globalThis.Capacitor?.Plugins?.GslNative || null;
 
 /** Открыто внутри приложения GSL Woman+ для Android. */
 export const isApp = () => !!(globalThis.Capacitor?.isNativePlatform?.() && plugin());
+
+/** Открыто в приложении для Android прежней версии — без родной части (виджета, будильника): нужно обновить. */
+export const isOldApp = () => !!(globalThis.Capacitor?.isNativePlatform?.() && !plugin());
 
 /** Вызов родной части; нет её или отказ — null (веб-часть от этого не падает). */
 export async function call(name, args = {}) {
