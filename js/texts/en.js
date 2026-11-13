@@ -158,11 +158,11 @@ export default {
     expired: 'Your sign-in has expired — please sign in again. Your entries are safe.',
     passExpired: 'The link from Quantum has expired — it lives for two minutes. Sign in with your password or open GSL Woman from Quantum again.',
     err: {
-      invalid_credentials: 'Wrong login or password.',
+      invalid_credentials: 'The login or password has a typo. Check them — the eye next to the password helps.',
+      rate_limited: 'Too many sign-in attempts. Wait an hour and try again.',
       access_expired: 'Access to GSL Woman+ is closed. The Quantum administrator opens it.',
       pending_approval: 'Your application is awaiting approval.',
       blocked: 'This account is blocked.',
-      access_expired: 'Your access period has ended.',
       network: 'The connection to the server dropped. Check the internet.',
       other: 'Please try signing in again.',
     },

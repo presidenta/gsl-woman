@@ -43,6 +43,8 @@ export async function request(path, { body, token = current()?.token } = {}) {
   }
   if (res.status === 204) return null;
   const data = await res.json().catch(() => null);
+  // 429 — сервер временно не пускает после многих попыток (20 в час): сказать прямо, а не «попробуй ещё раз»
+  if (res.status === 429) throw new ApiError('rate_limited', 429);
   if (!res.ok) throw new ApiError(data?.error || 'other', res.status);
   return data;
 }
