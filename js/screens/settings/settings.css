@@ -158,4 +158,4 @@
 .native-row__fix { padding: 6px 14px; border: 1px solid var(--c-gold); border-radius: 999px; background: none; color: var(--c-gold); font: inherit; font-size: var(--fs-xs); font-weight: 700; }
 .native-card__sub { margin-top: var(--sp-5); color: var(--c-champagne); font-family: var(--f-display); font-size: var(--fs-lg); }
 .native-card__hint { margin-top: var(--sp-2); font-size: var(--fs-xs); line-height: var(--lh-text); }
-.native-card__get { margin-top: var(--sp-3); text-decoration: none; }
+.native-card__get { margin-top: var(--sp-3); justify-content: center; text-align: center; text-decoration: none; }

@@ -345,7 +345,7 @@ export default {
   native: {
     title: 'Widget and alarm',
     webText: 'A home-screen widget, the alarm and reminders while the app is closed live in the GSL Woman+ app for Android.',
-    get: 'Download the Android app',
+    get: 'Download for Android',
     getHint: 'Open the link on your phone and allow the installation. Sign in with the same login and password — all your entries come along.',
     appText: 'Reminders arrive even while the app is closed. For everything to ring on time, everything below should be on.',
     notifications: 'Notifications',
