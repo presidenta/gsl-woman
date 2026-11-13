@@ -1,0 +1,97 @@
+import { getLang } from '../core/i18n.js';
+import { addDays } from '../core/dates.js';
+import * as circles from './circles.js';
+import ru from './catalog/ru.js';
+import ua from './catalog/ua.js';
+import en from './catalog/en.js';
+
+/* ЖЕЛАНИЯ НА ВЫХОДНЫЕ (владелец 13.11.2026, ТЗ раздел 5). Неделя — календарная; у каждого свои отметки на неделю.
+   «Хочу» — Да / Может быть / Пас; «Близость» — только «Откликается» / «Подумаю» (без отказа вообще); «Дарю» — что я
+   хочу сделать для тебя. Отметки партнёра видны, совпадения подсвечиваются.
+
+   Записи в контуре пары:
+     mark — id «неделя.участник.желание», data { week, wish, mark } — правит только автор;
+     wish — своё желание, id «w-…», data { text, mode: want|give, section } — общее. */
+
+const CATALOG = { ru, ua, en };
+export const MODES = ['want', 'give'];
+export const WANT_SECTIONS = ['rest', 'nature', 'together', 'body', 'fun', 'home', 'close'];
+export const GIVE_SECTIONS = ['care', 'close'];
+export const MARKS = ['yes', 'maybe', 'no'];
+export const CLOSE_MARKS = ['resonates', 'think'];
+const POSITIVE = new Set(['yes', 'resonates']);
+
+const catalog = () => CATALOG[getLang()] || CATALOG.ru;
+export const sectionsOf = (mode) => (mode === 'give' ? GIVE_SECTIONS : WANT_SECTIONS);
+export const marksOf = (section) => (section === 'close' ? CLOSE_MARKS : MARKS);
+
+/** Желания раздела: готовые (ключ «режим.раздел.ключ») и свои. */
+export function list(circleId, mode, section) {
+  const ready = Object.entries(catalog()[mode]?.[section] || {}).map(([k, text]) => ({ key: `${mode}.${section}.${k}`, text, own: false }));
+  const own = circles.items(circleId, 'wish')
+    .filter((w) => w.data?.mode === mode && w.data?.section === section)
+    .sort((a, b) => a.updatedAt.localeCompare(b.updatedAt))
+    .map((w) => ({ key: w.id, text: w.data.text, own: true, author: w.author }));
+  return [...ready, ...own];
+}
+
+const markId = (week, member, key) => `${circles.compact(week)}.${circles.short(member)}.${key}`.slice(0, 64);
+
+/** Отметки недели: { [ключ желания]: { [участник]: отметка } }. */
+export function marks(circleId, week) {
+  const out = {};
+  for (const m of circles.items(circleId, 'mark')) {
+    if (m.data?.week !== week) continue;
+    (out[m.data.wish] ||= {})[m.author] = m.data.mark;
+  }
+  return out;
+}
+
+/** Поставить, сменить или снять (то же ещё раз) свою отметку. */
+export function setMark(circle, week, key, mark) {
+  const id = markId(week, circle.me, key);
+  const had = circles.item(circle.id, 'mark', id);
+  if (had && had.data?.mark === mark) circles.drop(circle.id, 'mark', id);
+  else circles.put(circle.id, 'mark', id, { week, wish: key, mark });
+}
+
+export function addOwn(circle, mode, section, text) {
+  const clean = String(text || '').trim().slice(0, 120);
+  if (!clean) return null;
+  return circles.put(circle.id, 'wish', circles.newId('w'), { text: clean, mode, section });
+}
+
+/** Перенести свои отметки с прошлой недели (те, что ещё не стоят). */
+export function copyLastWeek(circle, week) {
+  const prev = addDays(week, -7);
+  const now = marks(circle.id, week);
+  for (const m of circles.items(circle.id, 'mark')) {
+    if (m.data?.week !== prev || m.author !== circle.me) continue;
+    if (now[m.data.wish]?.[circle.me]) continue;
+    circles.put(circle.id, 'mark', markId(week, circle.me, m.data.wish), { week, wish: m.data.wish, mark: m.data.mark });
+  }
+}
+
+/** Совпадение у желания: both — оба «да» («откликается»), soft — «да» и «может быть»; иначе null. */
+export function matchOf(byMember, memberIds) {
+  if (memberIds.length < 2) return null;
+  const [a, b] = memberIds.map((id) => byMember?.[id]);
+  if (!a || !b) return null;
+  if (POSITIVE.has(a) && POSITIVE.has(b)) return 'both';
+  if ((POSITIVE.has(a) && b === 'maybe') || (POSITIVE.has(b) && a === 'maybe')) return 'soft';
+  return null;
+}
+
+/** Все совпадения «Хочу» и «Близость» за неделю — для итога «вы оба хотите». */
+export function matches(circle, week) {
+  const ids = circle.members.filter((m) => m.role !== 'child').map((m) => m.id);
+  const all = marks(circle.id, week);
+  const out = [];
+  for (const section of WANT_SECTIONS) {
+    for (const w of list(circle.id, 'want', section)) {
+      const m = matchOf(all[w.key], ids);
+      if (m) out.push({ ...w, section, match: m });
+    }
+  }
+  return out.sort((a, b) => (a.match === b.match ? 0 : a.match === 'both' ? -1 : 1));
+}

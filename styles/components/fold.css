@@ -66,6 +66,11 @@
   display: none;
 }
 
+/* Раскрыта: рисунка в шапке нет — название слева, отметка и стрелка справа */
+.fold.is-open .fold__head {
+  grid-template-columns: minmax(0, 1fr) auto;
+}
+
 .fold__side {
   display: flex;
   align-items: center;

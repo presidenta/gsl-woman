@@ -26,6 +26,8 @@ export function weekPlan(week, lang) {
     flow: w.flow,
     call: w.call,
     imsgs: w.imsg || [],
+    // «Разговор пары» — тема недели для седьмого дня (сервер: gsl/talks/, общая для обеих частей), по кругу
+    talk: talkOf(week, lang),
     review: isReviewWeek(week),
     final: week === WEEKS,
   };
@@ -38,6 +40,11 @@ export function weekPlan(week, lang) {
 function kindOf(n, tasksCount) {
   if (n === WEEK_DAYS) return 'call';
   return n <= Math.min(tasksCount, TASK_DAYS) ? 'task' : 'flow';
+}
+
+function talkOf(week, lang) {
+  const list = data(lang)?.talks || [];
+  return list.length ? list[(week - 1) % list.length] : null;
 }
 
 /* Я-СООБЩЕНИЕ — КАЖДЫЙ ДЕНЬ (владелец 13.11.2026: «чтобы каждый день была хотя бы одна фраза, каждый день попадала

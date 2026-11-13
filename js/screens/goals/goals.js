@@ -5,9 +5,15 @@ import { field } from '../../ui/controls.js';
 import { icons } from '../../ui/icons.js';
 import { openSheet, closeSheet } from '../../ui/sheet.js';
 import { toast } from '../../ui/toast.js';
+import { segmented } from '../../ui/controls.js';
+import { circleGoals } from '../../circles/goals-view.js';
 
-/* ЭКРАН «ЦЕЛИ»: сверху — строка «Новая цель» и золотой «+», ниже — цели в работе, внизу — «Сбылось»
-   с датами. Кружок слева отмечает «сбылось», нажатие на текст открывает правку. Данные — js/goals/. */
+/* ЭКРАН «ЦЕЛИ»: вкладки «Мои · Пара · Семья» (владелец 13.11.2026: «цели у женщины, если она одна, и цели пары,
+   если они вместе; и семьи»). «Мои» — сверху строка «Новая цель» и золотой «+», ниже — цели в работе, внизу —
+   «Сбылось» с датами; кружок слева отмечает «сбылось», нажатие на текст открывает правку (данные — js/goals/).
+   «Пара» и «Семья» — общие цели контура (js/circles/goals-view.js). */
+
+let tab = 'mine';
 
 function goalRow(g) {
   const mark = h('button', {
@@ -46,7 +52,17 @@ function editGoal(g) {
   setTimeout(() => f.control.focus(), 300);
 }
 
-export function render(view) {
+export function render(view, ctx) {
+  const tabs = segmented({
+    label: t('goals.title'),
+    options: ['mine', 'pair', 'family'].map((k) => ({ value: k, label: t(`us.goals.${k}`) })),
+    value: tab,
+    onChange: (v) => { tab = v; ctx.rerender(); },
+  });
+  if (tab !== 'mine') {
+    add(view, h('h1', { class: 'screen-title' }, t('goals.title')), tabs, circleGoals(tab));
+    return;
+  }
   const list = goals.all();
   const open = list.filter((g) => !g.done);
   const done = list.filter((g) => g.done).sort((a, b) => (b.doneAt || '').localeCompare(a.doneAt || ''));
@@ -68,6 +84,7 @@ export function render(view) {
 
   add(view,
     h('h1', { class: 'screen-title' }, t('goals.title')),
+    tabs,
     h('p', { class: 'screen-lead' }, t('goals.lead')),
     form,
   );

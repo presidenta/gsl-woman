@@ -26,6 +26,9 @@ import * as genderScreen from './screens/gender/gender.js';
 import * as side from './side/side.js';
 import * as goalsScreen from './screens/goals/goals.js';
 import * as loveScreen from './screens/love/love.js';
+import * as usScreen from './screens/us/us.js';
+import * as circles from './circles/circles.js';
+import { watchHabits } from './circles/goals-model.js';
 import { identity } from './account/avatar.js';
 import { brand as brandMark } from './ui/brand.js';
 import * as install from './install/install.js';
@@ -63,6 +66,7 @@ router.define('path', path);
 router.define('goals', goalsScreen);
 router.define('settings', settingsScreen);
 router.define('love', loveScreen);
+router.define('us', usScreen);
 
 const root = document.getElementById('app');
 let shell = null;
@@ -95,6 +99,8 @@ function context() {
 function buildShell() {
   const back = h('button', { type: 'button', class: 'icon-btn', 'aria-label': t('common.back'), onclick: () => router.go('today') }, svg(icons.back));
   const gear = h('a', { class: 'icon-btn', href: '#/settings', 'aria-label': t('common.settings') }, svg(icons.gear));
+  // «Мы» — пара и семья (circles/): красная точка — есть новое сообщение
+  const us = h('a', { class: 'icon-btn us-btn', href: '#/us', 'aria-label': t('us.open') }, svg(icons.rings), h('span', { class: 'us-btn__dot', hidden: true }));
   const brand = h('div', { class: 'app-header__brand gold-text' }, brandMark());
   const who = identity();
   const view = h('main', { class: 'app-view', id: 'view', tabindex: '-1' });
@@ -105,12 +111,12 @@ function buildShell() {
     )),
   );
   const app = h('div', { class: 'app' },
-    h('header', { class: 'app-header' }, back, who, h('span', { class: 'spacer' }), brand, gear),
+    h('header', { class: 'app-header' }, back, who, h('span', { class: 'spacer' }), brand, us, gear),
     view,
     nav,
   );
   mount(root, app);
-  return { app, back, who, brand, gear, view, nav };
+  return { app, back, who, brand, gear, us, view, nav };
 }
 
 /* Программа: нет на телефоне — ждём её на экране входа; есть — молча сверяем отпечаток (вышла правка —
@@ -278,14 +284,19 @@ function draw() {
   // Каркас пересобирается целиком, чтобы смена языка сразу дошла до шапки и панели
   shell = buildShell();
   const name = router.currentRoute() || router.routeName();
-  const screen = { today, week, journal: journalScreen, path, goals: goalsScreen, settings: settingsScreen, love: loveScreen }[name] || today;
+  const screen = { today, week, journal: journalScreen, path, goals: goalsScreen, settings: settingsScreen, love: loveScreen, us: usScreen }[name] || today;
 
   // Шапка: везде — кто вошёл (фото, имя, кабинет) и название; в настройках — «назад» вместо себя
   // «Пять языков любви» — тоже подэкран: «назад» вместо себя
-  const sub = name === 'settings' || name === 'love';
+  const sub = name === 'settings' || name === 'love' || name === 'us';
   shell.back.hidden = !sub;
   if (shell.who) shell.who.hidden = sub;
   shell.gear.hidden = name === 'settings';
+  shell.us.hidden = name === 'us';
+  const unread = circles.unread();
+  const dot = shell.us.querySelector('.us-btn__dot');
+  dot.hidden = !unread.length;
+  dot.classList.toggle('is-urgent', unread.some((u) => u.msg.data?.signal === 'urgent'));
   for (const a of shell.nav.querySelectorAll('.app-nav__item')) {
     if (a.dataset.route === name) a.setAttribute('aria-current', 'page');
     else a.removeAttribute('aria-current');
@@ -383,6 +394,17 @@ setTimeout(() => media.prune(journal.photoIds()).catch(() => {}), 4000);
 
 // Копия данных на сервере и обмен между устройствами (владелец 13.11.2026) — как у GoldenFit
 sync.start();
+
+// «Пара» и «Семья» (circles/): обмен при открытии, возврате и раз в 30 секунд на экране; новое сообщение — плашка
+circles.start();
+watchHabits();
+circles.onMessage(({ circle, msg }) => {
+  if (router.currentRoute() === 'us') return;
+  const name = circles.memberName(circle, msg.author);
+  const urgent = msg.data?.signal === 'urgent';
+  const text = msg.data?.text || (msg.data?.signal && !urgent ? t(`us.chat.signals.${msg.data.signal}`) : '');
+  toast({ title: t(urgent ? 'us.chat.urgentFrom' : 'us.chat.newFrom', { name }), text, ms: 8000, onClick: () => router.go('us') });
+});
 
 // В приложении для Android: напоминания при закрытом приложении, будильник, виджет (native/)
 native.start(() => ({ settings: settings.get(), entries: journal.all() }));

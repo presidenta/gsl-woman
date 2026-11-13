@@ -1,12 +1,12 @@
 import { h, svg } from '../core/dom.js';
 import { t, plural, formatDate } from '../core/i18n.js';
 import { icons } from '../ui/icons.js';
-import { HABITS } from './habits.js';
+import { MORNING } from './habits.js';
 
 /* КАРТОЧКА «УТРО» в итогах: по строке на привычку — значок, сколько дней из срока, полоса, кружок на каждый
    день (золотой — сделано) и сколько дней подряд сейчас. Экраны «Записи» (срок на выбор) и «Неделя». */
 
-const ICON = { water: icons.cup, minute: icons.sun };
+const ICON = { water: icons.cup, minute: icons.sun, kegel: icons.pulse, steps: icons.footprints };
 
 function row(s, habit) {
   const n = s[habit];
@@ -30,12 +30,14 @@ function row(s, habit) {
   );
 }
 
-export function habitsCard(s, { title = t('insights.habits.title') } = {}) {
+/** Карточка привычек: «Утро» (вода, минута — с подсказкой) или «День» (list: Кегель, шаги). */
+export function habitsCard(s, { title = t('insights.habits.title'), list = MORNING } = {}) {
   if (!s.total) return null;
+  const morning = list === MORNING;
   return h('section', { class: 'card insight habits' },
     h('h2', { class: 'caps insight__title' }, title),
-    ...HABITS.map((habit) => row(s, habit)),
-    h('p', { class: 'habits__legend faint' }, t('insights.habits.legend')),
-    h('p', { class: 'habits__legend faint' }, t('insights.habits.hint')),
+    ...list.map((habit) => row(s, habit)),
+    morning ? h('p', { class: 'habits__legend faint' }, t('insights.habits.legend')) : null,
+    morning ? h('p', { class: 'habits__legend faint' }, t('insights.habits.hint')) : null,
   );
 }

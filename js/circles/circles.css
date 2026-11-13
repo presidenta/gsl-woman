@@ -1,0 +1,660 @@
+/* «МЫ» — ПАРА И СЕМЬЯ (circles/, screens/us/). Цвета участников — токены --c-tone-* (одинаковые в обеих частях). */
+
+/* — Значок «Мы» в шапке с красной точкой — */
+.us-btn {
+  position: relative;
+}
+
+.us-btn__dot {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--c-gold);
+  box-shadow: 0 0 0 2px rgb(var(--rgb-bg));
+}
+
+.us-btn__dot.is-urgent {
+  background: rgb(var(--rgb-urgent));
+  animation: us-blink 1.4s ease-in-out infinite;
+}
+
+@keyframes us-blink {
+  50% { transform: scale(1.35); }
+}
+
+/* — Участники — */
+.us-members {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.us-member {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  border: 1px solid var(--c-line-strong);
+  border-radius: var(--r-pill);
+  font-size: var(--fs-sm);
+  font-weight: 600;
+}
+
+.us-member__dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--c-tone-woman);
+}
+
+.us-member.is-man .us-member__dot { background: var(--c-tone-man); }
+.us-member.is-child .us-member__dot { background: var(--c-tone-child); }
+.us-member.is-me { border-color: var(--c-gold); }
+
+.us-mentor {
+  margin-top: var(--sp-3);
+  font-size: var(--fs-2xs);
+  line-height: var(--lh-text);
+}
+
+.us-empty,
+.us-invite {
+  text-align: center;
+}
+
+.us-empty .goals__emblem {
+  margin: 0 auto var(--sp-3);
+}
+
+.us-empty__actions {
+  display: grid;
+  gap: var(--sp-2);
+}
+
+.us-join {
+  margin-top: var(--sp-4);
+  text-align: left;
+}
+
+.us-code {
+  margin: var(--sp-3) 0;
+  font-family: var(--f-display);
+  font-size: 44px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  line-height: 1;
+}
+
+.us-code__input {
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  font-weight: 700;
+}
+
+.us-waiting {
+  margin-top: var(--sp-3);
+  font-size: var(--fs-xs);
+}
+
+.us-goals-link {
+  justify-self: center;
+}
+
+.us-leave {
+  margin-top: var(--sp-4);
+}
+
+/* — Чат — */
+.chat__signals {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.chat__quick {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border: 1px solid var(--c-line-strong);
+  border-radius: var(--r-pill);
+  background: var(--g-gold-soft);
+  color: var(--c-text);
+  font: inherit;
+  font-size: var(--fs-2xs);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.chat__quick.is-urgent {
+  border-color: rgba(var(--rgb-urgent), 0.6);
+  background: rgba(var(--rgb-urgent), 0.14);
+}
+
+.chat__quick-icon svg,
+.chat__signal-icon svg {
+  display: block;
+  width: 14px;
+  height: 14px;
+}
+
+.chat__feed {
+  display: grid;
+  gap: 8px;
+  max-height: 56vh;
+  margin: var(--sp-3) 0 0;
+  padding: 0 2px;
+  overflow-y: auto;
+  list-style: none;
+  overscroll-behavior: contain;
+}
+
+.chat__day {
+  justify-self: center;
+  margin: var(--sp-2) 0 2px;
+  color: var(--c-text-faint);
+  font-size: var(--fs-2xs);
+}
+
+.chat__empty {
+  padding: var(--sp-4) 0;
+  text-align: center;
+}
+
+.chat__msg {
+  display: grid;
+  gap: 2px;
+  max-width: 82%;
+  padding: 8px 12px 6px;
+  border-radius: 16px;
+  background: var(--c-surface-strong);
+  box-shadow: inset 0 0 0 1px var(--c-line);
+  font-size: var(--fs-sm);
+  line-height: 1.4;
+}
+
+.chat__msg.is-theirs {
+  justify-self: start;
+  border-bottom-left-radius: 4px;
+  box-shadow: inset 3px 0 0 var(--c-tone-woman), inset 0 0 0 1px var(--c-line);
+}
+
+.chat__msg.is-theirs.is-man { box-shadow: inset 3px 0 0 var(--c-tone-man), inset 0 0 0 1px var(--c-line); }
+.chat__msg.is-theirs.is-child { box-shadow: inset 3px 0 0 var(--c-tone-child), inset 0 0 0 1px var(--c-line); }
+
+.chat__msg.is-mine {
+  justify-self: end;
+  border-bottom-right-radius: 4px;
+  background: var(--g-gold-soft);
+  box-shadow: inset 0 0 0 1px var(--c-line-strong);
+}
+
+.chat__msg.is-urgent {
+  background: rgba(var(--rgb-urgent), 0.16);
+  box-shadow: inset 0 0 0 1px rgba(var(--rgb-urgent), 0.55);
+}
+
+.chat__who {
+  color: var(--c-gold);
+  font-size: var(--fs-2xs);
+  font-weight: 700;
+}
+
+.chat__signal {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--c-champagne);
+  font-weight: 800;
+}
+
+.chat__msg.is-urgent .chat__signal { color: rgb(var(--rgb-urgent)); }
+
+.chat__text {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.chat__time {
+  justify-self: end;
+  color: var(--c-text-faint);
+  font-size: 10px;
+}
+
+.chat__compose {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 46px;
+  gap: var(--sp-2);
+  align-items: end;
+  margin-top: var(--sp-3);
+}
+
+.chat__input {
+  min-height: 46px;
+  resize: none;
+}
+
+.chat__send {
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  border: 0;
+  border-radius: 50%;
+  background: var(--g-gold-smooth);
+  color: var(--c-on-gold);
+  cursor: pointer;
+}
+
+.chat__send svg {
+  display: block;
+  width: 20px;
+  height: 20px;
+}
+
+/* — Желания — */
+.wishes__mode {
+  margin-top: var(--sp-3);
+}
+
+.wishes__matches {
+  margin-top: var(--sp-3);
+  padding: var(--sp-3) var(--sp-4);
+  border-radius: var(--r-lg);
+  background: var(--g-gold-soft);
+  box-shadow: inset 0 0 0 1px var(--c-line-strong);
+}
+
+.wishes__matches-title { color: var(--c-gold); }
+
+.wishes__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: var(--sp-2) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.wishes__chip {
+  padding: 4px 10px;
+  border: 1px solid var(--c-line-strong);
+  border-radius: var(--r-pill);
+  font-size: var(--fs-xs);
+  font-weight: 600;
+}
+
+.wishes__chip.is-both {
+  border-color: var(--c-gold);
+  background: rgba(var(--rgb-gold), 0.16);
+}
+
+.wish-section {
+  margin-top: var(--sp-3);
+  border-top: 1px solid var(--c-line);
+}
+
+.wish-section__head {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  gap: var(--sp-2);
+  align-items: center;
+  padding-top: var(--sp-3);
+  list-style: none;
+  cursor: pointer;
+}
+
+.wish-section__head::-webkit-details-marker { display: none; }
+
+.wish-section__title {
+  color: var(--c-champagne);
+  font-family: var(--f-display);
+  font-size: var(--fs-lg);
+  font-weight: 600;
+}
+
+.wish-section.is-close .wish-section__title { color: var(--c-tone-woman); }
+
+.wish-section__count {
+  min-width: 24px;
+  padding: 2px 8px;
+  border-radius: var(--r-pill);
+  background: rgba(var(--rgb-gold), 0.16);
+  color: var(--c-gold);
+  font-size: var(--fs-2xs);
+  font-weight: 800;
+  text-align: center;
+}
+
+.wish-section[open] .fold__chevron svg { transform: rotate(-90deg); }
+
+.wish-section__lead {
+  margin-top: var(--sp-2);
+  font-size: var(--fs-xs);
+}
+
+.wish-list {
+  display: grid;
+  gap: 8px;
+  margin: var(--sp-3) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.wish {
+  display: grid;
+  gap: 8px;
+  padding: 10px 12px;
+  border: 1px solid var(--c-line);
+  border-radius: var(--r-md);
+  background: var(--c-surface);
+}
+
+.wish.is-soft { border-color: var(--c-line-strong); background: rgba(var(--rgb-gold), 0.06); }
+
+.wish.is-both {
+  border-color: var(--c-gold);
+  background: rgba(var(--rgb-gold), 0.12);
+  box-shadow: 0 0 18px -8px rgba(var(--rgb-gold), 0.7);
+}
+
+.wish__text {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 8px;
+  font-size: var(--fs-sm);
+  font-weight: 600;
+}
+
+.wish__partner {
+  color: var(--c-text-dim);
+  font-size: var(--fs-2xs);
+  font-weight: 700;
+}
+
+.wish__partner.is-yes,
+.wish__partner.is-resonates,
+.wish__partner.is-give { color: var(--c-gold); }
+
+.wish__marks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.wish__mark {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 10px;
+  border: 1px solid var(--c-line-strong);
+  border-radius: var(--r-pill);
+  background: transparent;
+  color: var(--c-text-dim);
+  font: inherit;
+  font-size: var(--fs-2xs);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.wish__mark-sign { font-size: var(--fs-sm); line-height: 1; }
+
+.wish__mark.is-on {
+  border-color: var(--c-gold);
+  background: var(--g-gold-smooth);
+  color: var(--c-on-gold);
+}
+
+.wish__mark.is-no.is-on {
+  border-color: var(--c-line-strong);
+  background: var(--c-surface-strong);
+  color: var(--c-text);
+}
+
+.wish__new {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: var(--sp-2);
+  margin-top: var(--sp-3);
+}
+
+.wishes__copy { margin-top: var(--sp-4); }
+
+/* — Общие цели — */
+.cgoal {
+  position: relative;
+  display: grid;
+  gap: var(--sp-3);
+}
+
+.cgoal__head {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: var(--sp-2);
+  align-items: baseline;
+  padding-right: 34px;
+}
+
+.cgoal__title {
+  color: var(--c-champagne);
+  font-family: var(--f-display);
+  font-size: var(--fs-xl);
+  font-weight: 600;
+  line-height: 1.15;
+}
+
+.cgoal__percent {
+  font-family: var(--f-display);
+  font-size: var(--fs-2xl);
+  font-weight: 600;
+}
+
+.cgoal__bar {
+  display: flex;
+  overflow: hidden;
+}
+
+.cgoal__part { height: 100%; background: var(--c-tone-woman); }
+.cgoal__part.is-man { background: var(--c-tone-man); }
+.cgoal__part.is-child { background: var(--c-tone-child); }
+.cgoal__part.is-both { background: var(--g-gold-smooth); }
+
+.cgoal__steps {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.cgoal__step {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  column-gap: var(--sp-3);
+  align-items: center;
+}
+
+.cgoal__step-text { font-size: var(--fs-sm); font-weight: 600; }
+.cgoal__step.is-done .cgoal__step-text { color: var(--c-text-dim); text-decoration: line-through; }
+
+.cgoal__step-meta {
+  grid-column: 2;
+  color: var(--c-text-faint);
+  font-size: var(--fs-2xs);
+}
+
+.cgoal__counter {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px var(--sp-3);
+}
+
+.cgoal__count { font-size: var(--fs-md); font-weight: 800; }
+.cgoal__track,
+.cgoal__period { font-size: var(--fs-2xs); }
+.cgoal__plus { margin-left: auto; min-height: 40px; }
+
+.cgoal__reached {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  color: var(--c-gold);
+  font-weight: 800;
+}
+
+.cgoal__crown svg { display: block; width: 18px; height: 18px; }
+
+.cgoal__remove {
+  position: absolute;
+  top: var(--sp-4);
+  right: var(--sp-4);
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--c-text-faint);
+  cursor: pointer;
+}
+
+.cgoal__remove svg { display: block; width: 17px; height: 17px; }
+
+.cgoal-form__steps {
+  display: grid;
+  gap: var(--sp-2);
+  margin: var(--sp-2) 0;
+}
+
+.cgoal-form__step {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 72px;
+  gap: 6px;
+}
+
+.cgoal-form__step .select { grid-column: 1 / -1; }
+
+/* — Мечты детей — */
+.dreams__kid {
+  margin-top: var(--sp-4);
+  padding-top: var(--sp-3);
+  border-top: 1px solid var(--c-line);
+}
+
+.dreams__name {
+  color: var(--c-tone-child);
+  font-family: var(--f-display);
+  font-size: var(--fs-xl);
+  font-weight: 600;
+}
+
+.dreams__list {
+  display: grid;
+  gap: 8px;
+  margin: var(--sp-2) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.dreams__item {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  column-gap: var(--sp-3);
+  align-items: center;
+  padding-right: 34px;
+}
+
+.dreams__type {
+  grid-column: 2;
+  color: var(--c-gold);
+  font-size: var(--fs-2xs);
+  font-weight: 800;
+  letter-spacing: var(--tracking-caps);
+  text-transform: uppercase;
+}
+
+.dreams__text { grid-column: 2; font-size: var(--fs-sm); font-weight: 600; }
+.dreams__item.is-done .dreams__text { color: var(--c-text-dim); }
+.dreams__item .cgoal__remove { top: 50%; right: 0; transform: translateY(-50%); }
+
+.dreams__new {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: var(--sp-2);
+  margin-top: var(--sp-3);
+}
+
+.dreams__new .select { grid-column: 1 / -1; }
+
+/* — Разговор пары (седьмой день) — */
+.talk__theme-label { margin-top: var(--sp-4); color: var(--c-gold); }
+.talk__theme { margin-top: var(--sp-1); }
+
+.talk__questions {
+  display: grid;
+  gap: var(--sp-2);
+  margin: var(--sp-3) 0 0;
+  padding-left: 1.2em;
+  font-size: var(--fs-md);
+  line-height: var(--lh-text);
+}
+
+.talk__questions li::marker { color: var(--c-gold); font-weight: 800; }
+
+.talk__note {
+  margin-top: var(--sp-3);
+  color: var(--c-text-dim);
+  font-size: var(--fs-xs);
+  text-align: center;
+}
+
+.talk__note.is-both { color: var(--c-gold); font-weight: 800; }
+
+/* — Карточка «Мы» на «Сегодня» — */
+.us-card {
+  display: block;
+  color: inherit;
+  text-decoration: none;
+  box-shadow: inset 0 0 0 1px var(--c-line-strong), var(--sh-card);
+}
+
+.us-card.is-urgent {
+  background: linear-gradient(160deg, rgba(var(--rgb-urgent), 0.2), rgba(var(--rgb-ink), 0.2));
+  box-shadow: inset 0 0 0 1px rgba(var(--rgb-urgent), 0.6), 0 12px 30px -16px rgba(var(--rgb-urgent), 0.8);
+}
+
+.us-card__count {
+  min-width: 26px;
+  padding: 2px 8px;
+  border-radius: var(--r-pill);
+  background: var(--g-gold-smooth);
+  color: var(--c-on-gold);
+  font-size: var(--fs-2xs);
+  font-weight: 800;
+  text-align: center;
+}
+
+.us-card.is-urgent .us-card__count { background: rgb(var(--rgb-urgent)); color: #fff; }
+
+.us-card__signal {
+  color: var(--c-champagne);
+  font-weight: 800;
+}
+
+.us-card__text {
+  margin-top: var(--sp-1);
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+}

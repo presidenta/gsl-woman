@@ -39,6 +39,9 @@ export const COLLECTIONS = [
   { key: 'morning', kind: 'morning', type: 'map', empty: {} },
   // Стакан тёплой воды выпит — по дням (water/water-log.js), с 40
   { key: 'waterlog', kind: 'water', type: 'map', empty: {} },
+  // Кегель и шаги — по дням (habits/logs.js), с 42
+  { key: 'kegel', kind: 'kegel', type: 'map', empty: {} },
+  { key: 'steps', kind: 'steps', type: 'map', empty: {} },
   { key: 'settings', kind: 'settings', type: 'single', empty: null },
   { key: 'love', kind: 'love', type: 'single', empty: null },
 ];

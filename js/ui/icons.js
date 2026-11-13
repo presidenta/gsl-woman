@@ -15,6 +15,12 @@ export const icons = {
   cup: wrap('<path d="M6 8h12l-1.3 11.2a1.6 1.6 0 0 1-1.6 1.4H8.9a1.6 1.6 0 0 1-1.6-1.4z"/><path d="M6.8 12.5h10.4"/><path d="M10 2.8c-.8 1 .8 1.6 0 2.7M14 2.8c-.8 1 .8 1.6 0 2.7"/>'),
   // Градусник — температура воды в стакане (37–40 °C)
   thermo: wrap('<path d="M10 14.6V5.2a2 2 0 0 1 4 0v9.4a4 4 0 1 1-4 0z"/><path d="M12 9.5v7"/><circle cx="12" cy="17.6" r="1.4" fill="currentColor" stroke="none"/>'),
+  // Кегель — круги от центра (сжатие и расслабление); шаги — два следа (сборка 42)
+  pulse: wrap('<circle cx="12" cy="12" r="2.4"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="9.4" stroke-dasharray="2 2.4"/>'),
+  footprints: wrap('<path d="M8 3.5c1.6 0 2.6 1.6 2.6 3.6S9.8 11 8.4 11 5.8 9.6 5.8 7.4 6.4 3.5 8 3.5z"/><path d="M6.2 13.2h4l-.3 2a2 2 0 0 1-3.4 0z"/><path d="M16 9.5c1.6 0 2.4 1.8 2.4 3.8s-.8 3.9-2.2 3.9-2.6-1.4-2.6-3.6.8-4.1 2.4-4.1z"/><path d="M14.2 19.2h4l-.3 1.5a2 2 0 0 1-3.4 0z"/>'),
+  // «Мы» — два кольца, связанные вместе (пара и семья)
+  rings: wrap('<circle cx="9" cy="12.5" r="5.5"/><circle cx="15" cy="12.5" r="5.5"/>'),
+  send: wrap('<path d="M4 12l16-7-6.5 16-2.8-6.6z"/><path d="M10.7 14.4L20 5"/>'),
   chevronLeft: wrap('<path d="M14.5 6l-6 6 6 6"/>'),
   chevronRight: wrap('<path d="M9.5 6l6 6-6 6"/>'),
   close: wrap('<path d="M6 6l12 12M18 6L6 18"/>'),

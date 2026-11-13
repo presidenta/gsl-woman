@@ -15,6 +15,10 @@ import { imsgCard } from '../../imsg/imsg-card.js';
 import { loveCard } from '../../love/cards.js';
 import { waterCard } from '../../water/water-card.js';
 import { foldCard } from '../../ui/fold.js';
+import { kegelCard } from '../../habits/kegel-card.js';
+import { stepsCard } from '../../habits/steps-card.js';
+import { usCard } from '../../circles/today-card.js';
+import { talkCard } from '../../circles/talk.js';
 
 /* ЭКРАН «СЕГОДНЯ» — главный. Сверху вниз, в порядке дня:
    1. Шапка дня: «День N» (без «из скольких» и без номера недели — обучение постоянное, владелец 12.11.2026),
@@ -23,7 +27,8 @@ import { foldCard } from '../../ui/fold.js';
    3. Стакан тёплой воды — сразу после пробуждения: человек сам кладёт в него составляющие (js/water/).
    3½. Утренняя минута: выбор 1, 2 или 3 минуты (Минимум / 100% / Максимум), счёт вверх со звуком каждую секунду.
    4. Дело дня: задание с уровнями / свободный поток / седьмой день с созвоном и отзывом месяца.
-   5. Что уже записано сегодня. */
+   5. Что уже записано сегодня.
+   6. Привычки дня — Кегель и шаги (js/habits/). */
 
 // Таймер утренней минуты живёт вне отрисовки: экран перерисовывается после каждой записи,
 // а идущая минута не должна ни сбрасываться, ни терять отметку «сделано». Таймер сам ставит отметку,
@@ -348,14 +353,21 @@ export function render(view, ctx) {
   add(view,
     h('div', { class: 'stack' },
       header(plan, summary),
+      // Новое от близкого (пара, семья) — сразу на виду; «Срочно» — красным
+      usCard(),
       catchUp(ctx, summary),
       // Сначала стакан тёплой воды — сразу после пробуждения, потом утренняя минута (js/water/README.md)
       waterCard(ctx),
       morningCard(ctx, plan),
       main,
+      // Седьмой день — «Разговор пары» (circles/talk.js)
+      talkCard(ctx, plan),
       imsgCard(ctx, plan),
       loveCard(ctx, plan),
       recordedToday(ctx, plan),
+      // Привычки дня — в конце (владелец 13.11.2026): утром — вода и минута, Кегель и шаги — в течение дня
+      kegelCard(ctx),
+      stepsCard(ctx),
     ),
   );
 }

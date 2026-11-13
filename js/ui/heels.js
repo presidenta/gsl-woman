@@ -285,3 +285,26 @@ export function heelsFigure({ aside = null } = {}) {
     },
   };
 }
+
+/* ЧАСТИ ФИГУР ДЛЯ ДРУГИХ УПРАЖНЕНИЙ (habits/: Кегель, шаги; сборка 42). Фигура одна на часть, но на экране она может
+   стоять несколько раз: у каждой копии свои id градиентов и свои классы (приставка prefix) — заливки не путаются,
+   и копия не «поднимается на носки» вместе с утренней минутой. */
+
+/** Фигура своей части целиком, под приставкой prefix (id, ссылки на градиенты и классы). */
+export function figureCopy(prefix) {
+  const src = side.get() === 'man' ? FIGURE_MAN : FIGURE;
+  return src
+    .replace(/id="heels-/g, `id="${prefix}-`)
+    .replace(/url\(#heels-/g, `url(#${prefix}-`)
+    .replace(/class="heels__/g, `class="${prefix}__`);
+}
+
+/** Только градиенты и обрезки фигуры (для рисунка, собранного из частей — идущая фигура). */
+export const defsCopy = (prefix) => figureCopy(prefix).match(/<defs>[\s\S]*?<\/defs>/)[0];
+
+/** Контуры частей тела: голова с туловищем и ближней ногой, нога, рука, волосы, стопа. */
+export const PARTS = {
+  woman: { body: W_BODY, leg: W_LEG, arm: W_ARM, hair: W_HAIR, tail: W_TAIL },
+  man: { body: M_BODY, leg: M_LEG, arm: M_ARM, hair: M_HAIR },
+  foot: FOOT,
+};
