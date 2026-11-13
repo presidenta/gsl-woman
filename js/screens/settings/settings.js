@@ -5,6 +5,7 @@ import { isValidIso, isValidTime } from '../../core/dates.js';
 import * as settings from '../../settings/settings.js';
 import * as permission from '../../reminders/permission.js';
 import { clearAll } from '../../core/store.js';
+import * as sync from '../../sync/sync.js';
 import { field, switchRow } from '../../ui/controls.js';
 import { icons } from '../../ui/icons.js';
 import { toast } from '../../ui/toast.js';
@@ -86,6 +87,28 @@ function notificationsBlock(ctx) {
   return body;
 }
 
+/* Копия на сервере (sync/): когда сохранилось, сколько ждёт отправки. Нажатие — сохранить сейчас. */
+function syncLine() {
+  const st = sync.status();
+  let text;
+  if (st.status === 'offline') text = t('sync.offline');
+  else if (!st.savedAt) text = t('sync.first');
+  else {
+    const d = new Date(st.savedAt);
+    const sameDay = d.toDateString() === new Date().toDateString();
+    const when = sameDay ? d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : d.toLocaleDateString();
+    text = t('sync.saved', { when });
+  }
+  if (st.pending) text += ` · ${t('sync.pending', { n: st.pending })}`;
+  const btn = h('button', { type: 'button', class: 'settings__sync' }, svg(icons.refresh, 'settings__sync-icon'), h('span', {}, text));
+  btn.addEventListener('click', async () => {
+    btn.disabled = true;
+    await sync.now();
+    toast({ title: t('sync.done') });
+  });
+  return btn;
+}
+
 export function render(view, ctx) {
   const s = ctx.settings;
 
@@ -111,6 +134,7 @@ export function render(view, ctx) {
     h('h1', { class: 'screen-title' }, t('settings.title')),
 
     accountCard({ onLogout: ctx.logout, update: updateButton() }),
+    syncLine(),
     installCard(),
 
     h('a', { class: 'card settings__link', href: '#/love' },

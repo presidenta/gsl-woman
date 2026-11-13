@@ -8,6 +8,7 @@ import * as settings from './settings/settings.js';
 import * as journal from './journal/journal.js';
 import * as account from './account/session.js';
 import * as access from './access/access.js';
+import * as sync from './sync/sync.js';
 import * as program from './program/source.js';
 import * as reminders from './reminders/local.js';
 import { isOpen as sheetOpen } from './ui/sheet.js';
@@ -163,7 +164,7 @@ function takeKvantLink() {
   if (!pass || account.current()) return;
   gate = { mode: 'loading', message: '' };
   account.redeem(pass)
-    .then(() => loadProgram())
+    .then(() => { loadProgram(); sync.now(); })
     .catch((err) => {
       const key = `login.err.${err?.code}`;
       const text = t(key);
@@ -175,6 +176,8 @@ function takeKvantLink() {
 async function onLogin(loginName, password) {
   await account.login(loginName, password);
   loadProgram();
+  // Вошла — сразу забрать с сервера всё, что она вводила на других устройствах (sync/)
+  sync.now();
 }
 
 // Выход из настроек: сессия и копия программы стираются, записи остаются на телефоне
@@ -274,8 +277,8 @@ addEventListener('sheet-closed', () => {
 });
 
 subscribe((key) => {
-  // Отметки отправленных напоминаний экран не меняют
-  if (key === 'reminders-sent') return;
+  // Отметки отправленных напоминаний и служебное состояние синхронизации экран не меняют
+  if (key === 'reminders-sent' || key === 'sync') return;
   scheduleDraw();
 });
 
@@ -330,5 +333,8 @@ install.onChange(() => router.currentRoute() === 'settings' && scheduleDraw());
 
 // Снимки, на которые больше не ссылается ни одна запись (закрыла форму без «Сохранить»), — стереть
 setTimeout(() => media.prune(journal.photoIds()).catch(() => {}), 4000);
+
+// Копия данных на сервере и обмен между устройствами (владелец 13.11.2026) — как у GoldenFit
+sync.start();
 
 registerWorker({ onUpdated: () => toast({ title: t('update.ready') }) });

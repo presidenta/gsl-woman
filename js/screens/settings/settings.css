@@ -148,3 +148,25 @@
   height: 16px;
   color: var(--c-gold);
 }
+
+/* Копия на сервере — тихая строка под аккаунтом; нажатие — сверить сейчас */
+.settings__sync {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  width: 100%;
+  padding: 0 var(--sp-2);
+  border: 0;
+  background: none;
+  color: var(--c-text-dim);
+  font: inherit;
+  font-size: var(--fs-xs);
+  text-align: left;
+}
+
+.settings__sync-icon svg {
+  display: block;
+  width: 14px;
+  height: 14px;
+  color: var(--c-gold);
+}
