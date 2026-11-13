@@ -9,15 +9,10 @@ export const BASE = 'heels';
 export const ADDONS = [null, 'hum', 'voice', 'shake'];
 export const SECONDS = 60;
 
-/* Стакан тёплой воды после минуты — у обеих частей (владелец 13.11.2026: «пожелание утром выпить стакан тёплой воды
-   с лимоном, имбирём, мёдом, с куркумой — как направление; добавь и в женское»). Семь вариантов — по одному на день
-   недели программы; первый — полный, «с лимоном, имбирём, мёдом и куркумой», как сказал владелец. Тексты —
-   morning.water.kinds.<вариант> в js/texts. */
-export const WATERS = ['full', 'lemon', 'ginger', 'turmeric', 'cinnamon', 'mint', 'plain'];
+/* Стакан тёплой воды перед минутой — отдельный модуль js/water/: составляющие человек выбирает сам. */
 
-/** Что входит в утреннюю минуту дня программы: пятки, добавка дня и вода дня. */
+/** Что входит в утреннюю минуту дня программы: пятки и добавка дня. */
 export function morningFor(day) {
   const n = Math.max(day, 1) - 1;
-  const addon = ADDONS[n % ADDONS.length];
-  return { base: BASE, addon, seconds: SECONDS, water: WATERS[n % WATERS.length] };
+  return { base: BASE, addon: ADDONS[n % ADDONS.length], seconds: SECONDS };
 }

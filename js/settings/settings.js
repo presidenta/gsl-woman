@@ -18,6 +18,8 @@ const DEFAULTS = {
   showTaskInNotice: false,
   // В приложении для Android: какое напоминание звонит будильником на весь экран (native/, 13.11.2026)
   alarms: { morning: true, noon: false, evening: false },
+  // Что человек кладёт в утренний стакан тёплой воды (js/water/, 13.11.2026)
+  water: [],
 };
 
 export function get() {
@@ -32,6 +34,7 @@ export function get() {
     name: typeof saved.name === 'string' ? saved.name.slice(0, 40) : '',
     times,
     alarms: { ...DEFAULTS.alarms, ...(saved.alarms && typeof saved.alarms === 'object' ? saved.alarms : {}) },
+    water: Array.isArray(saved.water) ? saved.water.filter((x) => typeof x === 'string').slice(0, 12) : [],
   };
 }
 

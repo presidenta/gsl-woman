@@ -7,7 +7,8 @@ import * as side from '../js/side/side.js';
 import * as program from '../js/program/source.js';
 import { setLang, t } from '../js/core/i18n.js';
 import * as sync from '../js/sync/sync.js';
-import { morningFor, WATERS } from '../js/program/morning.js';
+import * as water from '../js/water/water.js';
+import * as settings from '../js/settings/settings.js';
 
 beforeEach(() => {
   clearAll();
@@ -82,10 +83,17 @@ test('пол ещё не выбран — синхронизация ждёт', 
   assert.deepEqual(calls, []);
 });
 
-test('стакан тёплой воды: семь вариантов по кругу, первый — с лимоном, имбирём, мёдом и куркумой', () => {
-  assert.equal(WATERS.length, 7);
-  assert.equal(morningFor(1).water, 'full');
-  assert.equal(morningFor(8).water, 'full');
-  assert.equal(new Set(Array.from({ length: 7 }, (_, i) => morningFor(i + 1).water)).size, 7);
-  for (const w of WATERS) assert.notEqual(t(`morning.water.kinds.${w}.title`), `morning.water.kinds.${w}.title`, w);
+test('стакан тёплой воды: человек сам кладёт составляющие, выбор хранится в настройках, вода меняет цвет', () => {
+  assert.deepEqual(water.chosen(), [], 'сначала — просто тёплая вода');
+  assert.equal(water.label(), 'тёплая вода');
+  const plain = water.waterColor([]);
+  water.setItem('turmeric', true);
+  water.setItem('lemon', true);
+  assert.deepEqual(water.chosen(), ['lemon', 'turmeric'], 'порядок — как в столбике');
+  assert.deepEqual(settings.get().water, ['lemon', 'turmeric'], 'выбор — в настройках: синхронизируется и остаётся наутро');
+  assert.equal(water.label(), 'тёплая вода: лимон, куркума');
+  assert.notDeepEqual(water.waterColor(water.chosen()), plain, 'куркума и лимон красят воду');
+  water.setItem('lemon', false);
+  assert.deepEqual(water.chosen(), ['turmeric']);
+  assert.deepEqual(water.chosen(['чужое', 'mint']), ['mint'], 'незнакомое отбрасывается');
 });

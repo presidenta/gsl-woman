@@ -5,6 +5,7 @@ import { isoDate, addDays, programDay, weekOf } from '../core/dates.js';
 import { buildPlan } from '../reminders/plan.js';
 import { dayPlan } from '../program/index.js';
 import { morningFor } from '../program/morning.js';
+import { chosen as chosenWater, label as waterLabel } from '../water/water.js';
 import { ideaFor, groupIdeas } from '../love/love.js';
 import { getLang } from '../core/i18n.js';
 
@@ -69,7 +70,8 @@ export function widgetDays({ settings }, now = new Date()) {
     const title = plan.kind === 'task' ? `«${plan.task.title}»` : t(`kinds.${plan.kind}`);
     const m = morningFor(day);
     const minute = m.addon ? `${t('morning.heels.title')} ${t(`morning.addon.${m.addon}.title`)}` : t('morning.heels.title');
-    const lines = [`☀ ${minute}`, `💧 ${t(`morning.water.kinds.${m.water}.title`)}`];
+    // Утро по порядку: сначала стакан тёплой воды (с тем, что человек выбрал), потом минута (js/water/)
+    const lines = [`💧 ${waterLabel(chosenWater(settings.water))}`, `☀ ${minute}`];
     const him = ideaFor('him', day, lang);
     if (him) lines.push(`♡ ${him.text}`);
     for (const group of ['children', 'family']) {

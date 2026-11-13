@@ -13,12 +13,14 @@ import { heelsFigure } from '../../ui/heels.js';
 import * as sound from '../../ui/tick.js';
 import { imsgCard } from '../../imsg/imsg-card.js';
 import { loveCard } from '../../love/cards.js';
+import { waterCard } from '../../water/water-card.js';
 
 /* ЭКРАН «СЕГОДНЯ» — главный. Сверху вниз, в порядке дня:
    1. Шапка дня: «День N» (без «из скольких» и без номера недели — обучение постоянное, владелец 12.11.2026),
       вид дня, название недели и её прогресс.
    2. «Можно наверстать» — если в этой неделе есть пропуски.
-   3. Утренняя минута: выбор 1, 2 или 3 минуты (Минимум / 100% / Максимум), счёт вверх со звуком каждую секунду.
+   3. Стакан тёплой воды — сразу после пробуждения: человек сам кладёт в него составляющие (js/water/).
+   3½. Утренняя минута: выбор 1, 2 или 3 минуты (Минимум / 100% / Максимум), счёт вверх со звуком каждую секунду.
    4. Дело дня: задание с уровнями / свободный поток / седьмой день с созвоном и отзывом месяца.
    5. Что уже записано сегодня. */
 
@@ -166,29 +168,9 @@ function morningCard(ctx, plan) {
     figure.node,
     h('div', { class: 'bar minute__bar' }, fill),
     h('div', { class: 'card__actions' }, picks, runningRow),
-    waterBlock(m.water),
   );
 }
 
-/* Стакан тёплой воды после минуты (владелец 13.11.2026) — пожелание, а не задание: без отметки и записи. Вариант дня
-   — из program/morning.js, бережная подсказка (мёд, зубы, желудок, лекарства) — мелко внизу. */
-function waterBlock(kind) {
-  return h('div', { class: 'water' },
-    h('div', { class: 'water__head' },
-      h('span', { class: 'water__icon' }, svg(icons.cup)),
-      h('div', {},
-        h('p', { class: 'water__title' }, t('morning.water.title')),
-        h('p', { class: 'water__lead' }, t('morning.water.lead')),
-      ),
-    ),
-    h('div', { class: 'water__today' },
-      h('span', { class: 'caps water__label' }, t('morning.water.today')),
-      h('strong', { class: 'water__kind' }, t(`morning.water.kinds.${kind}.title`)),
-      h('p', { class: 'water__text' }, t(`morning.water.kinds.${kind}.text`)),
-    ),
-    h('p', { class: 'faint water__care' }, t('morning.water.care')),
-  );
-}
 
 function taskCard(plan) {
   const { task } = plan;
@@ -355,6 +337,8 @@ export function render(view, ctx) {
     h('div', { class: 'stack' },
       header(plan, summary),
       catchUp(ctx, summary),
+      // Сначала стакан тёплой воды — сразу после пробуждения, потом утренняя минута (js/water/README.md)
+      waterCard(ctx),
       morningCard(ctx, plan),
       main,
       imsgCard(ctx, plan),

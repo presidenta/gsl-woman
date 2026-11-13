@@ -1,0 +1,330 @@
+/* СТАКАН ТЁПЛОЙ ВОДЫ (water-card.js, glass.js). Цвета — только токены; вода, стекло и составляющие — свои цвета в
+   рисунке (art.js), они одинаковы в обеих частях. Все движения в стакане — от общего такта --phase (glass.js), их
+   длины делят 12 секунд нацело: перерисовка экрана не сбивает ни волну, ни пар. «Меньше движения» — всё стоит. */
+
+.water__lead {
+  margin-top: var(--sp-2);
+}
+
+.water__stage {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: var(--sp-3);
+  align-items: start;
+  margin-top: var(--sp-4);
+}
+
+.water__glass {
+  position: sticky;
+  top: calc(var(--header-h) + var(--sp-3));
+}
+
+.wg-holder,
+.wg {
+  display: block;
+  width: 100%;
+}
+
+.wg {
+  height: auto;
+  overflow: visible;
+}
+
+/* — Столбик составляющих — */
+.water__pick {
+  margin-bottom: var(--sp-2);
+  color: var(--c-text-dim);
+  font-size: var(--fs-xs);
+  line-height: 1.35;
+}
+
+.water__item {
+  display: grid;
+  grid-template-columns: 38px minmax(0, 1fr) 22px;
+  gap: var(--sp-2);
+  align-items: center;
+  width: 100%;
+  min-height: 52px;
+  margin-top: 6px;
+  padding: 6px 8px 6px 6px;
+  border: 1px solid var(--c-line);
+  border-radius: var(--r-md);
+  background: var(--c-surface);
+  color: var(--c-text);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color var(--t-fast) var(--ease), background var(--t-fast) var(--ease), transform var(--t-fast) var(--ease);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.water__item:active {
+  transform: scale(0.97);
+}
+
+.water__item.is-on {
+  border-color: var(--c-line-strong);
+  background: var(--g-gold-soft);
+}
+
+.water__art {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: rgba(var(--rgb-ink), 0.35);
+}
+
+.water__art .water-art,
+.water-fly .water-art {
+  display: block;
+  width: 30px;
+  height: 30px;
+}
+
+.water__item-text {
+  display: grid;
+  min-width: 0;
+}
+
+.water__item-name {
+  font-size: var(--fs-sm);
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.water__item-amount {
+  color: var(--c-text-faint);
+  font-size: var(--fs-2xs);
+  line-height: 1.25;
+}
+
+.water__check {
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border: 1.5px solid var(--c-line-strong);
+  border-radius: 50%;
+  color: transparent;
+  transition: background var(--t-fast) var(--ease), color var(--t-fast) var(--ease), transform var(--t-med) var(--ease);
+}
+
+.water__check svg {
+  width: 13px;
+  height: 13px;
+}
+
+.water__item.is-on .water__check {
+  border-color: transparent;
+  background: var(--g-gold-smooth);
+  color: var(--c-on-gold);
+  transform: scale(1.08);
+}
+
+/* Летящая копия значка — поверх всего (water-card.js → fly) */
+.water-fly {
+  position: fixed;
+  z-index: 60;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+  will-change: transform, opacity;
+  filter: drop-shadow(0 6px 10px rgba(0, 0, 0, 0.45));
+}
+
+/* — Что в стакане сейчас — */
+.water__plain,
+.water__mine {
+  margin-top: var(--sp-4);
+}
+
+.water__plain {
+  color: var(--c-text-dim);
+  font-size: var(--fs-sm);
+}
+
+.water__mine-title {
+  color: var(--c-gold);
+}
+
+.water__mine-list {
+  display: grid;
+  gap: 4px;
+  margin: var(--sp-2) 0 0;
+  padding: 0;
+  list-style: none;
+  font-size: var(--fs-sm);
+  line-height: 1.45;
+}
+
+.water__care {
+  margin-top: var(--sp-3);
+  font-size: var(--fs-xs);
+  line-height: var(--lh-text);
+}
+
+/* — Движения в стакане — */
+.wg-wave {
+  transform-box: view-box;
+}
+
+.wg-wave--front,
+.wg-wave--line {
+  animation: wg-wave 4s linear infinite;
+  animation-delay: var(--phase, 0s);
+}
+
+.wg-wave--back {
+  animation: wg-wave-back 6s linear infinite;
+  animation-delay: var(--phase, 0s);
+}
+
+@keyframes wg-wave {
+  from { transform: translateX(0); }
+  to { transform: translateX(-200px); }
+}
+
+@keyframes wg-wave-back {
+  from { transform: translateX(-200px); }
+  to { transform: translateX(0); }
+}
+
+.wg-glow-in { stop-color: rgb(var(--rgb-gold)); stop-opacity: 0.22; }
+.wg-glow-out { stop-color: rgb(var(--rgb-gold)); stop-opacity: 0; }
+
+.wg-top,
+.wg-bottom {
+  transition: stop-color 1.2s var(--ease);
+}
+
+.wg-light {
+  animation: wg-light 6s ease-in-out infinite;
+  animation-delay: var(--phase, 0s);
+}
+
+@keyframes wg-light {
+  0%, 100% { transform: translateX(0); opacity: 0.05; }
+  50% { transform: translateX(14px); opacity: 0.11; }
+}
+
+/* Пар: три струйки поднимаются по очереди и тают — вода тёплая */
+.wg-steam__wisp {
+  opacity: 0;
+  stroke-opacity: 0.5;
+  animation: wg-steam 4s ease-in-out infinite;
+  animation-delay: var(--phase, 0s);
+}
+
+.wg-steam__wisp--2 { animation-delay: calc(var(--phase, 0s) - 1.33s); }
+.wg-steam__wisp--3 { animation-delay: calc(var(--phase, 0s) - 2.66s); }
+
+@keyframes wg-steam {
+  0% { opacity: 0; transform: translateY(10px) scaleX(0.9); }
+  30% { opacity: 0.55; }
+  100% { opacity: 0; transform: translateY(-14px) scaleX(1.15); }
+}
+
+/* Составляющие: на поверхности покачиваются, под водой медленно плывут, мёд закручивается, куркума клубится */
+.wf {
+  transform-box: view-box;
+}
+
+.wf--bob {
+  animation: wf-bob 3s ease-in-out infinite;
+  animation-delay: var(--phase, 0s);
+}
+
+.wf--late {
+  animation-delay: calc(var(--phase, 0s) - 1.5s);
+}
+
+@keyframes wf-bob {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(3px) rotate(-2.5deg); }
+}
+
+.wf--drift {
+  animation: wf-drift 6s ease-in-out infinite;
+  animation-delay: var(--phase, 0s);
+}
+
+@keyframes wf-drift {
+  0%, 100% { transform: translate(0, 0); }
+  50% { transform: translate(6px, -5px); }
+}
+
+.wf--swirl {
+  transform-origin: 100px 214px;
+  animation: wf-swirl 12s linear infinite;
+  animation-delay: var(--phase, 0s);
+}
+
+@keyframes wf-swirl {
+  to { transform: rotate(360deg); }
+}
+
+.wf--cloud {
+  transform-origin: 100px 214px;
+  animation: wf-cloud 6s ease-in-out infinite;
+  animation-delay: var(--phase, 0s);
+}
+
+@keyframes wf-cloud {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.08, 1.14); opacity: 0.8; }
+}
+
+.wf--lean {
+  transform-origin: 112px 238px;
+  animation: wf-lean 6s ease-in-out infinite;
+  animation-delay: var(--phase, 0s);
+}
+
+@keyframes wf-lean {
+  0%, 100% { transform: rotate(0deg); }
+  50% { transform: rotate(1.6deg); }
+}
+
+/* Только что упала: всплеск по воде и мягкое появление; убрана — тает и уходит вниз */
+.wg-item.is-new {
+  animation: wg-in 0.9s var(--ease) both;
+}
+
+@keyframes wg-in {
+  0% { opacity: 0; transform: translateY(-26px); }
+  45% { opacity: 1; transform: translateY(5px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+.wg-item.is-gone {
+  animation: wg-out 0.8s var(--ease) both;
+}
+
+@keyframes wg-out {
+  to { opacity: 0; transform: translateY(14px); }
+}
+
+.wg-ripple {
+  transform-box: fill-box;
+  transform-origin: center;
+  opacity: 0;
+  animation: wg-ripple 1.1s ease-out 0.05s both;
+}
+
+@keyframes wg-ripple {
+  0% { opacity: 0.9; transform: scale(0.4); }
+  100% { opacity: 0; transform: scale(5.4, 3.2); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wg *,
+  .wg-item {
+    animation: none !important;
+  }
+
+  .wg-steam__wisp {
+    opacity: 0.25;
+  }
+}

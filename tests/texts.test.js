@@ -47,9 +47,10 @@ test('мужская часть — по-мужски: реакция женщи
   assert.equal(t('app.name'), 'GSL Woman+');
 });
 
-test('у обеих частей — стакан тёплой воды: семь вариантов и бережная подсказка', () => {
+test('у обеих частей — стакан тёплой воды: семь составляющих на выбор и бережная подсказка', () => {
   for (const [name, d] of Object.entries(SETS)) {
-    assert.equal(Object.keys(d.morning.water.kinds).length, 7, name);
+    assert.deepEqual(Object.keys(d.morning.water.items), ['lemon', 'ginger', 'honey', 'turmeric', 'pepper', 'cinnamon', 'mint'], name);
+    for (const it of Object.values(d.morning.water.items)) assert.ok(it.name && it.amount && it.benefit, name);
     assert.ok(d.morning.water.title && d.morning.water.lead && d.morning.water.care, name);
   }
 });
