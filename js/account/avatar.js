@@ -4,6 +4,7 @@ import { t } from '../core/i18n.js';
 import { icons } from '../ui/icons.js';
 import { toast } from '../ui/toast.js';
 import * as media from '../media/photos.js';
+import { openViewer } from '../media/viewer.js';
 import { current } from './session.js';
 
 /* ФОТО ПРОФИЛЯ — своё у GSL Woman, как у спорта своё (владелец про спорт: «это всё-таки разные
@@ -38,7 +39,8 @@ export function pickPhoto() {
     input.remove();
     if (!file) return;
     try {
-      await media.save(file, { id: media.AVATAR_ID, max: 512 });
+      // 1280 точек: фото открывается во весь экран чётким (владелец 13.11.2026), а на сервер уходит меньше 1 МБ
+      await media.save(file, { id: media.AVATAR_ID, max: 1280 });
       write(KEY, { at: Date.now() });   // перерисует шапку и настройки
     } catch {
       toast({ title: t('photos.failed') });
@@ -74,7 +76,11 @@ export function accountCard({ onLogout, update = null }) {
   const a = current();
   if (!a) return null;
   const has = hasPhoto();
-  const photo = h('button', { type: 'button', class: 'account__photo', 'aria-label': t('photos.profile'), onclick: pickPhoto },
+  // Фото есть — нажатие открывает его во весь экран; нет — выбрать (владелец 13.11.2026: «фото должно открываться»)
+  const photo = h('button', {
+    type: 'button', class: 'account__photo', 'aria-label': t(has ? 'photos.open' : 'photos.profile'),
+    onclick: () => (has ? openViewer([media.AVATAR_ID]) : pickPhoto()),
+  },
     avatar('lg'),
     has ? null : h('span', { class: 'account__cam' }, svg(icons.camera)),
   );

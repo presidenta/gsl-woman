@@ -67,8 +67,8 @@ async function decode(file) {
   }
 }
 
-/** Ужать снимок: длинная сторона не больше max, JPEG. */
-export async function shrink(file, max = MAX_SIDE) {
+/** Ужать снимок: длинная сторона не больше max, JPEG качества quality. */
+export async function shrink(file, max = MAX_SIDE, quality = QUALITY) {
   const img = await decode(file);
   const w0 = img.width || img.naturalWidth;
   const h0 = img.height || img.naturalHeight;
@@ -80,7 +80,7 @@ export async function shrink(file, max = MAX_SIDE) {
   canvas.height = h;
   canvas.getContext('2d').drawImage(img, 0, 0, w, h);
   img.close?.();
-  const blob = await new Promise((resolve) => canvas.toBlob(resolve, 'image/jpeg', QUALITY));
+  const blob = await new Promise((resolve) => canvas.toBlob(resolve, 'image/jpeg', quality));
   if (!blob) throw new Error('photo: не удалось сжать');
   return { blob, w, h };
 }
@@ -91,6 +91,22 @@ export async function save(file, { id = newId(), max = MAX_SIDE } = {}) {
   await run('readwrite', (s) => s.put({ id, blob, w, h, createdAt: new Date().toISOString() }));
   forgetUrl(id);
   return id;
+}
+
+/** Положить готовый снимок под номером (пришёл с сервера — sync/photos.js). */
+export async function put(id, blob, w, h) {
+  await run('readwrite', (s) => s.put({ id, blob, w, h, createdAt: new Date().toISOString() }));
+  forgetUrl(id);
+}
+
+/** Снимок целиком { id, blob, w, h } или null — для отправки на сервер. */
+export async function get(id) {
+  return (await run('readonly', (s) => s.get(id)).catch(() => null)) || null;
+}
+
+/** Номера всех снимков на устройстве. */
+export async function ids() {
+  return (await run('readonly', (s) => s.getAllKeys()).catch(() => [])) || [];
 }
 
 /** Адрес снимка для <img>; нет такого — null. */

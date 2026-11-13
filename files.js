@@ -73,6 +73,7 @@ self.GSL_FILES = [
   './js/screens/week/week.css',
   './js/screens/week/week.js',
   './js/settings/settings.js',
+  './js/sync/photos.js',
   './js/sync/sync.js',
   './js/texts/en.js',
   './js/texts/ru.js',

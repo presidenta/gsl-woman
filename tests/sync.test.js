@@ -13,7 +13,8 @@ function fakeServer() {
   return {
     setUser(u) { user = u; },
     rows,
-    async handle(path, { body }) {
+    async handle(path, { body } = {}) {
+      if (path === '/api/woman/photos') return [];
       assert.equal(path, '/api/woman/sync');
       for (const ch of body.changes || []) {
         const key = `${user}/${ch.kind}/${ch.id}`;

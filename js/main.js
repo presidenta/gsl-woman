@@ -278,7 +278,7 @@ addEventListener('sheet-closed', () => {
 
 subscribe((key) => {
   // Отметки отправленных напоминаний и служебное состояние синхронизации экран не меняют
-  if (key === 'reminders-sent' || key === 'sync') return;
+  if (key === 'reminders-sent' || key === 'sync' || key === 'photo-sync') return;
   scheduleDraw();
 });
 

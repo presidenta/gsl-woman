@@ -1,6 +1,8 @@
 import { read, write, subscribe } from '../core/store.js';
 import { current, request as apiRequest, isClosed } from '../account/session.js';
 import * as access from '../access/access.js';
+import * as media from '../media/photos.js';
+import { syncPhotos, _use as usePhotos } from './photos.js';
 
 /* СИНХРОНИЗАЦИЯ GSL WOMAN+ МЕЖДУ УСТРОЙСТВАМИ (владелец 13.11.2026: «это очень важно, обязательно»).
 
@@ -131,6 +133,11 @@ function diff(s, c, when) {
 }
 
 function onLocalChange(key) {
+  // Сменила или убрала фото профиля — обменяться сразу (само фото ходит в sync/photos.js)
+  if (key === 'avatar' && !applying) {
+    schedule();
+    return;
+  }
   const c = BY_KEY[key];
   if (!c || applying) return;
   const s = active || state();
@@ -239,6 +246,10 @@ async function run() {
     s.status = 'syncing';
     if (s.userId && s.userId !== session.userId) {
       wipeForOther();
+      // И фото прежней: снимки, её фото профиля и что согласовано по фото
+      await media.clear();
+      write('avatar', null);
+      write('photo-sync', {});
       s.userId = null;
     }
     if (!s.userId) await adopt(s, session.userId);
@@ -257,6 +268,8 @@ async function run() {
       s.cursor = r.cursor;
       if (!r.more && !Object.keys(s.pending).length) break;
     }
+    // Фото — после записей: теперь видно, какие снимки к ним нужны (sync/photos.js)
+    await syncPhotos().catch(() => {});
     s.savedAt = new Date().toISOString();
     s.status = 'ok';
   } catch (err) {
@@ -293,4 +306,6 @@ export function start() {
 /** Для проверок: подменить запрос к серверу. */
 export function _useRequest(fn) {
   requestFn = fn;
+  // Фото ходят тем же подставным сервером; сами снимки в проверках не качаются
+  usePhotos({ request: fn, raw: async () => null });
 }
