@@ -1,0 +1,28 @@
+// Сборка родной части GSL Woman+ — точно как у плагина «Кванта» (planner/android-alarm-plugin/android/build.gradle):
+// версии берутся из variables.gradle проекта, своего buildscript нет (второй AGP в одной сборке — конфликт).
+
+apply plugin: 'com.android.library'
+
+android {
+    namespace "space.coreviaflow.gslwoman.plugin"
+    compileSdk project.hasProperty('compileSdkVersion') ? rootProject.ext.compileSdkVersion : 34
+
+    defaultConfig {
+        minSdkVersion project.hasProperty('minSdkVersion') ? rootProject.ext.minSdkVersion : 22
+        targetSdkVersion project.hasProperty('targetSdkVersion') ? rootProject.ext.targetSdkVersion : 34
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+}
+
+repositories {
+    google()
+    mavenCentral()
+}
+
+dependencies {
+    implementation project(':capacitor-android')
+}

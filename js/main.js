@@ -9,6 +9,7 @@ import * as journal from './journal/journal.js';
 import * as account from './account/session.js';
 import * as access from './access/access.js';
 import * as sync from './sync/sync.js';
+import * as native from './native/native.js';
 import * as program from './program/source.js';
 import * as reminders from './reminders/local.js';
 import { isOpen as sheetOpen } from './ui/sheet.js';
@@ -336,5 +337,8 @@ setTimeout(() => media.prune(journal.photoIds()).catch(() => {}), 4000);
 
 // Копия данных на сервере и обмен между устройствами (владелец 13.11.2026) — как у GoldenFit
 sync.start();
+
+// В приложении для Android: напоминания при закрытом приложении, будильник, виджет (native/)
+native.start(() => ({ settings: settings.get(), entries: journal.all() }));
 
 registerWorker({ onUpdated: () => toast({ title: t('update.ready') }) });

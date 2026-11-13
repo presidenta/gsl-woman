@@ -1,0 +1,13 @@
+{
+  "name": "gsl-native",
+  "version": "1.0.0",
+  "description": "Родная часть GSL Woman+ для Android: напоминания при закрытом приложении, будильник на весь экран, виджет",
+  "main": "src/index.js",
+  "private": true,
+  "capacitor": {
+    "android": {
+      "src": "android"
+    }
+  },
+  "files": ["android/", "src/"]
+}

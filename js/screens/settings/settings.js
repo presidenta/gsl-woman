@@ -6,6 +6,7 @@ import * as settings from '../../settings/settings.js';
 import * as permission from '../../reminders/permission.js';
 import { clearAll } from '../../core/store.js';
 import * as sync from '../../sync/sync.js';
+import { nativeCard } from './native-card.js';
 import { field, switchRow } from '../../ui/controls.js';
 import { icons } from '../../ui/icons.js';
 import { toast } from '../../ui/toast.js';
@@ -131,6 +132,7 @@ export function render(view, ctx) {
     h('h1', { class: 'screen-title' }, t('settings.title')),
 
     accountCard({ onLogout: ctx.logout, update: updateButton() }),
+    nativeCard(),
     installCard(),
 
     h('a', { class: 'card settings__link', href: '#/love' },

@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Родная часть GSL Woman+: разрешения, приёмники, экран будильника и виджет. Gradle подмешивает этот файл в манифест
+     приложения сам (manifest merger) — папка android/ приложения создаётся заново на каждой сборке.
+     Имена классов от точки: подставляется namespace из build.gradle. -->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Уведомления (Android 13+ спрашивает разрешение), точные будильники, экран поверх блокировки, после перезагрузки -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" android:maxSdkVersion="32" />
+    <uses-permission android:name="android.permission.USE_EXACT_ALARM" />
+    <uses-permission android:name="android.permission.USE_FULL_SCREEN_INTENT" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+
+    <application>
+
+        <!-- Сработавшее напоминание: обычное уведомление или будильник на весь экран -->
+        <receiver android:name=".GslAlarmReceiver" android:exported="false" />
+
+        <!-- После перезагрузки, обновления приложения и смены времени — поставить расписание заново -->
+        <receiver android:name=".GslBootReceiver" android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
+                <action android:name="android.intent.action.TIME_SET" />
+                <action android:name="android.intent.action.TIMEZONE_CHANGED" />
+            </intent-filter>
+        </receiver>
+
+        <!-- Экран будильника: поверх блокировки с первого кадра, одним окном, без карточки в недавних -->
+        <activity
+            android:name=".GslAlarmActivity"
+            android:exported="false"
+            android:excludeFromRecents="true"
+            android:launchMode="singleInstance"
+            android:showWhenLocked="true"
+            android:turnScreenOn="true"
+            android:taskAffinity=""
+            android:theme="@android:style/Theme.DeviceDefault.NoActionBar" />
+
+        <!-- Виджет на экран телефона -->
+        <receiver android:name=".GslWidget" android:exported="true" android:label="GSL Woman+">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data android:name="android.appwidget.provider" android:resource="@xml/gsl_widget_info" />
+        </receiver>
+    </application>
+</manifest>

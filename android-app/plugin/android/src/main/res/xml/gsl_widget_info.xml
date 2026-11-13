@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Размер 4×2 по умолчанию, можно растянуть. Обновление раз в полчаса — чтобы новый день наступал на виджете
+     и без открытия приложения (данные на неделю уже лежат в нём). -->
+<appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
+    android:minWidth="250dp"
+    android:minHeight="110dp"
+    android:targetCellWidth="4"
+    android:targetCellHeight="2"
+    android:minResizeWidth="180dp"
+    android:minResizeHeight="80dp"
+    android:resizeMode="horizontal|vertical"
+    android:updatePeriodMillis="1800000"
+    android:initialLayout="@layout/gsl_widget"
+    android:widgetCategory="home_screen" />

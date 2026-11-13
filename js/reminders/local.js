@@ -1,5 +1,6 @@
 import { read, write } from '../core/store.js';
 import { buildPlan } from './plan.js';
+import { isApp } from '../native/native.js';
 
 /* ПОКАЗ НАПОМИНАНИЙ НА ТЕЛЕФОНЕ — пока приложение открыто или свёрнуто, но живо.
 
@@ -49,6 +50,8 @@ async function systemNotice(item) {
 export function start({ context, inApp }) {
   stop();
   const tick = async () => {
+    // В приложении для Android напоминания ставит сам телефон (native/) — здесь молчим, чтобы не было двойных
+    if (isApp()) return;
     const now = new Date();
     const items = buildPlan({ ...context(), now, since: new Date(now - GRACE_MS), days: 1 });
     const sent = new Set(sentKeys());

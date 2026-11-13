@@ -148,3 +148,14 @@
   height: 16px;
   color: var(--c-gold);
 }
+
+/* «Виджет и будильник» (native-card.js): строки разрешений с отметкой и кнопкой «Включить» */
+.native-status { display: grid; gap: var(--sp-2); margin: var(--sp-3) 0; }
+.native-row { display: flex; align-items: center; gap: var(--sp-3); padding: var(--sp-2) var(--sp-3); border: 1px solid var(--c-line); border-radius: var(--r-md); }
+.native-row__mark { display: grid; place-items: center; width: 24px; height: 24px; flex: none; border-radius: 50%; background: rgba(239, 196, 166, 0.12); color: var(--c-gold); font-weight: 700; }
+.native-row__mark svg { width: 14px; height: 14px; }
+.native-row__title { flex: 1; color: var(--c-text); font-size: var(--fs-sm); }
+.native-row__fix { padding: 6px 14px; border: 1px solid var(--c-gold); border-radius: 999px; background: none; color: var(--c-gold); font: inherit; font-size: var(--fs-xs); font-weight: 700; }
+.native-card__sub { margin-top: var(--sp-5); color: var(--c-champagne); font-family: var(--f-display); font-size: var(--fs-lg); }
+.native-card__hint { margin-top: var(--sp-2); font-size: var(--fs-xs); line-height: var(--lh-text); }
+.native-card__get { margin-top: var(--sp-3); text-decoration: none; }

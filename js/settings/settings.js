@@ -16,6 +16,8 @@ const DEFAULTS = {
   times: { ...DEFAULT_TIMES },
   // Экран блокировки видят чужие: по умолчанию в уведомлении нейтральная фраза, без текста задания
   showTaskInNotice: false,
+  // В приложении для Android: какое напоминание звонит будильником на весь экран (native/, 13.11.2026)
+  alarms: { morning: true, noon: false, evening: false },
 };
 
 export function get() {
@@ -29,6 +31,7 @@ export function get() {
     startDate: isValidIso(saved.startDate) ? saved.startDate : null,
     name: typeof saved.name === 'string' ? saved.name.slice(0, 40) : '',
     times,
+    alarms: { ...DEFAULTS.alarms, ...(saved.alarms && typeof saved.alarms === 'object' ? saved.alarms : {}) },
   };
 }
 

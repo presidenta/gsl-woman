@@ -1,10 +1,11 @@
 {
   "name": "gsl-woman-android",
   "private": true,
-  "description": "GSL Woman+ для Android: оболочка Capacitor вокруг сайта приложения. Собирается в облаке GitHub (.github/workflows/android.yml).",
+  "description": "GSL Woman+ для Android: оболочка Capacitor вокруг сайта приложения и своя родная часть (plugin/: напоминания при закрытом приложении, будильник, виджет). Собирается в облаке (planner/.github/workflows/gsl-woman-android.yml).",
   "dependencies": {
     "@capacitor/android": "^6.2.0",
-    "@capacitor/core": "^6.2.0"
+    "@capacitor/core": "^6.2.0",
+    "gsl-native": "file:plugin"
   },
   "devDependencies": {
     "@capacitor/cli": "^6.2.0"
