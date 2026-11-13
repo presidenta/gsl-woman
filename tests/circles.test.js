@@ -156,3 +156,17 @@ test('Кегель: уровни по Mayo Clinic, отметка — лучши
   logs.setSteps(iso, 0);
   assert.equal(logs.stepsOf(iso), 0);
 });
+
+test('«Близость»: женщине — массаж йони в «буду благодарна за…», лингам — в «хочу сделать для тебя»; ключи парные', async () => {
+  const srv = fakeServer(SHE);
+  circles._useRequest(srv.handler);
+  await circles.refresh();
+  const receive = wishes.list('c1', 'want', 'close').map((w) => w.key);
+  const give = wishes.list('c1', 'give', 'close').map((w) => w.key);
+  assert.ok(receive.includes('want.close.yoni') && !receive.includes('want.close.lingam'));
+  assert.ok(give.includes('give.close.lingam') && !give.includes('give.close.yoni'));
+  assert.ok(receive.includes('want.close.tantra') && give.includes('give.close.tantra'), 'общее — у обоих');
+  assert.equal(wishes.list('c1', 'want', 'close').find((w) => w.key === 'want.close.tantra').pairKey, 'give.close.tantra');
+  side._use('man');
+  assert.ok(wishes.list('c1', 'want', 'close').some((w) => w.key === 'want.close.lingam'));
+});

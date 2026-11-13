@@ -658,3 +658,21 @@
   -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
 }
+
+/* «Близость» (сборка 44): два списка — «буду благодарна за…» и «хочу сделать для тебя» */
+.wish-section.is-close {
+  margin-top: var(--sp-4);
+  padding: 0 var(--sp-3) var(--sp-3);
+  border: 1px solid rgba(var(--rgb-rose), 0.35);
+  border-radius: var(--r-lg);
+  background: linear-gradient(160deg, rgba(var(--rgb-rose), 0.08), rgba(var(--rgb-ink), 0.15));
+}
+
+.wish-sub {
+  margin-top: var(--sp-4);
+  color: var(--c-tone-woman);
+  font-family: var(--f-display);
+  font-size: var(--fs-lg);
+  font-weight: 600;
+  font-style: italic;
+}

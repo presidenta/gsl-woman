@@ -189,7 +189,7 @@ export const INSIDE = {
   // Вечерний стакан: ромашки и мелисса — на поверхности, липовый цвет и семена фенхеля — под водой
   chamomile: {
     layer: 'surface',
-    svg: `<g class="wf wf--bob"><g transform="translate(120 70) scale(1.05 .7)">${daisy(1.1)}</g><g transform="translate(92 73) scale(.75 .5)">${daisy(1.1)}</g></g>`,
+    svg: `<g class="wf wf--bob"><g transform="translate(88 72) scale(1.05 .7)">${daisy(1.1)}</g><g transform="translate(148 73) scale(.7 .46)">${daisy(1.1)}</g></g>`,
   },
   melissa: {
     layer: 'surface',

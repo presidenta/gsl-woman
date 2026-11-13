@@ -137,7 +137,7 @@ function pairView(view, ctx, circle) {
   return [
     h('section', { class: 'card us-head' }, memberList(circle)),
     segmented({ label: t('us.pair'), options: tabs.map((k) => ({ value: k, label: t(`us.tabs.${k}`) })), value: pairTab, onChange: (v) => { pairTab = v; ctx.rerender(); } }),
-    pairTab === 'wishes' ? wishesView(circle, ctx.rerender) : chatView(circle),
+    pairTab === 'wishes' ? wishesView(circle) : chatView(circle),
     h('a', { class: 'love-card__link us-goals-link', href: '#/goals' }, t('us.goalsLink'), svg(icons.chevronRight, 'love-card__chevron')),
     leaveButton(ctx, circle),
   ];

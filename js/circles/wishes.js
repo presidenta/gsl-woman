@@ -1,4 +1,5 @@
 import { getLang } from '../core/i18n.js';
+import * as side from '../side/side.js';
 import { addDays } from '../core/dates.js';
 import * as circles from './circles.js';
 import ru from './catalog/ru.js';
@@ -15,8 +16,18 @@ import en from './catalog/en.js';
 
 const CATALOG = { ru, ua, en };
 export const MODES = ['want', 'give'];
-export const WANT_SECTIONS = ['rest', 'nature', 'together', 'body', 'fun', 'home', 'close'];
-export const GIVE_SECTIONS = ['care', 'close'];
+/** Обычные разделы — «Да / Возможно»; «Близость» (сборка 44) — отдельно, через я-сообщение: want.close — «буду
+    благодарна за…», give.close (+ give.care) — «хочу сделать для тебя»; ключи одинаковые — совпадения крест-накрест. */
+export const WANT_SECTIONS = ['rest', 'nature', 'together', 'body', 'fun', 'home'];
+export const GIVE_SECTIONS = ['close', 'care'];
+
+/* Что подходит только одному полу: массаж лингама и простаты получает мужчина (делает — женщина), массаж йони —
+   женщина (делает — мужчина). Ключ → кому показывать (часть приложения). */
+const ONLY = {
+  'want.close.lingam': 'man', 'want.close.prostate': 'man', 'want.close.yoni': 'woman',
+  'give.close.lingam': 'woman', 'give.close.prostate': 'woman', 'give.close.yoni': 'man',
+};
+const fits = (key) => !ONLY[key] || ONLY[key] === (side.get() || 'woman');
 export const MARKS = ['yes', 'maybe'];
 const POSITIVE = new Set(['yes']);
 // Отметки сборки 42 («пас», «откликается», «подумаю») — к новым двум; «пас» просто снимается
@@ -29,7 +40,9 @@ export const marksOf = () => MARKS;
 
 /** Желания раздела: готовые (ключ «режим.раздел.ключ») и свои. */
 export function list(circleId, mode, section) {
-  const ready = Object.entries(catalog()[mode]?.[section] || {}).map(([k, text]) => ({ key: `${mode}.${section}.${k}`, text, own: false }));
+  const ready = Object.entries(catalog()[mode]?.[section] || {})
+    .map(([k, text]) => ({ key: `${mode}.${section}.${k}`, text, own: false, pairKey: `${mode === 'want' ? 'give' : 'want'}.${section}.${k}` }))
+    .filter((w) => fits(w.key));
   const own = circles.items(circleId, 'wish')
     .filter((w) => w.data?.mode === mode && w.data?.section === section)
     .sort((a, b) => a.updatedAt.localeCompare(b.updatedAt))

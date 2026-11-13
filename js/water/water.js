@@ -17,7 +17,7 @@ export const ITEMS = ['lemon', 'ginger', 'mint', 'cinnamon', 'chia', 'honey', 't
    успокаивающий, другой состав»). У каждого свои составляющие, свой выбор в настройках и свои тексты. */
 export const KINDS = {
   morning: { items: ITEMS, setting: 'water', texts: 'morning.water' },
-  night: { items: ['chamomile', 'melissa', 'linden', 'fennel', 'honey', 'cinnamon'], setting: 'waterNight', texts: 'night' },
+  night: { items: ['chamomile', 'melissa', 'linden', 'fennel', 'lemon', 'honey', 'turmeric', 'pepper', 'cinnamon'], setting: 'waterNight', texts: 'night' },
 };
 const kindOf = (kind) => KINDS[kind] || KINDS.morning;
 
