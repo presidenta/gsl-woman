@@ -10,7 +10,8 @@ import { fileURLToPath } from 'node:url';
 const ROOT = fileURLToPath(new URL('..', import.meta.url));
 
 // Что в кэш не идёт: служебное, проверки, исходники значков и сам работник
-const SKIP_DIRS = new Set(['.git', 'node_modules', 'tests', 'tools']);
+// android-app — оболочка приложения для Android, сайту в кэше она не нужна
+const SKIP_DIRS = new Set(['.git', '.github', 'node_modules', 'tests', 'tools', 'android-app']);
 const SKIP_FILES = new Set(['sw.js', 'package.json', 'package-lock.json', '.gitattributes', '.gitignore', '.nojekyll']);
 const SKIP_EXT = ['.md', '.svg'];
 

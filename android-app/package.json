@@ -1,0 +1,12 @@
+{
+  "name": "gsl-woman-android",
+  "private": true,
+  "description": "GSL Woman+ для Android: оболочка Capacitor вокруг сайта приложения. Собирается в облаке GitHub (.github/workflows/android.yml).",
+  "dependencies": {
+    "@capacitor/android": "^6.2.0",
+    "@capacitor/core": "^6.2.0"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^6.2.0"
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "appId": "space.coreviaflow.gslwoman",
+  "appName": "GSL Woman+",
+  "webDir": "www",
+  "server": {
+    "url": "https://presidenta.github.io/gsl-woman/",
+    "androidScheme": "https",
+    "cleartext": false,
+    "errorPath": "index.html"
+  },
+  "android": {
+    "allowMixedContent": false,
+    "backgroundColor": "#150c11"
+  }
+}
