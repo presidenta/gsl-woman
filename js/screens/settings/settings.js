@@ -17,17 +17,19 @@ import { checkNow } from '../../core/updates.js';
 /* ЭКРАН «НАСТРОЙКИ»: аккаунт «Кванта» (фото, имя, кабинет), значок на экран, обо мне (имя, язык), дата старта, время трёх напоминаний, уведомления, данные.
    Каждое изменение сохраняется сразу — кнопки «Сохранить» здесь нет, как и в спорте. */
 
-/* «Обновить» — в карточке аккаунта над «Выйти»: одним нажатием подтянуть новую версию. Новая есть —
-   страница сама перезагрузится на неё (core/updates.js). Номер версии — внизу настроек. */
+/* «Обновить» — в карточке аккаунта рядом с «Выйти»: одним нажатием подтянуть новую версию и сверить данные с
+   сервером. Окно показывает номер версии и когда последний раз сохранено на сервере. Новая версия есть —
+   страница сама перезагрузится на неё (core/updates.js). */
 function updateButton() {
   const btn = h('button', { type: 'button', class: 'icon-btn account__icon settings__update', 'aria-label': t('update.check'), title: t('update.check') }, svg(icons.refresh));
   btn.addEventListener('click', async () => {
     btn.disabled = true;
     btn.classList.add('is-spinning');
-    const { result, mine, site } = await checkNow();
+    // Одно нажатие — и версия, и копия на сервере, в одном окне (владелец 13.11.2026)
+    const [{ result, mine, site }] = await Promise.all([checkNow(), sync.now()]);
     btn.classList.remove('is-spinning');
     btn.disabled = false;
-    toast({ title: t(`update.${result}`, { mine, site: site || '…' }), ms: result === 'latest' ? 4000 : 8000 });
+    toast({ title: t(`update.${result}`, { mine, site: site || '…' }), text: syncText(), ms: result === 'latest' ? 5000 : 9000 });
   });
   return btn;
 }
@@ -87,9 +89,9 @@ function notificationsBlock(ctx) {
   return body;
 }
 
-/* Копия на сервере (sync/) — постоянный нижний ряд карточки аккаунта: когда последний раз сохранено, сколько ждёт
-   отправки; «Сверить» — обменяться с сервером сейчас. */
-function syncFooter() {
+/* Копия на сервере (sync/) одной строкой — для окна по значку обновления: когда последний раз сохранено, сколько
+   ждёт отправки, или что сеть пропала. */
+function syncText() {
   const st = sync.status();
   let text;
   if (st.status === 'offline') text = t('sync.offline');
@@ -97,22 +99,11 @@ function syncFooter() {
   else {
     const d = new Date(st.savedAt);
     const sameDay = d.toDateString() === new Date().toDateString();
-    const when = sameDay ? d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : d.toLocaleDateString();
+    const when = sameDay ? d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : d.toLocaleString([], { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
     text = t('sync.saved', { when });
   }
   if (st.pending) text += ` · ${t('sync.pending', { n: st.pending })}`;
-  const btn = h('button', { type: 'button', class: 'account__foot-btn' }, t('sync.check'));
-  btn.addEventListener('click', async () => {
-    btn.disabled = true;
-    await sync.now();
-    toast({ title: t('sync.done') });
-    btn.disabled = false;
-  });
-  return h('div', { class: `account__foot${st.status === 'offline' ? ' account__foot--offline' : ''}` },
-    h('span', { class: 'account__foot-icon' }, svg(icons.cloud)),
-    h('span', { class: 'account__foot-text' }, text),
-    btn,
-  );
+  return text;
 }
 
 export function render(view, ctx) {
@@ -139,7 +130,7 @@ export function render(view, ctx) {
   add(view,
     h('h1', { class: 'screen-title' }, t('settings.title')),
 
-    accountCard({ onLogout: ctx.logout, update: updateButton(), footer: syncFooter() }),
+    accountCard({ onLogout: ctx.logout, update: updateButton() }),
     installCard(),
 
     h('a', { class: 'card settings__link', href: '#/love' },
