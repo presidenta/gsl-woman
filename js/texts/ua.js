@@ -9,6 +9,8 @@ export default {
   nav: { today: 'Сьогодні', week: 'Тиждень', goals: 'Цілі', journal: 'Записи', path: 'Шлях' },
 
   common: {
+    showPassword: 'Показати пароль',
+    hidePassword: 'Сховати пароль',
     save: 'Зберегти',
     cancel: 'Скасувати',
     delete: 'Видалити',

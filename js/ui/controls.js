@@ -1,4 +1,6 @@
-import { h } from '../core/dom.js';
+import { h, svg } from '../core/dom.js';
+import { t } from '../core/i18n.js';
+import { icons } from './icons.js';
 
 /* РЕГУЛИРОВКИ — готовые элементы с доступностью (роли, aria-checked, управление стрелками).
    Вид — в styles/components/controls.css. Экран передаёт значение и обработчик, элемент сам ведёт
@@ -84,10 +86,26 @@ export function field({ label, hint, multiline = false, ...attrs }) {
   });
   const node = h('div', { class: 'field' },
     h('label', { class: 'field__label', for: id }, label),
-    control,
+    attrs.type === 'password' ? passwordEye(control) : control,
     hint ? h('p', { class: 'field__hint' }, hint) : null,
   );
   return { node, control };
+}
+
+/* Глаз у любого поля пароля (владелец 13.11.2026: «не видно, какой пароль вводишь — везде глазик»): нажала —
+   пароль виден, ещё раз — снова точки. Курсор и набранное остаются на месте. */
+function passwordEye(control) {
+  const eye = h('button', { type: 'button', class: 'password__eye', 'aria-label': t('common.showPassword'), 'aria-pressed': 'false' },
+    svg(icons.eye));
+  eye.addEventListener('click', () => {
+    const show = control.type === 'password';
+    control.type = show ? 'text' : 'password';
+    eye.setAttribute('aria-pressed', String(show));
+    eye.setAttribute('aria-label', t(show ? 'common.hidePassword' : 'common.showPassword'));
+    eye.replaceChildren(svg(show ? icons.eyeOff : icons.eye));
+    control.focus();
+  });
+  return h('div', { class: 'password' }, control, eye);
 }
 
 /** Список вариантов-карточек с одним выбором: [{ value, label }]. */

@@ -9,6 +9,8 @@ export default {
   nav: { today: 'Today', week: 'Week', goals: 'Goals', journal: 'Journal', path: 'Path' },
 
   common: {
+    showPassword: 'Show password',
+    hidePassword: 'Hide password',
     save: 'Save',
     cancel: 'Cancel',
     delete: 'Delete',

@@ -11,6 +11,8 @@ export default {
   nav: { today: 'Сегодня', week: 'Неделя', goals: 'Цели', journal: 'Записи', path: 'Путь' },
 
   common: {
+    showPassword: 'Показать пароль',
+    hidePassword: 'Скрыть пароль',
     save: 'Сохранить',
     cancel: 'Отмена',
     delete: 'Удалить',
