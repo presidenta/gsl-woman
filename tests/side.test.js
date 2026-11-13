@@ -9,6 +9,11 @@ import { setLang, t } from '../js/core/i18n.js';
 import * as sync from '../js/sync/sync.js';
 import * as water from '../js/water/water.js';
 import * as settings from '../js/settings/settings.js';
+import * as waterLog from '../js/water/water-log.js';
+import * as morningLog from '../js/journal/morning-log.js';
+import { habits } from '../js/insights/habits.js';
+import { periodRange } from '../js/insights/insights.js';
+import { dateOfDay } from '../js/core/dates.js';
 
 beforeEach(() => {
   clearAll();
@@ -96,4 +101,51 @@ test('стакан тёплой воды: человек сам кладёт с�
   water.setItem('lemon', false);
   assert.deepEqual(water.chosen(), ['turmeric']);
   assert.deepEqual(water.chosen(['чужое', 'mint']), ['mint'], 'незнакомое отбрасывается');
+});
+
+test('золотая смесь кладётся разом: мёд, куркума и перец; гвоздика — восьмая составляющая', () => {
+  water.setItem('lemon', true);
+  water.setItems(water.GOLDEN, true);
+  assert.deepEqual(water.chosen(), ['lemon', 'honey', 'turmeric', 'pepper']);
+  water.setItem('clove', true);
+  assert.deepEqual(water.chosen(), ['lemon', 'honey', 'turmeric', 'pepper', 'clove']);
+  water.setItems(['pepper', 'чужое'], false);
+  assert.deepEqual(water.chosen(), ['lemon', 'honey', 'turmeric', 'clove']);
+});
+
+test('итоги утра: стакан выпит — отметка человека, минута — своя; серия подряд идёт со вчера, пока сегодня впереди', () => {
+  const start = '2026-11-01';
+  for (const d of [1, 2, 4, 5, 6]) waterLog.setDone(dateOfDay(start, d), true);
+  for (const d of [2, 3]) morningLog.markDone(dateOfDay(start, d));
+  assert.equal(waterLog.isDone(dateOfDay(start, 4)), true);
+  waterLog.setDone(dateOfDay(start, 4), false);
+  assert.equal(waterLog.isDone(dateOfDay(start, 4)), false, 'отметку можно снять');
+  waterLog.setDone(dateOfDay(start, 4), true);
+
+  const s = habits({ from: 1, to: 7 }, 7, start);
+  assert.equal(s.total, 7, 'неделя — до сегодняшнего дня включительно');
+  assert.equal(s.water, 5);
+  assert.equal(s.minute, 2);
+  assert.equal(s.streak.water, 3, 'сегодня (7) ещё впереди — серия 4, 5, 6');
+  assert.equal(s.streak.minute, 0);
+  assert.equal(s.days[6].today, true);
+  const early = habits({ from: 1, to: 7 }, 3, start);
+  assert.equal(early.total, 3, 'будущие дни в счёт не входят');
+  assert.equal(early.days.length, 7, 'но неделя видна целиком');
+  assert.equal(early.days[5].future, true);
+  assert.equal(early.days[5].water, false, 'день впереди — пустой, даже если отметка есть');
+  assert.equal(habits({ from: 1, to: 84 }, 10, start).days.length, 10, 'длинный срок — до сегодня');
+  assert.equal(habits({ from: 1, to: 7 }, 0, start).total, 0, 'до старта — пусто');
+});
+
+test('сроки итогов: месяц, 2 и 3 месяца — по месяцам программы, считая текущий', () => {
+  assert.deepEqual(periodRange('week', 10), { from: 8, to: 14 });
+  assert.deepEqual(periodRange('month', 60), { from: 57, to: 84 });
+  assert.deepEqual(periodRange('two', 60), { from: 29, to: 84 });
+  assert.deepEqual(periodRange('three', 60), { from: 1, to: 84 });
+  assert.deepEqual(periodRange('three', 10), { from: 1, to: 28 }, 'в начале — с первого дня');
+});
+
+test('выпитый стакан синхронизируется: вид записи water', () => {
+  assert.ok(sync.COLLECTIONS.some((c) => c.key === 'waterlog' && c.kind === 'water' && c.type === 'map'));
 });

@@ -13,6 +13,8 @@ export const icons = {
   back: wrap('<path d="M15 5l-7 7 7 7"/>'),
   // Стакан тёплой воды (утренняя минута): стакан, вода и пар над ним
   cup: wrap('<path d="M6 8h12l-1.3 11.2a1.6 1.6 0 0 1-1.6 1.4H8.9a1.6 1.6 0 0 1-1.6-1.4z"/><path d="M6.8 12.5h10.4"/><path d="M10 2.8c-.8 1 .8 1.6 0 2.7M14 2.8c-.8 1 .8 1.6 0 2.7"/>'),
+  // Градусник — температура воды в стакане (37–40 °C)
+  thermo: wrap('<path d="M10 14.6V5.2a2 2 0 0 1 4 0v9.4a4 4 0 1 1-4 0z"/><path d="M12 9.5v7"/><circle cx="12" cy="17.6" r="1.4" fill="currentColor" stroke="none"/>'),
   chevronLeft: wrap('<path d="M14.5 6l-6 6 6 6"/>'),
   chevronRight: wrap('<path d="M9.5 6l6 6-6 6"/>'),
   close: wrap('<path d="M6 6l12 12M18 6L6 18"/>'),

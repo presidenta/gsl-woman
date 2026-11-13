@@ -47,12 +47,22 @@ test('мужская часть — по-мужски: реакция женщи
   assert.equal(t('app.name'), 'GSL Woman+');
 });
 
-test('у обеих частей — стакан тёплой воды: семь составляющих на выбор и бережная подсказка', () => {
+test('у обеих частей — стакан тёплой воды: восемь составляющих, у каждой доза, польза по пунктам и «бережно»', () => {
   for (const [name, d] of Object.entries(SETS)) {
-    assert.deepEqual(Object.keys(d.morning.water.items), ['lemon', 'ginger', 'honey', 'turmeric', 'pepper', 'cinnamon', 'mint'], name);
-    for (const it of Object.values(d.morning.water.items)) assert.ok(it.name && it.amount && it.benefit, name);
-    assert.ok(d.morning.water.title && d.morning.water.lead && d.morning.water.care, name);
+    const w = d.morning.water;
+    assert.deepEqual(Object.keys(w.items), ['lemon', 'ginger', 'mint', 'cinnamon', 'honey', 'turmeric', 'pepper', 'clove'], name);
+    for (const it of Object.values(w.items)) {
+      assert.ok(it.name && it.amount && it.benefit && it.care, name);
+      assert.ok(Array.isArray(it.points) && it.points.length >= 3, `${name}: польза — пунктами`);
+    }
+    assert.ok(w.title && w.short && w.lead && w.care && w.info && w.golden.title && w.drink, name);
+    assert.equal(w.temp, '37–40 °C', `${name}: идеальная температура под стаканом`);
   }
+});
+
+test('мужчинам про мяту — отдельная оговорка про тестостерон (владелец 13.11.2026)', () => {
+  for (const d of [manRu, manUa, manEn]) assert.match(d.morning.water.items.mint.care, /тестостерон|testosterone/i);
+  for (const d of [ru, ua, en]) assert.doesNotMatch(d.morning.water.items.mint.care, /тестостерон|testosterone/i);
 });
 
 test('нигде в надписях нет имени ведущего: созвоны — с наставником', () => {

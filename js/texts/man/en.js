@@ -10,7 +10,7 @@ export default {
   },
 
   nav: { today: 'Today', week: 'Week', goals: 'Goals', journal: 'Journal', path: 'Path' },
-
+  fold: { open: 'Open', close: 'Close' },
   common: {
     showPassword: 'Show password',
     hidePassword: 'Hide password',
@@ -70,6 +70,7 @@ export default {
 
   morning: {
     title: 'Morning minute',
+    short: 'Rises onto your toes — 1, 2 or 3 minutes, 10–15 minutes after the water',
     lead: 'One minute — and energy for the whole day.',
     start: 'Start the minute',
     running: 'Once a second — breathe out',
@@ -94,22 +95,103 @@ export default {
     },
     water: {
       title: 'A glass of warm water',
+      short: 'Right after waking — a glass of warm water in small sips',
       lead: 'Right after waking — a glass of warm water in small sips, as warm as fresh milk: the body loses water overnight, and this wakes it up gently. In 10–15 minutes — the morning minute.',
       pick: 'With what today? Tap to add it to the glass',
       plain: 'Simply warm water is already a beautiful start to the day.',
       mine: 'Your glass',
       glass: 'A glass of warm water: {list}',
+      temp: '37–40 °C',
+      tempHint: 'body-warm',
       plainShort: 'warm water',
       withList: 'warm water: {list}',
-      care: 'Honey goes into warm water: hot water takes away its benefit. Lemon water is kinder to your teeth through a straw. If you have stomach troubles or take medication, check with your doctor first.',
+      drink: 'I drank my glass',
+      drunk: 'Done today',
+      info: 'Ingredients and benefits',
+      infoHint: 'the dose and what each one does',
+      dose: 'Dose',
+      careLabel: 'Gently',
+      inGlass: 'in the glass',
+      golden: { title: 'Golden mix', text: 'Turmeric + a pinch of black pepper + a spoon of honey. Pepper boosts turmeric, honey softens the taste and supports immunity itself.', add: 'Put it in the glass', done: 'The golden mix is in the glass' },
+      care: 'This is gentle support for the body; treatment belongs with a doctor. With stomach conditions or medication, check with your doctor first.',
       items: {
-        lemon: { name: 'Lemon', amount: 'a slice', benefit: 'a fresh taste and vitamin C' },
-        ginger: { name: 'Ginger', amount: '2–3 thin slices', benefit: 'warms and energises' },
-        honey: { name: 'Honey', amount: 'a teaspoon', benefit: 'gentle sweetness and energy' },
-        turmeric: { name: 'Turmeric', amount: 'a pinch', benefit: 'a golden colour and warmth' },
-        pepper: { name: 'Black pepper', amount: 'a pinch', benefit: 'with it, turmeric is absorbed far better' },
-        cinnamon: { name: 'Cinnamon', amount: 'a stick or a pinch', benefit: 'a warm spicy taste' },
-        mint: { name: 'Mint', amount: '2–3 leaves', benefit: 'freshness and lightness' },
+        lemon: {
+          name: 'Lemon', amount: 'a slice or the juice of ¼ lemon', benefit: 'vitamin C: immunity, vessels, skin',
+          points: [
+            'Vitamin C strengthens immunity: the body handles colds more easily.',
+            'The body builds collagen from vitamin C: firm skin, strong vessels, joints, bones and gums.',
+            'Helps absorb iron from food — more energy and a clear head.',
+            'An antioxidant: protects cells and slows ageing.',
+          ],
+          care: 'Acid softens enamel: drink through a straw and rinse with plain water. Brush your teeth half an hour later.',
+        },
+        ginger: {
+          name: 'Ginger', amount: '2–3 thin slices of fresh root', benefit: 'digestion, warmth, immunity',
+          points: [
+            'Kick-starts digestion and eases nausea — one of its best-studied effects.',
+            'Gingerol is a natural anti-inflammatory: good for joints and muscles.',
+            'Warms you up, gets the blood moving and supports immunity in the cold season.',
+          ],
+          care: 'With gallstones or blood-thinning medication, ask your doctor first.',
+        },
+        mint: {
+          name: 'Mint', amount: '2–3 leaves', benefit: 'a light stomach, freshness, calm',
+          points: [
+            'Soothes the stomach: eases heaviness, cramps and bloating.',
+            'Freshens the breath and clears the head.',
+            'Gently releases tension — a calm start to the day.',
+          ],
+          care: 'For men, in moderation: in large amounts mint, especially spearmint, lowers testosterone. 2–3 leaves now and then are fine. With heartburn, go gently.',
+        },
+        cinnamon: {
+          name: 'Cinnamon', amount: 'a pinch or half a stick', benefit: 'steady blood sugar, warmth',
+          points: [
+            'Helps keep blood sugar steady: fewer sugar cravings and energy dips.',
+            'An antioxidant and a mild anti-inflammatory.',
+            'Warming and cosy — a good mood in the morning.',
+          ],
+          care: 'Ceylon cinnamon is best. Regular cassia is rich in coumarin — just a pinch, and only now and then.',
+        },
+        honey: {
+          name: 'Honey', amount: '1 teaspoon', benefit: 'energy, throat, protection',
+          points: [
+            'Quick, gentle morning energy — instead of sugar.',
+            'A natural antiseptic: soothes the throat and softens a cough.',
+            'Antioxidants and enzymes — living support for the body.',
+            'With turmeric and pepper — the “golden mix” for immunity.',
+          ],
+          care: 'Add it to warm water, around 40 °C: hot water destroys its enzymes. For children — from age one.',
+        },
+        turmeric: {
+          name: 'Turmeric', amount: '¼ teaspoon', benefit: 'curcumin: fights inflammation',
+          points: [
+            'Curcumin is a strong natural anti-inflammatory: joints, muscles, skin.',
+            'An antioxidant: protects cells, vessels and the brain.',
+            'Supports the liver and digestion.',
+            'Always together with a pinch of black pepper: that way curcumin is absorbed many times better.',
+          ],
+          care: 'With gallstones or blood-thinning medication, ask your doctor first.',
+        },
+        pepper: {
+          name: 'Black pepper', amount: 'a pinch — on the tip of a knife', benefit: 'boosts turmeric up to 20 times',
+          points: [
+            'Piperine in pepper boosts curcumin absorption up to 20 times: turmeric and pepper are a pair that works together.',
+            'Wakes up digestion and helps the body take more from food.',
+            'Good with honey too: turmeric + pepper + honey — the “golden mix”.',
+          ],
+          care: 'A pinch is enough. With gastritis or an ulcer, go gently — better ask your doctor.',
+        },
+        clove: {
+          name: 'Cloves', amount: '2–3 buds', benefit: 'eugenol: a natural antiseptic',
+          points: [
+            'Eugenol is a strong natural antiseptic and antioxidant.',
+            'Freshens the mouth and cares for the gums.',
+            'Helps digestion and eases bloating.',
+            'In folk tradition — a remedy for cleansing the body of parasites.',
+            'Drop the buds into the glass or simply chew them.',
+          ],
+          care: '2–3 buds are enough: the effect is strong. With blood-thinning medication, ask your doctor first.',
+        },
       },
     },
   },
@@ -238,13 +320,24 @@ export default {
     period: 'Results for a period',
     week: 'Week',
     month: 'Month',
+    two: '2 mo',
+    three: '3 mo',
     all: 'All time',
-    title: { week: 'Week results', month: 'Month results', all: 'All-time results' },
+    title: { week: 'Week results', month: 'Month results', two: 'Two months in review', three: 'Three months in review', all: 'All-time results' },
     days: 'days done',
     reactionsCount: 'her reactions',
     winsCount: 'wins recorded',
     showAll: 'Show all ({n})',
     empty: 'Your results will appear here as soon as you make your first entry.',
+    habits: {
+      title: 'Mornings',
+      water: 'A glass of warm water',
+      minute: 'The morning minute',
+      of: '{n} of {all}',
+      streak: 'in a row now: {n}',
+      legend: 'Each dot is a day: gold means done.',
+      hint: 'Mark the glass with “I drank my glass”; the minute marks itself when it reaches the end.',
+    },
   },
   settings: {
     title: 'Settings',
@@ -308,6 +401,7 @@ export default {
 
   love: {
     title: 'The five love languages',
+    doToday: 'Today, do this',
     who: { him: 'My woman’s language', me: 'My language' },
     whoTest: { him: 'Test: my woman’s language', me: 'Test: my language', named: 'Test: {name}’s language' },
     pickNone: 'Choose a language',

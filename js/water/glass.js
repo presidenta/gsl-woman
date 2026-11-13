@@ -3,7 +3,7 @@ import { waterColor } from './water.js';
 
 /* СТАКАН — большой, с тёплой водой (владелец 13.11.2026: «прям видно, что она тёпленькая, что она шевелится»).
    Слои снизу вверх: тёплое свечение → стекло изнутри → палочка корицы (за водой) → то, что под водой (имбирь,
-   перец, облако куркумы, завиток мёда) → вода (две волны навстречу, свет) → то, что на поверхности (лимон, мята) →
+   перец, гвоздика, облако куркумы, завиток мёда) → вода (две волны навстречу, свет) → то, что на поверхности (лимон, мята) →
    пар над краем → стекло снаружи (кромка, блики, толстое дно) → всплеск от упавшей составляющей.
 
    Экран «Сегодня» перерисовывается после любой правки, и стакан строится заново. Чтобы волны, пар и плавающие
@@ -27,10 +27,19 @@ const GLASS = 'M30 30 L45 236 Q46 246 56 246 L144 246 Q154 246 155 236 L170 30';
 const INNER = 'M33.2 32 L47.6 233 Q48.6 242.4 57 242.4 L143 242.4 Q151.4 242.4 152.4 233 L166.8 32 Z';
 
 /**
- * Стакан с составляющими items. fresh — только что упавшая (всплеск и появление), gone — только что убранная
- * (тает). Вернёт { node, svg, surface() } — surface() даёт точку поверхности воды на экране (куда летит составляющая).
+ * Точка поверхности воды стакана svg на экране — сюда падает составляющая.
+ */
+export function surfaceOf(svg) {
+  const r = svg.getBoundingClientRect();
+  return { x: r.left + r.width * 0.5, y: r.top + r.height * ((SURFACE + 44) / 300) };
+}
+
+/**
+ * Стакан с составляющими items. fresh — только что упавшие (всплеск и появление; одна или список — «золотая
+ * смесь» падает тремя), gone — только что убранная (тает). Вернёт { node, svg, surface() }.
  */
 export function glassNode(items, { fresh = null, gone = null, label = '' } = {}) {
+  const freshList = [].concat(fresh || []);
   const color = waterColor(items);
   const from = lastColor || color;
   lastColor = color;
@@ -41,7 +50,7 @@ export function glassNode(items, { fresh = null, gone = null, label = '' } = {})
     if (gone && !keys.includes(gone) && INSIDE[gone]?.layer === layer) keys.push(gone);
     return keys
       .filter((k) => INSIDE[k]?.layer === layer)
-      .map((k) => `<g class="wg-item${k === fresh ? ' is-new' : ''}${k === gone ? ' is-gone' : ''}" data-item="${k}">${INSIDE[k].svg}</g>`)
+      .map((k) => `<g class="wg-item${freshList.includes(k) ? ' is-new' : ''}${k === gone ? ' is-gone' : ''}" data-item="${k}">${INSIDE[k].svg}</g>`)
       .join('');
   };
 
@@ -83,7 +92,7 @@ export function glassNode(items, { fresh = null, gone = null, label = '' } = {})
       <path class="wg-wave wg-wave--line" d="${wave(SURFACE, 4.2).replace(/ V250 H0 Z$/, '')}" fill="none" stroke="#fff" stroke-opacity=".38" stroke-width="1.2"/>
     </g>
     <path class="wg-light" d="M60 90 L78 90 L66 240 L48 240 Z" fill="#fff" opacity=".07"/>
-    ${fresh ? `<ellipse class="wg-ripple" cx="100" cy="${SURFACE}" rx="10" ry="2.6" fill="none" stroke="#fff" stroke-width="1.4"/>` : ''}
+    ${freshList.length ? `<ellipse class="wg-ripple" cx="100" cy="${SURFACE}" rx="10" ry="2.6" fill="none" stroke="#fff" stroke-width="1.4"/>` : ''}
   </g>
 
   ${parts('surface')}
@@ -123,9 +132,6 @@ export function glassNode(items, { fresh = null, gone = null, label = '' } = {})
     node: holder,
     svg,
     /** Точка поверхности воды на экране — сюда падает составляющая. */
-    surface() {
-      const r = svg.getBoundingClientRect();
-      return { x: r.left + r.width * 0.5, y: r.top + r.height * ((SURFACE + 44) / 300) };
-    },
+    surface: () => surfaceOf(svg),
   };
 }

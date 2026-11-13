@@ -1,7 +1,7 @@
 import { read, write } from '../core/store.js';
 
 /* УТРЕННЯЯ МИНУТА: отметка «сделала сегодня» по дате. Отдельно от записей: это привычка каждого дня,
-   а не задание недели, и в процент недели она не входит. Хранятся последние 200 дат. */
+   а не задание недели, и в процент недели она не входит. Хранятся последние 400 дат. */
 
 const KEY = 'morning';
 
@@ -17,7 +17,7 @@ export function isDone(iso) {
 export function markDone(iso) {
   const next = { ...log(), [iso]: true };
   const keys = Object.keys(next).sort();
-  for (const k of keys.slice(0, Math.max(0, keys.length - 200))) delete next[k];
+  for (const k of keys.slice(0, Math.max(0, keys.length - 400))) delete next[k];
   write(KEY, next);
 }
 

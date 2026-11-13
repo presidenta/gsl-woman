@@ -4,6 +4,7 @@ import { icons } from '../../ui/icons.js';
 import { toast } from '../../ui/toast.js';
 import { KINDS, GROUPS, MAX_PEOPLE, choices, choose, setCount, setPerson, content, score } from '../../love/love.js';
 import { GROUP_TEXT, personLabel } from '../../love/cards.js';
+import { KIND_ICON } from '../../love/kind-icons.js';
 
 /* ЭКРАН «ПЯТЬ ЯЗЫКОВ ЛЮБВИ» (#/love). Отдельные разделы, по порядку (владелец 13.11.2026: «отдельно мужчина,
    потом дети, потом родители и другие родственники — три разных раздела, отделены»):
@@ -191,7 +192,9 @@ export function render(view, ctx) {
     h('section', { class: 'card' },
       h('h2', { class: 'caps settings__heading' }, t('love.kinds')),
       h('ol', { class: 'love-kinds' },
-        ...KINDS.map((k) => h('li', {}, h('strong', {}, c.kinds[k].name), h('span', { class: 'dim' }, c.kinds[k].about)))),
+        ...KINDS.map((k) => h('li', { class: 'love-kinds__item' },
+          svg(KIND_ICON[k], 'love-kinds__seal'),
+          h('span', { class: 'love-kinds__body' }, h('strong', {}, c.kinds[k].name), h('span', { class: 'dim' }, c.kinds[k].about))))),
     ),
   );
 }

@@ -6,10 +6,14 @@ import { t } from '../core/i18n.js';
 
    Выбор живёт в настройках (settings.water — список ключей): он синхронизируется между устройствами вместе с
    настройками (sync/) и наутро уже стоит в стакане — менять каждый день незачем. Тексты — morning.water.items.<ключ>
-   в js/texts обеих частей; рисунки — js/water/art.js. */
+   в js/texts обеих частей; рисунки — js/water/art.js. Выпил ли человек стакан сегодня — water-log.js. */
 
-/** Составляющие по порядку в столбике. Перец — сразу за куркумой: с ним она усваивается. */
-export const ITEMS = ['lemon', 'ginger', 'honey', 'turmeric', 'pepper', 'cinnamon', 'mint'];
+/** Составляющие по порядку: первые четыре стоят слева от стакана, остальные — справа. Справа — «золотая смесь»
+    подряд: мёд, куркума и перец (с перцем куркума усваивается в разы лучше), и гвоздика. */
+export const ITEMS = ['lemon', 'ginger', 'mint', 'cinnamon', 'honey', 'turmeric', 'pepper', 'clove'];
+
+/** «Золотая смесь» — собирается одной кнопкой в «Состав и польза». */
+export const GOLDEN = ['honey', 'turmeric', 'pepper'];
 
 /* Как составляющая окрашивает воду: [r, g, b, сила]. Перец и мята почти не красят — у них свой рисунок в стакане.
    Чистая тёплая вода — светлая и прозрачная: на тёмном фоне она светится, а не сереет. */
@@ -22,6 +26,7 @@ const TINTS = {
   pepper: [120, 96, 72, 0.06],
   cinnamon: [170, 96, 40, 0.45],
   mint: [150, 214, 150, 0.3],
+  clove: [130, 72, 40, 0.12],
 };
 
 /** Что сейчас в стакане — только знакомые ключи, в порядке столбика. */
@@ -35,6 +40,17 @@ export function setItem(item, on) {
   const now = new Set(chosen());
   if (on) now.add(item);
   else now.delete(item);
+  settings.update({ water: ITEMS.filter((k) => now.has(k)) });
+}
+
+/** Положить или убрать сразу несколько (золотая смесь). */
+export function setItems(list, on) {
+  const now = new Set(chosen());
+  for (const k of list) {
+    if (!ITEMS.includes(k)) continue;
+    if (on) now.add(k);
+    else now.delete(k);
+  }
   settings.update({ water: ITEMS.filter((k) => now.has(k)) });
 }
 

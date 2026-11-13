@@ -153,3 +153,126 @@
   font-size: var(--fs-lg);
   font-style: italic;
 }
+
+/* УТРО (habits-card.js): по строке на привычку — значок, процент, полоса, кружки дней, серия подряд */
+.habit + .habit {
+  margin-top: var(--sp-5);
+  padding-top: var(--sp-4);
+  border-top: 1px solid var(--c-line);
+}
+
+.habit__head {
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr) auto;
+  gap: var(--sp-3);
+  align-items: center;
+}
+
+.habit__icon {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: var(--g-gold-soft);
+  box-shadow: inset 0 0 0 1px var(--c-line-strong);
+  color: var(--c-gold);
+}
+
+.habit__icon svg {
+  display: block;
+  width: 18px;
+  height: 18px;
+}
+
+.habit__name {
+  color: var(--c-champagne);
+  font-family: var(--f-display);
+  font-size: var(--fs-lg);
+  font-weight: 600;
+  line-height: 1.15;
+}
+
+.habit__value {
+  display: grid;
+  justify-items: end;
+  gap: 1px;
+}
+
+.habit__value strong {
+  font-family: var(--f-display);
+  font-size: var(--fs-2xl);
+  font-weight: 600;
+  line-height: 1;
+  font-variant-numeric: var(--num-display);
+}
+
+.habit__value span {
+  color: var(--c-text-faint);
+  font-size: var(--fs-2xs);
+  white-space: nowrap;
+}
+
+.habit__bar {
+  margin-top: var(--sp-3);
+}
+
+.habit__dots {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 6px;
+  margin-top: var(--sp-3);
+}
+
+.habit__dot {
+  justify-self: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 1px var(--c-line-strong);
+}
+
+.habit__dots--many .habit__dot {
+  width: 12px;
+  height: 12px;
+}
+
+.habit__dot.is-done {
+  background: var(--g-gold-smooth);
+  box-shadow: 0 0 10px -2px rgba(var(--rgb-gold), 0.6);
+}
+
+.habit__dot.is-future {
+  opacity: 0.35;
+  box-shadow: inset 0 0 0 1px var(--c-line);
+}
+
+.habit__dot.is-today:not(.is-done) {
+  box-shadow: inset 0 0 0 1.5px var(--c-gold);
+}
+
+.habit__streak {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: var(--sp-3);
+  color: var(--c-gold);
+  font-size: var(--fs-xs);
+  font-weight: 700;
+}
+
+.habit__streak-icon svg {
+  display: block;
+  width: 14px;
+  height: 14px;
+}
+
+.habits__legend {
+  margin-top: var(--sp-3);
+  font-size: var(--fs-2xs);
+  line-height: var(--lh-text);
+}
+
+.habit + .habits__legend {
+  margin-top: var(--sp-4);
+}

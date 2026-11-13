@@ -2,6 +2,16 @@
    Цветные, без градиентов с id: один и тот же рисунок стоит в столбике, летит в стакан и плавает в нём, а
    одинаковые id на странице спутали бы заливки. Свои SVG-строки, текст пользователя сюда не попадает. */
 
+
+// Бутон гвоздики: шарик-головка, четыре чашелистика и сужающаяся ножка (рисунок стоит головкой вверх в 0,0)
+const cloveBud = `
+  <path d="M-1.9 2 L-0.8 22 Q0 24 0.8 22 L1.9 2 Z" fill="#6b3a22"/>
+  <path d="M-0.5 4 L-0.2 20" stroke="#94573a" stroke-width=".9" stroke-linecap="round"/>
+  <path d="M-5 1.5 Q0 5.2 5 1.5 L3.8 -2.4 Q0 -.4 -3.8 -2.4 Z" fill="#7d4528"/>
+  <path d="M-4 -2 L-6.4 -6.6 L-1.8 -3.6 Z M4 -2 L6.4 -6.6 L1.8 -3.6 Z" fill="#8a4d2c"/>
+  <circle cx="0" cy="-5.2" r="3.9" fill="#a5643c"/>
+  <path d="M-2.2 -6.6 a2.4 2.4 0 0 1 3 -.9" stroke="#d29a6c" stroke-width=".9" fill="none" stroke-linecap="round"/>`;
+
 const ICON = {
   lemon: `
     <circle cx="24" cy="24" r="19" fill="#f2c62e"/>
@@ -55,6 +65,10 @@ const ICON = {
     <path d="M25 40.5c5-8.5 9-15.5 13.5-24.5" stroke="#4a9a56" stroke-width="1.3" fill="none" stroke-linecap="round"/>
     <path d="M24.6 40.5v4" stroke="#3c8749" stroke-width="1.7" stroke-linecap="round"/>
     <path d="M14 20c1.5 1 3 2.6 4 4.4M33.5 22c-1.6 1-3 2.4-4 4" stroke="#b9e6b8" stroke-width="1.1" fill="none" stroke-linecap="round" opacity=".8"/>`,
+  // Два бутона крест-накрест
+  clove: `
+    <g transform="translate(19 16) rotate(-22) scale(1.05)">${cloveBud}</g>
+    <g transform="translate(30 19) rotate(24) scale(.95)">${cloveBud}</g>`,
 };
 
 /** Значок составляющей 48×48 (столбик и полёт в стакан). */
@@ -99,6 +113,15 @@ export const INSIDE = {
     svg: `<g class="wf wf--drift wf--late" fill="#3b2f28">
       <circle cx="78" cy="118" r="2.6"/><circle cx="126" cy="132" r="2.2"/><circle cx="96" cy="168" r="2.4"/>
       <circle cx="140" cy="182" r="2"/><circle cx="70" cy="200" r="2.2"/><circle cx="112" cy="226" r="2.6"/>
+    </g>`,
+  },
+  // Гвоздика: три бутона медленно плывут под самой поверхностью
+  clove: {
+    layer: 'under',
+    svg: `<g class="wf wf--drift">
+      <g transform="translate(60 102) rotate(32) scale(1.15)">${cloveBud}</g>
+      <g transform="translate(146 96) rotate(-38) scale(1.1)">${cloveBud}</g>
+      <g transform="translate(104 128) rotate(12) scale(1.05)">${cloveBud}</g>
     </g>`,
   },
   cinnamon: {

@@ -1,0 +1,154 @@
+/* СВОРАЧИВАЕМАЯ КАРТОЧКА (js/ui/fold.js): шапка-кнопка и раздел, который плавно раскрывается по высоте. */
+
+.fold__head {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: var(--sp-3);
+  align-items: center;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Маленький рисунок слева — только в свёрнутом виде */
+.fold__thumb {
+  display: grid;
+  place-items: center;
+  width: 64px;
+  height: 76px;
+  border-radius: var(--r-md);
+  background: radial-gradient(60% 70% at 50% 60%, rgba(var(--rgb-gold), 0.12), transparent 75%);
+}
+
+.fold__thumb:empty,
+.fold.is-open .fold__thumb {
+  display: none;
+}
+
+.fold__thumb > * {
+  width: 100%;
+  max-height: 100%;
+}
+
+.fold__text {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
+.fold__eyebrow {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  color: var(--c-gold);
+}
+
+.fold__icon svg {
+  display: block;
+  width: 18px;
+  height: 18px;
+}
+
+.fold__lead {
+  color: var(--c-text);
+  font-family: var(--f-display);
+  font-size: var(--fs-md);
+  line-height: 1.3;
+}
+
+.fold.is-open .fold__lead {
+  display: none;
+}
+
+.fold__side {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+}
+
+/* Стрелка: вниз — раскрыть, вверх — свернуть. В золотом кольце, чтобы её было видно сразу */
+.fold__arrow {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: var(--g-gold-soft);
+  box-shadow: inset 0 0 0 1px var(--c-line-strong);
+  color: var(--c-gold);
+}
+
+.fold__chevron svg {
+  display: block;
+  width: 16px;
+  height: 16px;
+  transform: rotate(90deg);
+  transition: transform var(--t-med) var(--ease);
+}
+
+.fold.is-open > .fold__head .fold__chevron svg {
+  transform: rotate(-90deg);
+}
+
+.fold__head:active .fold__arrow {
+  transform: scale(0.94);
+}
+
+/* Отметка «сделано» в шапке — золотой кружок с галочкой */
+.fold__done {
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--g-gold-smooth);
+  color: var(--c-on-gold);
+  box-shadow: 0 4px 12px -4px rgba(var(--rgb-glow), 0.8);
+}
+
+.fold__done svg {
+  display: block;
+  width: 15px;
+  height: 15px;
+  stroke-width: 2.4;
+}
+
+/* Раздел: высота 0 → по содержимому. Поля внутри — чтобы свечение кнопок и значков не обрезалось */
+.fold__body {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows var(--t-slow) var(--ease);
+}
+
+.fold.is-open .fold__body {
+  grid-template-rows: 1fr;
+}
+
+.fold__inner {
+  min-height: 0;
+  margin: 0 -8px;
+  padding: 0 8px;
+  overflow: hidden;
+  opacity: 0;
+  transition: opacity var(--t-med) var(--ease);
+}
+
+.fold.is-open .fold__inner {
+  padding-top: var(--sp-2);
+  padding-bottom: 8px;
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fold__body,
+  .fold__inner,
+  .fold__chevron svg {
+    transition: none;
+  }
+}

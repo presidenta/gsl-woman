@@ -14,6 +14,7 @@ import * as sound from '../../ui/tick.js';
 import { imsgCard } from '../../imsg/imsg-card.js';
 import { loveCard } from '../../love/cards.js';
 import { waterCard } from '../../water/water-card.js';
+import { foldCard } from '../../ui/fold.js';
 
 /* ЭКРАН «СЕГОДНЯ» — главный. Сверху вниз, в порядке дня:
    1. Шапка дня: «День N» (без «из скольких» и без номера недели — обучение постоянное, владелец 12.11.2026),
@@ -115,7 +116,6 @@ function catchUp(ctx, summary) {
 
 function morningCard(ctx, plan) {
   const m = morningFor(plan.day);
-  const done = morningLog.isDone(ctx.todayIso);
   const title = m.addon ? `${t('morning.heels.title')} ${t(`morning.addon.${m.addon}.title`)}` : t('morning.heels.title');
 
   const count = h('span', { class: 'minute__count' });
@@ -140,6 +140,8 @@ function morningCard(ctx, plan) {
     h('button', { type: 'button', class: 'minute__stop', onclick: stopMinute }, t('morning.stop')),
   );
 
+  const status = h('span', { class: 'minute__fold-status' });
+
   function paint() {
     const running = minuteTotal > 0;
     count.textContent = running ? String(minuteCount) : '1–3';
@@ -149,26 +151,36 @@ function morningCard(ctx, plan) {
     picks.hidden = running;
     runningRow.hidden = !running;
     figure.setRunning(running, (((Date.now() - minuteStart) / 1000) + LANDING) % 1);
+    // Шапка свёрнутой карточки: идёт — счёт, сделана — золотая галочка
+    if (running) status.replaceChildren(h('span', { class: 'minute__fold-count' }, `${minuteCount} / ${minuteTotal}`));
+    else status.replaceChildren(morningLog.isDone(ctx.todayIso) ? h('span', { class: 'fold__done', title: t('morning.done') }, svg(icons.check)) : '');
   }
 
   paintMinute = paint;
   paint();
 
-  return h('section', { class: 'card minute' },
-    h('div', { class: 'card__eyebrow' },
-      h('span', { class: 'card__icon' }, svg(icons.sun)),
-      h('span', { class: 'caps' }, t('morning.title')),
-      h('span', { class: 'spacer' }),
-      done ? h('span', { class: 'chip' }, svg(icons.check, 'chip__icon'), t('morning.done')) : null,
-    ),
-    // Текст — на всю ширину (владелец, сборка 19): таймер перенесён в панель с фигурой
-    h('h2', { class: 'card__title' }, title),
-    h('p', { class: 'card__text' }, t('morning.heels.text')),
-    m.addon ? h('p', { class: 'card__text' }, t(`morning.addon.${m.addon}.text`)) : null,
-    figure.node,
-    h('div', { class: 'bar minute__bar' }, fill),
-    h('div', { class: 'card__actions' }, picks, runningRow),
-  );
+  // Сворачивается стрелкой, как стакан (владелец 13.11.2026): свёрнута — маленькая фигура и одна строка
+  const figureSvg = figure.node.querySelector('svg');
+  const fold = foldCard({
+    id: 'minute',
+    cls: 'minute',
+    icon: icons.sun,
+    title: t('morning.title'),
+    lead: t('morning.short'),
+    status,
+    body: [
+      // Текст — на всю ширину (владелец, сборка 19): таймер перенесён в панель с фигурой
+      h('h2', { class: 'card__title' }, title),
+      h('p', { class: 'card__text' }, t('morning.heels.text')),
+      m.addon ? h('p', { class: 'card__text' }, t(`morning.addon.${m.addon}.text`)) : null,
+      figure.node,
+      h('div', { class: 'bar minute__bar' }, fill),
+      h('div', { class: 'card__actions' }, picks, runningRow),
+    ],
+    // Одна фигура на странице (у неё свои id градиентов): свёрнута — в шапке, раскрыта — на своём месте
+    onToggle: (open) => (open ? figure.node.prepend(figureSvg) : fold.thumb.append(figureSvg)),
+  });
+  return fold.node;
 }
 
 

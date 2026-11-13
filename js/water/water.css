@@ -1,22 +1,43 @@
 /* СТАКАН ТЁПЛОЙ ВОДЫ (water-card.js, glass.js). Цвета — только токены; вода, стекло и составляющие — свои цвета в
    рисунке (art.js), они одинаковы в обеих частях. Все движения в стакане — от общего такта --phase (glass.js), их
-   длины делят 12 секунд нацело: перерисовка экрана не сбивает ни волну, ни пар. «Меньше движения» — всё стоит. */
+   длины делят 12 секунд нацело: перерисовка экрана не сбивает ни волну, ни пар. «Меньше движения» — всё стоит.
+   Сворачивание карточки — ui/fold.js (styles/components/fold.css). */
 
 .water__lead {
   margin-top: var(--sp-2);
 }
 
+.water__pick {
+  margin-top: var(--sp-3);
+  color: var(--c-text-dim);
+  font-size: var(--fs-xs);
+  line-height: 1.35;
+  text-align: center;
+}
+
+/* — Стакан в центре, по четыре составляющие слева и справа — */
 .water__stage {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-  gap: var(--sp-3);
-  align-items: start;
-  margin-top: var(--sp-4);
+  grid-template-columns: 70px minmax(0, 1fr) 70px;
+  gap: var(--sp-2);
+  align-items: center;
+  max-width: 460px;
+  margin: var(--sp-3) auto 0;
+}
+
+.water__side {
+  display: grid;
+  gap: var(--sp-2);
 }
 
 .water__glass {
-  position: sticky;
-  top: calc(var(--header-h) + var(--sp-3));
+  display: grid;
+  place-items: center;
+  min-width: 0;
+}
+
+.water__glass .wg-holder {
+  max-width: 210px;
 }
 
 .wg-holder,
@@ -30,97 +51,93 @@
   overflow: visible;
 }
 
-/* — Столбик составляющих — */
-.water__pick {
-  margin-bottom: var(--sp-2);
-  color: var(--c-text-dim);
-  font-size: var(--fs-xs);
-  line-height: 1.35;
+/* Свёрнутая карточка: тот же стакан, маленький, в шапке */
+.fold__thumb .wg-holder,
+.fold__thumb .wg {
+  width: auto;
+  height: 76px;
 }
 
-.water__item {
+/* Составляющая — медальон с рисунком и подпись под ним */
+.water-chip {
   display: grid;
-  grid-template-columns: 38px minmax(0, 1fr) 22px;
-  gap: var(--sp-2);
-  align-items: center;
-  width: 100%;
-  min-height: 52px;
-  margin-top: 6px;
-  padding: 6px 8px 6px 6px;
-  border: 1px solid var(--c-line);
-  border-radius: var(--r-md);
-  background: var(--c-surface);
-  color: var(--c-text);
+  justify-items: center;
+  gap: 5px;
+  min-width: 0;
+  padding: 2px 0;
+  border: 0;
+  background: none;
+  color: var(--c-text-dim);
   font: inherit;
-  text-align: left;
   cursor: pointer;
-  transition: border-color var(--t-fast) var(--ease), background var(--t-fast) var(--ease), transform var(--t-fast) var(--ease);
   -webkit-tap-highlight-color: transparent;
 }
 
-.water__item:active {
-  transform: scale(0.97);
-}
-
-.water__item.is-on {
-  border-color: var(--c-line-strong);
-  background: var(--g-gold-soft);
-}
-
-.water__art {
+.water-chip__medal {
+  position: relative;
   display: grid;
   place-items: center;
-  width: 38px;
-  height: 38px;
+  width: 52px;
+  height: 52px;
   border-radius: 50%;
-  background: rgba(var(--rgb-ink), 0.35);
+  background: radial-gradient(circle at 34% 28%, rgba(var(--rgb-gold), 0.16), rgba(var(--rgb-ink), 0.55) 72%);
+  box-shadow: inset 0 0 0 1px var(--c-line), 0 6px 14px -6px rgba(var(--rgb-ink), 0.8);
+  transition: box-shadow var(--t-med) var(--ease), transform var(--t-fast) var(--ease);
 }
 
-.water__art .water-art,
-.water-fly .water-art {
+.water-chip:active .water-chip__medal {
+  transform: scale(0.9);
+}
+
+.water-chip.is-on .water-chip__medal {
+  box-shadow: inset 0 0 0 1.5px var(--c-gold), 0 0 18px -2px rgba(var(--rgb-gold), 0.45);
+}
+
+.water-chip__art .water-art {
   display: block;
-  width: 30px;
-  height: 30px;
+  width: 36px;
+  height: 36px;
 }
 
-.water__item-text {
-  display: grid;
-  min-width: 0;
-}
-
-.water__item-name {
-  font-size: var(--fs-sm);
-  font-weight: 700;
-  line-height: 1.2;
-}
-
-.water__item-amount {
-  color: var(--c-text-faint);
-  font-size: var(--fs-2xs);
-  line-height: 1.25;
-}
-
-.water__check {
+.water-chip__check {
+  position: absolute;
+  top: -3px;
+  right: -3px;
   display: grid;
   place-items: center;
-  width: 22px;
-  height: 22px;
-  border: 1.5px solid var(--c-line-strong);
+  width: 19px;
+  height: 19px;
   border-radius: 50%;
-  color: transparent;
-  transition: background var(--t-fast) var(--ease), color var(--t-fast) var(--ease), transform var(--t-med) var(--ease);
-}
-
-.water__check svg {
-  width: 13px;
-  height: 13px;
-}
-
-.water__item.is-on .water__check {
-  border-color: transparent;
   background: var(--g-gold-smooth);
   color: var(--c-on-gold);
-  transform: scale(1.08);
+  box-shadow: 0 0 0 2px rgb(var(--rgb-bg));
+  transform: scale(0);
+  transition: transform var(--t-med) cubic-bezier(0.3, 1.6, 0.5, 1);
+}
+
+.water-chip.is-on .water-chip__check {
+  transform: scale(1);
+}
+
+.water-chip__check svg {
+  display: block;
+  width: 12px;
+  height: 12px;
+  stroke-width: 2.6;
+}
+
+.water-chip__name {
+  max-width: 100%;
+  font-size: var(--fs-2xs);
+  font-weight: 600;
+  line-height: 1.15;
+  text-align: center;
+  overflow-wrap: anywhere;
+  transition: color var(--t-med) var(--ease);
+}
+
+.water-chip.is-on .water-chip__name {
+  color: var(--c-gold);
 }
 
 /* Летящая копия значка — поверх всего (water-card.js → fly) */
@@ -134,33 +151,304 @@
   filter: drop-shadow(0 6px 10px rgba(0, 0, 0, 0.45));
 }
 
-/* — Что в стакане сейчас — */
-.water__plain,
-.water__mine {
-  margin-top: var(--sp-4);
+.water-fly .water-art {
+  display: block;
+  width: 100%;
+  height: 100%;
 }
 
-.water__plain {
+/* Что в стакане сейчас — одной строкой под ним */
+.water__now {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 4px var(--sp-2);
+  margin-top: var(--sp-3);
   color: var(--c-text-dim);
   font-size: var(--fs-sm);
+  text-align: center;
 }
 
-.water__mine-title {
+.water__now-label {
   color: var(--c-gold);
 }
 
-.water__mine-list {
+.water__drink-icon svg {
+  display: block;
+  width: 18px;
+  height: 18px;
+}
+
+.water__drink.is-done {
+  border: 1px solid var(--c-line-strong);
+  background: var(--g-gold-soft);
+  color: var(--c-gold);
+}
+
+/* — «Состав и польза» — свёрнут, стрелка раскрывает — */
+.water-info {
+  margin-top: var(--sp-4);
+  border-top: 1px solid var(--c-line);
+}
+
+.water-info__summary {
   display: grid;
-  gap: 4px;
+  grid-template-columns: 32px minmax(0, 1fr) auto;
+  gap: var(--sp-3);
+  align-items: center;
+  padding-top: var(--sp-4);
+  list-style: none;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.water-info__summary::-webkit-details-marker {
+  display: none;
+}
+
+.water-info__mark {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--g-gold-soft);
+  box-shadow: inset 0 0 0 1px var(--c-line-strong);
+  color: var(--c-gold);
+}
+
+.water-info__mark svg {
+  display: block;
+  width: 17px;
+  height: 17px;
+}
+
+.water-info__heading {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.water-info__title {
+  color: var(--c-champagne);
+  font-family: var(--f-display);
+  font-size: var(--fs-lg);
+  font-weight: 600;
+  line-height: 1.15;
+}
+
+.water-info__hint {
+  color: var(--c-text-faint);
+  font-size: var(--fs-2xs);
+}
+
+.water-info[open] .fold__chevron svg {
+  transform: rotate(-90deg);
+}
+
+.water-info__body {
+  display: grid;
+  gap: var(--sp-3);
+  padding-top: var(--sp-4);
+  animation: water-open var(--t-slow) var(--ease);
+}
+
+@keyframes water-open {
+  from { opacity: 0; transform: translateY(-8px); }
+}
+
+/* Золотая смесь — карточка в карточке, три значка внахлёст */
+.water-gold {
+  display: grid;
+  gap: var(--sp-3);
+  padding: var(--sp-4);
+  border-radius: var(--r-lg);
+  background: var(--g-gold-soft);
+  box-shadow: inset 0 0 0 1px var(--c-line-strong), 0 10px 30px -18px rgba(var(--rgb-glow), 0.9);
+}
+
+.water-gold__icons {
+  display: flex;
+}
+
+.water-gold__art {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  margin-right: -10px;
+  border-radius: 50%;
+  background: rgba(var(--rgb-ink), 0.6);
+  box-shadow: 0 0 0 1.5px var(--c-gold);
+}
+
+.water-gold__art .water-art {
+  width: 28px;
+  height: 28px;
+}
+
+.water-gold__title {
+  background: var(--g-gold-text);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  font-family: var(--f-display);
+  font-size: var(--fs-xl);
+  font-weight: 600;
+  line-height: 1.1;
+}
+
+.water-gold__desc {
+  margin-top: 4px;
+  font-size: var(--fs-sm);
+  line-height: var(--lh-text);
+}
+
+.water-gold__done {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  color: var(--c-gold);
+  font-size: var(--fs-sm);
+  font-weight: 700;
+}
+
+.water-gold__done-icon svg {
+  display: block;
+  width: 18px;
+  height: 18px;
+}
+
+/* Составляющая в составе: значок, имя, доза; польза одной строкой золотом; пункты; «бережно» */
+.water-info__item {
+  padding: var(--sp-4);
+  border: 1px solid var(--c-line);
+  border-radius: var(--r-lg);
+  background: var(--c-surface);
+}
+
+.water-info__item.is-on {
+  border-color: var(--c-line-strong);
+  box-shadow: inset 3px 0 0 var(--c-gold);
+}
+
+.water-info__head {
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr);
+  gap: var(--sp-3);
+  align-items: center;
+}
+
+.water-info__art {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 34% 28%, rgba(var(--rgb-gold), 0.16), rgba(var(--rgb-ink), 0.55) 72%);
+  box-shadow: inset 0 0 0 1px var(--c-line);
+}
+
+.water-info__art .water-art {
+  width: 31px;
+  height: 31px;
+}
+
+.water-info__titles {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+
+.water-info__name {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 2px var(--sp-2);
+  color: var(--c-champagne);
+  font-family: var(--f-display);
+  font-size: var(--fs-lg);
+  font-weight: 600;
+  line-height: 1.15;
+}
+
+.water-info__in {
+  color: var(--c-gold);
+  font-family: var(--f-body);
+  font-size: var(--fs-2xs);
+  font-weight: 700;
+  letter-spacing: var(--tracking-caps);
+  text-transform: uppercase;
+}
+
+.water-info__dose {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px var(--sp-2);
+  font-size: var(--fs-xs);
+}
+
+.water-info__dose-label,
+.water-info__care-label {
+  display: inline-block;
+  padding: 1px 8px;
+  border-radius: var(--r-pill);
+  background: rgba(var(--rgb-gold), 0.14);
+  color: var(--c-gold);
+  font-size: var(--fs-2xs);
+  font-weight: 700;
+  letter-spacing: var(--tracking-caps);
+  text-transform: uppercase;
+}
+
+.water-info__benefit {
+  margin-top: var(--sp-3);
+  color: var(--c-gold);
+  font-size: var(--fs-sm);
+  font-weight: 700;
+}
+
+.water-info__points {
+  display: grid;
+  gap: 6px;
   margin: var(--sp-2) 0 0;
   padding: 0;
   list-style: none;
   font-size: var(--fs-sm);
-  line-height: 1.45;
+  line-height: var(--lh-text);
+}
+
+.water-info__points li {
+  position: relative;
+  padding-left: 16px;
+}
+
+.water-info__points li::before {
+  content: '';
+  position: absolute;
+  top: calc(0.75em - 3px);
+  left: 2px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--g-gold-smooth);
+}
+
+.water-info__care {
+  margin-top: var(--sp-3);
+  padding-top: var(--sp-3);
+  border-top: 1px dashed var(--c-line);
+  color: var(--c-text-dim);
+  font-size: var(--fs-xs);
+  line-height: var(--lh-text);
+}
+
+.water-info__care-label {
+  margin-right: var(--sp-2);
 }
 
 .water__care {
-  margin-top: var(--sp-3);
   font-size: var(--fs-xs);
   line-height: var(--lh-text);
 }
@@ -327,4 +615,55 @@
   .wg-steam__wisp {
     opacity: 0.25;
   }
+
+  .water-info__body {
+    animation: none;
+  }
+}
+
+/* Идеальная температура — золотая плашка с градусником под стаканом */
+.water__center {
+  display: grid;
+  justify-items: center;
+  gap: var(--sp-2);
+  min-width: 0;
+}
+
+.water__temp {
+  display: grid;
+  grid-template-columns: auto auto;
+  justify-content: center;
+  align-items: center;
+  gap: 0 5px;
+  padding: 5px 12px;
+  border-radius: var(--r-md);
+  background: var(--g-gold-soft);
+  box-shadow: inset 0 0 0 1px var(--c-line-strong);
+  text-align: center;
+}
+
+.water__temp-hint {
+  grid-column: 1 / -1;
+}
+
+.water__temp-icon {
+  color: var(--c-gold);
+}
+
+.water__temp-icon svg {
+  display: block;
+  width: 16px;
+  height: 16px;
+}
+
+.water__temp-value {
+  color: var(--c-champagne);
+  font-size: var(--fs-sm);
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+.water__temp-hint {
+  color: var(--c-text-faint);
+  font-size: var(--fs-2xs);
 }

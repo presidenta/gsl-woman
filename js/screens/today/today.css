@@ -369,3 +369,21 @@
   color: var(--c-text);
 }
 
+
+/* Утренняя минута свёрнута (ui/fold.js): фигура — маленькая в шапке, справа — счёт, пока минута идёт */
+.fold__thumb .heels__svg {
+  width: auto;
+  height: 76px;
+  opacity: 1;
+}
+
+.minute__fold-status {
+  display: contents;
+}
+
+.minute__fold-count {
+  color: var(--c-gold);
+  font-size: var(--fs-sm);
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+}

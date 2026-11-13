@@ -9,6 +9,8 @@ import { photoStrip } from '../../media/photo-field.js';
 import { segmented } from '../../ui/controls.js';
 import { periodRange, summarize } from '../../insights/insights.js';
 import { summaryCard } from '../../insights/summary-card.js';
+import { habits } from '../../insights/habits.js';
+import { habitsCard } from '../../insights/habits-card.js';
 
 /* ЭКРАН «ЗАПИСИ»: история женщины по неделям, свежее сверху. Нажатие открывает запись для правки.
    Пустые поля не показываются — запись «просто отметила» выглядит коротко. */
@@ -47,7 +49,7 @@ function entryCard(ctx, e) {
   );
 }
 
-const PERIODS = ['week', 'month', 'all'];
+const PERIODS = ['week', 'month', 'two', 'three', 'all'];
 let period = 'week';
 
 export function render(view, ctx) {
@@ -56,16 +58,17 @@ export function render(view, ctx) {
     h('p', { class: 'screen-lead' }, svg(icons.lock, 'journal__lock'), t('journal.lead')),
   );
 
-  if (!ctx.entries.length) {
+  // Срок: неделя, месяц, 2 или 3 месяца, всё время — итоги сверху, записи этого срока ниже (владелец 12.11.2026,
+  // сроки 2 и 3 месяца — 13.11.2026). «Утро» (стакан воды и минута) — первым: оно есть и без записей
+  const range = periodRange(period, ctx.day);
+  const morning = habitsCard(habits(range, ctx.day, ctx.settings.startDate));
+  if (!ctx.entries.length && !morning) {
     add(view, h('div', { class: 'card empty' },
       h('div', { class: 'empty__title' }, t('journal.emptyTitle')),
       h('p', {}, t('journal.emptyText')),
     ));
     return;
   }
-
-  // Срок: неделя, месяц или всё время — итоги сверху, записи этого срока ниже (владелец 12.11.2026)
-  const range = periodRange(period, ctx.day);
   add(view,
     h('div', { class: 'journal__period' }, segmented({
       label: t('insights.period'),
@@ -73,7 +76,13 @@ export function render(view, ctx) {
       value: period,
       onChange: (p) => { period = p; ctx.rerender(); },
     })),
-    summaryCard(summarize(ctx.entries, range, ctx.lang), { title: t(`insights.title.${period}`), limit: period === 'all' ? 5 : 0 }),
+    morning,
+    ctx.entries.length
+      ? summaryCard(summarize(ctx.entries, range, ctx.lang), { title: t(`insights.title.${period}`), limit: period === 'all' || period === 'three' ? 5 : 0 })
+      : h('div', { class: 'card empty' },
+        h('div', { class: 'empty__title' }, t('journal.emptyTitle')),
+        h('p', {}, t('journal.emptyText')),
+      ),
   );
 
   const sorted = ctx.entries
