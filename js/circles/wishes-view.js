@@ -70,7 +70,7 @@ function details(id, title, count, extraClass, ...body) {
 function section(circle, week, name, all) {
   const partner = circles.partnerOf(circle);
   const ids = [circle.me, partner?.id].filter(Boolean);
-  const list = wishes.list(circle.id, 'want', name);
+  const list = wishes.sectionList(circle.id, name);
   const count = list.filter((w) => (all[w.key] || {})[circle.me]).length;
   return details(`want.${name}`, t(`us.wishes.sections.${name}`), count, '',
     h('ul', { class: 'wish-list' }, ...list.map((w) => {
@@ -82,7 +82,7 @@ function section(circle, week, name, all) {
         match: wishes.matchOf(by, ids),
       });
     })),
-    addForm(circle, 'want', name, t('us.wishes.addPh')),
+    name === 'care' ? addForm(circle, 'give', 'care', t('us.wishes.givePh')) : addForm(circle, 'want', name, t('us.wishes.addPh')),
   );
 }
 
@@ -91,7 +91,7 @@ function closeBlock(circle, week, all) {
   const partner = circles.partnerOf(circle);
   const pid = partner?.id;
   const receive = wishes.list(circle.id, 'want', 'close');
-  const give = [...wishes.list(circle.id, 'give', 'close'), ...wishes.list(circle.id, 'give', 'care')];
+  const give = wishes.list(circle.id, 'give', 'close');
   const mineCount = [...receive, ...give].filter((w) => (all[w.key] || {})[circle.me]).length;
 
   const receiveRows = receive.map((w) => {

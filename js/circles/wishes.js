@@ -18,8 +18,8 @@ const CATALOG = { ru, ua, en };
 export const MODES = ['want', 'give'];
 /** Обычные разделы — «Да / Возможно»; «Близость» (сборка 44) — отдельно, через я-сообщение: want.close — «буду
     благодарна за…», give.close (+ give.care) — «хочу сделать для тебя»; ключи одинаковые — совпадения крест-накрест. */
-export const WANT_SECTIONS = ['rest', 'nature', 'together', 'body', 'fun', 'home'];
-export const GIVE_SECTIONS = ['close', 'care'];
+export const WANT_SECTIONS = ['rest', 'nature', 'together', 'body', 'fun', 'home', 'care'];
+export const GIVE_SECTIONS = ['close'];
 
 /* Что подходит только одному полу: массаж лингама и простаты получает мужчина (делает — женщина), массаж йони —
    женщина (делает — мужчина). Ключ → кому показывать (часть приложения). */
@@ -50,6 +50,9 @@ export function list(circleId, mode, section) {
   return [...ready, ...own];
 }
 
+/** Желания обычного раздела: «Забота» (сборка 45) — бытовое служение из give.care, остальные — want.<раздел>. */
+export const sectionList = (circleId, section) => (section === 'care' ? list(circleId, 'give', 'care') : list(circleId, 'want', section));
+
 const markId = (week, member, key) => `${circles.compact(week)}.${circles.short(member)}.${key}`.slice(0, 64);
 
 /** Отметки недели: { [ключ желания]: { [участник]: отметка } }. */
@@ -57,7 +60,9 @@ export function marks(circleId, week) {
   const out = {};
   for (const m of circles.items(circleId, 'mark')) {
     if (m.data?.week !== week) continue;
-    const mark = m.data.mark === 'give' ? 'give' : normal(m.data.mark);
+    // Бытовая забота (give.care) с 45 — обычный раздел «Да / Возможно»: прежнее «хочу сделать» там = «да»
+    const care = String(m.data.wish).startsWith('give.care.');
+    const mark = m.data.mark === 'give' ? (care ? 'yes' : 'give') : normal(m.data.mark);
     if (mark) (out[m.data.wish] ||= {})[m.author] = mark;
   }
   return out;
@@ -104,7 +109,7 @@ export function matches(circle, week) {
   const all = marks(circle.id, week);
   const out = [];
   for (const section of WANT_SECTIONS) {
-    for (const w of list(circle.id, 'want', section)) {
+    for (const w of sectionList(circle.id, section)) {
       const m = matchOf(all[w.key], ids);
       if (m) out.push({ ...w, section, match: m });
     }

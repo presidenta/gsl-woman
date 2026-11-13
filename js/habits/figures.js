@@ -9,7 +9,7 @@ import { figureCopy, defsCopy, PARTS } from '../ui/heels.js';
 
    Шаги — фигура идёт по дороге: бедро качается от бедренного сустава (61, 99), голень сгибается в колене (61, 139),
    руки идут навстречу ногам, тело чуть пружинит; дорога под ногами бежит назад. Тело нарисовано тем же контуром,
-   ближняя нога у него обрезана выше бедра — её рисуют отдельные бедро и голень. */
+   ближняя нога у него обрезана выше бедра (сзади — ниже ягодицы: ягодица неподвижна, плавки и леггинсы без ступеньки) — её рисуют отдельные бедро и голень. */
 
 const NS = 'http://www.w3.org/2000/svg';
 
@@ -62,7 +62,7 @@ export function walkFigure() {
     ? `<path d="${p.hair}" fill="url(#${g.hair})"/>
        <ellipse cx="59.6" cy="21.6" rx="1.5" ry="2.4" fill="url(#${g.skin})" stroke="#5a3d22" stroke-opacity=".4" stroke-width=".4"/>
        <path d="M66.4 18.4 C67.3 17.9 68.3 18 69 18.6" fill="none" stroke="#3a2a18" stroke-opacity=".8" stroke-width=".6" stroke-linecap="round"/>
-       <path d="M46.6 90.6 L74 90.6" stroke="url(#walk-m-gold)" stroke-width="2"/>`
+       <path d="M46.8 87.9 C56 88.8 66 90.4 74.6 91.9" fill="none" stroke="url(#walk-m-gold)" stroke-width="2"/>`
     : `<path d="${p.hair}" fill="url(#${g.hair})"/>
        <ellipse cx="54.2" cy="11.4" rx="1.7" ry="2.2" fill="#f0b29a"/>
        <path d="M66.6 18.6 C67.4 18.2 68.2 18.3 68.8 18.8" fill="none" stroke="#5a2a26" stroke-opacity=".7" stroke-width=".55" stroke-linecap="round"/>`;
@@ -75,7 +75,7 @@ export function walkFigure() {
 <svg viewBox="18 0 98 200" class="walk" aria-hidden="true">
   ${defsCopy('walk')}
   <defs>
-    <clipPath id="walk-torso-clip"><rect x="0" y="0" width="140" height="104"/></clipPath>
+    <clipPath id="walk-torso-clip"><path d="M0 0 H140 V100 L63 100 L57 116 L0 116 Z"/></clipPath>
     <clipPath id="walk-thigh-clip"><rect x="0" y="90" width="140" height="50"/></clipPath>
     <clipPath id="walk-shin-clip"><rect x="0" y="137" width="140" height="60"/></clipPath>
     <linearGradient id="walk-road" x1="0" y1="0" x2="1" y2="0">

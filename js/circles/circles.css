@@ -676,3 +676,11 @@
   font-weight: 600;
   font-style: italic;
 }
+
+/* Строка «поле + кнопка» (вход по коду) */
+.us-join .steps__row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: var(--sp-2);
+  margin-top: var(--sp-2);
+}

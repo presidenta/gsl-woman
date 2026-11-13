@@ -166,11 +166,20 @@
   background: var(--c-line-strong);
 }
 
-.steps__row {
+.steps__own {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   gap: var(--sp-2);
+  align-items: end;
   margin-top: var(--sp-3);
+}
+
+.steps__own .btn {
+  grid-column: 1 / -1;
+}
+
+.steps__pick-about {
+  font-size: var(--fs-2xs);
 }
 
 .kegel .water__care {

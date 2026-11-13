@@ -82,7 +82,7 @@ const ICON = {
   // Семена чиа и льна (сборка 43): чиа — мелкие пёстрые, лён — блестящие коричневые
   chia: `
     <ellipse cx="24" cy="30" rx="15" ry="9" fill="#dfe4dc" opacity=".35"/>
-    <g fill="#4a4a4f"><ellipse cx="16" cy="28" rx="2.2" ry="1.6"/><ellipse cx="22" cy="33" rx="2.2" ry="1.6" transform="rotate(20 22 33)"/><ellipse cx="28" cy="27" rx="2.2" ry="1.6" transform="rotate(-25 28 27)"/><ellipse cx="33" cy="32" rx="2.2" ry="1.6"/><ellipse cx="20" cy="23" rx="2" ry="1.5" transform="rotate(40 20 23)"/><ellipse cx="30" cy="36" rx="2" ry="1.5"/></g>
+    <g fill="#4a4a4f"><ellipse cx="16" cy="28" rx="2.8" ry="2"/><ellipse cx="22" cy="33" rx="2.8" ry="2" transform="rotate(20 22 33)"/><ellipse cx="28" cy="27" rx="2.8" ry="2" transform="rotate(-25 28 27)"/><ellipse cx="33" cy="32" rx="2.8" ry="2"/><ellipse cx="20" cy="23" rx="2" ry="1.5" transform="rotate(40 20 23)"/><ellipse cx="30" cy="36" rx="2" ry="1.5"/></g>
     <g fill="#b9b7ae"><ellipse cx="25" cy="31" rx="2.1" ry="1.5" transform="rotate(-10 25 31)"/><ellipse cx="18" cy="34" rx="1.9" ry="1.4"/><ellipse cx="32" cy="24" rx="1.9" ry="1.4" transform="rotate(30 32 24)"/></g>
     <g fill="#fff" opacity=".6"><circle cx="15.4" cy="27.4" r=".5"/><circle cx="27.4" cy="26.4" r=".5"/><circle cx="32.4" cy="31.4" r=".5"/></g>`,
   flax: `
@@ -171,19 +171,32 @@ export const INSIDE = {
   // Чиа — облачко геля с семенами внизу, лён — семена медленно плывут
   chia: {
     layer: 'under',
-    svg: `<g class="wf wf--cloud">
-      <ellipse cx="100" cy="222" rx="46" ry="14" fill="#e8ece4" opacity=".22"/>
-      <g fill="#4a4a4f"><circle cx="78" cy="220" r="1.8"/><circle cx="92" cy="214" r="1.6"/><circle cx="106" cy="224" r="1.8"/><circle cx="120" cy="216" r="1.6"/><circle cx="86" cy="228" r="1.5"/><circle cx="130" cy="226" r="1.5"/><circle cx="100" cy="208" r="1.4"/></g>
-      <g fill="none" stroke="#fff" stroke-opacity=".35" stroke-width=".7"><circle cx="78" cy="220" r="3.4"/><circle cx="106" cy="224" r="3.4"/><circle cx="120" cy="216" r="3.2"/></g>
+    front: true,
+    svg: `<g class="wf wf--drift wf--late">
+      <ellipse cx="100" cy="226" rx="48" ry="11" fill="#eef4f2" opacity=".28"/>
+      <g fill="#2a2a30">
+        <ellipse cx="70" cy="132" rx="3.2" ry="2.3"/><ellipse cx="96" cy="118" rx="3.2" ry="2.3" transform="rotate(30 96 118)"/>
+        <ellipse cx="128" cy="140" rx="3.2" ry="2.3"/><ellipse cx="84" cy="168" rx="3.2" ry="2.3" transform="rotate(-20 84 168)"/>
+        <ellipse cx="118" cy="182" rx="3.2" ry="2.3"/><ellipse cx="66" cy="204" rx="3" ry="2.2"/>
+        <ellipse cx="104" cy="214" rx="3.2" ry="2.3" transform="rotate(40 104 214)"/><ellipse cx="138" cy="208" rx="3" ry="2.2"/>
+        <ellipse cx="88" cy="226" rx="3" ry="2.2"/><ellipse cx="122" cy="228" rx="3" ry="2.2"/>
+      </g>
+      <g fill="#b9b7ae"><ellipse cx="110" cy="152" rx="3" ry="2.2"/><ellipse cx="76" cy="186" rx="3" ry="2.2"/><ellipse cx="132" cy="170" rx="2.8" ry="2"/><ellipse cx="96" cy="196" rx="2.8" ry="2"/></g>
+      <g fill="#eef6f2" fill-opacity=".18" stroke="#fff" stroke-opacity=".55" stroke-width=".9">
+        <circle cx="70" cy="132" r="5.6"/><circle cx="128" cy="140" r="5.6"/><circle cx="118" cy="182" r="5.4"/><circle cx="104" cy="214" r="5.4"/><circle cx="110" cy="152" r="5.2"/><circle cx="84" cy="168" r="5.2"/><circle cx="96" cy="118" r="5.2"/>
+      </g>
     </g>`,
   },
   flax: {
     layer: 'under',
+    front: true,
     svg: `<g class="wf wf--drift">
-      <g transform="translate(74 168) rotate(30)"><ellipse rx="2.6" ry="4.8" fill="#8a5a2b"/></g>
-      <g transform="translate(116 178) rotate(-25)"><ellipse rx="2.6" ry="4.8" fill="#7a4c22"/></g>
-      <g transform="translate(134 154) rotate(70)"><ellipse rx="2.6" ry="4.8" fill="#94622f"/></g>
-      <g transform="translate(92 196) rotate(-60)"><ellipse rx="2.6" ry="4.8" fill="#835426"/></g>
+      <g transform="translate(78 150) rotate(30)"><ellipse rx="3.4" ry="6.2" fill="#8a5a2b"/><ellipse cx="-1" cy="-2" rx="1" ry="2.6" fill="#e0b273" opacity=".85"/></g>
+      <g transform="translate(120 162) rotate(-25)"><ellipse rx="3.4" ry="6.2" fill="#7a4c22"/><ellipse cx="-1" cy="-2" rx="1" ry="2.6" fill="#e0b273" opacity=".85"/></g>
+      <g transform="translate(136 196) rotate(70)"><ellipse rx="3.4" ry="6.2" fill="#94622f"/><ellipse cx="-1" cy="-2" rx="1" ry="2.6" fill="#e8bd7d" opacity=".85"/></g>
+      <g transform="translate(90 200) rotate(-60)"><ellipse rx="3.4" ry="6.2" fill="#835426"/><ellipse cx="-1" cy="-2" rx="1" ry="2.6" fill="#e0b273" opacity=".85"/></g>
+      <g transform="translate(64 182) rotate(10)"><ellipse rx="3.2" ry="5.8" fill="#8f5d2c"/><ellipse cx="-1" cy="-2" rx="1" ry="2.4" fill="#e0b273" opacity=".85"/></g>
+      <g transform="translate(110 226) rotate(85)"><ellipse rx="3.2" ry="5.8" fill="#7d4f24"/><ellipse cx="-1" cy="-2" rx="1" ry="2.4" fill="#e0b273" opacity=".85"/></g>
     </g>`,
   },
   // Вечерний стакан: ромашки и мелисса — на поверхности, липовый цвет и семена фенхеля — под водой

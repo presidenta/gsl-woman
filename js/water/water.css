@@ -15,19 +15,32 @@
   text-align: center;
 }
 
-/* — Стакан в центре, по четыре составляющие слева и справа — */
+/* — Большой стакан слева, составляющие буквой «Г»: столбиком справа и рядом снизу (сборка 45) — */
 .water__stage {
   display: grid;
-  grid-template-columns: 70px minmax(0, 1fr) 70px;
-  gap: var(--sp-2);
+  grid-template-columns: minmax(0, 1fr) 70px;
+  grid-template-areas:
+    "glass side"
+    "bottom bottom";
+  gap: var(--sp-3) var(--sp-2);
   align-items: center;
-  max-width: 460px;
+  max-width: 480px;
   margin: var(--sp-3) auto 0;
 }
 
 .water__side {
   display: grid;
   gap: var(--sp-2);
+}
+
+.water__side--right {
+  grid-area: side;
+}
+
+.water__side--bottom {
+  grid-area: bottom;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  align-items: start;
 }
 
 .water__glass {
@@ -37,7 +50,7 @@
 }
 
 .water__glass .wg-holder {
-  max-width: 210px;
+  max-width: 300px;
 }
 
 .wg-holder,
@@ -623,6 +636,7 @@
 
 /* Идеальная температура — золотая плашка с градусником под стаканом */
 .water__center {
+  grid-area: glass;
   display: grid;
   justify-items: center;
   gap: var(--sp-2);

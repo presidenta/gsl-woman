@@ -1,4 +1,4 @@
-import { h } from '../core/dom.js';
+import { h, svg } from '../core/dom.js';
 import { t } from '../core/i18n.js';
 import * as side from '../side/side.js';
 
@@ -19,6 +19,9 @@ import * as side from '../side/side.js';
    Движение видно и до старта, чтобы ритм был понятен заранее. С «меньше движения» — неподвижная фигура. */
 
 const SVG_NS = 'http://www.w3.org/2000/svg';
+
+// Стрелка вниз под словом «выдох»
+const ARROW_DOWN = '<svg viewBox="0 0 16 26" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2v20"/><path d="M2.5 16.5L8 22l5.5-5.5"/></svg>';
 
 /* Сборка 40 (владелец 13.11.2026): «фигуры более фигурные, красивые, чтобы хотелось быть этой фигуркой и сразу
    вставать». Женщина — спортивная и женственная: красивая грудь, тонкая талия, глубокий прогиб поясницы, круглые
@@ -147,8 +150,8 @@ const FIGURE = `
 const M_BODY = `M57 7.5 C63.5 6.4 69.4 9.6 70.2 15.4 C70.4 16.8 70.6 17.6 71.2 18.6 L73.8 22.8
   C74 23.4 73.2 23.8 72.2 24 C72.5 24.8 72.5 25.4 72.1 25.8 C71.8 26.1 71.4 26.3 71.8 26.8
   C72 27.5 71.8 28.2 71.2 28.6 C71.6 30.2 71.4 31.8 70.4 32.6 C69 33.6 67.4 33.8 66 33.4
-  C66.2 35.4 66.8 37.2 68 38.4 C71.4 39.4 74.8 40.8 77.4 43.2 C79.6 45.4 80.4 48.6 79.8 51.8
-  C79.6 54.6 78.8 56.6 77 57.4 C75.4 58 73.4 58.2 72.2 59.2 C72 63 72.2 67 72.4 71
+  C66.2 35.4 66.8 37.2 68 38.4 C71 39 74 40.2 75.6 42.4 C76.8 44 77.2 46.4 77.2 49
+  C77.2 51.6 76.9 53.6 76.2 55 L73 57.2 C72.6 57.8 72.3 58.4 72.2 59.2 C72 63 72.2 67 72.4 71
   C72.6 75 72.8 79 73 83 C73.2 86.6 73.6 90 74 93.6 C75.2 99 75.6 105 74.8 111
   C74 118 71.8 126 69.8 132.6 C69 135.6 68.6 138.6 68 141.6 C67 149 66.4 157 65.6 165
   C65 172 64.2 178 63.8 184 L58.2 184 C58.4 178 58 172 56.2 166 C53.4 160 50.4 154 50.6 147
@@ -163,10 +166,11 @@ const M_LEG = `M74 94 C75.2 99 75.6 105 74.8 111 C74 118 71.8 126 69.8 132.6 C69
   C50 108 49.6 100 50.4 94 Z`;
 
 // Мощная рука: большое круглое плечо, бицепс, трицепс, предплечье, кулак у бедра
-const M_ARM = `M56.4 40 C62.6 36.6 69.8 39.4 70.4 45.6 C70.6 48.8 69.6 51.2 69.2 53.4 C70.2 56.4 69.8 60.8 67.8 64.8
-  C68.4 70.6 70.2 76.6 70.8 82.6 C71.4 87 71.6 91.4 70.6 95.4 C69.8 98.4 67 98.6 66.4 96
-  C65.8 93 65 90 64.6 87.6 C62.6 81.4 60.4 75 59.4 69.2 C57.2 65 54.2 60.4 53.8 55
-  C53.4 50 53.6 45.6 54.4 43 C54.8 41.4 55.4 40.6 56.4 40 Z`;
+const M_ARM = `M56.2 40 C62.6 36.6 70.2 39 70.8 45.4 C71 48.4 70 51 69.4 52.8 C70.6 54.6 71 57.4 70.4 60.2
+  C69.8 62.8 68.4 64.6 67.6 66.2 C69.6 68.6 70.8 72 70.8 75.4 C70.8 80 69.6 84.6 69.8 88.6
+  C70.4 91.4 70.4 94.4 69.4 96.6 C68.4 98.8 65.8 98.8 65.2 96.6 C64.6 94.4 64.4 91.6 64.6 89
+  C63.4 84 60.8 78.4 59.2 73 C58.4 70.4 58 68.4 57.8 66.8 C55.4 64 53 59.6 52.8 54.6
+  C52.6 50 53.2 45.8 54.2 43 C54.8 41.4 55.4 40.6 56.2 40 Z`;
 
 const M_HAIR = `M68.6 11.6 C66 7.2 58.6 6 54.4 9.4 C51.6 12 51.4 18 52.6 23.4 C53.6 24.6 54.6 25.2 55.6 25
   C55.4 21.6 55.8 18 57.4 15.6 C60.4 13 64.8 12 68.6 11.6 Z`;
@@ -200,7 +204,7 @@ const FIGURE_MAN = `
     <radialGradient id="heels-m-shadow" cx=".5" cy=".5" r=".5">
       <stop offset="0" stop-color="#000" stop-opacity=".5"/><stop offset="1" stop-color="#000" stop-opacity="0"/>
     </radialGradient>
-    <clipPath id="heels-m-pants"><path d="M30 89.4 L104 89.4 L104 119 C90 120 80 121.4 30 123 Z"/></clipPath>
+    <clipPath id="heels-m-pants"><path d="M30 86.8 L50 87.4 C58 88.6 66 90.6 76 92.2 L104 92.6 L104 108.6 C92 108.8 80 109.6 72 111 C64 112.4 56 113.6 30 114.6 Z"/></clipPath>
   </defs>
   <line x1="34" y1="190.4" x2="100" y2="190.4" stroke="url(#heels-m-floor)" stroke-width="1"/>
   <ellipse class="heels__shade" cx="66" cy="190.6" rx="16" ry="2.3" fill="url(#heels-m-shadow)"/>
@@ -215,15 +219,15 @@ const FIGURE_MAN = `
   <g class="heels__body">
     <path d="${M_BODY}" fill="url(#heels-m-skin)"/>
     <path d="${M_BODY}" fill="url(#heels-m-shorts)" clip-path="url(#heels-m-pants)"/>
-    <path d="M46.6 90.6 L74 90.6" stroke="url(#heels-m-gold)" stroke-width="2"/>
+    <path d="M46.8 87.9 C56 88.8 66 90.4 74.6 91.9" fill="none" stroke="url(#heels-m-gold)" stroke-width="2"/>
     <path d="${M_HAIR}" fill="url(#heels-m-hair)"/>
     <ellipse cx="59.6" cy="21.6" rx="1.5" ry="2.4" fill="url(#heels-m-skin)" stroke="#5a3d22" stroke-opacity=".4" stroke-width=".4"/>
     <path d="M66.4 18.4 C67.3 17.9 68.3 18 69 18.6" fill="none" stroke="#3a2a18" stroke-opacity=".8" stroke-width=".6" stroke-linecap="round"/>
     <path d="M65.8 31.6 C67.4 32.6 69.4 32.6 70.6 31.6" fill="none" stroke="#5a3d22" stroke-opacity=".35" stroke-width=".5" stroke-linecap="round"/>
     <!-- Рельеф: грудь, пресс, широчайшие, ягодица, бедро, икра -->
     <g fill="none" stroke-linecap="round">
-      <path d="M75 43.4 C77.8 45.4 79 48.4 78.8 51.6" stroke="#fff3dc" stroke-opacity=".6" stroke-width=".9"/>
-      <path d="M72.2 58.8 C74.4 58.6 76.6 58 78.4 56.4" stroke="#5a3d22" stroke-opacity=".65" stroke-width=".9"/>
+      <path d="M73.8 43.6 C75.6 45.2 76.2 47.4 76.2 50" stroke="#fff3dc" stroke-opacity=".6" stroke-width=".9"/>
+      <path d="M72.4 58 L76 55.4" stroke="#5a3d22" stroke-opacity=".7" stroke-width="1"/>
       <path d="M70.4 60.4 C70 68 70.2 76 70.8 85" stroke="#6e4f30" stroke-opacity=".3" stroke-width=".55"/>
       <path d="M70.6 64.6 C71.2 65 71.8 65 72.4 64.6M70.8 70.6 C71.4 71 72 71 72.6 70.6M71 76.6 C71.6 77 72.2 77 72.8 76.6M71.2 82.4 C71.8 82.8 72.4 82.8 73 82.4" stroke="#6e4f30" stroke-opacity=".5" stroke-width=".55"/>
       <path d="M52.2 49 C53.6 55 55 61 55.4 67.6" stroke="#5a3d22" stroke-opacity=".45" stroke-width=".7"/>
@@ -238,12 +242,13 @@ const FIGURE_MAN = `
     </g>
     <path d="${M_ARM}" fill="url(#heels-m-skin)" stroke="#3a2a18" stroke-opacity=".25" stroke-width=".6"/>
     <g fill="none" stroke-linecap="round">
-      <path d="M54.2 51.6 C58.4 49.4 64 49 69.4 50.8" stroke="#6e4f30" stroke-opacity=".55" stroke-width=".7"/>
+      <path d="M53.4 51.4 C57.6 50.4 63.6 50.8 69.6 52.6" stroke="#6e4f30" stroke-opacity=".6" stroke-width=".7"/>
       <path d="M66.6 42 C68.4 45 68.6 48 67.8 50.6" stroke="#fff3dc" stroke-opacity=".55" stroke-width=".8"/>
-      <path d="M68.2 54.4 C68.8 57.6 68.2 61 66.8 63.8" stroke="#fff3dc" stroke-opacity=".5" stroke-width=".8"/>
-      <path d="M55.6 56 C56.8 60 58.4 63.6 60 66.6" stroke="#5a3d22" stroke-opacity=".45" stroke-width=".6"/>
-      <path d="M67.8 66.6 C66.4 66.2 65 66.4 63.8 67.2" stroke="#5a3d22" stroke-opacity=".4" stroke-width=".55"/>
-      <path d="M69.2 72 C69.8 76.6 70.2 80.6 70.4 85" stroke="#fff3dc" stroke-opacity=".4" stroke-width=".7"/>
+      <path d="M69 54.8 C69.8 57.6 69.4 60.4 68 62.8" stroke="#fff3dc" stroke-opacity=".6" stroke-width=".9"/>
+      <path d="M54.6 55 C55.4 59 56.8 62.8 58.4 65.8" stroke="#5a3d22" stroke-opacity=".55" stroke-width=".7"/>
+      <path d="M67.4 66.4 C65.6 66.4 63.4 66.8 61.6 67.6" stroke="#5a3d22" stroke-opacity=".5" stroke-width=".6"/>
+      <path d="M69.6 70.4 C70 74.4 69.8 79 69.2 84" stroke="#fff3dc" stroke-opacity=".45" stroke-width=".8"/>
+      <path d="M60.6 72 C61.8 77 63.4 82 64.6 87" stroke="#5a3d22" stroke-opacity=".4" stroke-width=".6"/>
     </g>
     <g class="heels__breath" fill="none" stroke="#f6ecd2" stroke-linecap="round">
       <path pathLength="1" d="M74.2 26.6 C78.2 25.4 81 28.4 84.6 27.6 C88.2 26.8 89.8 24.4 93.4 25.2"/>
@@ -261,14 +266,18 @@ export function heelsFigure({ aside = null } = {}) {
   const holder = document.createElement('div');
   // Своя фигура у каждой части: женщина — у GSL Woman+, мужчина — у GSL Man+ (side/side.js)
   holder.innerHTML = side.get() === 'man' ? FIGURE_MAN : FIGURE;
-  const svg = holder.firstElementChild;
-  svg.setAttribute('xmlns', SVG_NS);
+  const figure = holder.firstElementChild;
+  figure.setAttribute('xmlns', SVG_NS);
 
   const node = h('div', { class: 'heels', role: 'img', 'aria-label': t('morning.heels.rhythm') },
-    svg,
+    figure,
+    // Одно слово «выдох» и стрелка вниз — в миг, когда пятки опускаются (владелец 14.11.2026: «два слова смотрятся
+    // ужасно; оставить только „выдох“ и стрелочку вниз»)
     h('div', { class: 'heels__cues', 'aria-hidden': 'true' },
-      h('span', { class: 'heels__cue heels__cue--up' }, t('morning.heels.up')),
-      h('span', { class: 'heels__cue heels__cue--down' }, t('morning.heels.exhale')),
+      h('span', { class: 'heels__cue heels__cue--down' },
+        h('span', { class: 'heels__cue-word' }, t('morning.heels.exhale')),
+        svg(ARROW_DOWN, 'heels__cue-arrow'),
+      ),
     ),
     aside,
   );

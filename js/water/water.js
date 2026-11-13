@@ -26,7 +26,8 @@ export const GOLDEN = ['honey', 'turmeric', 'pepper'];
 
 /* Как составляющая окрашивает воду: [r, g, b, сила]. Перец и мята почти не красят — у них свой рисунок в стакане.
    Чистая тёплая вода — светлая и прозрачная: на тёмном фоне она светится, а не сереет. */
-const BASE = [255, 240, 210];
+// Чистая вода — прозрачная, чуть голубоватая (владелец 14.11.2026: «мутная, как молоко — сделать как вода»)
+const BASE = [150, 206, 250];
 const TINTS = {
   lemon: [255, 226, 104, 0.45],
   ginger: [240, 212, 150, 0.25],
@@ -86,8 +87,8 @@ export function waterColor(items) {
   }
   const rgb = [r, g, b].map((v) => Math.round(v / weight)).join(', ');
   // Чистая вода — почти прозрачная, тёплая к низу: на тёмном она светится, а не сереет
-  const top = Math.min(0.12 + strength * 0.11, 0.42);
-  const bottom = Math.min(0.28 + strength * 0.19, 0.8);
+  const top = Math.min(0.14 + strength * 0.12, 0.42);
+  const bottom = Math.min(0.26 + strength * 0.2, 0.8);
   return { top: `rgba(${rgb}, ${top.toFixed(2)})`, bottom: `rgba(${rgb}, ${bottom.toFixed(2)})` };
 }
 

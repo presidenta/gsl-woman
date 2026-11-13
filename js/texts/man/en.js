@@ -748,8 +748,6 @@ export default {
       short: '3000 — minimum, 6000 — 100%, 12,000 — maximum',
       text: 'Walk during the day: on foot for errands, by the stairs, an evening stroll. In the evening mark how many you did.',
       today: 'Today: {n} steps',
-      own: 'Your number',
-      ownPh: 'For example, 8400',
       save: 'Mark',
       levels: {
         min: '3000',
@@ -757,6 +755,14 @@ export default {
         max: '12,000+',
       },
       done: 'Steps marked',
+      stepsLabel: 'Steps',
+      stepsPh: '8400',
+      minutesLabel: 'Or minutes of walking',
+      minutesPh: '40',
+      rate: 'You can enter minutes of walking instead: at a brisk pace that is about 100 steps a minute.',
+      about: '≈ {n} min',
+      aboutH: '≈ {n} h',
+      fromMinutes: '{m} min of walking ≈ {n} steps',
     },
   },
   imsg: {

@@ -53,6 +53,7 @@ export function glassNode(items, { fresh = null, gone = null, label = '', kind =
     if (gone && !keys.includes(gone) && INSIDE[gone]?.layer === layer) keys.push(gone);
     return keys
       .filter((k) => INSIDE[k]?.layer === layer)
+      .sort((a, b) => (INSIDE[a].front ? 1 : 0) - (INSIDE[b].front ? 1 : 0))
       .map((k) => `<g class="wg-item${freshList.includes(k) ? ' is-new' : ''}${k === gone ? ' is-gone' : ''}" data-item="${k}">${INSIDE[k].svg}</g>`)
       .join('');
   };

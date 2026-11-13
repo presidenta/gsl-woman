@@ -11,7 +11,17 @@ import { LEVELS, STEP_LEVELS, MAX_STEPS, stepsOf, stepsLevel, setSteps } from '.
    и идёт счётчик»). Сворачивается (ui/fold.js). Шаги приложение само считать не умеет — человек отмечает их
    кнопкой уровня или своим числом. */
 
-const fmt = (n) => n.toLocaleString('ru-RU').replace(/ /g, ' ');
+const fmt = (n) => Number(n).toLocaleString('ru-RU').replace(/ /g, ' ');
+
+/* Шаги ↔ время: бодрым шагом около 100 шагов в минуту (Tudor-Locke и др., CADENCE-Adults): 3000 — ~30 минут,
+   6000 — ~1 час, 12 000 — ~2 часа. Кто шагомером не пользуется — вписывает минуты прогулки. */
+export const STEPS_PER_MINUTE = 100;
+export function approx(n) {
+  const min = Math.round(n / STEPS_PER_MINUTE);
+  if (min < 60) return t('day.steps.about', { n: min });
+  const hours = Math.round((min / 60) * 2) / 2;
+  return t('day.steps.aboutH', { n: String(hours).replace('.', ',') });
+}
 
 export function stepsCard(ctx) {
   const iso = ctx.todayIso;
@@ -22,7 +32,7 @@ export function stepsCard(ctx) {
     figure,
     h('div', { class: 'minute__dial steps__dial' + (level ? ' is-running' : '') },
       h('span', { class: 'minute__count steps__count' }, n ? fmt(n) : '0'),
-      h('span', { class: 'faint minute__unit' }, level ? t(`levels.${level}`) : t('day.steps.title').toLowerCase()),
+      h('span', { class: 'faint minute__unit' }, n ? `${level ? t(`levels.${level}`) : ''} ${approx(n)}`.trim() : t('day.steps.title').toLowerCase()),
     ),
   );
 
@@ -37,13 +47,24 @@ export function stepsCard(ctx) {
       onclick: () => mark(STEP_LEVELS[lv]),
     },
     h('span', { class: 'minute__pick-level' }, t(`levels.${lv}`)),
-    h('span', { class: 'minute__pick-time kegel__pick-time' }, t(`day.steps.levels.${lv}`)))),
+    h('span', { class: 'minute__pick-time kegel__pick-time' }, t(`day.steps.levels.${lv}`)),
+    h('span', { class: 'steps__pick-about faint' }, approx(STEP_LEVELS[lv])))),
   );
-  const own = h('input', {
-    class: 'input steps__own', type: 'number', inputmode: 'numeric', min: '0', max: String(MAX_STEPS), step: '100',
-    placeholder: t('day.steps.ownPh'), 'aria-label': t('day.steps.own'),
-  });
-  const save = h('button', { type: 'button', class: 'btn btn--ghost steps__save', onclick: () => { if (own.value) mark(own.value); } }, t('day.steps.save'));
+  // Своё число шагов — или минуты прогулки (пересчёт в шаги)
+  const stepsInput = h('input', { id: 'steps-own', class: 'input', type: 'number', inputmode: 'numeric', min: '0', max: String(MAX_STEPS), step: '100', placeholder: t('day.steps.stepsPh') });
+  const minutesInput = h('input', { id: 'steps-min', class: 'input', type: 'number', inputmode: 'numeric', min: '0', max: '600', step: '5', placeholder: t('day.steps.minutesPh') });
+  const save = h('button', {
+    type: 'button',
+    class: 'btn btn--ghost btn--block',
+    onclick: () => {
+      if (Number(stepsInput.value) > 0) { mark(stepsInput.value); return; }
+      const m = Number(minutesInput.value);
+      if (!(m > 0)) return;
+      const value = Math.round(m * STEPS_PER_MINUTE);
+      setSteps(iso, value);
+      toast({ title: t('day.steps.done'), text: t('day.steps.fromMinutes', { m, n: fmt(value) }) });
+    },
+  }, t('day.steps.save'));
 
   // Полоса до 12 000 с отметками уровней
   const percent = Math.min(100, (n / STEP_LEVELS.max) * 100);
@@ -64,7 +85,12 @@ export function stepsCard(ctx) {
       stage,
       bar,
       h('div', { class: 'card__actions' }, picks),
-      h('div', { class: 'steps__row' }, own, save),
+      h('div', { class: 'steps__own' },
+        h('div', { class: 'field' }, h('label', { class: 'field__label', for: 'steps-own' }, t('day.steps.stepsLabel')), stepsInput),
+        h('div', { class: 'field' }, h('label', { class: 'field__label', for: 'steps-min' }, t('day.steps.minutesLabel')), minutesInput),
+        save,
+      ),
+      h('p', { class: 'field__hint' }, t('day.steps.rate')),
     ],
     onToggle: (open) => (open ? stage.prepend(figure) : fold.thumb.append(figure)),
   });

@@ -88,11 +88,32 @@
 }
 
 .heels__cue--down {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  color: var(--c-gold);
+  animation: heels-cue-down 1s linear infinite;
+}
+
+.heels__cue-word {
   background: var(--g-gold-text);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
-  animation: heels-cue-down 1s linear infinite;
+}
+
+/* Стрелка вниз скользит вместе с опусканием на пятки */
+.heels__cue-arrow svg {
+  display: block;
+  width: 16px;
+  height: 26px;
+  animation: heels-arrow 1s ease-in infinite;
+}
+
+@keyframes heels-arrow {
+  0%, 60% { transform: translateY(-4px); }
+  88%, 100% { transform: translateY(6px); }
 }
 
 @keyframes heels-body {
@@ -145,7 +166,7 @@
 }
 
 /* Идёт счёт — цикл сдвинут (--heels-delay из setRunning): касание пятками = смена цифры и звук */
-.heels.is-running :is(.heels__body, .heels__foot, .heels__shade, .heels__ripple, .heels__breath path, .heels__breath circle, .heels__cue) {
+.heels.is-running :is(.heels__body, .heels__foot, .heels__shade, .heels__ripple, .heels__breath path, .heels__breath circle, .heels__cue, .heels__cue-arrow svg) {
   animation-delay: var(--heels-delay, 0s);
 }
 

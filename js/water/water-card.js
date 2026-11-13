@@ -12,7 +12,7 @@ import { glassNode, surfaceOf } from './glass.js';
 
    Владелец 13.11.2026, сборка 40:
    - карточка сворачивается стрелкой (ui/fold.js): свёрнута — маленький стакан и строка «сразу после пробуждения…»;
-   - составляющие стоят ВОКРУГ стакана: четыре слева, четыре справа — место экономится, стакан в центре;
+   - стакан большой слева, составляющие — буквой «Г»: столбиком справа и рядом снизу (сборка 45);
    - нажал — галочка, составляющая дугой летит в стакан, падает со всплеском и остаётся в нём; вода меняет цвет;
      нажал ещё раз — тает и уходит. Выбор запоминается (water.js → настройки) и наутро уже в стакане;
    - под стаканом — идеальная температура: 37–40 °C, тёплая, как тело;
@@ -237,11 +237,11 @@ export function waterCard(ctx, kind = 'morning') {
   const log = waterLog.logOf(kind);
   const done = log.isDone(ctx.todayIso);
   const on = (k) => items.includes(k) || s.flying.has(k);
-  const half = Math.ceil(all.length / 2);
+  // Буквой «Г» (владелец 14.11.2026: «стакан большой; кружочки — справа и снизу, обволакивают его»)
+  const RIGHT = 5;
 
   const glassSlot = h('div', { class: 'water__glass' });
   const stage = h('div', { class: 'water__stage' },
-    h('div', { class: 'water__side', role: 'group', 'aria-label': t(`${b}.pick`) }, ...all.slice(0, half).map((k) => chip(k, on(k), kind))),
     h('div', { class: 'water__center' },
       glassSlot,
       // Идеальная температура (владелец 13.11.2026): тёплая, как тело — 37–40 °C; в такой и мёд сохраняет пользу
@@ -251,7 +251,8 @@ export function waterCard(ctx, kind = 'morning') {
         h('span', { class: 'water__temp-hint' }, t(`${b}.tempHint`)),
       ),
     ),
-    h('div', { class: 'water__side', role: 'group', 'aria-label': t(`${b}.pick`) }, ...all.slice(half).map((k) => chip(k, on(k), kind))),
+    h('div', { class: 'water__side water__side--right', role: 'group', 'aria-label': t(`${b}.pick`) }, ...all.slice(0, RIGHT).map((k) => chip(k, on(k), kind))),
+    h('div', { class: 'water__side water__side--bottom', role: 'group', 'aria-label': t(`${b}.pick`) }, ...all.slice(RIGHT).map((k) => chip(k, on(k), kind))),
   );
 
   const drink = h('button', {
