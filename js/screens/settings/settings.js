@@ -24,10 +24,10 @@ function updateButton() {
   btn.addEventListener('click', async () => {
     btn.disabled = true;
     btn.classList.add('is-spinning');
-    const result = await checkNow();
+    const { result, mine, site } = await checkNow();
     btn.classList.remove('is-spinning');
     btn.disabled = false;
-    toast({ title: t(`update.${result}`), ms: result === 'updating' ? 8000 : 4000 });
+    toast({ title: t(`update.${result}`, { mine, site: site || '…' }), ms: result === 'latest' ? 4000 : 8000 });
   });
   return btn;
 }

@@ -371,8 +371,9 @@ export default {
   update: {
     ready: 'The app has been updated',
     check: 'Update',
-    updating: 'A new version is loading — the app will restart now.',
-    latest: 'You have the latest version.',
+    updating: 'Loading version {site} — the app will restart now.',
+    latest: 'You have the latest version — {mine}.',
+    newer: 'Version {site} is out, you have {mine}. The site is still rolling it out — tap “Update” in a couple of minutes.',
     offline: 'The site is out of reach right now — check the internet.',
   },
 

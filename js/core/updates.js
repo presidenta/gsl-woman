@@ -46,19 +46,28 @@ export function register({ onUpdated }) {
   });
 }
 
-/* «Обновить» в настройках (владелец 12.11.2026: «как знать, что обновилось? одно действие — чтобы подтягивало
-   новую версию»). Спрашиваем сайт о новом работнике: есть — он встаёт сам (skipWaiting), срабатывает
-   controllerchange выше, и страница перезагружается на новую версию. Нет — честно отвечаем «последняя».
-   Вернёт: 'updating' — новая версия ставится; 'latest' — уже последняя; 'offline' — сайт недоступен. */
+/* «Обновить» в настройках (владелец 12.11.2026: «одно действие — чтобы подтягивало новую версию»; 13.11.2026: «пиши,
+   какая именно у меня версия»). Номер версии спрашиваем у сайта напрямую (version.js?fresh — мимо офлайн-копии,
+   sw.js его не кэширует) и сравниваем с тем, что работает сейчас. Затем просим браузер проверить работника:
+   новый есть — он встаёт сам (skipWaiting), срабатывает controllerchange выше, страница перезагружается.
+   Вернёт { result, mine, site }: result — 'updating' (ставится), 'latest' (уже последняя), 'newer' (на сайте
+   новее, но раздача сайта ещё отдаёт прежние файлы — через пару минут), 'offline' (сайт недоступен). */
 export async function checkNow() {
-  if (!('serviceWorker' in navigator) || !isSecureContext) return 'latest';
-  const reg = await navigator.serviceWorker.getRegistration();
-  if (!reg) return 'latest';
+  const mine = String(globalThis.GSL_VERSION || '');
+  let site = null;
   try {
-    await reg.update();
+    const res = await fetch(`./version.js?fresh=${Date.now()}`, { cache: 'no-store' });
+    site = ((await res.text()).match(/GSL_VERSION\s*=\s*'([^']+)'/) || [])[1] || null;
   } catch {
-    return 'offline';
+    return { result: 'offline', mine, site };
   }
-  if (reg.installing || reg.waiting) return 'updating';
-  return 'latest';
+  if (!('serviceWorker' in navigator) || !isSecureContext) return { result: site && site !== mine ? 'newer' : 'latest', mine, site };
+  const reg = await navigator.serviceWorker.getRegistration();
+  try {
+    await reg?.update();
+  } catch {
+    // работник не проверился — решаем по номеру ниже
+  }
+  if (reg && (reg.installing || reg.waiting)) return { result: 'updating', mine, site };
+  return { result: site && site !== mine ? 'newer' : 'latest', mine, site };
 }
