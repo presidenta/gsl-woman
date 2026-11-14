@@ -187,8 +187,12 @@
   border-radius: var(--r-pill);
   background: none;
   color: var(--c-gold);
-  font-size: var(--fs-lg);
   cursor: pointer;
+}
+
+.help__rule-btn svg {
+  width: 1.2em;
+  height: 1.2em;
 }
 
 .help__rule-add {
@@ -196,3 +200,133 @@
   gap: var(--sp-2);
   margin-top: var(--sp-4);
 }
+
+/* Крестик у правила — без круга, тихий; ярче — когда на него наводят или нажимают */
+.help__rule-x {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: var(--tap);
+  height: var(--tap);
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--c-text-faint);
+  cursor: pointer;
+  transition: color var(--t-fast) var(--ease);
+}
+
+.help__rule-x svg {
+  width: 1.1em;
+  height: 1.1em;
+}
+
+.help__rule-x:hover,
+.help__rule-x:focus-visible,
+.help__rule-x:active {
+  color: var(--c-flag-red);
+}
+
+/* Число на плашке: «3 вопроса», «36 вопросов» */
+.help__count {
+  flex: none;
+  padding: 2px var(--sp-2);
+  border: 1px solid var(--c-line-strong);
+  border-radius: var(--r-pill);
+  color: var(--c-gold);
+  font-size: var(--fs-xs);
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.help__folder-title {
+  flex: 1;
+}
+
+.help__section-title .help__count {
+  margin-left: var(--sp-2);
+  vertical-align: middle;
+}
+
+/* Флаги под вопросом: золотисто-зелёный и золотисто-красный, с галочкой */
+.help__flags-hint {
+  margin: 0 0 var(--sp-3);
+}
+
+.help__flags {
+  display: grid;
+  gap: var(--sp-1);
+  margin-top: var(--sp-2);
+}
+
+.help__flag {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--sp-2);
+  padding: var(--sp-2) var(--sp-3);
+  border-radius: var(--r-md);
+  border-left: 3px solid;
+  font-size: var(--fs-sm);
+  cursor: pointer;
+}
+
+.help__flag--green {
+  color: var(--c-flag-green);
+  border-color: var(--c-flag-green);
+  background: color-mix(in srgb, var(--c-flag-green) 9%, transparent);
+}
+
+.help__flag--red {
+  color: var(--c-flag-red);
+  border-color: var(--c-flag-red);
+  background: color-mix(in srgb, var(--c-flag-red) 9%, transparent);
+}
+
+.help__flag-box {
+  flex: none;
+  width: 1.15em;
+  height: 1.15em;
+  margin-top: 0.15em;
+}
+
+.help__flag--green .help__flag-box { accent-color: var(--c-flag-green); }
+.help__flag--red .help__flag-box { accent-color: var(--c-flag-red); }
+
+.help__flag-mark {
+  display: none;
+}
+
+/* Итог папки — как калькулятор в «Знакомстве» */
+.help__total {
+  margin-top: var(--sp-4);
+  padding: var(--sp-3) var(--sp-4);
+  border-radius: var(--r-md);
+  border: 1px solid var(--c-line-strong);
+}
+
+.help__total--build { border-color: var(--c-flag-green); }
+.help__total--look { border-color: var(--c-gold); }
+.help__total--pass { border-color: var(--c-flag-red); }
+
+.help__total-title {
+  margin: 0 0 var(--sp-1);
+  color: var(--c-gold);
+}
+
+.help__total-counts {
+  margin: 0 0 var(--sp-2);
+  font-weight: 600;
+}
+
+.help__total-green { color: var(--c-flag-green); }
+.help__total-red { color: var(--c-flag-red); }
+
+.help__total-verdict {
+  margin: 0 0 var(--sp-1);
+  font-family: var(--f-display);
+  font-size: var(--fs-lg);
+}
+
+.help__total--build .help__total-verdict { color: var(--c-flag-green); }
+.help__total--look .help__total-verdict { color: var(--c-gold); }
+.help__total--pass .help__total-verdict { color: var(--c-flag-red); }

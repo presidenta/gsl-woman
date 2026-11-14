@@ -789,13 +789,19 @@ export default {
   // «Знакомство» — js/meet/, экран #/meet
   // «Помощь» — js/help/, экран #/help (владелец 14.11.2026)
   help: {
+    flagsHint: 'Under each question, tick how the person answered — the result appears below.',
+    total: 'Result',
+    greenCount: 'Green flags',
+    redCount: 'Red flags',
+    totalEmpty: 'Tick the flags — and the result appears here.',
+    verdictNote: 'You decide — this is only a hint.',
+    rulesRemoveConfirm: 'Are you sure you want to delete this rule?\n\n“{rule}”',
     read: 'How to read the answer:',
     sources: 'Sources',
     rulesAdd: 'Add a rule',
     rulesPh: 'A new rule for our home',
     rulesRemove: 'Remove the rule',
     rulesEdit: 'Tap to edit',
-    rulesRemoveConfirm: 'Remove this rule?',
     rulesSaved: 'Rule added',
     title: 'Help',
     lead: 'First date, questions, topics to discuss, compliments',
@@ -915,6 +921,11 @@ export default {
   },
 
   plural: {
+    questions: ['question', 'questions'],
+    topics: ['topic', 'topics'],
+    rules: ['rule', 'rules'],
+    tips: ['tip', 'tips'],
+    compliments: ['compliment', 'compliments'],
     points: ['point', 'points'],
     days: ['day', 'days'],
   },
