@@ -9,6 +9,7 @@ import { levelOf, starsOf, waiting, skillCount, skillStep, gamesOf } from './sta
 import { chosenOf, progressOf } from './careers.js';
 import { PROF_BY_ID } from './dreams-catalog.js';
 import { isSealed } from '../letters/letters.js';
+import { gamesFor, gameForm, minusButton, hiddenBlock } from './games-list.js';
 
 /* «СЕМЬЯ» → «ДЕТИ» — КАБИНЕТ РЕБЁНКА ГЛАЗАМИ РОДИТЕЛЯ (владелец 14.11.2026: «в кабинете родителя всё должно
    отображаться»; ТЗ — docs/TZ-deti.md).
@@ -29,6 +30,7 @@ const BASE = '/api/gsl/kids';
 let info = {}; // { [circleId]: { list, at } }
 let loading = null;
 let passOpen = {}; // { [childId]: true } — открыта форма пароля
+let gameOpen = {}; // { [childId]: true } — открыта форма новой игры
 let watching = null; // { circleId, rerender } — вкладка «Дети» на экране: новый телефон ребёнка появится сам
 let timer = null;
 
@@ -224,6 +226,26 @@ function careersBlock(api, kid) {
     })));
 }
 
+/* Список живых игр ребёнка (владелец: «родитель сам может вписывать игры, которые ребёнок может выбирать»):
+   «＋ Добавить игру», весь список с «−», убранные — «Вернуть». */
+function gameListBlock(ctx, api, kid) {
+  const list = gamesFor(api, kid.id);
+  return h('div', {},
+    h('h4', { class: 'kid-sub' }, kt('parent.gameList')),
+    h('p', { class: 'faint' }, kt('parent.gameListLead')),
+    gameOpen[kid.id]
+      ? gameForm(api, kid.id, () => { gameOpen[kid.id] = false; ctx.rerender(); })
+      : h('button', { type: 'button', class: 'btn btn--gold', onclick: () => { gameOpen[kid.id] = true; ctx.rerender(); } }, kt('games.add')),
+    h('details', { class: 'kid-gamelist' },
+      h('summary', {}, kt('parent.gameListAll', { n: list.length })),
+      h('ul', { class: 'kid-rows' }, ...list.map((g) => h('li', { class: 'kid-row' },
+        h('span', { class: 'kid-row__icon', 'aria-hidden': 'true' }, g.icon),
+        h('span', { class: 'kid-row__title' }, g.title),
+        minusButton(api, kid.id, g, ctx.rerender))))),
+    hiddenBlock(api, kid.id, ctx.rerender),
+  );
+}
+
 /* Письма ребёнка себе: родитель видит, что письмо есть и когда откроется; текст запечатан и для него. */
 function lettersBlock(api, kid) {
   const list = api.items('letter').filter((x) => x.data.member === kid.id).sort((a, b) => a.data.openAt.localeCompare(b.data.openAt));
@@ -258,6 +280,7 @@ export function kidsView(ctx, circle) {
         waitingBlock(api, kid),
         skillsBlock(api, kid),
         gamesBlock(api, kid),
+        gameListBlock(ctx, api, kid),
         careersBlock(api, kid),
         dreamsBlock(api, kid),
         lettersBlock(api, kid),

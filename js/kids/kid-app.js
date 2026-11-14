@@ -9,7 +9,8 @@ import { chatView } from '../circles/chat-view.js';
 import * as store from './kid-store.js';
 import * as play from './nophone.js';
 import { kt } from './texts.js';
-import { SKILL_SECTIONS, SKILLS, GAMES, GAME_BY_ID, DREAM_CATEGORIES } from './catalog.js';
+import { SKILL_SECTIONS, SKILLS, DREAM_CATEGORIES } from './catalog.js';
+import { gamesFor, gameById, gameForm, minusButton, hiddenBlock } from './games-list.js';
 import { levelOf, starsOf, skillCount, skillStep, okMap, familyScore, gamesOf } from './stars.js';
 import { familyDreamCard } from './family-dream.js';
 import { careersView, stepTitle, doStep } from './careers.js';
@@ -31,10 +32,11 @@ let root = null;
 let tab = 'today';
 let code = '';
 let loginMsg = '';
-let starting = null; // id игры, для которой выбираем друзей; 'own' — своя игра
+let starting = null; // id игры, для которой выбираем друзей
 let chosen = new Set();
 let result = null; // итог последней живой игры
 let pending = false;
+let gameFormOpen = false; // «＋ Добавить игру» открыта
 let dreamTab = 'mine'; // «Мечты»: мои мечты · кем стать · письма
 
 const short = (id) => String(id || '').replace(/-/g, '').slice(0, 8);
@@ -162,8 +164,9 @@ function planCard(api) {
   const rows = list.map((x) => {
     const deed = todayDeed(api, x.type, x.ref);
     const step = x.type === 'step' ? stepTitle(x.ref) : null;
-    const title = x.type === 'skill' ? SKILLS[x.ref]?.title : step ? step.title : GAME_BY_ID[x.ref]?.title;
-    const icon = x.type === 'skill' ? SKILLS[x.ref]?.icon : step ? step.icon : GAME_BY_ID[x.ref]?.icon;
+    const game = x.type === 'game' ? gameById(api, x.ref) : null;
+    const title = x.type === 'skill' ? SKILLS[x.ref]?.title : step ? step.title : game?.title;
+    const icon = x.type === 'skill' ? SKILLS[x.ref]?.icon : step ? step.icon : game?.icon;
     if (!title) return null;
     let action;
     if (deed) action = deedState(api, deed);
@@ -275,10 +278,8 @@ function addFriend(api, name) {
 
 function startBox(api, game) {
   const friends = friendsOf(api);
-  const own = game.id === 'own' ? h('input', { class: 'input', maxlength: '60', placeholder: kt('games.ownPh'), 'aria-label': kt('games.own') }) : null;
   const extra = h('input', { class: 'input', maxlength: '40', placeholder: kt('games.friendPh'), 'aria-label': kt('games.friendPh') });
   return h('div', { class: 'kid-start' },
-    own,
     h('p', { class: 'field__label' }, kt('games.who')),
     h('p', { class: 'field__hint' }, kt('games.whoHint')),
     h('div', { class: 'kid-chips' }, ...friends.map((n) => h('button', {
@@ -289,7 +290,7 @@ function startBox(api, game) {
     h('button', {
       type: 'button', class: 'btn btn--gold btn--block',
       onclick: () => {
-        const title = game.id === 'own' ? (own.value.trim().slice(0, 60) || kt('games.own')) : game.title;
+        const title = game.title;
         const names = [...chosen];
         for (const n of extra.value.split(',').map((x) => x.trim()).filter(Boolean)) names.push(n.slice(0, 40));
         starting = null;
@@ -318,7 +319,6 @@ function gamesView(api) {
   const friendInput = h('input', { class: 'input', maxlength: '40', placeholder: kt('games.friendPh'), 'aria-label': kt('games.friendPh') });
   const friendForm = h('form', { class: 'steps__row' }, friendInput, h('button', { type: 'submit', class: 'btn btn--gold' }, kt('games.friendAdd')));
   friendForm.addEventListener('submit', (e) => { e.preventDefault(); addFriend(api, friendInput.value); });
-  const own = { id: 'own', title: kt('games.own'), icon: '🎲' };
   return [
     h('h1', { class: 'screen-title' }, kt('games.title')),
     h('p', { class: 'card__text faint kid-lead' }, kt('games.lead')),
@@ -330,20 +330,24 @@ function gamesView(api) {
       friendForm,
       h('p', { class: 'faint' }, kt('games.played', { n: played.length, m: minutes })),
     ),
+    // «＋ Добавить игру» — своя игра в список (ребёнок сам; родитель — во вкладке «Дети»)
     h('section', { class: 'card kid-game' },
-      h('h2', { class: 'card__title' }, `${own.icon} ${own.title}`),
-      starting === 'own' ? startBox(api, own) : h('button', { type: 'button', class: 'btn btn--gold', onclick: () => { starting = 'own'; chosen = new Set(); draw(); } }, `▶ ${kt('games.start')}`),
-    ),
-    ...GAMES.map((g) => {
+      gameFormOpen
+        ? gameForm(api, api.me, () => { gameFormOpen = false; draw(); })
+        : h('button', { type: 'button', class: 'btn btn--gold btn--block', onclick: () => { gameFormOpen = true; draw(); } }, kt('games.add'))),
+    ...gamesFor(api, api.me).map((g) => {
       const planned = inPlan(api, 'game', g.id);
-      return h('section', { class: 'card kid-game' },
+      const meta = [g.players ? kt('games.players', { n: g.players }) : '', g.place ? kt('games.place', { place: g.place }) : ''].filter(Boolean).join(' · ');
+      return h('section', { class: `card kid-game${g.custom ? ' is-custom' : ''}` },
+        minusButton(api, api.me, g, draw),
         h('h2', { class: 'card__title' }, `${g.icon} ${g.title}`),
-        h('p', { class: 'kid-game__meta faint' }, `${kt('games.players', { n: g.players })} · ${kt('games.place', { place: g.place })}`),
-        h('p', { class: 'kid-game__grows' }, kt('games.grows', { list: g.grows.join(', ') })),
-        h('details', { class: 'kid-game__rules' },
+        g.custom ? h('p', { class: 'kid-game__by' }, kt('games.addedBy', { name: api.name(g.by) })) : null,
+        meta ? h('p', { class: 'kid-game__meta faint' }, meta) : null,
+        g.grows.length ? h('p', { class: 'kid-game__grows' }, kt('games.grows', { list: g.grows.join(', ') })) : null,
+        g.rules ? h('details', { class: 'kid-game__rules' },
           h('summary', {}, kt('games.rules')),
           h('p', {}, g.rules),
-          h('p', { class: 'faint' }, kt('games.need', { need: g.need }))),
+          g.need ? h('p', { class: 'faint' }, kt('games.need', { need: g.need })) : null) : null,
         starting === g.id ? startBox(api, g) : h('div', { class: 'card__actions' },
           h('button', { type: 'button', class: 'btn btn--gold', onclick: () => { starting = g.id; chosen = new Set(); draw(); } }, `▶ ${kt('games.start')}`),
           h('button', { type: 'button', class: `btn ${planned ? 'btn--gold' : 'btn--ghost'}`, 'aria-pressed': String(planned), onclick: () => togglePlan(api, 'game', g.id) },
@@ -351,6 +355,7 @@ function gamesView(api) {
         ),
       );
     }),
+    hiddenBlock(api, api.me, draw),
   ];
 }
 

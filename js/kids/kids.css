@@ -931,3 +931,63 @@
 .kid-career__remove {
   width: fit-content;
 }
+
+/* ---------- Список игр: «−», своя игра, убранные ---------- */
+
+.kid-game {
+  position: relative;
+}
+
+.kid-game .card__title {
+  padding-right: 44px;
+}
+
+.kid-minus {
+  position: absolute;
+  top: var(--sp-3);
+  right: var(--sp-3);
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid var(--c-line-strong);
+  background: var(--c-surface);
+  color: var(--c-text-dim);
+  font: inherit;
+  font-size: 22px;
+  font-weight: 800;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.kid-row .kid-minus {
+  position: static;
+  flex: none;
+}
+
+.kid-game.is-custom {
+  border-color: var(--c-line-strong);
+}
+
+.kid-game__by {
+  margin: 0;
+  font-size: var(--fs-xs);
+  color: var(--c-gold);
+}
+
+.kid-game-new {
+  display: grid;
+  gap: var(--sp-2);
+}
+
+.kid-game-new__row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--sp-2);
+}
+
+.kid-hidden summary,
+.kid-gamelist summary {
+  cursor: pointer;
+  font-weight: 700;
+  color: var(--c-text-dim);
+}

@@ -165,3 +165,33 @@ test('мечта семьи: общий котёл — звёзды всех с 
   assert.equal(activeDream([{ ...dream, data: { ...dream.data, status: 'done' } }]), null);
   assert.equal(starsOf('dad', data), 5);
 });
+
+test('список игр: «−» убирает игру каталога (вернуть можно), своя игра — от ребёнка или родителя, «−» — совсем', async () => {
+  const { gamesFor, hiddenGames, removeGame, restoreGame, gameById } = await import('../js/kids/games-list.js');
+  const store = new Map();
+  const key = (k, id) => `${k}/${id}`;
+  const api = (me) => ({
+    me,
+    items: (kind) => [...store.values()].filter((x) => x.kind === kind && !x.deletedAt),
+    put: (kind, id, data) => store.set(key(kind, id), { kind, id, author: store.get(key(kind, id))?.author || me, data, updatedAt: new Date().toISOString(), deletedAt: null }),
+    drop: (kind, id) => store.delete(key(kind, id)),
+    newId: (p) => `${p}-${store.size + 1}`,
+  });
+  const kidApi = api('ira');
+  const momApi = api('mom');
+  const all = GAMES.length;
+  assert.equal(gamesFor(kidApi, 'ira').length, all);
+  removeGame(kidApi, 'ira', GAMES[0]);
+  assert.equal(gamesFor(kidApi, 'ira').length, all - 1, 'ребёнок убрал «−»');
+  assert.deepEqual(hiddenGames(momApi, 'ira').map((g) => g.id), [GAMES[0].id], 'родитель видит убранную');
+  restoreGame(momApi, 'ira', GAMES[0].id);
+  assert.equal(gamesFor(kidApi, 'ira').length, all, 'вернули');
+  momApi.put('kgame', 'kg-1', { member: 'ira', title: 'Лапта', icon: '🏏', by: 'mom' });
+  const list = gamesFor(kidApi, 'ira');
+  assert.equal(list[0].title, 'Лапта', 'своя игра — первой в списке');
+  assert.equal(gamesFor(kidApi, 'sonya').length, all, 'у другого ребёнка своя игра Иры не появляется');
+  assert.equal(gameById(kidApi, 'kg-1').title, 'Лапта');
+  removeGame(kidApi, 'ira', list[0]);
+  assert.equal(gamesFor(kidApi, 'ira').length, all, 'своя игра убрана совсем');
+  assert.equal(hiddenGames(kidApi, 'ira').length, 0);
+});

@@ -77,6 +77,7 @@ self.GSL_FILES = [
   './js/kids/dreams-catalog.js',
   './js/kids/family-api.js',
   './js/kids/family-dream.js',
+  './js/kids/games-list.js',
   './js/kids/kid-app.js',
   './js/kids/kid-store.js',
   './js/kids/kids.css',
