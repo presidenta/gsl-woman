@@ -45,7 +45,7 @@ export function glassNode(items, { fresh = null, gone = null, label = '', kind =
   const from = lastColor[kind] || color;
   lastColor[kind] = color;
   // id градиентов и обрезки — свои у каждого стакана: два стакана на экране иначе спутали бы заливки
-  const P = kind === 'night' ? 'wgn' : 'wg';
+  const P = kind === 'morning' ? 'wg' : `wg-${kind}`;
 
   const phase = -((performance.now() / 1000) % CYCLE);
   const parts = (layer) => {

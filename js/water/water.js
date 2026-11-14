@@ -27,7 +27,7 @@ export const GOLDEN = ['honey', 'turmeric', 'pepper'];
 /* Как составляющая окрашивает воду: [r, g, b, сила]. Перец и мята почти не красят — у них свой рисунок в стакане.
    Чистая тёплая вода — светлая и прозрачная: на тёмном фоне она светится, а не сереет. */
 // Чистая вода — прозрачная, чуть голубоватая (владелец 14.11.2026: «мутная, как молоко — сделать как вода»)
-const BASE = [150, 206, 250];
+const BASE = [70, 185, 255];
 const TINTS = {
   lemon: [255, 226, 104, 0.45],
   ginger: [240, 212, 150, 0.25],
@@ -69,26 +69,27 @@ export function setItems(list, on, kind = 'morning') {
 /** Положить или убрать одну составляющую. */
 export const setItem = (item, on, kind = 'morning') => setItems([item], on, kind);
 
-/** Цвет воды по составляющим: верх светлее, низ гуще; чем больше красящего, тем насыщеннее. */
+/** Цвет воды по составляющим: чистая — прозрачно-голубая (владелец 14.11.2026: «прям голубая, как прозрачная»);
+    чем больше красящего, тем меньше голубого и больше цвета специй (куркума — в золото, а не в зелень). */
 export function waterColor(items) {
-  let r = BASE[0];
-  let g = BASE[1];
-  let b = BASE[2];
-  let weight = 1;
   let strength = 0;
+  let r = 0;
+  let g = 0;
+  let b = 0;
   for (const k of items) {
     const tint = TINTS[k];
     if (!tint) continue;
     r += tint[0] * tint[3];
     g += tint[1] * tint[3];
     b += tint[2] * tint[3];
-    weight += tint[3];
     strength += tint[3];
   }
-  const rgb = [r, g, b].map((v) => Math.round(v / weight)).join(', ');
-  // Чистая вода — почти прозрачная, тёплая к низу: на тёмном она светится, а не сереет
-  const top = Math.min(0.14 + strength * 0.12, 0.42);
-  const bottom = Math.min(0.26 + strength * 0.2, 0.8);
+  // Голубая основа уступает специям: без них — вся вода голубая, с куркумой — почти вся золотая
+  const base = 1 / (1 + strength * 6);
+  const weight = base + strength;
+  const rgb = [r + BASE[0] * base, g + BASE[1] * base, b + BASE[2] * base].map((v) => Math.round(v / weight)).join(', ');
+  const top = Math.min(0.34 + strength * 0.05, 0.46);
+  const bottom = Math.min(0.56 + strength * 0.1, 0.82);
   return { top: `rgba(${rgb}, ${top.toFixed(2)})`, bottom: `rgba(${rgb}, ${bottom.toFixed(2)})` };
 }
 
