@@ -48,6 +48,8 @@ export const COLLECTIONS = [
   { key: 'love', kind: 'love', type: 'single', empty: null },
   // Записи после свиданий — «Знакомство» (meet/, 14.11.2026)
   { key: 'meetnotes', kind: 'meetnote', type: 'list', empty: [] },
+  // «Правила нашего дома» — «Помощь» (help/rules.js, 14.11.2026)
+  { key: 'houserules', kind: 'houserules', type: 'single', empty: null },
   // Письма себе в будущее — «Цели» (letters/, 14.11.2026)
   { key: 'letters', kind: 'letter', type: 'list', empty: [] },
 ];

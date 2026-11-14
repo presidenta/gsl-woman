@@ -790,6 +790,14 @@ export default {
   // «Знакомство» — js/meet/, экран #/meet
   // «Помощь» — js/help/, экран #/help (владелец 14.11.2026)
   help: {
+    read: 'How to read the answer:',
+    sources: 'Sources',
+    rulesAdd: 'Add a rule',
+    rulesPh: 'A new rule for our home',
+    rulesRemove: 'Remove the rule',
+    rulesEdit: 'Tap to edit',
+    rulesRemoveConfirm: 'Remove this rule?',
+    rulesSaved: 'Rule added',
     title: 'Help',
     lead: 'First date, questions, topics to discuss, compliments',
     meetTitle: 'First date',

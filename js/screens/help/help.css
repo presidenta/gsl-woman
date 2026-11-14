@@ -70,3 +70,129 @@
   color: var(--c-text-dim);
   font-size: var(--fs-sm);
 }
+
+/* Папки внутри пункта (например, «Три вопроса», «Карта любви») — раскрываются по нажатию */
+.help__folder {
+  margin-top: var(--sp-3);
+  border: 1px solid var(--c-line);
+  border-radius: var(--r-md);
+  padding: var(--sp-3) var(--sp-4);
+}
+
+.help__folder-summary {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  cursor: pointer;
+  list-style: none;
+  font-weight: 600;
+}
+
+.help__folder-summary::-webkit-details-marker {
+  display: none;
+}
+
+.help__folder[open] > .help__folder-summary .help__chevron {
+  transform: rotate(90deg);
+}
+
+.help__folder-body {
+  margin-top: var(--sp-3);
+}
+
+.help__section + .help__section {
+  margin-top: var(--sp-5);
+}
+
+.help__section-title {
+  margin: 0 0 var(--sp-2);
+  font-family: var(--f-display);
+  font-size: var(--fs-md);
+  color: var(--c-gold);
+}
+
+.help__section-lead {
+  margin: 0 0 var(--sp-3);
+  color: var(--c-text-dim);
+}
+
+/* «Как понимать ответ» — подсказка под вопросом */
+.help__read {
+  margin: var(--sp-1) 0 0;
+  padding: var(--sp-2) var(--sp-3);
+  border-left: 2px solid var(--c-gold);
+  color: var(--c-text-dim);
+  font-size: var(--fs-sm);
+}
+
+.help__read-label {
+  color: var(--c-gold);
+}
+
+.help__sources {
+  margin-top: var(--sp-3);
+  font-size: var(--fs-sm);
+  color: var(--c-text-dim);
+}
+
+.help__source-list {
+  margin: var(--sp-1) 0 0;
+  padding-left: var(--sp-5);
+  display: grid;
+  gap: var(--sp-1);
+}
+
+.help__source-list a {
+  color: var(--c-gold);
+}
+
+/* «Правила нашего дома»: строка правила — текст (нажать — изменить) и «−»; ниже поле и «＋» */
+.help__rules {
+  margin: var(--sp-3) 0 0;
+  padding-left: var(--sp-5);
+  display: grid;
+  gap: var(--sp-2);
+}
+
+.help__rule {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+}
+
+.help__rule-text {
+  flex: 1;
+  min-width: 0;
+  padding: var(--sp-1) 0;
+  border: 0;
+  background: none;
+  color: var(--c-text);
+  font: inherit;
+  text-align: left;
+  cursor: text;
+}
+
+.help__rule-input {
+  flex: 1;
+  min-width: 0;
+}
+
+.help__rule-btn {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: var(--tap);
+  height: var(--tap);
+  border: 1px solid var(--c-line-strong);
+  border-radius: var(--r-pill);
+  background: none;
+  color: var(--c-gold);
+  font-size: var(--fs-lg);
+  cursor: pointer;
+}
+
+.help__rule-add {
+  display: flex;
+  gap: var(--sp-2);
+  margin-top: var(--sp-4);
+}
