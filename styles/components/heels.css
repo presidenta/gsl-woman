@@ -8,21 +8,45 @@
 .heels {
   position: relative;
   display: grid;
-  grid-template-columns: 104px minmax(0, 1fr) auto;
+  grid-template-columns: 120px minmax(0, 1fr);
+  grid-template-rows: 1fr auto;
   align-items: center;
-  gap: var(--sp-3);
+  column-gap: var(--sp-3);
+  row-gap: var(--sp-4);
   margin-top: var(--sp-4);
   padding: var(--sp-2) var(--sp-3);
   border-radius: var(--r-md);
   background: radial-gradient(70% 90% at 30% 60%, rgba(var(--rgb-gold), 0.09), transparent 70%);
 }
 
-/* Фигура — два кадра один над другим. Фон картинок уведён в чёрный (scratchpad: cut.py) — «светлее из двух»
-   оставляет на его месте цвет карточки: фигура стоит прямо на карточке, без прямоугольника */
+/* Раскладка (владелец 14.11.2026: «выдох» наслаивался на круг): фигура слева во всю высоту, справа круг счёта
+   сверху и «выдох» со стрелкой под ним — каждое на своём месте */
+.heels > :is(.heels__art, .kf, .walk) {
+  grid-column: 1;
+  grid-row: 1 / span 2;
+}
+
+.heels > .minute__dial {
+  grid-column: 2;
+  grid-row: 1;
+  justify-self: center;
+  align-self: end;
+}
+
+.heels > :is(.heels__cues, .kegel__cue) {
+  grid-column: 2;
+  grid-row: 2;
+  justify-self: center;
+  align-self: start;
+}
+
+/* Фигура — два кадра один над другим. Фон картинок уведён в чёрный, подиум под ступнями тоже (14.11.2026: ступни
+   чёткие, без растворяющей маски) — «светлее из двух» оставляет на месте чёрного цвет карточки: фигура стоит прямо
+   на карточке, без прямоугольника. Мужчина отражён и смотрит вправо, как женщина (владелец 14.11.2026). */
 .heels__art {
   position: relative;
-  width: 104px;
-  height: 240px;
+  width: 120px;
+  height: 276px;
 }
 
 .heels__frame {
@@ -34,8 +58,6 @@
   object-position: center bottom;
   mix-blend-mode: lighten;
   transform-origin: 50% 100%;
-  -webkit-mask-image: linear-gradient(to bottom, #000 89%, transparent 97%);
-  mask-image: linear-gradient(to bottom, #000 89%, transparent 97%);
   user-select: none;
   pointer-events: none;
 }
@@ -146,15 +168,11 @@
 
 /* — «Выдох» со стрелкой вниз — вместе и без движения — */
 .heels__cues {
-  position: relative;
-  min-height: 2.6em;
+  display: flex;
+  justify-content: center;
 }
 
 .heels__cue {
-  position: absolute;
-  left: 0;
-  top: 50%;
-  translate: 0 -50%;
   font-family: var(--f-display);
   font-size: var(--fs-2xl);
   font-style: italic;

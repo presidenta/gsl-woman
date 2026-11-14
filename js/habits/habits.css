@@ -7,8 +7,8 @@
 .kf,
 .walk {
   position: relative;
-  width: 104px;
-  height: 240px;
+  width: 120px;
+  height: 276px;
 }
 
 .kf__img,
@@ -25,21 +25,9 @@
 
 .kf__img {
   mix-blend-mode: lighten;
-  -webkit-mask-image: linear-gradient(to bottom, #000 93%, transparent 100%);
-  mask-image: linear-gradient(to bottom, #000 93%, transparent 100%);
 }
 
-.kegel__stage {
-  grid-template-columns: 104px minmax(0, 1fr) auto;
-}
 
-.steps__stage {
-  grid-template-columns: 120px minmax(0, 1fr) auto;
-}
-
-.walk {
-  width: 120px;
-}
 
 .walk__frame {
   mix-blend-mode: lighten;

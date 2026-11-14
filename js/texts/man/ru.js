@@ -45,7 +45,7 @@ export default {
     // Профиль, дети, дела (js/profile/, 14.11.2026)
     swapTitle: 'Заменяем:',
     kidsTitle: 'Детям',
-    bizTitle: 'Подсказка по делам',
+    bizTitle: 'Совет недели по работе',
     dayOf: 'День {day}',
     week: 'Неделя {n}',
     month: 'Месяц {n}',

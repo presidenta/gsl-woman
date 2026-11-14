@@ -20,10 +20,10 @@ import * as side from '../side/side.js';
 // Стрелка вниз под словом «выдох»
 const ARROW_DOWN = '<svg viewBox="0 0 16 26" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2v20"/><path d="M2.5 16.5L8 22l5.5-5.5"/></svg>';
 
-/* Где рот на картинке (доли ширины и высоты) и куда идёт пар: мужчина смотрит влево, женщина — вправо.
+/* Где рот на картинке (доли ширины и высоты) и куда идёт пар: оба смотрят вправо (мужчина отражён 14.11.2026).
    Где центр таза — для свечения упражнения Кегеля (habits/figures.js). */
 export const FIGURE = {
-  man: { mouth: [0.4, 0.145], dir: -1, pelvis: [0.47, 0.55] },
+  man: { mouth: [0.6, 0.145], dir: 1, pelvis: [0.53, 0.55] },
   woman: { mouth: [0.61, 0.15], dir: 1, pelvis: [0.5, 0.52] },
 };
 
