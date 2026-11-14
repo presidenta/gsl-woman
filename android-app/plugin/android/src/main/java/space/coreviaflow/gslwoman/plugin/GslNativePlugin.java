@@ -10,6 +10,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Handler;
+import android.os.Looper;
 import android.provider.Settings;
 
 import com.getcapacitor.JSArray;
@@ -143,11 +145,17 @@ public class GslNativePlugin extends Plugin {
        startLockTask без прав администратора устройства — обычное «закрепление экрана» Android: система сама
        спрашивает согласие, другие приложения и шторка закрыты, звонки работают. Выйти можно системным жестом —
        веб-часть каждые несколько секунд спрашивает lockState и считает такой выход «телефон брали». */
+    /* Окно приложения — через WebView: getActivity() отдаёт AppCompatActivity, которого нет в пути сборки плагина. */
+    private Activity window() {
+        Context c = getBridge() == null || getBridge().getWebView() == null ? null : getBridge().getWebView().getContext();
+        return c instanceof Activity ? (Activity) c : null;
+    }
+
     @PluginMethod
     public void lockScreen(PluginCall call) {
-        Activity activity = getActivity();
+        Activity activity = window();
         if (activity == null) { call.reject("lockScreen: нет окна"); return; }
-        activity.runOnUiThread(() -> {
+        new Handler(Looper.getMainLooper()).post(() -> {
             try {
                 activity.startLockTask();
                 call.resolve();
@@ -159,9 +167,9 @@ public class GslNativePlugin extends Plugin {
 
     @PluginMethod
     public void unlockScreen(PluginCall call) {
-        Activity activity = getActivity();
+        Activity activity = window();
         if (activity == null) { call.resolve(); return; }
-        activity.runOnUiThread(() -> {
+        new Handler(Looper.getMainLooper()).post(() -> {
             try {
                 activity.stopLockTask();
             } catch (Exception e) {
