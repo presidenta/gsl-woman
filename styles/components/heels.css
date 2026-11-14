@@ -103,17 +103,11 @@
   color: transparent;
 }
 
-/* Стрелка вниз скользит вместе с опусканием на пятки */
+/* Стрелка вниз — неподвижная, появляется вместе со словом (владелец 14.11.2026: «без движений, синхронно») */
 .heels__cue-arrow svg {
   display: block;
   width: 16px;
   height: 26px;
-  animation: heels-arrow 1s ease-in infinite;
-}
-
-@keyframes heels-arrow {
-  0%, 60% { transform: translateY(-4px); }
-  88%, 100% { transform: translateY(6px); }
 }
 
 @keyframes heels-body {
@@ -160,13 +154,13 @@
 }
 
 @keyframes heels-cue-down {
-  0%, 60% { opacity: 0; transform: translateY(4px); }
-  68%, 88% { opacity: 1; transform: translateY(0); }
-  100% { opacity: 0; transform: translateY(0); }
+  0%, 60% { opacity: 0; }
+  68%, 88% { opacity: 1; }
+  100% { opacity: 0; }
 }
 
 /* Идёт счёт — цикл сдвинут (--heels-delay из setRunning): касание пятками = смена цифры и звук */
-.heels.is-running :is(.heels__body, .heels__foot, .heels__shade, .heels__ripple, .heels__breath path, .heels__breath circle, .heels__cue, .heels__cue-arrow svg) {
+.heels.is-running :is(.heels__body, .heels__foot, .heels__shade, .heels__ripple, .heels__breath path, .heels__breath circle, .heels__cue) {
   animation-delay: var(--heels-delay, 0s);
 }
 
