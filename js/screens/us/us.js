@@ -11,6 +11,9 @@ import { childrenBlock, dreamsView } from '../../circles/family-view.js';
 // Детский кабинет глазами родителя — вкладка «Дети» (kids/, 14.11.2026)
 import { kidsView } from '../../kids/parent-view.js';
 import { kt } from '../../kids/texts.js';
+import { familyDreamCard } from '../../kids/family-dream.js';
+import { familyApi } from '../../kids/family-api.js';
+import { kidAlerts } from '../../kids/alerts.js';
 
 /* ЭКРАН «МЫ» (#/us) — «Пара» и «Семья» (владелец 13.11.2026; ТЗ — docs/TZ-para-semya.md). Вверху переключатель
    «Пара · Семья». Нет контура — что это и «Создать» / «У меня есть код». Создан, но второго ещё нет — код для
@@ -149,9 +152,12 @@ function pairView(view, ctx, circle) {
 function familyView(view, ctx, circle) {
   const parents = circle.members.filter((m) => m.role === 'parent');
   const tabs = ['chat', 'kids', 'dreams'];
-  const tabLabel = (k) => (k === 'kids' ? kt('parent.tab') : t(`us.tabs.${k}`));
+  const alerts = kidAlerts(circle).total;
+  const tabLabel = (k) => (k === 'kids' ? `${kt('parent.tab')}${alerts ? ` · ${alerts} 🔴` : ''}` : t(`us.tabs.${k}`));
   return [
     h('section', { class: 'card us-head' }, memberList(circle)),
+    // Мечта нашей семьи — общий котёл звёзд (kids/family-dream.js)
+    familyDreamCard(familyApi(circle), { rerender: ctx.rerender }),
     childrenBlock(circle, fail),
     parents.length < 2 && circle.role === 'parent' ? codeCard(ctx, circle) : null,
     segmented({ label: t('us.family'), options: tabs.map((k) => ({ value: k, label: tabLabel(k) })), value: familyTab, onChange: (v) => { familyTab = v; ctx.rerender(); } }),

@@ -1,6 +1,8 @@
 package space.coreviaflow.gslwoman.plugin;
 
 import android.Manifest;
+import android.app.ActivityManager;
+import android.app.Activity;
 import android.app.NotificationManager;
 import android.appwidget.AppWidgetManager;
 import android.content.ComponentName;
@@ -28,6 +30,8 @@ import org.json.JSONObject;
  *  schedule — напоминания и будильники на ближайшие дни (работают и при закрытом приложении);
  *  setWidget — данные виджета на неделю; pinWidget — поставить виджет на экран;
  *  labels — подписи кнопок и каналов на языке женщины;
+ *  lockScreen / unlockScreen / lockState — закрепление экрана на время живой игры ребёнка (детский кабинет,
+ *  js/kids/nophone.js): телефон отдыхает, звонки работают; вышли из закрепления — игра это замечает;
  *  status / requestNotifications / openSettings — что разрешено и где это включить.
  */
 @CapacitorPlugin(
@@ -133,5 +137,53 @@ public class GslNativePlugin extends Plugin {
                 .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
         }
         call.resolve();
+    }
+
+    /* ЖИВАЯ ИГРА РЕБЁНКА — ТЕЛЕФОН ЗАКРЕПЛЁН (владелец 14.11.2026: «начать игру — и телефон закрыт, кроме звонков»).
+       startLockTask без прав администратора устройства — обычное «закрепление экрана» Android: система сама
+       спрашивает согласие, другие приложения и шторка закрыты, звонки работают. Выйти можно системным жестом —
+       веб-часть каждые несколько секунд спрашивает lockState и считает такой выход «телефон брали». */
+    @PluginMethod
+    public void lockScreen(PluginCall call) {
+        Activity activity = getActivity();
+        if (activity == null) { call.reject("lockScreen: нет окна"); return; }
+        activity.runOnUiThread(() -> {
+            try {
+                activity.startLockTask();
+                call.resolve();
+            } catch (Exception e) {
+                call.reject("lockScreen: " + e.getMessage());
+            }
+        });
+    }
+
+    @PluginMethod
+    public void unlockScreen(PluginCall call) {
+        Activity activity = getActivity();
+        if (activity == null) { call.resolve(); return; }
+        activity.runOnUiThread(() -> {
+            try {
+                activity.stopLockTask();
+            } catch (Exception e) {
+                // закрепления уже нет — ничего не делаем
+            }
+            call.resolve();
+        });
+    }
+
+    @PluginMethod
+    public void lockState(PluginCall call) {
+        ActivityManager am = (ActivityManager) getContext().getSystemService(Context.ACTIVITY_SERVICE);
+        boolean locked;
+        if (am == null) {
+            locked = false;
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            locked = am.getLockTaskModeState() != ActivityManager.LOCK_TASK_MODE_NONE;
+        } else {
+            locked = am.isInLockTaskMode();
+        }
+        JSObject ret = new JSObject();
+        ret.put("locked", locked);
+        call.resolve(ret);
     }
 }

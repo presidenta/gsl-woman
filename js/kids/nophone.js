@@ -6,10 +6,11 @@ import { kt } from './texts.js';
    отслеживает, что пока играют, телефон никто не открывает; кроме звонков»; главная цель — снизить зависимость от
    телефона и дать ребёнку живое общение).
 
-   Что умеет сайт: экран с таймером на весь телефон, экран горит сам (Wake Lock), а уход из приложения — в другое
-   приложение, на главный экран, выключение экрана — приложение замечает и считает: «телефон брали». Вернулся — та
-   же игра идёт дальше. Звонки работают как обычно. Совсем закрыть телефон на время игры (закрепление экрана Android)
-   — следующий шаг в Android-приложении (native/), сайт этого может только честно посчитать.
+   Сайт: экран с таймером на весь телефон, экран горит сам (Wake Lock), а уход из приложения — в другое приложение,
+   на главный экран, выключение экрана — приложение замечает и считает: «телефон брали». Вернулся — та же игра идёт.
+   Приложение для Android (с 14.11.2026): телефон ещё и ЗАКРЕПЛЁН на игре (закрепление экрана Android —
+   GslNativePlugin.lockScreen): другие приложения и шторка закрыты, звонки работают. Вышли из закрепления системным
+   жестом — проверка раз в 3 секунды (lockState) это замечает и тоже считает «телефон брали».
 
    Игра на телефоне — ключ kid-play { game, title, icon, friends, startedAt, opens, awayMs, leftAt }: перезапуск
    страницы посреди игры возвращает таймер. Конец игры — дело ребёнка (deed type game) для подтверждения родителем. */
@@ -20,6 +21,36 @@ const MIN_AWAY_MS = 1500;
 let lock = null;
 let tickTimer = null;
 let listening = false;
+let pinTimer = null;
+
+// Родная часть приложения для Android (android-app/plugin); в браузере её нет — только честный счёт
+const nativePlugin = () => (globalThis.Capacitor?.isNativePlatform?.() ? globalThis.Capacitor?.Plugins?.GslNative || null : null);
+export const canPin = () => typeof nativePlugin()?.lockScreen === 'function';
+
+async function pin() {
+  const p = nativePlugin();
+  if (!p?.lockScreen) return;
+  try { await p.lockScreen(); } catch { /* отказался закреплять — остаётся честный счёт */ }
+  clearInterval(pinTimer);
+  pinTimer = setInterval(async () => {
+    const now = current();
+    if (!now) { clearInterval(pinTimer); pinTimer = null; return; }
+    let locked = false;
+    try { locked = !!(await p.lockState())?.locked; } catch { return; }
+    if (locked && !now.pinned) write(KEY, { ...now, pinned: true });
+    // Было закреплено — и вышли из закрепления посреди игры: это тоже «телефон брали»; закрепляем снова
+    if (!locked && now.pinned) {
+      write(KEY, { ...now, pinned: false, opens: (now.opens || 0) + 1, backAt: Date.now() });
+      try { await p.lockScreen(); } catch { /* пусть так */ }
+    }
+  }, 3000);
+}
+
+async function unpin() {
+  clearInterval(pinTimer);
+  pinTimer = null;
+  try { await nativePlugin()?.unlockScreen?.(); } catch { /* закрепления уже нет */ }
+}
 
 export const current = () => read(KEY, null);
 
@@ -55,9 +86,10 @@ function listen() {
 
 /** Начать игру: { game, title, icon, friends }. */
 export function begin(game) {
-  write(KEY, { ...game, startedAt: Date.now(), opens: 0, awayMs: 0, leftAt: null });
+  write(KEY, { ...game, startedAt: Date.now(), opens: 0, awayMs: 0, leftAt: null, pinned: false });
   listen();
   keepAwake();
+  pin();
 }
 
 /** Закончить: вернуть итог { minutes, opens, ... } и убрать игру с телефона. */
@@ -65,6 +97,7 @@ export function finish() {
   const p = current();
   if (!p) return null;
   remove(KEY);
+  unpin();
   try { lock?.release(); } catch { /* уже отпущен */ }
   lock = null;
   const minutes = Math.max(1, Math.round((Date.now() - p.startedAt) / 60000));
@@ -82,6 +115,7 @@ function clock(ms) {
 export function render(root, onFinish) {
   listen();
   keepAwake();
+  if (canPin() && !pinTimer) pin();
   const p = current();
   const time = h('p', { class: 'kid-play__clock' }, clock(Date.now() - p.startedAt));
   const opens = h('p', { class: 'kid-play__opens' });
@@ -104,7 +138,7 @@ export function render(root, onFinish) {
     time,
     opens,
     back,
-    h('p', { class: 'kid-play__lead' }, kt('play.lead')),
+    h('p', { class: 'kid-play__lead' }, kt(canPin() ? 'play.leadApp' : 'play.lead')),
     h('button', {
       type: 'button', class: 'btn btn--gold btn--block kid-play__finish',
       onclick: () => {

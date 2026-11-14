@@ -1,4 +1,5 @@
 import { LEVELS, SKILL_STEPS, DEFAULT_STARS } from './catalog.js';
+import { POT_STOPS } from './dream-stops.js';
 
 /* ЗВЁЗДЫ, СТУПЕНИ, НАВЫКИ — только счёт, без экрана и хранилища (проверки — tests/kids.test.js).
 
@@ -6,7 +7,8 @@ import { LEVELS, SKILL_STEPS, DEFAULT_STARS } from './catalog.js';
      deed — дело ребёнка (автор — ребёнок): { type: skill|task|game|help, ref, text, at, minutes?, opens?, friends? };
      ok   — подтверждение родителя, id = id дела: { stars, at, by, again? } — again: «потренируемся ещё», 0 звёзд;
      task — дело семьи из чата: { text, stars, by, at, takenBy, doneAt, deed? }. Сделал взрослый — звёзды ему сразу
-            (взрослым верим), сделал ребёнок — он кладёт дело (deed), звёзды — после подтверждения родителя.
+            (взрослым верим), сделал ребёнок — он кладёт дело (deed), звёзды — после подтверждения родителя;
+     award — звезда от родителя любому в семье: { to, stars, text, at, by } («папа принёс еду — мама оценила»).
 
    Всё — по записям с датами: недели, месяцы и рейтинги (отложены владельцем) потом посчитаются из этого же. */
 
@@ -28,7 +30,7 @@ export function waiting(deeds, oks) {
 }
 
 /** Звёзды участника с даты since (ISO, необязательно). Ребёнок — подтверждённые дела, взрослый — сделанные дела семьи. */
-export function starsOf(member, { deeds = [], oks = [], tasks = [] }, since = '') {
+export function starsOf(member, { deeds = [], oks = [], tasks = [], awards = [] }, since = '') {
   const ok = okMap(oks);
   let sum = 0;
   for (const d of live(deeds)) {
@@ -39,6 +41,9 @@ export function starsOf(member, { deeds = [], oks = [], tasks = [] }, since = ''
   for (const t of live(tasks)) {
     const x = t.data;
     if (x.takenBy === member && x.doneAt && !x.deed && String(x.doneAt) >= since) sum += Math.max(1, Number(x.stars) || DEFAULT_STARS);
+  }
+  for (const a of live(awards)) {
+    if (a.data.to === member && String(a.data.at || a.updatedAt) >= since) sum += Math.max(0, Number(a.data.stars) || 0);
   }
   return sum;
 }
@@ -69,10 +74,35 @@ export function skillStep(count) {
 
 /** Звёзды семьи с даты: каждый участник и его звёзды — порядок семьи (без мест и соревнования). */
 export function familyScore(circle, data, since = '') {
-  return (circle?.members || []).map((m) => ({ id: m.id, name: m.name, role: m.role, stars: starsOf(m.id, data, since) }));
+  return (circle?.members || []).map((m) => ({ id: m.id, name: m.name, role: m.role, side: m.side || null, stars: starsOf(m.id, data, since) }));
 }
 
 /** Все сыгранные живые игры ребёнка: минуты и «сколько раз брали телефон». */
 export function gamesOf(member, deeds) {
   return live(deeds).filter((d) => d.author === member && d.data.type === 'game');
+}
+
+/* МЕЧТА НАШЕЙ СЕМЬИ — общий котёл: все звёзды всей семьи с того дня, как мечту завели (fdream.startAt). Ничьи звёзды
+   не «тратятся»: котёл — это сумма, видно вклад каждого. Остановки (POT_STOPS) — праздники по пути. */
+export function familyPot(circle, data, dream, now = new Date()) {
+  const since = dream?.data?.startAt || '';
+  const byMember = familyScore(circle, data, since).filter((m) => m.stars > 0 || m.role);
+  const total = byMember.reduce((s, m) => s + m.stars, 0);
+  const target = Math.max(1, Number(dream?.data?.target) || 1);
+  const progress = Math.min(1, total / target);
+  const dayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate()).toISOString();
+  const today = familyScore(circle, data, since > dayStart ? since : dayStart).reduce((s, m) => s + m.stars, 0);
+  const reached = POT_STOPS.filter((st) => progress >= st.at);
+  return {
+    total, target, progress, today, byMember,
+    left: Math.max(0, target - total),
+    stop: reached[reached.length - 1] || null,
+    next: POT_STOPS.find((st) => progress < st.at) || null,
+  };
+}
+
+/** Мечта семьи, которая копится сейчас (последняя заведённая и ещё не исполненная). */
+export function activeDream(dreams) {
+  return live(dreams).filter((d) => d.data.status !== 'done')
+    .sort((a, b) => String(b.data.startAt).localeCompare(String(a.data.startAt)))[0] || null;
 }

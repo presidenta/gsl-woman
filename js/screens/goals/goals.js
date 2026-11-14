@@ -7,6 +7,9 @@ import { openSheet, closeSheet } from '../../ui/sheet.js';
 import { toast } from '../../ui/toast.js';
 import { segmented } from '../../ui/controls.js';
 import { circleGoals } from '../../circles/goals-view.js';
+// Письмо себе в будущее — через год, 5, 10 лет (letters/, 14.11.2026)
+import { lettersCard } from '../../letters/letters-view.js';
+import { ownBox } from '../../letters/letters.js';
 
 /* ЭКРАН «ЦЕЛИ»: вкладки «Мои · Пара · Семья» (владелец 13.11.2026: «цели у женщины, если она одна, и цели пары,
    если они вместе; и семьи»). «Мои» — сверху строка «Новая цель» и золотой «+», ниже — цели в работе, внизу —
@@ -89,12 +92,13 @@ export function render(view, ctx) {
     form,
   );
 
+  const letters = () => lettersCard(ownBox, { rerender: ctx.rerender });
   if (!list.length) {
     add(view, h('div', { class: 'card empty goals__empty' },
       h('div', { class: 'goals__emblem' }, svg(icons.goals)),
       h('div', { class: 'empty__title' }, t('goals.emptyTitle')),
       h('p', {}, t('goals.emptyText')),
-    ));
+    ), letters());
     return;
   }
 
@@ -105,4 +109,5 @@ export function render(view, ctx) {
       h('ul', { class: 'goals__list' }, ...done.map(goalRow)),
     );
   }
+  add(view, letters());
 }

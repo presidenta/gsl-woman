@@ -6,6 +6,9 @@ import { familyApi } from './family-api.js';
 import { confirmBox } from './tasks-view.js';
 import { SKILLS, DREAM_STATUS, DREAM_CATEGORIES } from './catalog.js';
 import { levelOf, starsOf, waiting, skillCount, skillStep, gamesOf } from './stars.js';
+import { chosenOf, progressOf } from './careers.js';
+import { PROF_BY_ID } from './dreams-catalog.js';
+import { isSealed } from '../letters/letters.js';
 
 /* «СЕМЬЯ» → «ДЕТИ» — КАБИНЕТ РЕБЁНКА ГЛАЗАМИ РОДИТЕЛЯ (владелец 14.11.2026: «в кабинете родителя всё должно
    отображаться»; ТЗ — docs/TZ-deti.md).
@@ -206,6 +209,33 @@ function dreamsBlock(api, kid) {
   );
 }
 
+function careersBlock(api, kid) {
+  const list = chosenOf(api, kid.id);
+  if (!list.length) return null;
+  return h('div', {},
+    h('h4', { class: 'kid-sub' }, kt('parent.careers')),
+    h('ul', { class: 'kid-rows' }, ...list.map((c) => {
+      const p = PROF_BY_ID[c.data.prof];
+      const { done, all } = progressOf(api, kid.id, p.id);
+      return h('li', { class: 'kid-row' },
+        h('span', { class: 'kid-row__icon', 'aria-hidden': 'true' }, p.icon),
+        h('span', { class: 'kid-row__title' }, p.title),
+        h('span', { class: 'kid-badge is-ok' }, kt('career.route', { done, all })));
+    })));
+}
+
+/* Письма ребёнка себе: родитель видит, что письмо есть и когда откроется; текст запечатан и для него. */
+function lettersBlock(api, kid) {
+  const list = api.items('letter').filter((x) => x.data.member === kid.id).sort((a, b) => a.data.openAt.localeCompare(b.data.openAt));
+  if (!list.length) return null;
+  const fmt = (iso) => new Date(`${iso}T12:00:00`).toLocaleDateString();
+  return h('div', {},
+    h('h4', { class: 'kid-sub' }, kt('parent.letters')),
+    h('ul', { class: 'kid-rows' }, ...list.map((x) => h('li', { class: 'kid-row' },
+      h('span', { class: 'kid-row__title' }, isSealed(x.data) ? kt('parent.letterSealed', { date: fmt(x.data.openAt) }) : kt('parent.letterOpen', { date: fmt(x.data.openAt) })),
+      x.data.together ? h('span', { class: 'kid-badge' }, '👨‍👩‍👧') : null))));
+}
+
 /** Вкладка «Дети» в «Семье». */
 export function kidsView(ctx, circle) {
   const kids = circle.members.filter((m) => m.role === 'child');
@@ -213,7 +243,7 @@ export function kidsView(ctx, circle) {
   watch(circle.id, ctx.rerender);
   if (!kids.length) return h('section', { class: 'card' }, h('p', { class: 'card__text faint' }, kt('parent.noKids')));
   const api = familyApi(circle);
-  const data = { deeds: api.items('deed'), oks: api.items('ok'), tasks: api.items('task') };
+  const data = { deeds: api.items('deed'), oks: api.items('ok'), tasks: api.items('task'), awards: api.items('award') };
   const d = new Date();
   const monday = new Date(d.getFullYear(), d.getMonth(), d.getDate() - ((d.getDay() + 6) % 7)).toISOString();
   return h('div', { class: 'kid-parent' },
@@ -228,7 +258,9 @@ export function kidsView(ctx, circle) {
         waitingBlock(api, kid),
         skillsBlock(api, kid),
         gamesBlock(api, kid),
+        careersBlock(api, kid),
         dreamsBlock(api, kid),
+        lettersBlock(api, kid),
       );
     }),
   );

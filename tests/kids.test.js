@@ -6,12 +6,15 @@ import { SKILL_SECTIONS, SKILLS, GAMES, TASK_IDEAS, LEVELS, STAR_CHOICES, DEFAUL
 import { KT, kt } from '../js/kids/texts.js';
 import { starsOf, levelOf, waiting, skillCount, skillStep, familyScore, gamesOf } from '../js/kids/stars.js';
 import * as kid from '../js/kids/kid-store.js';
+import { familyPot, activeDream } from '../js/kids/stars.js';
+import { PROFESSIONS, routeOf, FAMILY_DREAM_IDEAS, KID_LETTER_PROMPTS, POT_STOPS } from '../js/kids/dreams-catalog.js';
 
 const strings = (v) => (typeof v === 'string' ? [v] : Array.isArray(v) ? v.flatMap(strings) : v && typeof v === 'object' ? Object.values(v).flatMap(strings) : []);
 const NEGATIVE = /(^|[^а-яёА-ЯЁ])(не|нет|ни|без)(?=[^а-яёА-ЯЁ]|$)/i;
 
 test('тексты и содержание — положительными словами (как вся программа)', () => {
-  const all = [...strings(KT), ...strings(SKILL_SECTIONS), ...strings(GAMES), ...TASK_IDEAS, ...strings(LEVELS), ...strings(DREAM_CATEGORIES)];
+  const all = [...strings(KT), ...strings(SKILL_SECTIONS), ...strings(GAMES), ...TASK_IDEAS, ...strings(LEVELS), ...strings(DREAM_CATEGORIES),
+    ...strings(PROFESSIONS), ...strings(FAMILY_DREAM_IDEAS), ...KID_LETTER_PROMPTS, ...strings(POT_STOPS)];
   assert.ok(all.length > 300);
   for (const s of all) assert.doesNotMatch(s, NEGATIVE, s);
 });
@@ -61,6 +64,7 @@ test('звёзды: ребёнку — после подтверждения р�
   assert.equal(gamesOf('ira', deeds).length, 1);
   const circle = { members: [{ id: 'mom', name: 'Мама', role: 'parent' }, { id: 'dad', name: 'Папа', role: 'parent' }, { id: 'ira', name: 'Ира', role: 'child' }] };
   assert.deepEqual(familyScore(circle, data).map((r) => [r.name, r.stars]), [['Мама', 1], ['Папа', 3], ['Ира', 6]], 'порядок семьи, без мест');
+  assert.equal(familyScore({ members: [{ id: 'dad', name: 'Папа', role: 'parent', side: 'man' }] }, data)[0].side, 'man', 'цвет вклада — по части');
   assert.equal(starsOf('ira', data, '2026-11-15T00:00:00Z'), 0, 'с даты');
 });
 
@@ -127,4 +131,37 @@ test('телефон ребёнка: вход ждёт родителя, пос�
   assert.equal(kid.session(), null);
   assert.ok(calls.includes('/api/kids/logout'));
   kid._useFetch(null);
+});
+
+test('кем я хочу стать: у каждой профессии путь, шаги-навыки берут название из каталога', () => {
+  assert.ok(PROFESSIONS.length >= 15);
+  assert.equal(new Set(PROFESSIONS.map((p) => p.id)).size, PROFESSIONS.length);
+  for (const p of PROFESSIONS) {
+    const route = routeOf(p.id);
+    assert.ok(route.length >= 5, p.id);
+    assert.equal(new Set(route.map((s) => s.id)).size, route.length, `${p.id}: шаги без повторов`);
+    for (const s of route) assert.ok(s.title && !s.title.startsWith('skill:'), `${p.id}: ${s.id} — навык есть в каталоге`);
+  }
+  assert.ok(routeOf('mechanic').some((s) => /ключ/i.test(s.title)), 'автомеханику — ключи (владелец)');
+  assert.ok(routeOf('business').some((s) => /Монопол/.test(s.title)), 'бизнесмену — бизнес-игры (владелец)');
+});
+
+test('мечта семьи: общий котёл — звёзды всех с того дня, как мечту завели; звёзды от родителя — тоже', () => {
+  const circle = { members: [{ id: 'mom', name: 'Мама', role: 'parent', side: 'woman' }, { id: 'dad', name: 'Папа', role: 'parent', side: 'man' }, { id: 'ira', name: 'Ира', role: 'child' }] };
+  const dream = rec('fdream', 'fd1', 'mom', { title: 'Море', icon: '🏖️', target: 20, startAt: '2026-11-14T00:00:00Z', status: 'active' });
+  const data = {
+    deeds: [rec('deed', 'd1', 'ira', { type: 'help', at: '2026-11-14T09:00:00Z' }), rec('deed', 'd0', 'ira', { type: 'help', at: '2026-11-10T09:00:00Z' })],
+    oks: [rec('ok', 'd1', 'mom', { stars: 3, at: '2026-11-14T10:00:00Z' }), rec('ok', 'd0', 'mom', { stars: 9, at: '2026-11-10T10:00:00Z' })],
+    tasks: [rec('task', 't1', 'mom', { text: 'Дрова', stars: 3, takenBy: 'dad', doneAt: '2026-11-14T11:00:00Z' })],
+    awards: [rec('award', 'a1', 'mom', { to: 'dad', stars: 2, text: 'Купил продукты', at: '2026-11-14T12:00:00Z', by: 'mom' })],
+  };
+  const pot = familyPot(circle, data, dream, new Date('2026-11-14T15:00:00Z'));
+  assert.equal(pot.total, 8, 'до мечты (9 звёзд 10 ноября) — в котёл не идёт');
+  assert.deepEqual(pot.byMember.map((m) => [m.name, m.stars]), [['Мама', 0], ['Папа', 5], ['Ира', 3]], 'вклад каждого; мама оценила папу');
+  assert.equal(pot.left, 12);
+  assert.equal(pot.stop.title, 'Собрали рюкзаки', '8 из 20 — первая остановка позади');
+  assert.equal(pot.next.title, 'Полпути!');
+  assert.equal(activeDream([dream]).id, 'fd1');
+  assert.equal(activeDream([{ ...dream, data: { ...dream.data, status: 'done' } }]), null);
+  assert.equal(starsOf('dad', data), 5);
 });

@@ -4,6 +4,7 @@ import { icons } from '../ui/icons.js';
 import * as circles from './circles.js';
 import { familyApi } from '../kids/family-api.js';
 import { taskCard, taskComposer } from '../kids/tasks-view.js';
+import { awardCard } from '../kids/family-dream.js';
 import { kt } from '../kids/texts.js';
 
 /* ЧАТ ПАРЫ И СЕМЕЙНЫЙ ЧАТ (владелец 13.11.2026: «отдельный чат, где люди понимают, что это написал их самый близкий
@@ -50,7 +51,7 @@ function bubble(circle, m, api) {
    В семейном чате вместе с сообщениями идут дела семьи (kids/tasks-view.js): «＋ Дело», «Беру», звёзды. */
 export function chatView(circle, api = familyApi(circle)) {
   const family = circle.kind === 'family';
-  const list = [...api.items('msg'), ...(family ? api.items('task') : [])].sort((a, b) => atOf(a).localeCompare(atOf(b)));
+  const list = [...api.items('msg'), ...(family ? [...api.items('task'), ...api.items('award')] : [])].sort((a, b) => atOf(a).localeCompare(atOf(b)));
   // Прочитано — после отрисовки: запись в хранилище посреди отрисовки перерисовала бы экран ещё раз
   queueMicrotask(() => api.markSeen?.());
 
@@ -62,7 +63,7 @@ export function chatView(circle, api = familyApi(circle)) {
       day = d;
       feed.append(h('li', { class: 'chat__day caps' }, formatDate(d)));
     }
-    feed.append(m.kind === 'task' ? taskCard(api, m) : bubble(circle, m, api));
+    feed.append(m.kind === 'task' ? taskCard(api, m) : m.kind === 'award' ? awardCard(api, m) : bubble(circle, m, api));
   }
   if (!list.length) feed.append(h('li', { class: 'chat__empty faint' }, t('us.chat.empty')));
 

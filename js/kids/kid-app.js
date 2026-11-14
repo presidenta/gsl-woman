@@ -11,6 +11,10 @@ import * as play from './nophone.js';
 import { kt } from './texts.js';
 import { SKILL_SECTIONS, SKILLS, GAMES, GAME_BY_ID, DREAM_CATEGORIES } from './catalog.js';
 import { levelOf, starsOf, skillCount, skillStep, okMap, familyScore, gamesOf } from './stars.js';
+import { familyDreamCard } from './family-dream.js';
+import { careersView, stepTitle, doStep } from './careers.js';
+import { KID_LETTER_PROMPTS } from './dreams-catalog.js';
+import { lettersCard } from '../letters/letters-view.js';
 
 /* ДЕТСКИЙ КАБИНЕТ НА ТЕЛЕФОНЕ РЕБЁНКА (владелец 14.11.2026, ТЗ — docs/TZ-deti.md). Своё приложение внутри GSL:
    js/boot.js открывает его вместо взрослого, когда на телефоне вход ребёнка или пришла ссылка #kid=КОД.
@@ -31,6 +35,7 @@ let starting = null; // id игры, для которой выбираем др
 let chosen = new Set();
 let result = null; // итог последней живой игры
 let pending = false;
+let dreamTab = 'mine'; // «Мечты»: мои мечты · кем стать · письма
 
 const short = (id) => String(id || '').replace(/-/g, '').slice(0, 8);
 const compact = (iso) => iso.replace(/-/g, '');
@@ -42,7 +47,7 @@ function weekStart(iso = isoDate()) {
 }
 
 function data(api) {
-  return { deeds: api.items('deed'), oks: api.items('ok'), tasks: api.items('task') };
+  return { deeds: api.items('deed'), oks: api.items('ok'), tasks: api.items('task'), awards: api.items('award') };
 }
 
 /* ---------- Ворота ---------- */
@@ -156,12 +161,15 @@ function planCard(api) {
   const list = plan(api);
   const rows = list.map((x) => {
     const deed = todayDeed(api, x.type, x.ref);
-    const title = x.type === 'skill' ? SKILLS[x.ref]?.title : GAME_BY_ID[x.ref]?.title;
-    const icon = x.type === 'skill' ? SKILLS[x.ref]?.icon : GAME_BY_ID[x.ref]?.icon;
+    const step = x.type === 'step' ? stepTitle(x.ref) : null;
+    const title = x.type === 'skill' ? SKILLS[x.ref]?.title : step ? step.title : GAME_BY_ID[x.ref]?.title;
+    const icon = x.type === 'skill' ? SKILLS[x.ref]?.icon : step ? step.icon : GAME_BY_ID[x.ref]?.icon;
     if (!title) return null;
     let action;
     if (deed) action = deedState(api, deed);
-    else if (x.type === 'skill') {
+    else if (step) {
+      action = h('button', { type: 'button', class: 'btn btn--gold kid-row__btn', onclick: () => doStep(api, step.prof.id, step.step) }, kt('today.done'));
+    } else if (x.type === 'skill') {
       action = h('button', {
         type: 'button', class: 'btn btn--gold kid-row__btn',
         onclick: () => api.put('deed', api.newId('d'), { type: 'skill', ref: x.ref, text: title, at: new Date().toISOString(), day: isoDate() }),
@@ -212,7 +220,7 @@ function familyCard(api) {
 }
 
 function todayView(api) {
-  return [levelCard(api), planCard(api), helpCard(api), familyCard(api)];
+  return [levelCard(api), familyDreamCard(api, { rerender: draw }), planCard(api), helpCard(api), familyCard(api)];
 }
 
 /* ---------- Навыки ---------- */
@@ -360,7 +368,28 @@ function gameEnded(api, r) {
 
 /* ---------- Мечты ---------- */
 
+/** Письма ребёнка — записи семьи letter { member, … }: родители видят, что письмо есть и когда откроется. */
+function kidBox(api) {
+  return {
+    list: () => api.items('letter').filter((x) => x.data.member === api.me).map((x) => ({ ...x.data, id: x.id })),
+    save: (l) => { const { id, ...rest } = l; api.put('letter', id, { ...rest, member: api.me }); },
+    remove: (id) => api.drop('letter', id),
+  };
+}
+
 function dreamsView(api) {
+  const tabs = h('div', { class: 'kid-subtabs', role: 'tablist' }, ...['mine', 'career', 'letters'].map((k) => h('button', {
+    type: 'button', role: 'tab', class: `kid-subtab${dreamTab === k ? ' is-on' : ''}`, 'aria-selected': String(dreamTab === k),
+    onclick: () => { dreamTab = k; draw(); },
+  }, kt(`sub.${k}`))));
+  if (dreamTab === 'career') {
+    return [tabs, ...careersView(api, { togglePlan: (type, ref) => togglePlan(api, type, ref), inPlan: (type, ref) => inPlan(api, type, ref) })];
+  }
+  if (dreamTab === 'letters') return [tabs, lettersCard(kidBox(api), { rerender: draw, kid: true, prompts: KID_LETTER_PROMPTS })];
+  return [tabs, ...myDreams(api)];
+}
+
+function myDreams(api) {
   let cat = DREAM_CATEGORIES[0][0];
   let month = false;
   const input = h('input', { class: 'input', maxlength: '160', placeholder: kt('dreams.ph'), 'aria-label': kt('dreams.ph') });

@@ -204,9 +204,17 @@
   border: 1px solid var(--c-line);
 }
 
-.kid-row--skill,
-.kid-row--wait {
+.kid-row--skill {
   flex-wrap: wrap;
+}
+
+.kid-row--wait {
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.kid-row--wait .kid-row__main {
+  flex: none;
 }
 
 .kid-row__icon {
@@ -622,4 +630,304 @@
 
 .kid-close {
   margin-top: var(--sp-2);
+}
+
+/* ---------- Мечта нашей семьи: общий котёл ---------- */
+
+.kid-pot {
+  display: grid;
+  gap: var(--sp-3);
+}
+
+.kid-pot.is-reached {
+  box-shadow: 0 0 40px -10px rgba(var(--rgb-gold), 0.8);
+}
+
+.kid-pot__icon {
+  font-size: 48px;
+  text-align: center;
+}
+
+.kid-pot__title {
+  font-size: var(--fs-xl);
+}
+
+.kid-pot__sum {
+  font-size: var(--fs-2xl);
+  font-weight: 800;
+}
+
+.kid-pot__form {
+  display: grid;
+  gap: var(--sp-2);
+}
+
+.kid-pot__target {
+  max-width: 160px;
+}
+
+.kid-chip--icon {
+  font-size: 20px;
+  padding: 6px 10px;
+}
+
+.kid-road {
+  position: relative;
+  height: 64px;
+  margin: var(--sp-2) 18px 0;
+}
+
+.kid-road__track {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 38px;
+  height: 12px;
+  border-radius: 999px;
+  background: repeating-linear-gradient(90deg, var(--c-surface-strong) 0 14px, transparent 14px 22px);
+  overflow: hidden;
+}
+
+.kid-road__fill {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--g-gold-smooth);
+  box-shadow: 0 0 14px rgba(var(--rgb-gold), 0.7);
+  transition: width 0.8s ease;
+}
+
+.kid-road__home,
+.kid-road__goal,
+.kid-road__stop {
+  position: absolute;
+  top: 30px;
+  font-size: 22px;
+  line-height: 1;
+  transform: translateX(-50%);
+}
+
+.kid-road__home {
+  left: 0;
+}
+
+.kid-road__goal {
+  left: 100%;
+  font-size: 28px;
+  top: 24px;
+  filter: grayscale(0.5);
+}
+
+.kid-road__stop {
+  filter: grayscale(1);
+  opacity: 0.55;
+}
+
+.kid-road__stop.is-on,
+.kid-road__goal.is-on {
+  filter: none;
+  opacity: 1;
+}
+
+.kid-road__family {
+  position: absolute;
+  top: 0;
+  font-size: 26px;
+  transform: translateX(-50%);
+  animation: kid-walk 1.6s ease-in-out infinite;
+  transition: left 0.8s ease;
+}
+
+@keyframes kid-walk {
+  0%, 100% { transform: translateX(-50%) translateY(0); }
+  50% { transform: translateX(-50%) translateY(-4px); }
+}
+
+.kid-pot__next,
+.kid-pot__stop,
+.kid-pot__today {
+  margin: 0;
+}
+
+.kid-pot__today {
+  font-weight: 700;
+  color: var(--c-gold);
+}
+
+.kid-pot__party {
+  text-align: center;
+  padding: var(--sp-3);
+  border-radius: 14px;
+  background: rgba(var(--rgb-gold), 0.12);
+  display: grid;
+  gap: var(--sp-2);
+}
+
+.kid-pot__party-title {
+  font-size: var(--fs-xl);
+  font-weight: 800;
+  color: var(--c-gold);
+}
+
+.kid-pot__history summary {
+  cursor: pointer;
+  color: var(--c-text-dim);
+  font-weight: 700;
+}
+
+.kid-shares {
+  display: flex;
+  height: 10px;
+  border-radius: 999px;
+  overflow: hidden;
+  background: var(--c-surface-strong);
+}
+
+.kid-shares__part.is-woman { background: var(--c-tone-woman); }
+.kid-shares__part.is-man { background: var(--c-tone-man); }
+.kid-shares__part.is-child { background: #7fd3ff; }
+.kid-shares__part + .kid-shares__part { border-left: 2px solid rgba(var(--rgb-bg), 0.9); }
+
+.kid-shares__list {
+  list-style: none;
+  margin: var(--sp-2) 0 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2) var(--sp-3);
+  font-size: var(--fs-sm);
+}
+
+.kid-shares__list li {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.kid-shares__dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--c-tone-woman);
+}
+
+.kid-shares__list .is-man .kid-shares__dot { background: var(--c-tone-man); }
+.kid-shares__list .is-child .kid-shares__dot { background: #7fd3ff; }
+
+/* Звезда от родителя в чате */
+.kid-award {
+  align-self: center;
+  max-width: 100%;
+  text-align: center;
+  border: 1px solid var(--c-line-strong);
+  background: rgba(var(--rgb-gold), 0.1);
+}
+
+.kid-award__line {
+  display: block;
+  font-weight: 800;
+  color: var(--c-gold);
+}
+
+.kid-award__text {
+  display: block;
+  font-size: var(--fs-sm);
+  color: var(--c-text-dim);
+}
+
+/* ---------- «Мечты»: вкладки, профессии, путь ---------- */
+
+.kid-subtabs {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 4px;
+  padding: 4px;
+  border-radius: 999px;
+  background: var(--c-surface);
+  border: 1px solid var(--c-line);
+}
+
+.kid-subtab {
+  border: 0;
+  border-radius: 999px;
+  padding: 9px 6px;
+  background: none;
+  color: var(--c-text-dim);
+  font: inherit;
+  font-weight: 700;
+  font-size: var(--fs-sm);
+  cursor: pointer;
+}
+
+.kid-subtab.is-on {
+  background: var(--g-gold-smooth);
+  color: var(--c-on-gold);
+}
+
+.kid-profs {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
+  gap: var(--sp-2);
+  margin-top: var(--sp-3);
+}
+
+.kid-prof {
+  display: grid;
+  justify-items: center;
+  gap: 4px;
+  padding: var(--sp-2);
+  border-radius: 14px;
+  border: 1px solid var(--c-line);
+  background: var(--c-surface);
+  color: var(--c-text-dim);
+  font: inherit;
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.kid-prof__icon {
+  font-size: 28px;
+}
+
+.kid-prof.is-on {
+  border-color: var(--c-line-strong);
+  background: rgba(var(--rgb-gold), 0.16);
+  color: var(--c-gold);
+}
+
+.kid-prof:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.kid-career {
+  display: grid;
+  gap: var(--sp-2);
+}
+
+.kid-career__count {
+  font-weight: 800;
+  margin: 0;
+}
+
+.kid-career__all {
+  font-weight: 800;
+  color: var(--c-gold);
+}
+
+.kid-route {
+  counter-reset: none;
+}
+
+.kid-route__step.is-done .kid-row__title {
+  color: var(--c-gold);
+}
+
+.kid-route__mark {
+  flex: none;
+}
+
+.kid-career__remove {
+  width: fit-content;
 }

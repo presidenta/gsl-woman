@@ -30,6 +30,8 @@ import * as meetScreen from './screens/meet/meet.js';
 import * as usScreen from './screens/us/us.js';
 import * as circles from './circles/circles.js';
 import { watchHabits } from './circles/goals-model.js';
+// Детский кабинет: телефон ребёнка или его дела ждут родителя — красная точка на «Мы» (kids/alerts.js)
+import { kidAlerts } from './kids/alerts.js';
 import { identity } from './account/avatar.js';
 import { brand as brandMark } from './ui/brand.js';
 import * as install from './install/install.js';
@@ -296,9 +298,10 @@ function draw() {
   shell.gear.hidden = name === 'settings';
   shell.us.hidden = name === 'us';
   const unread = circles.unread();
+  const kids = kidAlerts();
   const dot = shell.us.querySelector('.us-btn__dot');
-  dot.hidden = !unread.length;
-  dot.classList.toggle('is-urgent', unread.some((u) => u.msg.data?.signal === 'urgent'));
+  dot.hidden = !unread.length && !kids.total;
+  dot.classList.toggle('is-urgent', !!kids.total || unread.some((u) => u.msg.data?.signal === 'urgent'));
   for (const a of shell.nav.querySelectorAll('.app-nav__item')) {
     if (a.dataset.route === name) a.setAttribute('aria-current', 'page');
     else a.removeAttribute('aria-current');
