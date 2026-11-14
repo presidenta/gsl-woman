@@ -2,6 +2,9 @@ import { h, svg } from '../core/dom.js';
 import { t, formatDate } from '../core/i18n.js';
 import { icons } from '../ui/icons.js';
 import * as circles from './circles.js';
+import { familyApi } from '../kids/family-api.js';
+import { taskCard, taskComposer } from '../kids/tasks-view.js';
+import { kt } from '../kids/texts.js';
 
 /* ЧАТ ПАРЫ И СЕМЕЙНЫЙ ЧАТ (владелец 13.11.2026: «отдельный чат, где люди понимают, что это написал их самый близкий
    человек или ребёнок; всё по делу»; ТЗ раздел 4). Сверху — быстрые сигналы (помощь, поддержка, срочно, спасибо,
@@ -21,29 +24,35 @@ const sideClass = (c, id) => {
   return m?.role === 'child' ? 'is-child' : m?.side === 'man' ? 'is-man' : 'is-woman';
 };
 
-function send(circle, text, signal = null) {
+function send(api, text, signal = null) {
   const clean = String(text || '').trim().slice(0, MAX);
   if (!clean && !signal) return false;
-  circles.put(circle.id, 'msg', circles.newId('m'), { text: clean, signal, at: new Date().toISOString() });
+  api.put('msg', api.newId('m'), { text: clean, signal, at: new Date().toISOString() });
   return true;
 }
 
-function bubble(circle, m) {
+const atOf = (x) => x.data?.at || x.updatedAt;
+let composing = false;
+
+function bubble(circle, m, api) {
   const mine = m.author === circle.me;
   const d = m.data || {};
   const time = new Date(d.at || m.updatedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   return h('li', { class: `chat__msg ${mine ? 'is-mine' : 'is-theirs'} ${sideClass(circle, m.author)}${d.signal ? ` is-signal is-${d.signal}` : ''}` },
-    mine ? null : h('span', { class: 'chat__who' }, circles.memberName(circle, m.author)),
+    mine ? null : h('span', { class: 'chat__who' }, api.name(m.author)),
     d.signal ? h('span', { class: 'chat__signal' }, svg(SIGNAL_ICON[d.signal] || icons.sparkle, 'chat__signal-icon'), t(`us.chat.signals.${d.signal}`)) : null,
     d.text ? h('span', { class: 'chat__text' }, d.text) : null,
     h('span', { class: 'chat__time' }, time),
   );
 }
 
-export function chatView(circle) {
-  const list = circles.items(circle.id, 'msg').sort((a, b) => (a.data?.at || a.updatedAt).localeCompare(b.data?.at || b.updatedAt));
+/* api — чьими руками читать и писать: кабинет родителя (по умолчанию, circles/) или телефон ребёнка (kids/kid-store.js).
+   В семейном чате вместе с сообщениями идут дела семьи (kids/tasks-view.js): «＋ Дело», «Беру», звёзды. */
+export function chatView(circle, api = familyApi(circle)) {
+  const family = circle.kind === 'family';
+  const list = [...api.items('msg'), ...(family ? api.items('task') : [])].sort((a, b) => atOf(a).localeCompare(atOf(b)));
   // Прочитано — после отрисовки: запись в хранилище посреди отрисовки перерисовала бы экран ещё раз
-  queueMicrotask(() => circles.markSeen(circle.id));
+  queueMicrotask(() => api.markSeen?.());
 
   const feed = h('ol', { class: 'chat__feed' });
   let day = null;
@@ -53,7 +62,7 @@ export function chatView(circle) {
       day = d;
       feed.append(h('li', { class: 'chat__day caps' }, formatDate(d)));
     }
-    feed.append(bubble(circle, m));
+    feed.append(m.kind === 'task' ? taskCard(api, m) : bubble(circle, m, api));
   }
   if (!list.length) feed.append(h('li', { class: 'chat__empty faint' }, t('us.chat.empty')));
 
@@ -63,7 +72,7 @@ export function chatView(circle) {
   input.addEventListener('focus', () => { focused = circle.id; });
   input.addEventListener('blur', () => { setTimeout(() => { if (document.activeElement !== input) focused = null; }, 0); });
   const submit = () => {
-    if (send(circle, input.value)) {
+    if (send(api, input.value)) {
       drafts[circle.id] = '';
       input.value = '';
     }
@@ -72,10 +81,20 @@ export function chatView(circle) {
     if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) { e.preventDefault(); submit(); }
   });
 
+  // «＋ Дело» — форма над лентой открывается и закрывается на месте, без перерисовки экрана
+  const composer = family ? taskComposer(api, () => { composing = false; composer.hidden = true; }) : null;
+  if (composer) composer.hidden = !composing;
+  const quick = family ? h('button', {
+    type: 'button', class: 'chat__quick kid-task-quick', 'aria-expanded': String(composing),
+    onclick: (e) => { composing = !composing; composer.hidden = !composing; e.currentTarget.setAttribute('aria-expanded', String(composing)); },
+  }, api.role === 'child' ? kt('task.proposeQuick') : kt('task.quick')) : null;
+
   const node = h('section', { class: 'card chat' },
     h('div', { class: 'chat__signals', role: 'group' },
-      ...SIGNALS.map((s) => h('button', { type: 'button', class: `chat__quick is-${s}`, onclick: () => send(circle, input.value, s) && (drafts[circle.id] = '') },
-        svg(SIGNAL_ICON[s], 'chat__quick-icon'), t(`us.chat.signals.${s}`)))),
+      ...SIGNALS.map((s) => h('button', { type: 'button', class: `chat__quick is-${s}`, onclick: () => send(api, input.value, s) && (drafts[circle.id] = '') },
+        svg(SIGNAL_ICON[s], 'chat__quick-icon'), t(`us.chat.signals.${s}`))),
+      quick),
+    composer,
     feed,
     h('div', { class: 'chat__compose' },
       input,

@@ -1,0 +1,625 @@
+/* ДЕТСКИЙ КАБИНЕТ — вид (js/kids/). Телефон ребёнка: <html data-side="kid"> (kid-app.js) — ночное синее небо и тёплое
+   золото: ярче и веселее взрослых частей, те же токены (styles/tokens.css), компоненты ничего о части не знают.
+   Дела семьи в чате и вкладка «Дети» у родителя — в цветах его части. */
+
+:root[data-side="kid"] {
+  --c-bg: #0d1430;
+  --c-bg-raise: #17204a;
+  --c-surface: rgba(220, 232, 255, 0.06);
+  --c-surface-strong: rgba(220, 232, 255, 0.11);
+  --c-line: rgba(255, 214, 120, 0.18);
+  --c-line-strong: rgba(255, 214, 120, 0.42);
+  --c-scrim: rgba(5, 8, 22, 0.7);
+
+  --c-text: #f4f6ff;
+  --c-text-dim: #c3cbe8;
+  --c-text-faint: #8d97bf;
+  --c-on-gold: #2a1c02;
+
+  --c-gold: #ffd36e;
+  --c-gold-deep: #f0a72e;
+  --c-rose: #ff9db0;
+  --c-champagne: #ffe9b8;
+
+  --rgb-gold: 255, 211, 110;
+  --rgb-bg: 13, 20, 48;
+  --rgb-raise: 23, 32, 74;
+  --rgb-ink: 5, 8, 22;
+  --rgb-rose: 255, 157, 176;
+  --rgb-on-gold: 42, 28, 2;
+  --rgb-glow: 255, 190, 90;
+
+  --g-gold: linear-gradient(118deg, #fff2c4 0%, #ffd36e 30%, #f0a72e 55%, #ffe08f 78%, #f5b13c 100%);
+  --g-gold-smooth: linear-gradient(135deg, #fff2c4 0%, #ffd36e 35%, #f0a72e 70%, #ffe08f 100%);
+  --g-gold-text: linear-gradient(100deg, #ffe08f 0%, #ffc94a 45%, #fff2c4 60%, #f5b13c 100%);
+  --g-page:
+    radial-gradient(90% 55% at 85% -10%, rgba(255, 211, 110, 0.16), transparent 60%),
+    radial-gradient(80% 50% at -10% 20%, rgba(110, 200, 255, 0.12), transparent 60%),
+    radial-gradient(120% 70% at 50% 110%, rgba(120, 90, 255, 0.18), transparent 60%),
+    var(--c-bg);
+}
+
+/* ---------- Ворота: вход, ожидание, кабинет закрыт ---------- */
+
+.kid-app--gate {
+  min-height: 100dvh;
+  display: grid;
+  place-items: center;
+  padding: var(--sp-5) var(--gutter);
+}
+
+.kid-gate {
+  width: min(100%, 420px);
+  display: grid;
+  gap: var(--sp-3);
+  text-align: center;
+}
+
+.kid-gate .field {
+  text-align: left;
+}
+
+.kid-gate__icon {
+  font-size: 56px;
+  line-height: 1;
+}
+
+.kid-gate__icon--wait {
+  animation: kid-sway 2.4s ease-in-out infinite;
+}
+
+.kid-gate__name {
+  font-size: var(--fs-xl);
+  font-weight: 800;
+  color: var(--c-gold);
+}
+
+.kid-gate__err {
+  color: var(--c-rose);
+  font-weight: 600;
+}
+
+.kid-code {
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  font-weight: 800;
+  text-align: center;
+}
+
+@keyframes kid-sway {
+  0%, 100% { transform: rotate(-8deg); }
+  50% { transform: rotate(8deg); }
+}
+
+/* ---------- Каркас ---------- */
+
+.kid-header {
+  gap: var(--sp-2);
+}
+
+.kid-header__level {
+  font-size: 26px;
+}
+
+.kid-header__name {
+  font-weight: 800;
+  font-size: var(--fs-md);
+}
+
+.kid-header__stars {
+  font-weight: 800;
+  font-size: var(--fs-md);
+}
+
+.kid-header__brand {
+  font-weight: 800;
+  font-size: var(--fs-sm);
+  letter-spacing: 0.06em;
+  margin-left: var(--sp-2);
+}
+
+.kid-nav__icon {
+  font-size: 22px;
+  line-height: 1;
+  filter: grayscale(0.6);
+  opacity: 0.75;
+}
+
+.kid-nav .app-nav__item[aria-current='page'] .kid-nav__icon {
+  filter: none;
+  opacity: 1;
+  transform: scale(1.12);
+}
+
+.kid-view > * + * {
+  margin-top: var(--sp-4);
+}
+
+.kid-lead {
+  margin-top: 0;
+}
+
+.kid-logout {
+  margin-top: var(--sp-6);
+}
+
+/* ---------- Ступень и звёзды ---------- */
+
+.kid-level {
+  text-align: center;
+  display: grid;
+  gap: var(--sp-2);
+  justify-items: center;
+}
+
+.kid-level__tree {
+  font-size: 72px;
+  line-height: 1;
+  animation: kid-grow 3.2s ease-in-out infinite;
+}
+
+.kid-level__stars {
+  font-size: var(--fs-2xl);
+  font-weight: 800;
+}
+
+@keyframes kid-grow {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.06); }
+}
+
+.kid-bar {
+  width: 100%;
+  height: 12px;
+  border-radius: 999px;
+  background: var(--c-surface-strong);
+  overflow: hidden;
+}
+
+.kid-bar__fill {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--g-gold-smooth);
+  box-shadow: 0 0 12px rgba(var(--rgb-gold), 0.6);
+}
+
+/* ---------- Строки: задания, навыки, мечты ---------- */
+
+.kid-rows {
+  list-style: none;
+  margin: var(--sp-3) 0 0;
+  padding: 0;
+  display: grid;
+  gap: var(--sp-2);
+}
+
+.kid-row {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  padding: var(--sp-3);
+  border-radius: var(--r-md, 14px);
+  background: var(--c-surface);
+  border: 1px solid var(--c-line);
+}
+
+.kid-row--skill,
+.kid-row--wait {
+  flex-wrap: wrap;
+}
+
+.kid-row__icon {
+  font-size: 24px;
+  flex: none;
+}
+
+.kid-row {
+  flex-wrap: wrap;
+}
+
+.kid-row__title {
+  flex: 1 1 140px;
+  min-width: 0;
+  font-weight: 600;
+}
+
+.kid-row__main {
+  flex: 1 1 180px;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.kid-row__meta {
+  font-size: var(--fs-xs);
+}
+
+.kid-row__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+}
+
+.kid-row__btn {
+  min-height: 38px;
+  padding-inline: var(--sp-3);
+  font-size: var(--fs-sm);
+}
+
+.kid-badge {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  background: var(--c-surface-strong);
+  color: var(--c-text-dim);
+  width: fit-content;
+}
+
+.kid-badge.is-ok,
+.kid-badge.is-bought {
+  background: rgba(var(--rgb-gold), 0.18);
+  color: var(--c-gold);
+}
+
+.kid-badge.is-wait,
+.kid-badge.is-planned {
+  background: rgba(110, 200, 255, 0.16);
+  color: #9fdcff;
+}
+
+.kid-dream.is-month {
+  border-color: var(--c-line-strong);
+  box-shadow: 0 0 18px -8px rgba(var(--rgb-gold), 0.7);
+}
+
+.kid-dream.is-done .kid-row__title {
+  color: var(--c-gold);
+}
+
+.kid-dream__note {
+  font-style: italic;
+  color: var(--c-text-dim);
+}
+
+.kid-dream--parent .kid-chips {
+  margin-top: var(--sp-1);
+}
+
+/* ---------- Кнопки-фишки и звёзды ---------- */
+
+.kid-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+  margin: var(--sp-2) 0;
+}
+
+.kid-chip {
+  border: 1px solid var(--c-line);
+  background: var(--c-surface);
+  color: var(--c-text-dim);
+  border-radius: 999px;
+  padding: 7px 13px;
+  font: inherit;
+  font-size: var(--fs-sm);
+  cursor: pointer;
+}
+
+.kid-chip.is-on {
+  background: rgba(var(--rgb-gold), 0.2);
+  border-color: var(--c-line-strong);
+  color: var(--c-gold);
+  font-weight: 700;
+}
+
+.kid-chip.is-static {
+  cursor: default;
+}
+
+.kid-stars-pick {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+}
+
+.kid-stars-pick__n {
+  border: 1px solid var(--c-line);
+  background: var(--c-surface);
+  color: var(--c-text-dim);
+  border-radius: 999px;
+  padding: 6px 12px;
+  font: inherit;
+  font-size: var(--fs-sm);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.kid-stars-pick__n[aria-checked='true'] {
+  background: rgba(var(--rgb-gold), 0.22);
+  border-color: var(--c-line-strong);
+  color: var(--c-gold);
+}
+
+.kid-confirm {
+  width: 100%;
+  display: grid;
+  gap: var(--sp-2);
+  margin-top: var(--sp-2);
+}
+
+.kid-confirm__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+}
+
+/* ---------- Дела семьи в чате ---------- */
+
+.kid-task {
+  align-self: stretch;
+  max-width: 100%;
+  border: 1px dashed var(--c-line-strong);
+  background: rgba(var(--rgb-gold), 0.06);
+}
+
+.kid-task.is-done {
+  border-style: solid;
+  opacity: 0.85;
+}
+
+.kid-task__text {
+  font-weight: 700;
+  margin: 2px 0;
+}
+
+.kid-task__stars {
+  font-size: var(--fs-xs);
+  color: var(--c-gold);
+  font-weight: 700;
+}
+
+.kid-task__row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--sp-2);
+  margin-top: var(--sp-2);
+}
+
+.kid-task__who {
+  font-size: var(--fs-sm);
+  color: var(--c-text-dim);
+}
+
+.kid-task__take {
+  margin-top: var(--sp-2);
+}
+
+.kid-task__done {
+  margin-top: var(--sp-1);
+  color: var(--c-gold);
+  font-weight: 700;
+  font-size: var(--fs-sm);
+}
+
+.kid-task-quick {
+  border-style: dashed;
+}
+
+.kid-task-new {
+  display: grid;
+  gap: var(--sp-2);
+  margin: var(--sp-3) 0;
+  padding: var(--sp-3);
+  border-radius: var(--r-md, 14px);
+  background: var(--c-surface);
+  border: 1px solid var(--c-line);
+}
+
+.kid-task-new .kid-chips {
+  max-height: 128px;
+  overflow-y: auto;
+}
+
+/* ---------- Звёзды семьи ---------- */
+
+.kid-score {
+  list-style: none;
+  margin: var(--sp-3) 0 0;
+  padding: 0;
+  display: grid;
+  gap: var(--sp-1);
+}
+
+.kid-score__row {
+  display: flex;
+  justify-content: space-between;
+  padding: var(--sp-2) var(--sp-3);
+  border-radius: 10px;
+  background: var(--c-surface);
+  font-weight: 600;
+}
+
+.kid-score__row.is-me {
+  border: 1px solid var(--c-line-strong);
+}
+
+.kid-help .steps__row,
+.kid-pass .steps__row,
+.kid-game .steps__row,
+.kid-start .steps__row,
+.kid-dream .steps__row,
+.kid-view .steps__row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: var(--sp-2);
+  margin-top: var(--sp-2);
+}
+
+/* ---------- Живые игры ---------- */
+
+.kid-game__meta {
+  font-size: var(--fs-sm);
+  margin: 0;
+}
+
+.kid-game__grows {
+  font-size: var(--fs-sm);
+  color: var(--c-gold);
+  margin: 4px 0 var(--sp-2);
+}
+
+.kid-game__rules summary {
+  cursor: pointer;
+  font-weight: 700;
+  color: var(--c-text-dim);
+  margin-bottom: var(--sp-2);
+}
+
+.kid-game__rules p {
+  margin: 0 0 var(--sp-2);
+  line-height: 1.5;
+}
+
+.kid-start {
+  display: grid;
+  gap: var(--sp-2);
+  margin-top: var(--sp-3);
+}
+
+.kid-result {
+  text-align: center;
+  display: grid;
+  gap: var(--sp-2);
+  justify-items: center;
+}
+
+/* Игра идёт: весь экран — таймер, телефон отдыхает */
+.kid-play {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-3);
+  padding: var(--sp-6) var(--gutter);
+  text-align: center;
+  background: var(--g-page);
+}
+
+.kid-play__icon {
+  font-size: 84px;
+  line-height: 1;
+  animation: kid-grow 2.6s ease-in-out infinite;
+}
+
+.kid-play__title {
+  font-size: var(--fs-2xl);
+  font-weight: 800;
+}
+
+.kid-play__friends {
+  color: var(--c-text-dim);
+}
+
+.kid-play__clock {
+  font-size: clamp(56px, 18vw, 96px);
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  color: var(--c-gold);
+  text-shadow: 0 0 28px rgba(var(--rgb-gold), 0.45);
+  line-height: 1;
+}
+
+.kid-play__opens {
+  font-weight: 700;
+  color: var(--c-rose);
+}
+
+.kid-play__opens.is-clean {
+  color: #9fe8b0;
+}
+
+.kid-play__back {
+  padding: var(--sp-2) var(--sp-3);
+  border-radius: 12px;
+  background: rgba(var(--rgb-rose), 0.16);
+  color: var(--c-rose);
+  font-weight: 700;
+}
+
+.kid-play__lead {
+  max-width: 340px;
+  color: var(--c-text-dim);
+}
+
+.kid-play__finish {
+  max-width: 340px;
+  margin-top: var(--sp-4);
+}
+
+/* ---------- Кабинет родителя: «Семья» → «Дети» ---------- */
+
+.kid-parent > * + * {
+  margin-top: var(--sp-4);
+}
+
+.kid-card {
+  display: grid;
+  gap: var(--sp-3);
+}
+
+.kid-card__name {
+  font-size: var(--fs-xl);
+}
+
+.kid-sub {
+  font-size: var(--fs-md);
+  font-weight: 800;
+  margin: var(--sp-2) 0 0;
+  color: var(--c-gold);
+}
+
+.kid-login {
+  display: grid;
+  gap: var(--sp-2);
+}
+
+.kid-link {
+  word-break: break-all;
+  font-size: var(--fs-sm);
+  padding: var(--sp-2) var(--sp-3);
+  border-radius: 10px;
+  background: var(--c-surface);
+  border: 1px solid var(--c-line);
+  user-select: all;
+}
+
+.kid-device {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-2);
+  flex-wrap: wrap;
+  padding: var(--sp-2) var(--sp-3);
+  border-radius: 12px;
+  background: var(--c-surface);
+}
+
+.kid-device.is-pending {
+  display: block;
+  border: 1px solid var(--c-line-strong);
+  background: rgba(var(--rgb-gold), 0.1);
+}
+
+.kid-device.is-pending p {
+  margin: 0 0 var(--sp-1);
+}
+
+.kid-close {
+  margin-top: var(--sp-2);
+}

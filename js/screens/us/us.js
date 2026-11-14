@@ -8,6 +8,9 @@ import * as circles from '../../circles/circles.js';
 import { chatView } from '../../circles/chat-view.js';
 import { wishesView } from '../../circles/wishes-view.js';
 import { childrenBlock, dreamsView } from '../../circles/family-view.js';
+// Детский кабинет глазами родителя — вкладка «Дети» (kids/, 14.11.2026)
+import { kidsView } from '../../kids/parent-view.js';
+import { kt } from '../../kids/texts.js';
 
 /* ЭКРАН «МЫ» (#/us) — «Пара» и «Семья» (владелец 13.11.2026; ТЗ — docs/TZ-para-semya.md). Вверху переключатель
    «Пара · Семья». Нет контура — что это и «Создать» / «У меня есть код». Создан, но второго ещё нет — код для
@@ -145,13 +148,14 @@ function pairView(view, ctx, circle) {
 
 function familyView(view, ctx, circle) {
   const parents = circle.members.filter((m) => m.role === 'parent');
-  const tabs = ['chat', 'dreams'];
+  const tabs = ['chat', 'kids', 'dreams'];
+  const tabLabel = (k) => (k === 'kids' ? kt('parent.tab') : t(`us.tabs.${k}`));
   return [
     h('section', { class: 'card us-head' }, memberList(circle)),
     childrenBlock(circle, fail),
     parents.length < 2 && circle.role === 'parent' ? codeCard(ctx, circle) : null,
-    segmented({ label: t('us.family'), options: tabs.map((k) => ({ value: k, label: t(`us.tabs.${k}`) })), value: familyTab, onChange: (v) => { familyTab = v; ctx.rerender(); } }),
-    familyTab === 'dreams' ? dreamsView(circle) : chatView(circle),
+    segmented({ label: t('us.family'), options: tabs.map((k) => ({ value: k, label: tabLabel(k) })), value: familyTab, onChange: (v) => { familyTab = v; ctx.rerender(); } }),
+    familyTab === 'dreams' ? dreamsView(circle) : familyTab === 'kids' ? kidsView(ctx, circle) : chatView(circle),
     h('a', { class: 'love-card__link us-goals-link', href: '#/goals' }, t('us.goalsLink'), svg(icons.chevronRight, 'love-card__chevron')),
     leaveButton(ctx, circle),
   ];

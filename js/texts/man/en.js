@@ -540,7 +540,7 @@ export default {
       add: 'Add a child',
       ph: 'Child’s name',
       save: 'Add',
-      hint: 'Children’s own login comes later — for now parents write in their dreams and goals.',
+      hint: 'Each child has their own cabinet: login, stars and confirmations are in the «Дети» tab below.',
       remove: 'Remove',
     },
     chat: {
