@@ -1,0 +1,67 @@
+/* ЭКРАН «ЗНАКОМСТВО»: карточки-списки и форма записи после свидания. Цвета и отступы — только токены. */
+
+.meet__intro {
+  margin: 0 0 var(--sp-4);
+  color: var(--c-text-dim);
+}
+
+.meet__card + .meet__card {
+  margin-top: var(--sp-4);
+}
+
+.meet__heading {
+  margin: 0 0 var(--sp-3);
+}
+
+.meet__list {
+  margin: 0;
+  padding-left: var(--sp-5);
+  display: grid;
+  gap: var(--sp-2);
+}
+
+.meet__card--questions .meet__list li::marker {
+  content: '? ';
+  color: var(--c-gold, currentColor);
+}
+
+.meet__form {
+  display: grid;
+  gap: var(--sp-3);
+  margin-top: var(--sp-4);
+}
+
+.meet__notes {
+  margin-top: var(--sp-5);
+  display: grid;
+  gap: var(--sp-2);
+}
+
+.meet__note {
+  border: 1px solid var(--c-line);
+  border-radius: var(--r-md, 12px);
+  padding: var(--sp-3) var(--sp-4);
+}
+
+.meet__note summary {
+  cursor: pointer;
+}
+
+.meet__answers {
+  margin: var(--sp-3) 0 0;
+}
+
+.meet__answers dt {
+  font-size: 0.85em;
+  color: var(--c-text-dim);
+  margin-top: var(--sp-2);
+}
+
+.meet__answers dd {
+  margin: 0;
+  white-space: pre-wrap;
+}
+
+.meet__remove {
+  margin-top: var(--sp-3);
+}

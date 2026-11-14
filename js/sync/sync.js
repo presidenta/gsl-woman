@@ -46,6 +46,8 @@ export const COLLECTIONS = [
   { key: 'steps', kind: 'steps', type: 'map', empty: {} },
   { key: 'settings', kind: 'settings', type: 'single', empty: null },
   { key: 'love', kind: 'love', type: 'single', empty: null },
+  // Записи после свиданий — «Знакомство» (meet/, 14.11.2026)
+  { key: 'meetnotes', kind: 'meetnote', type: 'list', empty: [] },
 ];
 const BY_KEY = Object.fromEntries(COLLECTIONS.map((c) => [c.key, c]));
 const BY_KIND = Object.fromEntries(COLLECTIONS.map((c) => [c.kind, c]));

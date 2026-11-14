@@ -387,3 +387,16 @@
   font-variant-numeric: tabular-nums;
   font-weight: 700;
 }
+
+/* Что на что заменяем — строка под текстом задания (владелец 14.11.2026) */
+.task__swap {
+  margin: var(--sp-3) 0 0;
+  padding: var(--sp-2) var(--sp-3);
+  border-left: 2px solid var(--c-gold);
+  color: var(--c-text-dim);
+}
+
+/* Подсказка по делам — одна в день, у мужчин */
+.biz__title {
+  margin: var(--sp-1) 0 var(--sp-2);
+}

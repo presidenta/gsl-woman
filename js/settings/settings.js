@@ -22,7 +22,10 @@ const DEFAULTS = {
   water: [],
   // Стакан воды на ночь (сборка 43)
   waterNight: [],
+  // Профиль отношений (js/profile/, владелец 14.11.2026): married · together · dating · single
+  profile: 'married',
 };
+const PROFILE_KEYS = ['married', 'together', 'dating', 'single'];
 
 export function get() {
   const saved = read(KEY, {}) || {};
@@ -38,6 +41,7 @@ export function get() {
     alarms: { ...DEFAULTS.alarms, ...(saved.alarms && typeof saved.alarms === 'object' ? saved.alarms : {}) },
     water: Array.isArray(saved.water) ? saved.water.filter((x) => typeof x === 'string').slice(0, 12) : [],
     waterNight: Array.isArray(saved.waterNight) ? saved.waterNight.filter((x) => typeof x === 'string').slice(0, 12) : [],
+    profile: PROFILE_KEYS.includes(saved.profile) ? saved.profile : DEFAULTS.profile,
   };
 }
 

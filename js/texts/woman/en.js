@@ -37,6 +37,10 @@ export default {
   kinds: { task: 'New exercise', flow: 'Free flow', call: 'Day of live connection' },
 
   today: {
+    // Профиль, дети, дела (js/profile/, 14.11.2026)
+    swapTitle: 'We replace:',
+    kidsTitle: 'For the children',
+    bizTitle: 'Work tip',
     dayOf: 'Day {day}',
     week: 'Week {n}',
     month: 'Month {n}',
@@ -763,6 +767,31 @@ export default {
       aboutH: '≈ {n} h',
       fromMinutes: '{m} min of walking ≈ {n} steps',
     },
+  },
+  // Профиль отношений — js/profile/ (владелец 14.11.2026)
+  profile: {
+    title: 'My relationship',
+    label: 'Right now',
+    saved: 'Profile: {name}',
+    married: 'Married',
+    together: 'Living together',
+    dating: 'Dating',
+    single: 'Looking',
+  },
+  // «Знакомство» — js/meet/, экран #/meet
+  meet: {
+    title: 'Dating',
+    waiting: 'This section arrives together with the programme — open the app online.',
+    who: 'Who was the date with',
+    date: 'When',
+    save: 'Save the note',
+    saved: 'Note saved',
+    empty: 'Add a name or at least one answer',
+    notesTitle: 'My notes',
+    noName: 'A date',
+    remove: 'Delete the note',
+    removeConfirm: 'Delete this note?',
+    whoPh: 'His name',
   },
   imsg: {
     title: 'I-message',

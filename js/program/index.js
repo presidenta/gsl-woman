@@ -1,6 +1,7 @@
 import { TASK_DAYS, WEEK_DAYS, WEEKS, MONTH_WEEKS } from '../config.js';
 import { weekOf, dayInWeek, monthOf, inProgram } from '../core/dates.js';
 import { langData } from './source.js';
+import { applyTask, current as currentProfile } from '../profile/profile.js';
 
 /* ПРОГРАММА: что делать в день N. Экраны и напоминания спрашивают только отсюда — сами в данные
    не лезут. Тексты — на сервере «Кванта» (source.js: приходят после входа и хранятся на телефоне);
@@ -22,8 +23,11 @@ export function weekPlan(week, lang) {
     monthInfo: data(lang).months[month - 1],
     title: w.title,
     intro: w.intro || '',
-    tasks: w.tasks,
+    // Задания — в словах профиля отношений (profile/, владелец 14.11.2026): у каждого из четырёх свои слова
+    tasks: w.tasks.map((t) => applyTask(t, currentProfile())),
     flow: w.flow,
+    biz: w.biz || null,
+    profile: currentProfile(),
     call: w.call,
     imsgs: w.imsg || [],
     // «Разговор пары» — тема недели для седьмого дня (сервер: gsl/talks/, общая для обеих частей), по кругу

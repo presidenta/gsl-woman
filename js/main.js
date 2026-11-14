@@ -26,6 +26,7 @@ import * as genderScreen from './screens/gender/gender.js';
 import * as side from './side/side.js';
 import * as goalsScreen from './screens/goals/goals.js';
 import * as loveScreen from './screens/love/love.js';
+import * as meetScreen from './screens/meet/meet.js';
 import * as usScreen from './screens/us/us.js';
 import * as circles from './circles/circles.js';
 import { watchHabits } from './circles/goals-model.js';
@@ -66,6 +67,7 @@ router.define('path', path);
 router.define('goals', goalsScreen);
 router.define('settings', settingsScreen);
 router.define('love', loveScreen);
+router.define('meet', meetScreen);
 router.define('us', usScreen);
 
 const root = document.getElementById('app');
@@ -284,11 +286,11 @@ function draw() {
   // Каркас пересобирается целиком, чтобы смена языка сразу дошла до шапки и панели
   shell = buildShell();
   const name = router.currentRoute() || router.routeName();
-  const screen = { today, week, journal: journalScreen, path, goals: goalsScreen, settings: settingsScreen, love: loveScreen, us: usScreen }[name] || today;
+  const screen = { today, week, journal: journalScreen, path, goals: goalsScreen, settings: settingsScreen, love: loveScreen, meet: meetScreen, us: usScreen }[name] || today;
 
   // Шапка: везде — кто вошёл (фото, имя, кабинет) и название; в настройках — «назад» вместо себя
   // «Пять языков любви» — тоже подэкран: «назад» вместо себя
-  const sub = name === 'settings' || name === 'love' || name === 'us';
+  const sub = name === 'settings' || name === 'love' || name === 'meet' || name === 'us';
   shell.back.hidden = !sub;
   if (shell.who) shell.who.hidden = sub;
   shell.gear.hidden = name === 'settings';

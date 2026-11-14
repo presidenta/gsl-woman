@@ -19,6 +19,7 @@ import { kegelCard } from '../../habits/kegel-card.js';
 import { stepsCard } from '../../habits/steps-card.js';
 import { usCard } from '../../circles/today-card.js';
 import { talkCard } from '../../circles/talk.js';
+import { showKids, bizFor } from '../../profile/profile.js';
 
 /* ЭКРАН «СЕГОДНЯ» — главный. Сверху вниз, в порядке дня:
    1. Шапка дня: «День N» (без «из скольких» и без номера недели — обучение постоянное, владелец 12.11.2026),
@@ -191,6 +192,7 @@ function morningCard(ctx, plan) {
 
 function taskCard(plan) {
   const { task } = plan;
+  // plan.profile — профиль отношений (profile/): от него зависят слова задания и строка для детей
   return h('section', { class: 'card task' },
     h('div', { class: 'card__eyebrow' }, h('span', { class: 'card__icon' }, svg(icons.crown)), h('span', { class: 'caps' }, t('today.taskLabel'))),
     plan.intro ? h('p', { class: 'task__intro' }, plan.intro) : null,
@@ -198,6 +200,8 @@ function taskCard(plan) {
     // Подзаголовок — своей строкой под названием, другим начертанием (владелец: «Магия рук» / «Тайный ритуал соблазна»)
     task.subtitle ? h('p', { class: 'task__subtitle' }, task.subtitle) : null,
     h('p', { class: 'task__text' }, task.text),
+    // Что на что заменяем (владелец 14.11.2026: «оставь то, что мы заменяем, чтобы было понятно») — «Телефон → её глаза»
+    task.swap ? h('p', { class: 'task__swap' }, h('span', { class: 'caps' }, t('today.swapTitle')), ' ', task.swap) : null,
     task.how?.length
       ? h('div', { class: 'task__block' },
         h('p', { class: 'caps task__block-title' }, t('today.howTitle')),
@@ -213,6 +217,13 @@ function taskCard(plan) {
         ),
       ),
     ),
+    // Строка для детей — у семьи под одной крышей и только если дети добавлены (profile/showKids)
+    showKids(task, plan.profile)
+      ? h('div', { class: 'task__block task__kids' },
+        h('p', { class: 'caps task__block-title' }, t('today.kidsTitle')),
+        h('p', { class: 'card__text' }, task.kids),
+      )
+      : null,
     task.say?.length
       ? h('div', { class: 'task__block' },
         h('p', { class: 'caps task__block-title' }, t('today.sayTitle')),
@@ -292,6 +303,28 @@ function callCard(plan, summary) {
   );
 }
 
+/* Подсказка по делам — одна в день, устойчивая на всю неделю (у мужчин, week.biz; владелец 14.11.2026: «по бизнесу —
+   одна лёгкая подсказка, стабильно»). Седьмой день — отдых, подсказки нет. */
+function bizCard(plan) {
+  const text = bizFor(plan.biz, plan.dayInWeek);
+  if (!text) return null;
+  return h('section', { class: 'card card--soft biz' },
+    h('div', { class: 'card__eyebrow' }, h('span', { class: 'card__icon' }, svg(icons.goals)), h('span', { class: 'caps' }, t('today.bizTitle'))),
+    h('p', { class: 'card__title biz__title' }, plan.biz.title),
+    h('p', { class: 'card__text' }, text),
+  );
+}
+
+/* В поиске — вход в «Знакомство» прямо с «Сегодня»: советы, вопросы и запись после свидания. */
+function meetLink(plan) {
+  if (plan.profile !== 'single') return null;
+  return h('a', { class: 'card settings__link', href: '#/meet' },
+    h('span', { class: 'card__icon' }, svg(icons.rings)),
+    h('span', { class: 'settings__link-text' }, t('meet.title')),
+    svg(icons.chevronRight, 'settings__link-chevron'),
+  );
+}
+
 function recordedToday(ctx, plan) {
   const own = ctx.entries.filter((e) => e.day === plan.day);
   if (!own.length) return null;
@@ -360,6 +393,8 @@ export function render(view, ctx) {
       waterCard(ctx),
       morningCard(ctx, plan),
       main,
+      bizCard(plan),
+      meetLink(plan),
       // Седьмой день — «Разговор пары» (circles/talk.js)
       talkCard(ctx, plan),
       imsgCard(ctx, plan),

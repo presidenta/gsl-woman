@@ -15,8 +15,11 @@ import { accountCard } from '../../account/avatar.js';
 import { installCard } from '../../install/install.js';
 import * as media from '../../media/photos.js';
 import { checkNow } from '../../core/updates.js';
+import { PROFILES } from '../../profile/profile.js';
+import { langData } from '../../program/source.js';
 
-/* ЭКРАН «НАСТРОЙКИ»: аккаунт «Кванта» (фото, имя, кабинет), значок на экран, обо мне (имя, язык), дата старта, время трёх напоминаний, уведомления, данные.
+/* ЭКРАН «НАСТРОЙКИ»: аккаунт «Кванта» (фото, имя, кабинет), значок на экран, мои отношения (профиль программы),
+   «Пять языков любви», «Знакомство», обо мне (имя, язык), дата старта, время трёх напоминаний, уведомления, данные.
    Каждое изменение сохраняется сразу — кнопки «Сохранить» здесь нет, как и в спорте. */
 
 /* «Обновить» — в карточке аккаунта рядом с «Выйти»: одним нажатием подтянуть новую версию и сверить данные с
@@ -125,6 +128,31 @@ function partCard(ctx) {
   );
 }
 
+/* МОИ ОТНОШЕНИЯ — профиль программы (profile/, владелец 14.11.2026): у каждого из четырёх свои слова заданий.
+   Названия и подсказки — с сервера вместе с программой; программа ещё не пришла — из надписей приложения. */
+function profileCard(ctx) {
+  const info = langData(ctx.lang)?.profiles || {};
+  const name = (k) => info[k]?.name || t(`profile.${k}`);
+  const current = ctx.settings.profile;
+  const hint = h('p', { class: 'faint settings__hint' }, info[current]?.hint || '');
+  const id = 'profile-select';
+  const select = h('select', { id, class: 'input select__control', 'aria-label': t('profile.title') },
+    ...PROFILES.map((k) => h('option', { value: k, selected: k === current }, name(k))));
+  select.addEventListener('change', () => {
+    settings.update({ profile: select.value });
+    hint.textContent = info[select.value]?.hint || '';
+    toast({ title: t('profile.saved', { name: name(select.value) }) });
+  });
+  return h('section', { class: 'card settings__section' },
+    h('h2', { class: 'caps settings__heading' }, t('profile.title')),
+    h('div', { class: 'field' },
+      h('label', { class: 'field__label', for: id }, t('profile.label')),
+      h('div', { class: 'select' }, select, svg(icons.chevronRight, 'select__chevron')),
+    ),
+    hint,
+  );
+}
+
 export function render(view, ctx) {
   const s = ctx.settings;
 
@@ -154,9 +182,17 @@ export function render(view, ctx) {
     nativeCard(),
     installCard(),
 
+    profileCard(ctx),
+
     h('a', { class: 'card settings__link', href: '#/love' },
       h('span', { class: 'card__icon' }, svg(icons.heart)),
       h('span', { class: 'settings__link-text' }, t('love.title')),
+      svg(icons.chevronRight, 'settings__link-chevron'),
+    ),
+
+    h('a', { class: 'card settings__link', href: '#/meet' },
+      h('span', { class: 'card__icon' }, svg(icons.rings)),
+      h('span', { class: 'settings__link-text' }, t('meet.title')),
       svg(icons.chevronRight, 'settings__link-chevron'),
     ),
 
