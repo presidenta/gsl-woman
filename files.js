@@ -42,6 +42,7 @@ self.GSL_FILES = [
   './js/circles/family-view.js',
   './js/circles/goals-model.js',
   './js/circles/goals-view.js',
+  './js/circles/media.js',
   './js/circles/talk.js',
   './js/circles/today-card.js',
   './js/circles/wishes-view.js',

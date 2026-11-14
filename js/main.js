@@ -102,8 +102,20 @@ function context() {
   };
 }
 
+/* Откуда пришёл (владелец 14.11.2026: «назад» есть везде и ведёт туда, откуда пришёл — из «Знакомства» в «Помощь»,
+   из «Языков любви» в «Настройки»). Последние экраны по порядку; перерисовка того же экрана ничего не добавляет. */
+const trail = [];
+function noteRoute(name) {
+  if (trail[trail.length - 1] !== name) trail.push(name);
+  if (trail.length > 30) trail.shift();
+}
+function goBack() {
+  trail.pop();
+  router.go(trail.pop() || 'today');
+}
+
 function buildShell() {
-  const back = h('button', { type: 'button', class: 'icon-btn', 'aria-label': t('common.back'), onclick: () => router.go('today') }, svg(icons.back));
+  const back = h('button', { type: 'button', class: 'icon-btn', 'aria-label': t('common.back'), onclick: goBack }, svg(icons.back));
   const gear = h('a', { class: 'icon-btn', href: '#/settings', 'aria-label': t('common.settings') }, svg(icons.gear));
   // «Мы» — пара и семья (circles/): красная точка — есть новое сообщение
   const us = h('a', { class: 'icon-btn us-btn', href: '#/us', 'aria-label': t('us.open') }, svg(icons.rings), h('span', { class: 'us-btn__dot', hidden: true }));
@@ -295,7 +307,9 @@ function draw() {
   // Шапка: везде — кто вошёл (фото, имя, кабинет) и название; в настройках — «назад» вместо себя
   // «Пять языков любви» — тоже подэкран: «назад» вместо себя
   const sub = name === 'settings' || name === 'love' || name === 'meet' || name === 'help' || name === 'us';
-  shell.back.hidden = !sub;
+  // «Назад» — на всех экранах, кроме «Сегодня» (владелец 14.11.2026)
+  noteRoute(name);
+  shell.back.hidden = name === 'today';
   if (shell.who) shell.who.hidden = sub;
   shell.gear.hidden = name === 'settings';
   shell.us.hidden = name === 'us';

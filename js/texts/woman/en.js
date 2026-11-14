@@ -552,6 +552,17 @@ export default {
     },
     chat: {
       ph: 'Write…',
+      // Голосовые и фото (circles/media.js, 14.11.2026)
+      mic: 'Record a voice message',
+      photo: 'Send a photo',
+      recording: 'Recording',
+      cancel: 'Cancel',
+      sendVoice: 'Send',
+      play: 'Play the voice message',
+      uploadFail: 'Connection lost — send again once you are online',
+      loadFail: 'The voice message loads once you are online',
+      micDenied: 'Allow microphone access in your phone settings',
+      photoAlt: 'Photo',
       send: 'Send',
       empty: 'Your messages will be here — short and to the point.',
       you: 'You',

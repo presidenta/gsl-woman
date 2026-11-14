@@ -29,6 +29,9 @@ export const icons = {
   // Выйти: дверь с ручкой и стрелка наружу (владелец 12.11.2026: «чтобы было понятно, что дверь»)
   logout: wrap('<rect x="4" y="3" width="9.5" height="18" rx="1.4"/><circle cx="11" cy="12.2" r="1" fill="currentColor" stroke="none"/><path d="M15.5 12h5.5M18.5 9.2L21.2 12l-2.7 2.8"/>'),
   refresh: wrap('<path d="M19.5 12a7.5 7.5 0 1 1-2.2-5.3"/><path d="M19.5 4.5v4h-4"/>'),
+  // Голосовые в чате (circles/chat-view.js, 14.11.2026)
+  play: wrap('<path d="M8.5 5.5v13l10-6.5z" fill="currentColor"/>'),
+  pause: wrap('<path d="M8.5 5.5v13M15.5 5.5v13"/>'),
   check: wrap('<path d="M5 12.5l4.5 4.5L19 7.5"/>'),
   plus: wrap('<path d="M12 5v14M5 12h14"/>'),
   sparkle: wrap('<path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/><path d="M19 16l.7 1.8 1.8.7-1.8.7L19 21l-.7-1.8-1.8-.7 1.8-.7z"/>'),

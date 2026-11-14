@@ -210,3 +210,37 @@ img, svg {
   vertical-align: 0.5em;
   line-height: 0;
 }
+
+/* Раскрывающийся блок — всегда со стрелкой «развернуть / свернуть» (владелец 14.11.2026: «открывается раздел, а
+   свернуть его нечем»). Свою стрелку несут .fold__arrow и .help__chevron; остальным она рисуется здесь: вправо —
+   свёрнуто, вниз — раскрыто. */
+details > summary {
+  cursor: pointer;
+  list-style: none;
+}
+
+details > summary::-webkit-details-marker {
+  display: none;
+}
+
+details > summary:not(:has(.fold__arrow, .help__chevron)) {
+  position: relative;
+  padding-right: 30px;
+}
+
+details > summary:not(:has(.fold__arrow, .help__chevron))::after {
+  content: '';
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  width: 8px;
+  height: 8px;
+  border-right: 2px solid var(--c-gold);
+  border-bottom: 2px solid var(--c-gold);
+  transform: translateY(-50%) rotate(-45deg);
+  transition: transform var(--t-fast) var(--ease);
+}
+
+details[open] > summary:not(:has(.fold__arrow, .help__chevron))::after {
+  transform: translateY(-75%) rotate(45deg);
+}

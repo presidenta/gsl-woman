@@ -1,4 +1,6 @@
 import * as circles from '../circles/circles.js';
+import { circleMedia } from '../circles/media.js';
+import { current } from '../account/session.js';
 
 /* Кабинет родителя как «участник семьи» для общих экранов детского кабинета (дела семьи, звёзды, подтверждения):
    те же действия, что у телефона ребёнка (kid-store.js → adapter), только через circles/ — обмен «Семьи». */
@@ -13,5 +15,7 @@ export function familyApi(circle) {
     newId: circles.newId,
     name: (id) => circles.memberName(circle, id),
     markSeen: () => circles.markSeen(circle.id),
+    // Голосовые и фото семьи (circles/media.js): свой вход «Кванта»
+    media: circle ? circleMedia(circle.id, () => current()?.token) : null,
   };
 }

@@ -1,5 +1,6 @@
 import { read, write, remove } from '../core/store.js';
 import { API_BASE } from '../config.js';
+import { kidMedia } from '../circles/media.js';
 
 /* ТЕЛЕФОН РЕБЁНКА: его вход и записи семьи (сервер — planner/server/src/kids/).
 
@@ -220,6 +221,8 @@ export function adapter() {
     newId,
     name: (id) => f?.members?.find((m) => m.id === id)?.name || '',
     markSeen: () => {},
+    // Голосовые и фото семьи (circles/media.js): сессия ребёнка
+    media: kidMedia(() => session()?.token),
   };
 }
 

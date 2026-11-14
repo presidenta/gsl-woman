@@ -1,4 +1,5 @@
-import { h, mount } from '../core/dom.js';
+import { h, svg, mount } from '../core/dom.js';
+import { icons } from '../ui/icons.js';
 import { subscribe } from '../core/store.js';
 import { setLang, setSide } from '../core/i18n.js';
 import { isoDate, addDays } from '../core/dates.js';
@@ -465,8 +466,19 @@ function shellView(api) {
     type: 'button', class: 'app-nav__item', 'aria-current': k === tab ? 'page' : null,
     onclick: () => { tab = k; starting = null; draw(); scrollTo({ top: 0 }); },
   }, h('span', { class: 'kid-nav__icon', 'aria-hidden': 'true' }, TAB_ICON[k]), h('span', {}, kt(`nav.${k}`)))));
+  // «Назад» (владелец 14.11.2026): из выбора друзей для игры — к играм, с любой вкладки — на «Сегодня»
+  const back = tab === 'today' ? null : h('button', {
+    type: 'button', class: 'icon-btn kid-header__back', 'aria-label': t('common.back'),
+    onclick: () => {
+      if (starting) starting = null;
+      else tab = 'today';
+      draw();
+      scrollTo({ top: 0 });
+    },
+  }, svg(icons.back));
   return h('div', { class: 'app kid-app' },
     h('header', { class: 'app-header kid-header' },
+      back,
       h('span', { class: 'kid-header__level', 'aria-hidden': 'true' }, level.icon),
       h('span', { class: 'kid-header__name' }, store.session()?.name || ''),
       h('span', { class: 'spacer' }),

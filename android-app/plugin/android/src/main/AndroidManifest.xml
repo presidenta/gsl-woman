@@ -5,6 +5,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
     <!-- Уведомления (Android 13+ спрашивает разрешение), точные будильники, экран поверх блокировки, после перезагрузки -->
+    <!-- Голосовые в чатах «Пары» и «Семьи» (14.11.2026): микрофон для записи в окне приложения -->
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" android:maxSdkVersion="32" />
     <uses-permission android:name="android.permission.USE_EXACT_ALARM" />
