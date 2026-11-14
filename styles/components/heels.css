@@ -33,8 +33,9 @@
   object-fit: contain;
   object-position: center bottom;
   mix-blend-mode: lighten;
-  -webkit-mask-image: linear-gradient(to bottom, #000 93%, transparent 100%);
-  mask-image: linear-gradient(to bottom, #000 93%, transparent 100%);
+  transform-origin: 50% 100%;
+  -webkit-mask-image: linear-gradient(to bottom, #000 89%, transparent 97%);
+  mask-image: linear-gradient(to bottom, #000 89%, transparent 97%);
   user-select: none;
   pointer-events: none;
 }
@@ -47,16 +48,23 @@
   animation: heels-up 1s linear infinite;
 }
 
+/* Подъём — ВСЁ тело (владелец 14.11.2026: «не только пятки отрываются — поднимается всё тело»): фигура вытягивается
+   вверх от носков (носки стоят на земле), голова поднимается; опускание — всё тело вниз на пятки. Оба кадра
+   двигаются одинаково — при смене кадра ничего не прыгает. */
 @keyframes heels-down {
-  0%, 6% { opacity: 1; }
-  12%, 56% { opacity: 0; }
-  60%, 100% { opacity: 1; }
+  0% { opacity: 1; transform: scaleY(1); }
+  6% { opacity: 1; transform: scaleY(1.02); }
+  12%, 56% { opacity: 0; transform: scaleY(1.04); }
+  60% { opacity: 1; transform: scaleY(1); }
+  100% { opacity: 1; transform: scaleY(1); }
 }
 
 @keyframes heels-up {
-  0%, 6% { opacity: 0; }
-  12%, 56% { opacity: 1; }
-  60%, 100% { opacity: 0; }
+  0% { opacity: 0; transform: scaleY(1); }
+  6% { opacity: 0; transform: scaleY(1.02); }
+  12%, 56% { opacity: 1; transform: scaleY(1.04); }
+  60% { opacity: 0; transform: scaleY(1); }
+  100% { opacity: 0; transform: scaleY(1); }
 }
 
 /* Пар: три мягких облачка изо рта — растут, уходят вперёд (по взгляду: --dir) и тают; только после опускания */
@@ -69,48 +77,48 @@
 
 .heels__puff {
   position: absolute;
-  left: -9px;
-  top: -9px;
-  width: 18px;
-  height: 18px;
+  left: -11px;
+  top: -6px;
+  width: 22px;
+  height: 12px;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(255, 255, 255, 0.9) 0%, rgba(236, 242, 248, 0.5) 38%, rgba(236, 242, 248, 0) 70%);
-  filter: blur(2px);
+  background: radial-gradient(ellipse at center, rgba(255, 255, 255, 0.75) 0%, rgba(232, 238, 246, 0.38) 42%, rgba(232, 238, 246, 0) 72%);
+  filter: blur(2.6px);
   opacity: 0;
   animation: heels-puff 1s ease-out infinite;
 }
 
 .heels__puff--2 {
-  left: -7px;
-  top: -7px;
-  width: 14px;
-  height: 14px;
+  left: -9px;
+  top: -5px;
+  width: 18px;
+  height: 10px;
   animation-name: heels-puff-2;
 }
 
 .heels__puff--3 {
-  left: -6px;
-  top: -6px;
-  width: 11px;
-  height: 11px;
+  left: -7px;
+  top: -4px;
+  width: 14px;
+  height: 8px;
   animation-name: heels-puff-3;
 }
 
 @keyframes heels-puff {
   0%, 58% { opacity: 0; transform: translate(0, 0) scale(0.4); }
-  64% { opacity: 0.95; transform: translate(calc(var(--dir) * 4px), 0) scale(0.8); }
+  64% { opacity: 0.8; transform: translate(calc(var(--dir) * 4px), 0) scale(0.8); }
   100% { opacity: 0; transform: translate(calc(var(--dir) * 26px), -6px) scale(2.6); }
 }
 
 @keyframes heels-puff-2 {
   0%, 62% { opacity: 0; transform: translate(0, 2px) scale(0.4); }
-  70% { opacity: 0.8; transform: translate(calc(var(--dir) * 7px), 1px) scale(0.9); }
+  70% { opacity: 0.65; transform: translate(calc(var(--dir) * 7px), 1px) scale(0.9); }
   100% { opacity: 0; transform: translate(calc(var(--dir) * 36px), -2px) scale(2.4); }
 }
 
 @keyframes heels-puff-3 {
   0%, 66% { opacity: 0; transform: translate(0, -1px) scale(0.4); }
-  74% { opacity: 0.7; transform: translate(calc(var(--dir) * 9px), -3px) scale(1); }
+  74% { opacity: 0.5; transform: translate(calc(var(--dir) * 9px), -3px) scale(1); }
   100% { opacity: 0; transform: translate(calc(var(--dir) * 44px), -10px) scale(2.8); }
 }
 
