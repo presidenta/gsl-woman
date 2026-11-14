@@ -19,7 +19,7 @@ import { PROFILES } from '../../profile/profile.js';
 import { langData } from '../../program/source.js';
 
 /* ЭКРАН «НАСТРОЙКИ»: аккаунт «Кванта» (фото, имя, кабинет), значок на экран, мои отношения (профиль программы),
-   «Пять языков любви», «Знакомство», обо мне (имя, язык), дата старта, время трёх напоминаний, уведомления, данные.
+   «Пять языков любви», обо мне (имя, язык), дата старта, время трёх напоминаний, уведомления, данные.
    Каждое изменение сохраняется сразу — кнопки «Сохранить» здесь нет, как и в спорте. */
 
 /* «Обновить» — в карточке аккаунта рядом с «Выйти»: одним нажатием подтянуть новую версию и сверить данные с
@@ -190,11 +190,6 @@ export function render(view, ctx) {
       svg(icons.chevronRight, 'settings__link-chevron'),
     ),
 
-    h('a', { class: 'card settings__link', href: '#/meet' },
-      h('span', { class: 'card__icon' }, svg(icons.rings)),
-      h('span', { class: 'settings__link-text' }, t('meet.title')),
-      svg(icons.chevronRight, 'settings__link-chevron'),
-    ),
 
     h('section', { class: 'card settings__section' },
       h('h2', { class: 'caps settings__heading' }, t('settings.profile')),

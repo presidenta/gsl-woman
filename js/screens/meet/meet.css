@@ -65,3 +65,81 @@
 .meet__remove {
   margin-top: var(--sp-3);
 }
+
+/* Технология знакомства: номер темы, вопросы, зелёные и красные сигналы, галочки и подсказка */
+.meet__num {
+  display: inline-grid;
+  place-items: center;
+  width: 1.6em;
+  height: 1.6em;
+  margin-right: var(--sp-2);
+  border-radius: var(--r-pill);
+  border: 1px solid var(--c-gold);
+  color: var(--c-gold);
+  font-weight: 600;
+}
+
+.meet__sub {
+  margin: var(--sp-4) 0 var(--sp-2);
+}
+
+.meet__list--ask li::marker {
+  content: '? ';
+  color: var(--c-gold);
+}
+
+.meet__signals {
+  display: grid;
+  gap: var(--sp-3);
+}
+
+.meet__signal {
+  padding: var(--sp-2) var(--sp-3);
+  border-radius: var(--r-md);
+  border-left: 3px solid;
+}
+
+.meet__signal--green { border-color: var(--c-done); }
+.meet__signal--red { border-color: rgb(var(--rgb-urgent)); }
+
+.meet__picker {
+  display: grid;
+  gap: var(--sp-4);
+}
+
+.meet__pick {
+  display: grid;
+  gap: var(--sp-2);
+  margin-bottom: var(--sp-2);
+}
+
+.meet__check-row {
+  display: flex;
+  gap: var(--sp-2);
+  align-items: flex-start;
+  cursor: pointer;
+}
+
+.meet__check {
+  margin-top: 0.2em;
+  flex: none;
+  width: 1.15em;
+  height: 1.15em;
+}
+
+.meet__pick--green .meet__check { accent-color: var(--c-done); }
+.meet__pick--red .meet__check { accent-color: rgb(var(--rgb-urgent)); }
+
+.meet__verdict {
+  padding: var(--sp-3) var(--sp-4);
+  border-radius: var(--r-md);
+  border: 1px solid var(--c-line);
+}
+
+.meet__verdict--build { border-color: var(--c-done); }
+.meet__verdict--look { border-color: var(--c-gold); }
+.meet__verdict--pass { border-color: rgb(var(--rgb-urgent)); }
+
+.meet__chip {
+  margin-left: var(--sp-2);
+}

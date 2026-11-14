@@ -70,3 +70,15 @@ test('«Знакомство»: запись после свидания хра�
   assert.deepEqual(meet.all().map((n) => n.name), ['Катя']);
   assert.ok(COLLECTIONS.some((c) => c.key === 'meetnotes' && c.type === 'list'));
 });
+
+test('«Знакомство»: подсказка по сигналам — строить, присмотрись, своей дорогой; сигналы хранятся в записи', () => {
+  assert.equal(meet.verdictOf([], []), null);
+  assert.equal(meet.verdictOf(['past.0', 'future.0', 'present.0'], []), 'build');
+  assert.equal(meet.verdictOf(['past.0', 'future.0', 'present.0'], ['past.1']), 'build');
+  assert.equal(meet.verdictOf(['past.0'], ['past.1', 'future.2']), 'pass');
+  assert.equal(meet.verdictOf(['past.0', 'future.1'], ['past.1']), 'look');
+  const n = meet.add({ name: 'Олег', green: ['past.0', 'нечто', 'present.2'], red: ['future.1'] });
+  assert.deepEqual(n.green, ['past.0', 'present.2'], 'чужие ключи отбрасываются');
+  assert.equal(n.verdict, 'look');
+  assert.ok(meet.add({ green: ['past.0'] }), 'только сигналы, без имени и ответов — запись тоже сохраняется');
+});

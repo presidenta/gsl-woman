@@ -92,13 +92,14 @@ export function render(view, ctx) {
     form,
   );
 
-  const letters = () => lettersCard(ownBox, { rerender: ctx.rerender });
+  // Под письмом — «Знакомство» (владелец 14.11.2026: «знакомство — это тоже цель»): технология трёх тем, запись после встречи
+  const letters = () => [lettersCard(ownBox, { rerender: ctx.rerender }), meetLink()];
   if (!list.length) {
     add(view, h('div', { class: 'card empty goals__empty' },
       h('div', { class: 'goals__emblem' }, svg(icons.goals)),
       h('div', { class: 'empty__title' }, t('goals.emptyTitle')),
       h('p', {}, t('goals.emptyText')),
-    ), letters());
+    ), ...letters());
     return;
   }
 
@@ -109,5 +110,13 @@ export function render(view, ctx) {
       h('ul', { class: 'goals__list' }, ...done.map(goalRow)),
     );
   }
-  add(view, letters());
+  add(view, ...letters());
+}
+
+function meetLink() {
+  return h('a', { class: 'card settings__link goals__meet', href: '#/meet' },
+    h('span', { class: 'card__icon' }, svg(icons.rings)),
+    h('span', { class: 'settings__link-text' }, h('strong', {}, t('meet.title')), h('br'), h('span', { class: 'faint' }, t('meet.lead'))),
+    svg(icons.chevronRight, 'settings__link-chevron'),
+  );
 }

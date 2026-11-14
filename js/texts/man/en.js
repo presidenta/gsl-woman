@@ -781,6 +781,15 @@ export default {
   },
   // «Знакомство» — js/meet/, экран #/meet
   meet: {
+    lead: 'Before, during and after the date — what to ask and how to read a person',
+    ask: 'Ask',
+    green: 'Green signals',
+    red: 'Red signals',
+    signalsTitle: 'What I heard',
+    signalsHint: 'Tick what happened on the date — the app will give you a hint',
+    verdictEmpty: 'Tick the signals — and a hint appears here',
+    verdictNote: 'You decide — this is only a hint.',
+    verdict: { build: 'Worth building', look: 'Look closer', pass: 'Let them go their way' },
     title: 'Dating',
     waiting: 'This section arrives together with the programme — open the app online.',
     who: 'Who was the date with',
