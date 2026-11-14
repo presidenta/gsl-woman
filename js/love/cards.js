@@ -3,6 +3,7 @@ import { t } from '../core/i18n.js';
 import { icons } from '../ui/icons.js';
 import { content, ideaFor, groupIdeas } from './love.js';
 import { KIND_ICON } from './kind-icons.js';
+import { foldCard } from '../ui/fold.js';
 
 /* Подписи групп: дети и родные устроены одинаково (love.js → GROUPS), различаются только словами. */
 export const GROUP_TEXT = {
@@ -69,14 +70,18 @@ export function loveCard(ctx, plan) {
       h('div', { class: 'card__actions' }, h('a', { class: 'btn btn--gold btn--quiet btn--block', href: '#/love' }, t('love.inviteBtn'))),
     );
 
-  return h('section', { class: 'card love-card' },
-    h('div', { class: 'card__eyebrow' },
-      h('span', { class: 'card__icon' }, svg(icons.heart)),
-      h('span', { class: 'caps' }, t('love.title')),
-    ),
-    himPart,
-    groupBlock('children', groupIdeas('children', plan.day, ctx.lang)),
-    groupBlock('family', groupIdeas('family', plan.day, ctx.lang)),
-    h('a', { class: 'love-card__link', href: '#/love' }, t('love.more'), svg(icons.chevronRight, 'love-card__chevron')),
-  );
+  // Сворачивается стрелкой (владелец 14.11.2026); свёрнута — дело дня для него одной строкой
+  return foldCard({
+    id: 'love',
+    cls: 'love-card',
+    icon: icons.heart,
+    title: t('love.title'),
+    lead: him ? him.text : t('love.inviteTitle'),
+    body: [
+      himPart,
+      groupBlock('children', groupIdeas('children', plan.day, ctx.lang)),
+      groupBlock('family', groupIdeas('family', plan.day, ctx.lang)),
+      h('a', { class: 'love-card__link', href: '#/love' }, t('love.more'), svg(icons.chevronRight, 'love-card__chevron')),
+    ],
+  }).node;
 }

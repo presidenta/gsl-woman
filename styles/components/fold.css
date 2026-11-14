@@ -157,3 +157,24 @@
     transition: none;
   }
 }
+
+/* Отметка с баллами (score/, сборка 53): золотой круг с галочкой и «+N» рядом */
+.fold__score {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.fold__points {
+  font-family: var(--f-display);
+  font-size: var(--fs-md);
+  font-weight: 600;
+  line-height: 1;
+  color: var(--c-gold);
+}
+
+/* Карточка без рисунка (задание, я-сообщение, языки любви…): шапка в две колонки — текст и справа отметка со
+   стрелкой, у правого края, как у карточек с рисунком */
+.fold__head:has(> .fold__thumb:empty) {
+  grid-template-columns: minmax(0, 1fr) auto;
+}

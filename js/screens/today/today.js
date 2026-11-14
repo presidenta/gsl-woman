@@ -20,6 +20,8 @@ import { stepsCard } from '../../habits/steps-card.js';
 import { usCard } from '../../circles/today-card.js';
 import { talkCard } from '../../circles/talk.js';
 import { showKids, bizFor } from '../../profile/profile.js';
+import * as journal from '../../journal/journal.js';
+import { dayScore, doneBadge, pointsOf, taskPoints, pointsLabel } from '../../score/score.js';
 
 /* ЭКРАН «СЕГОДНЯ» — главный. Сверху вниз, в порядке дня:
    1. Шапка дня: «День N» (без «из скольких» и без номера недели — обучение постоянное, владелец 12.11.2026),
@@ -62,9 +64,11 @@ function runMinute(iso, seconds) {
     }
     clearInterval(minuteTimer);
     minuteTimer = null;
+    // Уровень — по длине минуты: 1 мин — Минимум, 2 — 100%, 3 — Максимум (баллы дня, score/)
+    const level = MINUTE_PICKS.find(([, m]) => m * 60 === minuteTotal)?.[0] || 'min';
     minuteTotal = 0;
     sound.finish();
-    morningLog.markDone(iso);
+    morningLog.markDone(iso, level);
     toast({ title: t('morning.done') });
     navigator.vibrate?.(120);
   }, 40);
@@ -77,10 +81,13 @@ function stopMinute() {
   paintMinute?.();
 }
 
-function header(plan, summary) {
+function header(ctx, plan, summary) {
+  // Баллы дня (score/): личные, для себя — сколько баллов прожито сегодня
+  const score = dayScore(ctx.todayIso, plan.day, ctx.entries);
   return h('section', { class: 'card card--hero today-hero' },
-    h('div', { class: 'card__eyebrow' },
+    h('div', { class: 'card__eyebrow today-hero__top' },
       h('span', { class: 'chip chip--solid' }, t('today.dayOf', { day: plan.day })),
+      h('span', { class: 'chip today-hero__score', title: t('score.hint') }, svg(icons.check, 'chip__icon'), t('score.today', { points: pointsLabel(score.total) })),
     ),
     h('p', { class: 'caps' }, `${t('today.month', { n: plan.month })} · ${plan.monthInfo.title}`),
     h('h1', { class: 'today-hero__title' }, plan.title),
@@ -159,7 +166,7 @@ function morningCard(ctx, plan) {
     figure.setRunning(running, (((Date.now() - minuteStart) / 1000) + LANDING) % 1);
     // Шапка свёрнутой карточки: идёт — счёт, сделана — золотая галочка
     if (running) status.replaceChildren(h('span', { class: 'minute__fold-count' }, `${minuteCount} / ${minuteTotal}`));
-    else status.replaceChildren(morningLog.isDone(ctx.todayIso) ? h('span', { class: 'fold__done', title: t('morning.done') }, svg(icons.check)) : '');
+    else status.replaceChildren(doneBadge(pointsOf(morningLog.levelOf(ctx.todayIso))) || '');
   }
 
   paintMinute = paint;
@@ -190,11 +197,45 @@ function morningCard(ctx, plan) {
 }
 
 
-function taskCard(plan) {
+/* Отметка задания дня прямо в карточке (владелец 14.11.2026): «человек отмечает, что сделал — Минимум, 100% или
+   Максимум, — и ему насчитываются баллы». Нажатие — запись дня с этим уровнем (есть запись — меняется её уровень);
+   подробная запись с реакцией и фото — кнопкой «Записать результат», как раньше. */
+function markLevels(ctx, plan, kind) {
+  const own = ctx.entries.filter((e) => e.day === plan.day && e.kind === kind);
+  const best = own.reduce((m, e) => Math.max(m, pointsOf(e.level)), 0);
+  const mark = (level) => {
+    if (own.length) journal.update(own[0].id, { level });
+    else journal.add({ day: plan.day, kind, level });
+    toast({ title: t('today.marked', { points: pointsLabel(pointsOf(level)) }) });
+  };
+  return h('div', { class: 'task__block task__mark' },
+    h('p', { class: 'caps task__block-title' }, t('today.markTitle')),
+    h('div', { class: 'minute__picks' },
+      ...['min', 'full', 'max'].map((l) => h('button', {
+        type: 'button',
+        class: pointsOf(l) === best ? 'minute__pick is-on' : 'minute__pick',
+        'aria-pressed': String(pointsOf(l) === best),
+        onclick: () => mark(l),
+      },
+      h('span', { class: 'minute__pick-level' }, t('levels.' + l)),
+      h('span', { class: 'minute__pick-time' }, '+' + pointsOf(l)))),
+    ),
+  );
+}
+
+/* Каждая карточка дня сворачивается стрелкой (владелец 14.11.2026: «очень длинная простыня — всё сворачиваем,
+   чтобы можно было промотать»): свёрнута — значок, название и одна строка, справа баллы и стрелка. */
+function taskCard(ctx, plan) {
   const { task } = plan;
   // plan.profile — профиль отношений (profile/): от него зависят слова задания и строка для детей
-  return h('section', { class: 'card task' },
-    h('div', { class: 'card__eyebrow' }, h('span', { class: 'card__icon' }, svg(icons.crown)), h('span', { class: 'caps' }, t('today.taskLabel'))),
+  return foldCard({
+    id: 'task',
+    cls: 'task',
+    icon: icons.crown,
+    title: t('today.taskLabel'),
+    lead: '«' + task.title + '»',
+    status: doneBadge(taskPoints(ctx.entries, plan.day)),
+    body: [
     plan.intro ? h('p', { class: 'task__intro' }, plan.intro) : null,
     h('h2', { class: 'task__title' }, `«${task.title}»`),
     // Подзаголовок — своей строкой под названием, другим начертанием (владелец: «Магия рук» / «Тайный ритуал соблазна»)
@@ -231,6 +272,7 @@ function taskCard(plan) {
         h('ul', { class: 'task__say' }, ...task.say.map(sayItem)),
       )
       : null,
+    markLevels(ctx, plan, 'task'),
     h('div', { class: 'card__actions' },
       h('button', {
         type: 'button',
@@ -238,7 +280,8 @@ function taskCard(plan) {
         onclick: () => openEntry({ day: plan.day, kind: 'task', levels: task.levels }),
       }, svg(icons.plus), t('today.record')),
     ),
-  );
+    ],
+  }).node;
 }
 
 /* Фраза: просто слова — или по формуле «комплимент — программа — комплимент» (kpk): три части строками,
@@ -260,9 +303,15 @@ function sayItem(s) {
   );
 }
 
-function flowCard(plan) {
-  return h('section', { class: 'card task' },
-    h('div', { class: 'card__eyebrow' }, h('span', { class: 'card__icon' }, svg(icons.sparkle)), h('span', { class: 'caps' }, t('kinds.flow'))),
+function flowCard(ctx, plan) {
+  return foldCard({
+    id: 'task',
+    cls: 'task',
+    icon: icons.sparkle,
+    title: t('kinds.flow'),
+    lead: plan.tasks.map((ex) => ex.title).join(' · ') || t('today.flowLead'),
+    status: doneBadge(taskPoints(ctx.entries, plan.day)),
+    body: [
     h('p', { class: 'task__text' }, plan.flow || t('today.flowLead')),
     plan.flow ? h('p', { class: 'card__text' }, t('today.flowLead')) : null,
     plan.tasks.length
@@ -271,6 +320,7 @@ function flowCard(plan) {
         h('ol', { class: 'flow__list' }, ...plan.tasks.map((ex) => h('li', {}, h('strong', {}, ex.title), h('span', { class: 'dim' }, ex.text)))),
       )
       : null,
+    markLevels(ctx, plan, 'flow'),
     h('div', { class: 'card__actions' },
       h('button', {
         type: 'button',
@@ -278,13 +328,20 @@ function flowCard(plan) {
         onclick: () => openEntry({ day: plan.day, kind: 'flow', exercises: plan.tasks }),
       }, svg(icons.plus), t('today.record')),
     ),
-  );
+    ],
+  }).node;
 }
 
-function callCard(plan, summary) {
-  return h('div', {},
-    h('section', { class: 'card card--hero call' },
-      h('div', { class: 'card__eyebrow' }, h('span', { class: 'card__icon' }, svg(icons.phone)), h('span', { class: 'caps' }, t('kinds.call'))),
+function callCard(ctx, plan, summary) {
+  return h('div', { class: 'stack' },
+    foldCard({
+      id: 'task',
+      cls: 'call',
+      icon: icons.phone,
+      title: t('kinds.call'),
+      lead: t('today.callTitle'),
+      status: doneBadge(taskPoints(ctx.entries, plan.day)),
+      body: [
       h('h2', { class: 'card__title' }, t('today.callTitle')),
       h('p', { class: 'task__text' }, plan.call),
       h('p', { class: 'card__text' }, t('today.callLead')),
@@ -293,7 +350,8 @@ function callCard(plan, summary) {
           ? h('span', { class: 'chip' }, svg(icons.check, 'chip__icon'), t('today.callDone'))
           : h('button', { type: 'button', class: 'btn btn--gold btn--block', onclick: () => openEntry({ day: plan.day, kind: 'call' }) }, t('today.callMark')),
       ),
-    ),
+      ],
+    }).node,
     plan.review
       ? h('section', { class: 'card card--soft' },
         h('div', { class: 'card__eyebrow' }, h('span', { class: 'card__icon' }, svg(icons.mic)), h('span', { class: 'caps' }, t('today.reviewTitle'))),
@@ -308,11 +366,17 @@ function callCard(plan, summary) {
 function bizCard(plan) {
   const text = bizFor(plan.biz, plan.dayInWeek);
   if (!text) return null;
-  return h('section', { class: 'card card--soft biz' },
-    h('div', { class: 'card__eyebrow' }, h('span', { class: 'card__icon' }, svg(icons.goals)), h('span', { class: 'caps' }, t('today.bizTitle'))),
-    h('p', { class: 'card__title biz__title' }, plan.biz.title),
-    h('p', { class: 'card__text' }, text),
-  );
+  return foldCard({
+    id: 'biz',
+    cls: 'biz',
+    icon: icons.goals,
+    title: t('today.bizTitle'),
+    lead: plan.biz.title,
+    body: [
+      h('p', { class: 'card__title biz__title' }, plan.biz.title),
+      h('p', { class: 'card__text' }, text),
+    ],
+  }).node;
 }
 
 /* В поиске — вход в «Знакомство» прямо с «Сегодня»: советы, вопросы и запись после свидания. */
@@ -328,8 +392,12 @@ function meetLink(plan) {
 function recordedToday(ctx, plan) {
   const own = ctx.entries.filter((e) => e.day === plan.day);
   if (!own.length) return null;
-  return h('section', { class: 'card' },
-    h('div', { class: 'card__eyebrow' }, h('span', { class: 'caps' }, t('today.recordedToday'))),
+  return foldCard({
+    id: 'recorded',
+    icon: icons.journal,
+    title: t('today.recordedToday'),
+    lead: t('today.recordedLead', { n: own.length }),
+    body: [
     h('div', { class: 'choice-list' },
       ...own.map((e) => h('button', {
         type: 'button',
@@ -349,7 +417,8 @@ function recordedToday(ctx, plan) {
         onclick: () => openEntry({ day: plan.day, kind: plan.kind, exercises: plan.tasks, levels: plan.task?.levels }),
       }, t('today.recordMore'))
       : null,
-  );
+    ],
+  }).node;
 }
 
 function outside(ctx) {
@@ -379,13 +448,13 @@ export function render(view, ctx) {
   }
   const summary = weekSummary(weekOf(ctx.day), ctx.entries, ctx.day);
   let main;
-  if (plan.kind === 'task') main = taskCard(plan);
-  else if (plan.kind === 'flow') main = flowCard(plan);
-  else main = callCard(plan, summary);
+  if (plan.kind === 'task') main = taskCard(ctx, plan);
+  else if (plan.kind === 'flow') main = flowCard(ctx, plan);
+  else main = callCard(ctx, plan, summary);
 
   add(view,
     h('div', { class: 'stack' },
-      header(plan, summary),
+      header(ctx, plan, summary),
       // Новое от близкого (пара, семья) — сразу на виду; «Срочно» — красным
       usCard(),
       catchUp(ctx, summary),

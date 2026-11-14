@@ -2,6 +2,7 @@ import { h, svg } from '../core/dom.js';
 import { t } from '../core/i18n.js';
 import { icons } from '../ui/icons.js';
 import { content, myLanguage } from '../love/love.js';
+import { foldCard } from '../ui/fold.js';
 
 /* «Я-СООБЩЕНИЕ» на экране «Сегодня» — КАЖДЫЙ ДЕНЬ (владелец 13.11.2026; до 40 — дни 4–6). Какой пример в какой
    день — program/index.js → imsgOf; в дни 4–6 он связан с заданием дня 1, 2 или 3 этой недели: ситуация,
@@ -13,11 +14,14 @@ export function imsgCard(ctx, plan) {
   if (!m) return null;
   const mine = myLanguage(plan.day, ctx.lang);
 
-  return h('section', { class: 'card imsg' },
-    h('div', { class: 'card__eyebrow' },
-      h('span', { class: 'card__icon' }, svg(icons.sparkle)),
-      h('span', { class: 'caps' }, t('imsg.title')),
-    ),
+  // Сворачивается стрелкой, как все карточки дня (владелец 14.11.2026); свёрнута — ситуация дня одной строкой
+  return foldCard({
+    id: 'imsg',
+    cls: 'imsg',
+    icon: icons.sparkle,
+    title: t('imsg.title'),
+    lead: m.title,
+    body: [
     h('p', { class: 'imsg__remind' }, t('imsg.remind')),
     h('div', { class: 'imsg__example' },
       h('p', { class: 'imsg__situation' }, m.title),
@@ -44,5 +48,6 @@ export function imsgCard(ctx, plan) {
           h('a', { class: 'love-card__link', href: '#/love' }, t('imsg.loveBtn'), svg(icons.chevronRight, 'love-card__chevron')),
         )
         : null,
-  );
+    ],
+  }).node;
 }

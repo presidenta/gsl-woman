@@ -1,7 +1,6 @@
 /* СПИСОК ФАЙЛОВ ДЛЯ КЭША РАБОТНИКА. Пишется командой `npm run files` (tools/files.mjs) — руками не править. */
 self.GSL_FILES = [
   './',
-  './.git',
   './assets/figures/man-stand.webp',
   './assets/figures/man-up.webp',
   './assets/figures/man-walk-1.webp',
@@ -112,6 +111,7 @@ self.GSL_FILES = [
   './js/reminders/local.js',
   './js/reminders/permission.js',
   './js/reminders/plan.js',
+  './js/score/score.js',
   './js/screens/entry/entry-sheet.js',
   './js/screens/gender/gender.css',
   './js/screens/gender/gender.js',

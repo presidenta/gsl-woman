@@ -15,6 +15,11 @@ export default {
 
   nav: { today: 'Сегодня', week: 'Неделя', goals: 'Цели', journal: 'Записи', path: 'Путь' },
   fold: { open: 'Развернуть', close: 'Свернуть' },
+  score: {
+    today: 'Баллы дня: {points}',
+    earned: 'Заработано: {points}',
+    hint: 'Баллы — для себя: Минимум — 1, 100% — 2, Максимум — 3, стакан воды — 1. Видишь их только ты.',
+  },
   common: {
     showPassword: 'Показать пароль',
     hidePassword: 'Скрыть пароль',
@@ -42,6 +47,9 @@ export default {
   kinds: { task: 'Новое упражнение', flow: 'Свободный поток', call: 'День живой связи' },
 
   today: {
+    markTitle: 'Как выполнено сегодня — отметь',
+    marked: 'Отмечено: {points}',
+    recordedLead: 'Записей за сегодня: {n}',
     // Профиль, дети, дела (js/profile/, 14.11.2026)
     swapTitle: 'Заменяем:',
     kidsTitle: 'Детям',
@@ -906,6 +914,7 @@ export default {
   },
 
   plural: {
+    points: ['балл', 'балла', 'баллов'],
     days: ['день', 'дня', 'дней'],
   },
 

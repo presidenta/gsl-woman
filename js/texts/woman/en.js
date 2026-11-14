@@ -10,6 +10,11 @@ export default {
 
   nav: { today: 'Today', week: 'Week', goals: 'Goals', journal: 'Journal', path: 'Path' },
   fold: { open: 'Open', close: 'Close' },
+  score: {
+    today: 'Points today: {points}',
+    earned: 'Earned: {points}',
+    hint: 'Points are just for you: Minimum — 1, 100% — 2, Maximum — 3, a glass of water — 1. Only you see them.',
+  },
   common: {
     showPassword: 'Show password',
     hidePassword: 'Hide password',
@@ -37,6 +42,9 @@ export default {
   kinds: { task: 'New exercise', flow: 'Free flow', call: 'Day of live connection' },
 
   today: {
+    markTitle: 'How it went today — mark it',
+    marked: 'Marked: {points}',
+    recordedLead: 'Entries today: {n}',
     // Профиль, дети, дела (js/profile/, 14.11.2026)
     swapTitle: 'We replace:',
     kidsTitle: 'For the children',
@@ -899,6 +907,7 @@ export default {
   },
 
   plural: {
+    points: ['point', 'points'],
     days: ['day', 'days'],
   },
 

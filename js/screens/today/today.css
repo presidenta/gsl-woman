@@ -400,3 +400,21 @@
 .biz__title {
   margin: var(--sp-1) 0 var(--sp-2);
 }
+
+/* Шапка дня: слева «День N», справа баллы дня (score/, сборка 53) */
+.today-hero__top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-2);
+}
+
+.today-hero__score {
+  color: var(--c-gold);
+}
+
+/* Отметка уровня задания прямо в карточке */
+.task__mark .minute__picks {
+  margin-top: var(--sp-2);
+}

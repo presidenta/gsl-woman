@@ -10,6 +10,11 @@ export default {
 
   nav: { today: 'Сьогодні', week: 'Тиждень', goals: 'Цілі', journal: 'Записи', path: 'Шлях' },
   fold: { open: 'Розгорнути', close: 'Згорнути' },
+  score: {
+    today: 'Бали дня: {points}',
+    earned: 'Зароблено: {points}',
+    hint: 'Бали — для себе: Мінімум — 1, 100% — 2, Максимум — 3, склянка води — 1. Бачиш їх тільки ти.',
+  },
   common: {
     showPassword: 'Показати пароль',
     hidePassword: 'Сховати пароль',
@@ -37,6 +42,9 @@ export default {
   kinds: { task: 'Нова вправа', flow: 'Вільний потік', call: 'День живого зв’язку' },
 
   today: {
+    markTitle: 'Як виконано сьогодні — познач',
+    marked: 'Позначено: {points}',
+    recordedLead: 'Записів за сьогодні: {n}',
     // Профиль, дети, дела (js/profile/, 14.11.2026)
     swapTitle: 'Замінюємо:',
     kidsTitle: 'Дітям',
@@ -899,6 +907,7 @@ export default {
   },
 
   plural: {
+    points: ['бал', 'бали', 'балів'],
     days: ['день', 'дні', 'днів'],
   },
 
