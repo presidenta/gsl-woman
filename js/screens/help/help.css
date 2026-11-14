@@ -1,0 +1,72 @@
+/* ЭКРАН «ПОМОЩЬ»: библиотека — разделы раскрываются по нажатию. Цвета и отступы — только токены. */
+
+.help__intro {
+  margin: 0 0 var(--sp-4);
+  color: var(--c-text-dim);
+}
+
+.help__meet,
+.help__item {
+  margin-top: var(--sp-3);
+}
+
+.help__summary {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  cursor: pointer;
+  list-style: none;
+}
+
+.help__summary::-webkit-details-marker {
+  display: none;
+}
+
+.help__title {
+  flex: 1;
+  font-family: var(--f-display);
+  font-size: var(--fs-lg);
+}
+
+.help__chevron {
+  width: 1.1em;
+  height: 1.1em;
+  transition: transform var(--t-fast) var(--ease);
+}
+
+.help__item[open] .help__chevron {
+  transform: rotate(90deg);
+}
+
+.help__lead {
+  margin-top: var(--sp-3);
+}
+
+.help__group {
+  margin-top: var(--sp-4);
+}
+
+.help__group-title {
+  margin: 0 0 var(--sp-2);
+}
+
+.help__list {
+  margin: 0;
+  padding-left: var(--sp-5);
+  display: grid;
+  gap: var(--sp-3);
+}
+
+.help__entry {
+  display: grid;
+  gap: var(--sp-1);
+}
+
+.help__text {
+  color: var(--c-text);
+}
+
+.help__note {
+  color: var(--c-text-dim);
+  font-size: var(--fs-sm);
+}

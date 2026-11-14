@@ -92,8 +92,8 @@ export function render(view, ctx) {
     form,
   );
 
-  // Под письмом — «Знакомство» (владелец 14.11.2026: «знакомство — это тоже цель»): технология трёх тем, запись после встречи
-  const letters = () => [lettersCard(ownBox, { rerender: ctx.rerender }), meetLink()];
+  // Под письмом — «Помощь» (владелец 14.11.2026): библиотека — первое свидание, вопросы, общие темы, комплименты
+  const letters = () => [lettersCard(ownBox, { rerender: ctx.rerender }), helpLink()];
   if (!list.length) {
     add(view, h('div', { class: 'card empty goals__empty' },
       h('div', { class: 'goals__emblem' }, svg(icons.goals)),
@@ -113,10 +113,10 @@ export function render(view, ctx) {
   add(view, ...letters());
 }
 
-function meetLink() {
-  return h('a', { class: 'card settings__link goals__meet', href: '#/meet' },
-    h('span', { class: 'card__icon' }, svg(icons.rings)),
-    h('span', { class: 'settings__link-text' }, h('strong', {}, t('meet.title')), h('br'), h('span', { class: 'faint' }, t('meet.lead'))),
+function helpLink() {
+  return h('a', { class: 'card settings__link goals__help', href: '#/help' },
+    h('span', { class: 'card__icon' }, svg(icons.sparkle)),
+    h('span', { class: 'settings__link-text' }, h('strong', {}, t('help.title')), h('br'), h('span', { class: 'faint' }, t('help.lead'))),
     svg(icons.chevronRight, 'settings__link-chevron'),
   );
 }

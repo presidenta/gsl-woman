@@ -779,6 +779,14 @@ export default {
     single: 'Looking',
   },
   // «Знакомство» — js/meet/, экран #/meet
+  // «Помощь» — js/help/, экран #/help (владелец 14.11.2026)
+  help: {
+    title: 'Help',
+    lead: 'First date, questions, topics to discuss, compliments',
+    meetTitle: 'First date',
+    draft: 'draft',
+    waiting: 'This section arrives together with the programme — open the app online.',
+  },
   meet: {
     lead: 'Before, during and after the date — what to ask and how to read a person',
     ask: 'Ask',
