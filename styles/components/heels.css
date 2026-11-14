@@ -1,13 +1,14 @@
-/* ПОДЪЁМЫ НА ПЯТКИ: фигура, пол, подписи и таймер справа (js/ui/heels.js). Цикл — ровно 1 секунда:
-   0–28%  — подъём на носки (тело вверх и чуть вперёд, ступня поворачивается вокруг подушечки);
-   28–55% — задержка вверху;
-   55–66% — опускание на пятки;
-   66–100% — стоим; в момент касания — круг под пятками, воздух изо рта и «выдох». */
+/* ПОДЪЁМЫ НА ПЯТКИ: фигура владельца (assets/figures/), пар, красный круг, «выдох» и таймер справа (js/ui/heels.js).
+   Цикл — ровно 1 секунда:
+   0–12%   — подъём на носки (кадр «на носках» сменяет кадр «на пятках»);
+   12–56%  — на носках, пара нет;
+   56–60%  — опускание на пятки;
+   60–100% — стоим: изо рта выходит пар, под ногами расходится красный круг, «выдох» со стрелкой. */
 
 .heels {
   position: relative;
   display: grid;
-  grid-template-columns: 74px minmax(0, 1fr) auto;
+  grid-template-columns: 104px minmax(0, 1fr) auto;
   align-items: center;
   gap: var(--sp-3);
   margin-top: var(--sp-4);
@@ -16,53 +17,126 @@
   background: radial-gradient(70% 90% at 30% 60%, rgba(var(--rgb-gold), 0.09), transparent 70%);
 }
 
-.heels__svg {
-  width: 74px;
-  height: 194px;
-  overflow: visible;
-  opacity: 0.85;
-  transition: opacity var(--t-med);
+/* Фигура — два кадра один над другим. Фон картинок уведён в чёрный (scratchpad: cut.py) — «светлее из двух»
+   оставляет на его месте цвет карточки: фигура стоит прямо на карточке, без прямоугольника */
+.heels__art {
+  position: relative;
+  width: 104px;
+  height: 240px;
 }
 
-.heels.is-running .heels__svg {
-  opacity: 1;
+.heels__frame {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center bottom;
+  mix-blend-mode: lighten;
+  -webkit-mask-image: linear-gradient(to bottom, #000 93%, transparent 100%);
+  mask-image: linear-gradient(to bottom, #000 93%, transparent 100%);
+  user-select: none;
+  pointer-events: none;
 }
 
-.heels__body {
-  animation: heels-body 1s var(--ease) infinite;
+.heels__frame--down {
+  animation: heels-down 1s linear infinite;
 }
 
-.heels__foot {
-  transform-box: view-box;
-  transform-origin: 73px 190px;
-  animation: heels-foot 1s var(--ease) infinite;
+.heels__frame--up {
+  animation: heels-up 1s linear infinite;
 }
 
-.heels__shade {
-  transform-box: fill-box;
-  transform-origin: center;
-  animation: heels-shade 1s var(--ease) infinite;
+@keyframes heels-down {
+  0%, 6% { opacity: 1; }
+  12%, 56% { opacity: 0; }
+  60%, 100% { opacity: 1; }
 }
 
-/* Выдох: три струйки воздуха изо рта прорисовываются вперёд и тают; точки — последние капли воздуха */
-.heels__breath path {
-  stroke-dasharray: 1;
-  stroke-dashoffset: 1;
-  animation: heels-breath 1s ease-out infinite;
+@keyframes heels-up {
+  0%, 6% { opacity: 0; }
+  12%, 56% { opacity: 1; }
+  60%, 100% { opacity: 0; }
 }
 
-.heels__breath circle {
+/* Пар: три мягких облачка изо рта — растут, уходят вперёд (по взгляду: --dir) и тают; только после опускания */
+.heels__vapor {
+  position: absolute;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+
+.heels__puff {
+  position: absolute;
+  left: -9px;
+  top: -9px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.9) 0%, rgba(236, 242, 248, 0.5) 38%, rgba(236, 242, 248, 0) 70%);
+  filter: blur(2px);
   opacity: 0;
-  animation: heels-breath-dot 1s ease-out infinite;
+  animation: heels-puff 1s ease-out infinite;
 }
 
-.heels__ripple {
-  transform-box: fill-box;
-  transform-origin: center;
+.heels__puff--2 {
+  left: -7px;
+  top: -7px;
+  width: 14px;
+  height: 14px;
+  animation-name: heels-puff-2;
+}
+
+.heels__puff--3 {
+  left: -6px;
+  top: -6px;
+  width: 11px;
+  height: 11px;
+  animation-name: heels-puff-3;
+}
+
+@keyframes heels-puff {
+  0%, 58% { opacity: 0; transform: translate(0, 0) scale(0.4); }
+  64% { opacity: 0.95; transform: translate(calc(var(--dir) * 4px), 0) scale(0.8); }
+  100% { opacity: 0; transform: translate(calc(var(--dir) * 26px), -6px) scale(2.6); }
+}
+
+@keyframes heels-puff-2 {
+  0%, 62% { opacity: 0; transform: translate(0, 2px) scale(0.4); }
+  70% { opacity: 0.8; transform: translate(calc(var(--dir) * 7px), 1px) scale(0.9); }
+  100% { opacity: 0; transform: translate(calc(var(--dir) * 36px), -2px) scale(2.4); }
+}
+
+@keyframes heels-puff-3 {
+  0%, 66% { opacity: 0; transform: translate(0, -1px) scale(0.4); }
+  74% { opacity: 0.7; transform: translate(calc(var(--dir) * 9px), -3px) scale(1); }
+  100% { opacity: 0; transform: translate(calc(var(--dir) * 44px), -10px) scale(2.8); }
+}
+
+/* Красный круг под ногами в момент касания пятками — «главное — опустить всё тело» */
+.heels__ground {
+  position: absolute;
+  left: 50%;
+  bottom: 3px;
+  width: 56px;
+  height: 12px;
+  margin-left: -28px;
+  border: 2px solid rgb(var(--rgb-urgent));
+  border-radius: 50%;
+  box-shadow: 0 0 10px rgba(var(--rgb-urgent), 0.8), inset 0 0 8px rgba(var(--rgb-urgent), 0.6);
   opacity: 0;
-  animation: heels-ripple 1s ease-out infinite;
+  animation: heels-ground 1s ease-out infinite;
+  pointer-events: none;
 }
 
+@keyframes heels-ground {
+  0%, 56% { opacity: 0; transform: scale(0.4); }
+  62% { opacity: 1; transform: scale(0.75); }
+  100% { opacity: 0; transform: scale(1.9); }
+}
+
+/* — «Выдох» со стрелкой вниз — вместе и без движения — */
 .heels__cues {
   position: relative;
   min-height: 2.6em;
@@ -81,12 +155,6 @@
   opacity: 0;
 }
 
-.heels__cue--up {
-  color: var(--c-text-dim);
-  font-size: var(--fs-lg);
-  animation: heels-cue-up 1s linear infinite;
-}
-
 .heels__cue--down {
   display: inline-flex;
   flex-direction: column;
@@ -103,82 +171,45 @@
   color: transparent;
 }
 
-/* Стрелка вниз — неподвижная, появляется вместе со словом (владелец 14.11.2026: «без движений, синхронно») */
 .heels__cue-arrow svg {
   display: block;
   width: 16px;
   height: 26px;
 }
 
-@keyframes heels-body {
-  0%, 100% { transform: translateY(0); }
-  28%, 55% { transform: translate(1.2px, -2.4px); }
-  66% { transform: translateY(0); }
-}
-
-@keyframes heels-foot {
-  0%, 100% { transform: rotate(0deg); }
-  28%, 55% { transform: rotate(10.8deg); }
-  66% { transform: rotate(0deg); }
-}
-
-@keyframes heels-ripple {
-  0%, 62% { opacity: 0; transform: scale(0.4); }
-  68% { opacity: 0.9; transform: scale(0.7); }
-  100% { opacity: 0; transform: scale(1.6); }
-}
-
-@keyframes heels-shade {
-  0%, 100% { opacity: 1; transform: scaleX(1); }
-  28%, 55% { opacity: 0.6; transform: scaleX(0.8); }
-  66% { opacity: 1; transform: scaleX(1); }
-}
-
-@keyframes heels-breath {
-  0%, 58% { stroke-dashoffset: 1; opacity: 0; transform: translateX(0); }
-  64% { opacity: 0.95; }
-  82% { stroke-dashoffset: 0; opacity: 0.85; }
-  100% { stroke-dashoffset: 0; opacity: 0; transform: translateX(3px); }
-}
-
-@keyframes heels-breath-dot {
-  0%, 74% { opacity: 0; transform: translateX(0); }
-  84% { opacity: 0.8; }
-  100% { opacity: 0; transform: translateX(3px); }
-}
-
-@keyframes heels-cue-up {
-  0% { opacity: 0; }
-  12%, 45% { opacity: 0.85; }
-  58%, 100% { opacity: 0; }
-}
-
 @keyframes heels-cue-down {
-  0%, 60% { opacity: 0; }
-  68%, 88% { opacity: 1; }
+  0%, 58% { opacity: 0; }
+  64%, 88% { opacity: 1; }
   100% { opacity: 0; }
 }
 
 /* Идёт счёт — цикл сдвинут (--heels-delay из setRunning): касание пятками = смена цифры и звук */
-.heels.is-running :is(.heels__body, .heels__foot, .heels__shade, .heels__ripple, .heels__breath path, .heels__breath circle, .heels__cue) {
+.heels.is-running :is(.heels__frame, .heels__puff, .heels__ground, .heels__cue) {
   animation-delay: var(--heels-delay, 0s);
 }
 
-/* «Меньше движения» в системе — неподвижный силуэт и спокойная подпись ритма */
+/* Свёрнутая карточка: та же фигура, маленькая */
+.fold__thumb .heels__art {
+  width: 36px;
+  height: 80px;
+}
+
+.fold__thumb .heels__vapor,
+.fold__thumb .heels__ground {
+  display: none;
+}
+
+/* «Меньше движения» в системе — неподвижная фигура на пятках и спокойная подпись */
 @media (prefers-reduced-motion: reduce) {
-  .heels__body,
-  .heels__foot,
-  .heels__shade,
-  .heels__ripple,
-  .heels__cue--up,
-  .heels__breath path,
-  .heels__breath circle {
+  .heels__frame--down,
+  .heels__frame--up,
+  .heels__puff,
+  .heels__ground {
     animation: none;
   }
 
-  .heels__breath path {
-    stroke-dashoffset: 0;
-    opacity: 0.7;
+  .heels__frame--up {
+    opacity: 0;
   }
 
   .heels__cue--down {

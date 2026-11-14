@@ -1,32 +1,133 @@
 /* ПРИВЫЧКИ ДНЯ: Кегель и шаги (kegel-card.js, steps-card.js, figures.js). Панель — как у утренней минуты
    (.heels, .minute__* из styles/components/heels.css и today.css). */
 
-.kegel__stage .kf,
-.steps__stage .walk {
-  width: 74px;
-  height: 194px;
-  overflow: visible;
+
+/* Фигуры владельца (habits/figures.js): Кегель — стоит на своём фоне (края растворяются), шаги — три кадра на
+   чёрном, чёрный сливается с карточкой */
+.kf,
+.walk {
+  position: relative;
+  width: 104px;
+  height: 240px;
 }
 
-.steps__stage .walk {
-  width: 92px;
+.kf__img,
+.walk__frame {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center bottom;
+  user-select: none;
+  pointer-events: none;
+}
+
+.kf__img {
+  mix-blend-mode: lighten;
+  -webkit-mask-image: linear-gradient(to bottom, #000 93%, transparent 100%);
+  mask-image: linear-gradient(to bottom, #000 93%, transparent 100%);
+}
+
+.kegel__stage {
+  grid-template-columns: 104px minmax(0, 1fr) auto;
 }
 
 .steps__stage {
-  grid-template-columns: 92px minmax(0, 1fr) auto;
+  grid-template-columns: 120px minmax(0, 1fr) auto;
+}
+
+.walk {
+  width: 120px;
+}
+
+.walk__frame {
+  mix-blend-mode: lighten;
+  opacity: 0;
+  animation: walk-frame 1.05s steps(1) infinite;
+}
+
+.walk__frame--2 { animation-delay: -0.7s; }
+.walk__frame--3 { animation-delay: -0.35s; }
+
+@keyframes walk-frame {
+  0% { opacity: 1; }
+  33.34% { opacity: 0; }
+  100% { opacity: 0; }
+}
+
+/* Дорога под ногами бежит назад */
+.walk__road {
+  position: absolute;
+  left: 4px;
+  right: 4px;
+  bottom: 1px;
+  height: 2px;
+  border-radius: 1px;
+  background: repeating-linear-gradient(90deg, rgba(var(--rgb-gold), 0.75) 0 8px, transparent 8px 15px);
+  -webkit-mask-image: linear-gradient(to right, transparent, #000 20%, #000 80%, transparent);
+  mask-image: linear-gradient(to right, transparent, #000 20%, #000 80%, transparent);
+  animation: walk-road 0.35s linear infinite;
+}
+
+@keyframes walk-road {
+  from { background-position: 0 0; }
+  to { background-position: -15px 0; }
 }
 
 .fold__thumb .kf,
 .fold__thumb .walk {
-  width: auto;
-  height: 76px;
+  width: 40px;
+  height: 80px;
+}
+
+.fold__thumb .walk__road {
+  display: none;
+}
+
+/* Свечение в области таза: до старта — мягко дышит (3 с сжатие, 3 с отдых), сжатие — ярко, расслабление — гаснет */
+.kf-glow {
+  position: absolute;
+  width: 34px;
+  height: 24px;
+  margin: -12px 0 0 -17px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 243, 200, 0.95) 0%, rgba(242, 198, 88, 0.55) 45%, rgba(242, 198, 88, 0) 72%);
+  opacity: 0.35;
+  transition: opacity 0.6s var(--ease), transform 0.6s var(--ease);
+  pointer-events: none;
+}
+
+.fold__thumb .kf-glow {
+  width: 14px;
+  height: 10px;
+  margin: -5px 0 0 -7px;
+}
+
+.kf--idle .kf-glow {
+  animation: kf-pulse 6s ease-in-out infinite;
+}
+
+.kf--squeeze .kf-glow {
+  opacity: 1;
+  transform: scale(1.3);
+}
+
+.kf--relax .kf-glow {
+  opacity: 0.12;
+  transform: scale(0.8);
+}
+
+@keyframes kf-pulse {
+  0%, 100% { opacity: 0.2; transform: scale(0.85); }
+  45%, 55% { opacity: 0.85; transform: scale(1.2); }
 }
 
 /* Подпись «сжать / расслабить» — посередине панели, крупно, как подсказки ритма у минуты */
 .kegel__cue {
   color: var(--c-champagne);
   font-family: var(--f-display);
-  font-size: var(--fs-xl);
+  font-size: var(--fs-lg);
   font-style: italic;
   text-align: center;
   transition: color var(--t-med) var(--ease);
@@ -51,102 +152,6 @@
   white-space: nowrap;
 }
 
-/* Копия фигуры стоит спокойно: выдох и подъём — только у утренней минуты */
-.kf__breath {
-  display: none;
-}
-
-/* Свечение в области таза: до старта — мягко дышит (3 с сжатие, 3 с отдых), сжатие — ярко, расслабление — гаснет */
-.kf-glow {
-  transform-box: fill-box;
-  transform-origin: center;
-  opacity: 0.35;
-  transition: opacity 0.6s var(--ease), transform 0.6s var(--ease);
-}
-
-.kf--idle .kf-glow {
-  animation: kf-pulse 6s ease-in-out infinite;
-}
-
-.kf--squeeze .kf-glow {
-  opacity: 1;
-  transform: scale(1.3);
-}
-
-.kf--relax .kf-glow {
-  opacity: 0.12;
-  transform: scale(0.8);
-}
-
-@keyframes kf-pulse {
-  0%, 100% { opacity: 0.2; transform: scale(0.85); }
-  45%, 55% { opacity: 0.85; transform: scale(1.2); }
-}
-
-/* — Шаги: бедро от тазобедренного сустава, голень от колена, руки навстречу ногам, дорога бежит назад — */
-.walk__thigh,
-.walk__shin,
-.walk__arm {
-  transform-box: view-box;
-}
-
-.walk__thigh {
-  transform-origin: 61px 99px;
-  animation: walk-thigh 1.1s ease-in-out infinite;
-}
-
-.walk__shin {
-  transform-origin: 61px 139px;
-  animation: walk-shin 1.1s linear infinite;
-}
-
-.walk__thigh--far,
-.walk__thigh--far .walk__shin {
-  animation-delay: -0.55s;
-}
-
-.walk__arm {
-  transform-origin: 60px 42px;
-  animation: walk-arm 1.1s ease-in-out infinite;
-}
-
-.walk__arm--far {
-  animation-delay: -0.55s;
-}
-
-.walk__bob {
-  animation: walk-bob 0.55s ease-in-out infinite;
-}
-
-.walk__road {
-  animation: walk-road 0.32s linear infinite;
-}
-
-@keyframes walk-thigh {
-  0%, 100% { transform: rotate(-20deg); }
-  50% { transform: rotate(16deg); }
-}
-
-@keyframes walk-shin {
-  0%, 100% { transform: rotate(2deg); }
-  45% { transform: rotate(6deg); }
-  65% { transform: rotate(40deg); }
-  85% { transform: rotate(12deg); }
-}
-
-@keyframes walk-arm {
-  0%, 100% { transform: rotate(14deg); }
-  50% { transform: rotate(-14deg); }
-}
-
-@keyframes walk-bob {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-1.6px); }
-}
-
-@keyframes walk-road {
-  to { stroke-dashoffset: 13; }
-}
 
 .steps__count {
   font-size: 26px;
@@ -192,8 +197,16 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .walk *,
+  .walk__road,
   .kf-glow {
     animation: none !important;
+  }
+
+  .walk__frame {
+    animation: none;
+  }
+
+  .walk__frame--1 {
+    opacity: 1;
   }
 }

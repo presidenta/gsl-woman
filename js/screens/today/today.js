@@ -166,7 +166,7 @@ function morningCard(ctx, plan) {
   paint();
 
   // Сворачивается стрелкой, как стакан (владелец 13.11.2026): свёрнута — маленькая фигура и одна строка
-  const figureSvg = figure.node.querySelector('svg');
+  const figureArt = figure.art;
   const fold = foldCard({
     id: 'minute',
     cls: 'minute',
@@ -183,8 +183,8 @@ function morningCard(ctx, plan) {
       h('div', { class: 'bar minute__bar' }, fill),
       h('div', { class: 'card__actions' }, picks, runningRow),
     ],
-    // Одна фигура на странице (у неё свои id градиентов): свёрнута — в шапке, раскрыта — на своём месте
-    onToggle: (open) => (open ? figure.node.prepend(figureSvg) : fold.thumb.append(figureSvg)),
+    // Одна фигура: свёрнута — в шапке, раскрыта — на своём месте
+    onToggle: (open) => (open ? figure.node.prepend(figureArt) : fold.thumb.append(figureArt)),
   });
   return fold.node;
 }
