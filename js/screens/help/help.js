@@ -22,7 +22,7 @@ const entriesOf = (g) => [...(g.entries || []), ...(g.sections || []).flatMap((s
 const count = (n, unit) => (unit && n ? `${n} ${plural(n, `plural.${unit}`)}` : null);
 
 // Значок каждого пункта — свой, вид один
-const ITEM_ICON = { redline: 'lock', questions: 'chat', her: 'heart', words: 'heart', kpk: 'crown', authors: 'journal', topics: 'rings', rules: 'home', dates: 'calendar', compliments: 'sparkle' };
+const ITEM_ICON = { redline: 'flag', questions: 'chat', her: 'heart', words: 'heart', kpk: 'crown', authors: 'journal', topics: 'rings', rules: 'home', dates: 'calendar', compliments: 'sparkle' };
 const iconOf = (key) => icons[ITEM_ICON[key]] || icons.sparkle;
 
 function readBox(text) {
@@ -161,6 +161,8 @@ function itemPlate(item, ctx, verdicts) {
   const n = rulesPart ? rulesPart.count : item.groups.filter((g) => g.unit === item.unit).reduce((s, g) => s + entriesOf(g).length, 0);
   return remember(platePanel({
     icon: iconOf(item.key),
+    // «Красный флаг» — единственная красная плашка: это запрет, а не совет (владелец 15.11.2026)
+    cls: item.key === 'redline' ? 'plate--red' : '',
     title: item.title,
     chip: count(n, item.unit),
     body: [

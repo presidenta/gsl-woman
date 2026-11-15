@@ -102,3 +102,20 @@ a.plate,
 .plates__heading {
   margin: var(--sp-5) 0 var(--sp-2);
 }
+
+/* «Красный флаг» (запрет оценок, владелец 15.11.2026): та же плашка, но кружок — красный флаг на красном, и красная
+   рамка — сразу видно, что это важно. Единственное место с этим цветом. */
+.plate--red {
+  border-color: color-mix(in srgb, var(--c-red-flag) 55%, transparent);
+}
+
+.plate--red .plate__icon {
+  color: var(--c-red-flag);
+  border: 2px solid var(--c-red-flag);
+  background: color-mix(in srgb, var(--c-red-flag) 18%, transparent);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--c-red-flag) 12%, transparent);
+}
+
+.plate--red .plate__title {
+  color: var(--c-red-flag);
+}
