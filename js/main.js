@@ -38,6 +38,7 @@ import { brand as brandMark } from './ui/brand.js';
 import * as install from './install/install.js';
 import * as media from './media/photos.js';
 import * as preview from './preview/preview.js';
+import { usedPhotoIds } from './media/used.js';
 
 /* ВХОД В ПРИЛОЖЕНИЕ: каркас (шапка, область экрана, нижняя панель), маршруты, перерисовка при
    изменениях, напоминания и работник. Экраны ничего не знают друг о друге: каждый получает ctx —
@@ -411,7 +412,7 @@ if (account.current()) {
 install.onChange(() => router.currentRoute() === 'settings' && scheduleDraw());
 
 // Снимки, на которые больше не ссылается ни одна запись (закрыла форму без «Сохранить»), — стереть
-setTimeout(() => media.prune(journal.photoIds()).catch(() => {}), 4000);
+setTimeout(() => media.prune(usedPhotoIds()).catch(() => {}), 4000);
 
 // Копия данных на сервере и обмен между устройствами (владелец 13.11.2026) — как у GoldenFit
 sync.start();

@@ -11,16 +11,26 @@ import { circleGoals } from '../../circles/goals-view.js';
 import { lettersBody } from '../../letters/letters-view.js';
 import { ownBox } from '../../letters/letters.js';
 import { lt } from '../../letters/texts.js';
-import { plateLink, platePanel, plateNote } from '../../ui/plate.js';
+import { plateLink, platePanel } from '../../ui/plate.js';
+import { photoField, photoStrip } from '../../media/photo-field.js';
+import * as media from '../../media/photos.js';
+import { usedPhotoIds } from '../../media/used.js';
+import { goalAudioField, deleteGoalAudio } from '../../goals/goal-media.js';
 
 /* ЭКРАН «ЦЕЛИ»: вкладки «Мои · Пара · Семья» (владелец 13.11.2026: «цели у женщины, если она одна, и цели пары,
    если они вместе; и семьи»). «Мои» — сверху строка «Новая цель» и золотой «+», ниже — цели в работе, внизу —
    «Сбылось» с датами; кружок слева отмечает «сбылось», нажатие на текст открывает правку (данные — js/goals/).
    Под целями — плашки одного вида (ui/plate.js, владелец 15.11.2026: «чтобы не было хаоса»): «Помощь», в самом
    низу — «Письмо себе в будущее» (раскрывается на месте, золотая кнопка не утяжеляет середину экрана).
-   «Пара» и «Семья» — общие цели контура (js/circles/goals-view.js). */
+   «Пара» и «Семья» — общие цели контура (js/circles/goals-view.js).
+
+   С 64 (владелец 15.11.2026: «нелогично — „+“ отдельно, а „здесь будут твои цели“ ниже»): «Мои цели» — ОДНА плашка.
+   Слева золотой «+» — сразу раскрывает плашку и ставит курсор в строку новой цели; справа стрелка — раскрыть и
+   свернуть. Внутри — строка новой цели, цели в работе и «Сбылось». В карточке цели — текст, описание, фото и голос
+   (фото — поле записей media/, голос — перенесён из «Дверей» «Кванта», goals/goal-media.js). */
 
 let tab = 'mine';
+let boxOpen = false; // плашка «Мои цели» раскрыта — переживает перерисовку
 let lettersOpen = false; // плашка письма раскрыта — переживает перерисовку («Написать», «Запечатать»)
 
 function goalRow(g) {
@@ -37,6 +47,8 @@ function goalRow(g) {
 
   const body = h('button', { type: 'button', class: 'goal__body', onclick: () => editGoal(g) },
     h('span', { class: 'goal__text' }, g.text),
+    g.note ? h('span', { class: 'goal__note' }, g.note) : null,
+    g.photos?.length ? photoStrip(g.photos) : null,
     g.done && g.doneAt ? h('span', { class: 'goal__date' }, t('goals.doneOn', { date: formatDate(g.doneAt.slice(0, 10)) })) : null,
   );
 
@@ -45,18 +57,36 @@ function goalRow(g) {
 
 function editGoal(g) {
   const f = field({ label: t('goals.text'), multiline: true, rows: 3, maxlength: goals.MAX_TEXT, value: g.text });
+  const note = field({ label: t('goals.note'), multiline: true, rows: 4, maxlength: goals.MAX_NOTE, value: g.note || '' });
+  let photoIds = [...(g.photos || [])];
+  const photosNode = photoField({ ids: photoIds, onChange: (ids) => { photoIds = ids; } });
+  // Голос — сразу на телефон, как у «Дверей» «Кванта»: «Сохранить» для него не нужно
+  const voice = goalAudioField(g.id);
+  // Снимки, которые больше никому не нужны (убрали, не сохранили), — стереть
+  const tidy = () => media.prune(usedPhotoIds()).catch(() => {});
+
   const save = h('button', { type: 'button', class: 'btn btn--gold btn--block' }, t('common.save'));
   save.addEventListener('click', () => {
     goals.rename(g.id, f.control.value);
+    goals.update(g.id, { note: note.control.value, photos: photoIds });
+    voice.close();
     closeSheet();
+    tidy();
   });
   const del = h('button', { type: 'button', class: 'btn btn--danger btn--block' }, svg(icons.trash), t('common.delete'));
-  del.addEventListener('click', () => {
+  del.addEventListener('click', async () => {
     if (!confirm(t('goals.deleteConfirm'))) return;
+    await voice.close();
     goals.remove(g.id);
+    deleteGoalAudio(g.id);
     closeSheet();
+    tidy();
   });
-  openSheet({ title: t('goals.edit'), content: h('div', { class: 'stack' }, f.node, save, del) });
+  openSheet({
+    title: t('goals.edit'),
+    content: h('div', { class: 'stack' }, f.node, note.node, photosNode, voice.node, save, del),
+    onClose: () => { voice.close(); tidy(); },
+  });
   setTimeout(() => f.control.focus(), 300);
 }
 
@@ -83,10 +113,10 @@ export function render(view, ctx) {
     enterkeyhint: 'done',
   });
   const addBtn = h('button', { type: 'submit', class: 'goals__add', 'aria-label': t('goals.add') }, svg(icons.plus));
-  const form = h('form', { class: 'card goals__new' }, input, addBtn);
+  const form = h('form', { class: 'goals__new' }, input, addBtn);
   form.addEventListener('submit', (e) => {
     e.preventDefault();
-    if (goals.add(input.value)) input.value = '';
+    if (goals.add(input.value)) { input.value = ''; boxOpen = true; }
     else input.focus();
   });
 
@@ -94,23 +124,43 @@ export function render(view, ctx) {
     h('h1', { class: 'screen-title' }, t('goals.title')),
     tabs,
     h('p', { class: 'screen-lead' }, t('goals.lead')),
-    form,
+    goalsBox({ list, open, done, form, input }),
+    helpPlate(),
+    lettersPlate(ctx),
   );
+}
 
-  const bottom = () => [helpPlate(), lettersPlate(ctx)];
-  if (!list.length) {
-    add(view, plateNote({ icon: icons.goals, title: t('goals.emptyTitle'), lead: t('goals.emptyText') }), ...bottom());
-    return;
-  }
-
-  if (open.length) add(view, h('ul', { class: 'goals__list' }, ...open.map(goalRow)));
-  if (done.length) {
-    add(view,
-      h('h2', { class: 'caps goals__heading' }, t('goals.doneTitle'), h('span', { class: 'goals__count' }, String(done.length))),
-      h('ul', { class: 'goals__list' }, ...done.map(goalRow)),
-    );
-  }
-  add(view, ...bottom());
+/* Одна плашка «Мои цели»: «+» слева — раскрыть и сразу писать; стрелка справа — раскрыть и свернуть. */
+function goalsBox({ list, open, done, form, input }) {
+  const body = h('div', { class: 'plate__body goals-box__body' },
+    form,
+    open.length ? h('ul', { class: 'goals__list' }, ...open.map(goalRow)) : null,
+    done.length ? h('h2', { class: 'caps goals__heading' }, t('goals.doneTitle'), h('span', { class: 'goals__count' }, String(done.length))) : null,
+    done.length ? h('ul', { class: 'goals__list' }, ...done.map(goalRow)) : null,
+  );
+  const box = h('section', { class: `card plate plate--panel goals-box${boxOpen ? ' is-open' : ''}` });
+  const setOpen = (v) => {
+    boxOpen = v;
+    box.classList.toggle('is-open', v);
+    toggle.setAttribute('aria-expanded', String(v));
+    body.hidden = !v;
+  };
+  const plus = h('button', {
+    type: 'button',
+    class: 'plate__icon goals-box__plus',
+    'aria-label': t('goals.add'),
+    onclick: () => { setOpen(true); setTimeout(() => input.focus(), 50); },
+  }, svg(icons.plus));
+  const toggle = h('button', { type: 'button', class: 'goals-box__toggle', onclick: () => setOpen(!boxOpen) },
+    h('span', { class: 'plate__text' },
+      h('span', { class: 'plate__title' }, list.length ? t('goals.boxTitle') : t('goals.emptyTitle')),
+      h('span', { class: 'plate__lead' }, list.length ? t('goals.boxCount', { open: open.length, done: done.length }) : t('goals.boxEmpty')),
+    ),
+    h('span', { class: 'plate__arrow', 'aria-hidden': 'true' }, svg(icons.chevronRight)),
+  );
+  box.append(h('div', { class: 'plate__head goals-box__head' }, plus, toggle), body);
+  setOpen(boxOpen);
+  return box;
 }
 
 // «Помощь» — библиотека: первое свидание, вопросы, общие темы, комплименты (владелец 14.11.2026)

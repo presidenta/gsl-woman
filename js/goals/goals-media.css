@@ -1,0 +1,240 @@
+/* ГОЛОС К ЦЕЛИ (js/goals/goal-media.js). Стили перенесены из «Кванта» один в один
+   (planner/web/css/space.css — «Плашки действий», «Идёт запись», «Состояние записи», «Ползунок»): префикс .qm-root
+   заменён на .goal-audio, цвета «Кванта» — на токены GSL (золото своей части). */
+
+.goal-audio {
+  display: grid;
+  gap: var(--sp-2);
+}
+
+.goal-audio__note {
+  margin: 0;
+  font-size: var(--fs-xs);
+}
+
+
+/* ----- Плашки действий ----- */
+.goal-audio .qm-media-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+
+.goal-audio .qm-chip {
+  position: relative;
+  overflow: hidden;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--c-surface-2, rgba(255, 255, 255, 0.04));
+  border: 1px solid var(--c-line);
+  color: var(--c-text-dim);
+  font-family: inherit;
+  font-size: 12px;
+  line-height: 1;
+  padding: 8px 11px;
+  border-radius: 10px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: color 0.18s ease, border-color 0.18s ease;
+}
+
+.goal-audio .qm-chip:hover {
+  color: var(--c-text);
+  border-color: var(--c-line-strong);
+}
+
+.goal-audio .qm-chip:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.goal-audio .qm-chip-text {
+  font-variant-numeric: tabular-nums;
+}
+
+.goal-audio .qm-ico {
+  font-size: 13px;
+  line-height: 1;
+}
+
+.goal-audio .qm-ico-mic::before { content: "\1F3A4"; }
+.goal-audio .qm-ico-file::before { content: "\1F4CE"; }
+.goal-audio .qm-ico-photo::before { content: "\1F4F7"; }
+
+/* ----- Идёт запись: плашка становится таймером ----- */
+.goal-audio .qm-chip-rec-on {
+  color: var(--c-gold);
+  border-color: var(--c-line-strong);
+  background: var(--g-gold-soft);
+  min-width: 92px;
+}
+
+/* Значок микрофона пульсирует, пока идёт запись */
+.goal-audio .qm-chip-rec-on .qm-ico-mic {
+  animation: qm-rec-pulse 1s ease-in-out infinite;
+}
+
+@keyframes qm-rec-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.35; }
+}
+
+/* Полоса хода: полный проход за минуту. Длительность записи не ограничена,
+   поэтому это указатель хода, а не полоса до конца. Ширину ведёт app.js. */
+.goal-audio .qm-chip-rec-on::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: 2px;
+  width: calc(var(--qm-rec-turn, 0) * 100%);
+  background: var(--c-gold);
+  transition: width 0.25s linear;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .goal-audio .qm-chip-rec-on .qm-ico-mic { animation: none; }
+  .goal-audio .qm-chip-rec-on::after { transition: none; }
+}
+
+/* ----- Состояние записи и кнопки при ней ----- */
+.goal-audio .qm-media-state {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  /* Пока записи нет, строка состояния пуста и места не занимает */
+  min-height: 0;
+  margin-top: 6px;
+}
+
+.goal-audio .qm-audio-info {
+  flex: 1 1 80px;
+  min-width: 0;
+  font-size: 11px;
+  color: var(--c-text-dim);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.goal-audio .qm-icon-btn {
+  flex: 0 0 auto;
+  width: 26px;
+  height: 26px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--c-surface-2, rgba(255, 255, 255, 0.04));
+  border: 1px solid var(--c-line);
+  border-radius: 8px;
+  color: var(--c-text-dim);
+  font-size: 11px;
+  line-height: 1;
+  cursor: pointer;
+  transition: color 0.18s ease, border-color 0.18s ease;
+}
+
+.goal-audio .qm-icon-btn:hover {
+  color: var(--c-gold);
+  border-color: var(--c-line-strong);
+}
+
+.goal-audio .qm-icon-btn[hidden] { display: none; }
+
+.goal-audio .qm-audio-preview::before { content: "\25B6"; }
+.goal-audio .qm-audio-stop::before { content: "\25A0"; font-size: 12px; }
+.goal-audio .qm-audio-remove::before { content: "\2715"; }
+
+/* Играющая запись: ▶ горит красным, чтобы среди двенадцати дверей было
+   видно, какую остановить квадратом рядом */
+.goal-audio .qm-audio-preview.qm-audio-playing,
+.goal-audio .qm-audio-preview.qm-audio-playing:hover {
+  color: #FF4D4D;
+  border-color: rgba(255, 77, 77, 0.75);
+  background: rgba(255, 77, 77, 0.14);
+  box-shadow: 0 0 10px rgba(255, 77, 77, 0.55);
+  animation: qm-play-glow 1.2s ease-in-out infinite;
+}
+
+.goal-audio .qm-audio-stop {
+  color: var(--c-gold);
+  border-color: var(--c-line-strong);
+}
+
+.goal-audio .qm-audio-stop:hover {
+  color: #FF4D4D;
+  border-color: rgba(255, 77, 77, 0.75);
+}
+
+@keyframes qm-play-glow {
+  0%, 100% { box-shadow: 0 0 6px rgba(255, 77, 77, 0.35); }
+  50%    { box-shadow: 0 0 14px rgba(255, 77, 77, 0.75); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .goal-audio .qm-audio-preview.qm-audio-playing { animation: none; }
+}
+
+/* ----- Счётчик и лента фотографий ----- */
+
+.goal-audio .qm-seek {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.goal-audio .qm-seek[hidden] { display: none; }
+
+.goal-audio .qm-seek-range {
+  flex: 1 1 auto;
+  min-width: 0;
+  height: 22px;
+  margin: 0;
+  background: transparent;
+  cursor: pointer;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+/* Дорожка: пройденное — красным, как горящий ▶, остальное — тусклое */
+.goal-audio .qm-seek-range::-webkit-slider-runnable-track {
+  height: 4px;
+  border-radius: 2px;
+  background: linear-gradient(to right, #FF4D4D 0 var(--qm-seek-fill, 0%), var(--c-line) var(--qm-seek-fill, 0%) 100%);
+}
+
+.goal-audio .qm-seek-range::-moz-range-track {
+  height: 4px;
+  border-radius: 2px;
+  background: linear-gradient(to right, #FF4D4D 0 var(--qm-seek-fill, 0%), var(--c-line) var(--qm-seek-fill, 0%) 100%);
+}
+
+.goal-audio .qm-seek-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 16px;
+  height: 16px;
+  margin-top: -6px;
+  border-radius: 50%;
+  background: #FF4D4D;
+  box-shadow: 0 0 8px rgba(255, 77, 77, 0.6);
+}
+
+.goal-audio .qm-seek-range::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  border: 0;
+  border-radius: 50%;
+  background: #FF4D4D;
+  box-shadow: 0 0 8px rgba(255, 77, 77, 0.6);
+}
+
+.goal-audio .qm-seek-time {
+  flex: 0 0 auto;
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+  color: var(--c-text-dim);
+  white-space: nowrap;
+}

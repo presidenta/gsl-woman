@@ -7,6 +7,7 @@ import { openSheet, closeSheet } from '../../ui/sheet.js';
 import { toast } from '../../ui/toast.js';
 import { photoField } from '../../media/photo-field.js';
 import * as media from '../../media/photos.js';
+import { usedPhotoIds } from '../../media/used.js';
 
 /* ФОРМА ЗАПИСИ — нижний лист. Одна форма на все случаи:
    - задание дня: уровень + четыре вопроса (что получилось, с каким мужчиной, что произошло, как);
@@ -84,7 +85,7 @@ export function openEntry({ day, kind, exercises = [], levels = null, entry = nu
   parts.push(photoField({ ids: draft.photos, onChange: (ids) => { draft.photos = ids; } }));
 
   // Снимки, которые больше никому не нужны (убрали, не сохранили, удалили запись), — стереть
-  const tidy = () => media.prune(journal.photoIds()).catch(() => {});
+  const tidy = () => media.prune(usedPhotoIds()).catch(() => {});
 
   const save = h('button', { type: 'button', class: 'btn btn--gold btn--block' }, t('common.save'));
   save.addEventListener('click', () => {

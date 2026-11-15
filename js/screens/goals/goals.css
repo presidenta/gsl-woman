@@ -179,3 +179,59 @@
   width: 26px;
   height: 26px;
 }
+
+/* ОДНА ПЛАШКА «МОИ ЦЕЛИ» (сборка 64): «+» слева, название и счёт, стрелка справа; внутри — новая цель и списки */
+.goals-box__head {
+  grid-template-columns: 44px minmax(0, 1fr);
+  cursor: default;
+}
+
+.goals-box__plus {
+  padding: 0;
+  border: 0;
+  background: var(--g-gold-smooth);
+  color: var(--c-on-gold);
+  box-shadow: 0 6px 16px -6px rgba(var(--rgb-glow), 0.85);
+  cursor: pointer;
+}
+
+.goals-box__plus:active {
+  transform: scale(0.94);
+}
+
+.goals-box__toggle {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--sp-3);
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.goals-box.is-open .plate__arrow svg {
+  transform: rotate(90deg);
+}
+
+.goals-box .goals__new {
+  border: 1px solid var(--c-line);
+  border-radius: var(--r-md);
+}
+
+.goals-box .goals__list {
+  margin-top: var(--sp-3);
+}
+
+/* Описание цели в списке — две строки, остальное — в карточке */
+.goal__note {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  color: var(--c-text-dim);
+  font-size: var(--fs-sm);
+}

@@ -1,7 +1,6 @@
 /* СПИСОК ФАЙЛОВ ДЛЯ КЭША РАБОТНИКА. Пишется командой `npm run files` (tools/files.mjs) — руками не править. */
 self.GSL_FILES = [
   './',
-  './.git',
   './assets/figures/man-stand.webp',
   './assets/figures/man-up.webp',
   './assets/figures/man-walk-1.webp',
@@ -55,6 +54,10 @@ self.GSL_FILES = [
   './js/core/store.js',
   './js/core/updates.js',
   './js/evening/evening.js',
+  './js/goals/audio-seek.js',
+  './js/goals/audio.js',
+  './js/goals/goal-media.js',
+  './js/goals/goals-media.css',
   './js/goals/goals.js',
   './js/habits/figures.js',
   './js/habits/habits.css',
@@ -102,6 +105,7 @@ self.GSL_FILES = [
   './js/media/media.css',
   './js/media/photo-field.js',
   './js/media/photos.js',
+  './js/media/used.js',
   './js/media/viewer.js',
   './js/meet/meet.js',
   './js/native/native.js',

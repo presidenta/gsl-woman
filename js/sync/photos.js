@@ -3,7 +3,7 @@ import * as side from '../side/side.js';
 import { API_BASE } from '../config.js';
 import { current, request as apiRequest } from '../account/session.js';
 import * as media from '../media/photos.js';
-import * as journal from '../journal/journal.js';
+import { usedPhotoIds } from '../media/used.js';
 
 /* ФОТО МЕЖДУ УСТРОЙСТВАМИ (владелец 13.11.2026: «фотография не перенеслась на телефон»). Точно как у GoldenFit:
    на сервере (/api/woman/photos, миграция 022) — список без снимков одним запросом, каждый снимок отдельно и
@@ -64,7 +64,7 @@ export async function syncPhotos() {
   if (!Array.isArray(list)) return;
   const onServer = new Map(list.map((p) => [p.id, p]));
   const here = new Set(await media.ids());
-  const wanted = new Set(journal.photoIds());
+  const wanted = new Set(usedPhotoIds());
 
   // Фото к записям
   for (const id of wanted) {

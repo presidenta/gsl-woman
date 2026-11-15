@@ -40,3 +40,16 @@ test('запись хранит до шести снимков, правка з�
   assert.ok(journal.photoIds().includes('p9'));
   journal.remove(e.id);
 });
+
+test('цель: описание и фото (сборка 64); снимки целей нужны наравне со снимками записей', async () => {
+  const { usedPhotoIds } = await import('../js/media/used.js');
+  const g = goals.add('Свой дом у моря');
+  goals.update(g.id, { note: '  Первый шаг — посмотреть участки  ', photos: ['p1', 'p2', 42] });
+  const saved = goals.all().find((x) => x.id === g.id);
+  assert.equal(saved.note, 'Первый шаг — посмотреть участки');
+  assert.deepEqual(saved.photos, ['p1', 'p2']);
+  assert.deepEqual(goals.photoIds(), ['p1', 'p2']);
+  assert.ok(usedPhotoIds().includes('p1'));
+  goals.update(g.id, { note: '' });
+  assert.deepEqual(goals.all().find((x) => x.id === g.id).photos, ['p1', 'p2'], 'правка описания фото не трогает');
+});
