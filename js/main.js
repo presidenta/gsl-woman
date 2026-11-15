@@ -1,6 +1,7 @@
 import { h, svg, mount } from './core/dom.js';
 import { t, setLang } from './core/i18n.js';
 import { subscribe } from './core/store.js';
+import * as backup from './backup/index.js';
 import { isoDate, programDay } from './core/dates.js';
 import * as router from './core/router.js';
 import { register as registerWorker } from './core/updates.js';
@@ -417,6 +418,9 @@ setTimeout(() => media.prune(usedPhotoIds()).catch(() => {}), 4000);
 
 // Копия данных на сервере и обмен между устройствами (владелец 13.11.2026) — как у GoldenFit
 sync.start();
+
+// Копия на почту человека (backup/, владелец 15.11.2026): раз в месяц спросить «Сохранить на свою почту?» — на «Сегодня»
+setTimeout(() => { if (router.currentRoute() === 'today') backup.maybeAsk().catch(() => {}); }, 5000);
 
 // «Пара» и «Семья» (circles/): обмен при открытии, возврате и раз в 30 секунд на экране; новое сообщение — плашка
 circles.start();

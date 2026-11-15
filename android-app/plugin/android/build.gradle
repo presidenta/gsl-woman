@@ -25,4 +25,6 @@ repositories {
 
 dependencies {
     implementation project(':capacitor-android')
+    // FileProvider — отдать файл копии почте (shareFile); версия — из variables.gradle проекта
+    implementation "androidx.core:core:${rootProject.ext.has('androidxCoreVersion') ? rootProject.ext.androidxCoreVersion : '1.12.0'}"
 }

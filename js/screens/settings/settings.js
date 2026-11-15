@@ -13,6 +13,7 @@ import { icons } from '../../ui/icons.js';
 import { toast } from '../../ui/toast.js';
 import { accountCard } from '../../account/avatar.js';
 import { installCard } from '../../install/install.js';
+import { backupCard } from '../../backup/index.js';
 import * as media from '../../media/photos.js';
 import { checkNow } from '../../core/updates.js';
 import { PROFILES } from '../../profile/profile.js';
@@ -181,6 +182,8 @@ export function render(view, ctx) {
     partCard(ctx),
     nativeCard(),
     installCard(),
+    // Копия всего на почту человека и возврат из файла (backup/, 15.11.2026)
+    backupCard(),
 
     profileCard(ctx),
 

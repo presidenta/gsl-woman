@@ -1,0 +1,11 @@
+/* Раздел настроек «Копия на твою почту» (backup/index.js) */
+.backup {
+  display: grid;
+  gap: var(--sp-2);
+}
+
+.backup p { margin: 0; }
+
+.backup__to { word-break: break-all; }
+
+.backup .btn--gold { margin-top: var(--sp-2); }

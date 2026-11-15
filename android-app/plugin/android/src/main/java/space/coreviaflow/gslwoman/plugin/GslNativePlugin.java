@@ -13,6 +13,9 @@ import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
 import android.provider.Settings;
+import android.util.Base64;
+
+import androidx.core.content.FileProvider;
 
 import com.getcapacitor.JSArray;
 import com.getcapacitor.JSObject;
@@ -26,6 +29,9 @@ import com.getcapacitor.annotation.PermissionCallback;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+
+import java.io.File;
+import java.io.FileOutputStream;
 
 /**
  * Мост между веб-частью GSL Woman+ (js/native/native.js) и Android:
@@ -193,5 +199,48 @@ public class GslNativePlugin extends Plugin {
         JSObject ret = new JSObject();
         ret.put("locked", locked);
         call.resolve(ret);
+    }
+
+    /* КОПИЯ НА ПОЧТУ (веб-часть js/backup/deliver.js, владелец 15.11.2026: «чтобы человек сохранял всё на свою почту»).
+       Файл копии приходит строкой base64, ложится во временную папку приложения (cache/gsl-backup — прежние копии
+       там стираются) и уходит в «Отправить» Android: почта открывается сразу с адресом человека, темой и файлом.
+       Ссылку на файл даёт FileProvider оболочки Capacitor (адрес <пакет>.fileprovider, папка cache — в её
+       file_paths.xml): своих ресурсов не добавляем — номера рисунков виджета остаются прежними. */
+    @PluginMethod
+    public void shareFile(PluginCall call) {
+        String data = call.getString("data");
+        if (data == null || data.isEmpty()) { call.reject("shareFile: пусто"); return; }
+        String name = call.getString("name", "GSL.json").replaceAll("[^A-Za-z0-9._-]", "_");
+        String mime = call.getString("mime", "application/json");
+        String email = call.getString("email", "");
+        String subject = call.getString("subject", "");
+        String text = call.getString("text", "");
+        Context ctx = getContext();
+        try {
+            File dir = new File(ctx.getCacheDir(), "gsl-backup");
+            if (!dir.exists() && !dir.mkdirs()) { call.reject("shareFile: папка"); return; }
+            File[] old = dir.listFiles();
+            if (old != null) for (File f : old) f.delete();
+            File file = new File(dir, name);
+            try (FileOutputStream out = new FileOutputStream(file)) {
+                out.write(Base64.decode(data, Base64.DEFAULT));
+            }
+            Uri uri = FileProvider.getUriForFile(ctx, ctx.getPackageName() + ".fileprovider", file);
+            Intent send = new Intent(Intent.ACTION_SEND);
+            send.setType(mime);
+            send.putExtra(Intent.EXTRA_STREAM, uri);
+            if (email != null && !email.isEmpty()) send.putExtra(Intent.EXTRA_EMAIL, new String[] { email });
+            send.putExtra(Intent.EXTRA_SUBJECT, subject);
+            send.putExtra(Intent.EXTRA_TEXT, text);
+            send.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            Intent chooser = Intent.createChooser(send, subject);
+            chooser.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            ctx.startActivity(chooser);
+            JSObject ret = new JSObject();
+            ret.put("ok", true);
+            call.resolve(ret);
+        } catch (Exception e) {
+            call.reject("shareFile: " + e.getMessage());
+        }
     }
 }
