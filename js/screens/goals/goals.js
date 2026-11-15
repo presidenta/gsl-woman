@@ -11,6 +11,8 @@ import { circleGoals } from '../../circles/goals-view.js';
 import { lettersBody } from '../../letters/letters-view.js';
 import { ownBox } from '../../letters/letters.js';
 import { lt } from '../../letters/texts.js';
+import { photoOf } from '../../photos/photos.js';
+import * as side from '../../side/side.js';
 import { plateLink, platePanel } from '../../ui/plate.js';
 import * as help from '../../help/help.js';
 import { itemPlate } from '../help/help.js';
@@ -168,7 +170,8 @@ export function render(view, ctx) {
     onChange: (v) => { tab = v; ctx.rerender(); },
   });
   if (tab !== 'mine') {
-    add(view, h('h1', { class: 'screen-title' }, t('goals.title')), tabs, circleGoals(tab));
+    // Фото цели пары / семьи — лентой во всю ширину (js/photos/: goals.pair, goals.family)
+    add(view, h('h1', { class: 'screen-title' }, t('goals.title')), tabs, photoOf(`goals.${tab}`), circleGoals(tab));
     return;
   }
   const list = goals.all();
@@ -181,6 +184,7 @@ export function render(view, ctx) {
     h('h1', { class: 'screen-title' }, t('goals.title')),
     tabs,
     h('p', { class: 'screen-lead' }, t('goals.lead')),
+    photoOf('goals.mine'), // мечта вместе: лайнер, дом на колёсах, доска мечты, купола — лентой (js/photos/)
     goalsBox({ list, open, done, form, input }),
     redFlagPlate(),
     meetPlate(ctx),
@@ -259,7 +263,10 @@ function lettersPlate(ctx) {
     icon: icons.mail,
     title: lt('title'),
     open: lettersOpen,
-    body: lettersBody(ownBox, { rerender: () => { lettersOpen = true; ctx.rerender(); } }),
+    // Фото «пишет в блокноте» слева, вступление обтекает (js/photos/: letters.<часть>)
+    cls: 'has-photo',
+    body: ((nodes) => [h('div', { class: 'has-photo' }, photoOf(`letters.${side.get() || 'woman'}`), nodes[0]), ...nodes.slice(1)])(
+      lettersBody(ownBox, { rerender: () => { lettersOpen = true; ctx.rerender(); } })),
   });
   node.addEventListener('toggle', () => { lettersOpen = node.open; });
   return node;
