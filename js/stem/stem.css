@@ -1,0 +1,9 @@
+/* Стержень недели (js/stem/): слова автора — цитатой с золотой чертой, подпись — мелко. */
+.stem__quote {
+  margin: var(--sp-3) 0 0;
+  padding: var(--sp-2) var(--sp-3);
+  border-left: 3px solid var(--c-gold);
+  font-style: italic;
+  color: var(--c-text);
+}
+.stem__by { margin-top: var(--sp-2); font-size: 0.9em; }

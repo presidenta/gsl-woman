@@ -20,7 +20,8 @@ import { stepsCard } from '../../habits/steps-card.js';
 import { usCard } from '../../circles/today-card.js';
 import { talkCard, talkDone } from '../../circles/talk.js';
 import { eveningCard } from '../../evening/evening.js';
-import { showKids, bizFor } from '../../profile/profile.js';
+import { stemCard } from '../../stem/stem.js';
+import { showKids } from '../../profile/profile.js';
 import * as journal from '../../journal/journal.js';
 import { dayScore, pointsOf, taskPoints, pointsLabel } from '../../score/score.js';
 
@@ -387,24 +388,6 @@ function callCard(ctx, plan, summary) {
   );
 }
 
-/* «Мудрость недели» (было «Подсказка по делам», «Совет недели по работе»; у мужчин, week.biz; владелец 14.11.2026:
-   «по бизнесу — одна лёгкая подсказка, стабильно»; «это как напутствие, наверху, без оценки»). Седьмой день — отдых. */
-function bizCard(plan) {
-  const text = bizFor(plan.biz, plan.dayInWeek);
-  if (!text) return null;
-  return foldCard({
-    id: 'biz',
-    cls: 'biz',
-    icon: icons.goals,
-    title: t('today.bizTitle'),
-    lead: plan.biz.title,
-    body: [
-      h('p', { class: 'card__title biz__title' }, plan.biz.title),
-      h('p', { class: 'card__text' }, text),
-    ],
-  }).node;
-}
-
 /* В поиске — вход в «Знакомство» прямо с «Сегодня»: советы, вопросы и запись после свидания. */
 function meetLink(plan) {
   if (plan.profile !== 'single') return null;
@@ -494,8 +477,8 @@ export function render(view, ctx) {
       // Новое от близкого (пара, семья) — сразу на виду; «Срочно» — красным
       usCard(),
       catchUp(ctx, summary),
-      // «Мудрость недели» (у мужчин) — напутствие на день, над стаканом; баллов за неё нет (владелец 14.11.2026)
-      bizCard(plan),
+      // «Стержень недели» (у мужчин, js/stem/) — вместо «Мудрости недели», наверху, над стаканом (владелец 15.11.2026)
+      stemCard(ctx, plan),
       // Сначала стакан тёплой воды — сразу после пробуждения, потом утренняя минута (js/water/README.md)
       waterCard(ctx),
       morningCard(ctx, plan),

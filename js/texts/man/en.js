@@ -878,6 +878,14 @@ export default {
     whoPh: 'Her name',
   },
   // Вопрос на вечер — вдвоём (js/evening/, 15.11.2026)
+  // Стержень недели — мужская сторона (js/stem/, 15.11.2026)
+  stem: {
+    markHint: 'Сделал шаг — хоть маленький — уже +1 балл.',
+    mark: 'Сделал',
+    markDone: 'Сделал — +1 балл',
+    again: 'Сделаю позже',
+    againToast: 'Упражнение ждёт тебя всю неделю',
+  },
   evening: {
     markHint: 'Even five minutes together is a talk — and +1 point.',
     mark: 'We talked',

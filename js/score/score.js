@@ -13,7 +13,7 @@ import * as deeds from './deeds.js';
      «Пять языков любви» и «Я-сообщение» — «Получилось» по 1 (deeds.js);
      «Разговор пары» (7-й день) — «Мы поговорили» 1;
      задание дня — лучший уровень из записей этого дня (созвон — 2).
-   «Мудрость недели» (у мужчин) — напутствие, без баллов.
+   «Стержень недели» (у мужчин, вместо «Мудрости недели», 15.11.2026) — «Сделал» 1 (deeds.js).
 
    Как видно (ui/fold.js, points): сделано — стрелка карточки светится золотом, после названия зелёным «+N балл». */
 
@@ -39,6 +39,7 @@ export function dayScore(iso, day, entries, { talk = false } = {}) {
     imsg: deeds.isDone(iso, 'imsg') ? 1 : 0,
     love: deeds.isDone(iso, 'love') ? 1 : 0,
     evening: deeds.isDone(iso, 'evening') ? 1 : 0, // «Мы поговорили» — вопрос на вечер (evening/)
+    stem: deeds.isDone(iso, 'stem') ? 1 : 0, // «Сделал» — стержень недели у мужчин (stem/)
     talk: talk ? 1 : 0,
     kegel: pointsOf(kegelLevel(iso)),
     steps: pointsOf(stepsLevel(stepsOf(iso))),
