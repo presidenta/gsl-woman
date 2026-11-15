@@ -21,9 +21,9 @@ function head({ icon, title, lead, chip }) {
   ];
 }
 
-/** Плашка-переход: { icon, title, lead?, chip?, href }. */
-export function plateLink({ href, ...rest }) {
-  return h('a', { class: 'card plate', href }, ...head(rest));
+/** Плашка-переход: { icon, title, lead?, chip?, href, cls? }. */
+export function plateLink({ href, cls = '', ...rest }) {
+  return h('a', { class: `card plate ${cls}`.trim(), href }, ...head(rest));
 }
 
 /** Плашка, которая раскрывается на месте: { icon, title, lead?, chip?, open?, body: [узлы], cls? }. */

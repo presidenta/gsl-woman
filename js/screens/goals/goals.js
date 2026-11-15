@@ -180,7 +180,9 @@ export function render(view, ctx) {
     tabs,
     h('p', { class: 'screen-lead' }, t('goals.lead')),
     goalsBox({ list, open, done, form, input }),
+    redFlagPlate(),
     helpPlate(),
+    libraryPlate(),
     lettersPlate(ctx),
   );
 }
@@ -218,9 +220,18 @@ function goalsBox({ list, open, done, form, input }) {
   return box;
 }
 
-// «Помощь» — библиотека: первое свидание, вопросы, общие темы, комплименты (владелец 14.11.2026)
+/* Владелец 15.11.2026: «Красный флаг» — отдельным разделом рядом с «Моими целями» (красная плашка — запрет оценок);
+   «Помощь» — быстрое (первое свидание, вопросы); «Библиотека» — отдельно, «это уже другое, это не помощь». */
+function redFlagPlate() {
+  return plateLink({ href: '#/redflag', cls: 'plate--red', icon: icons.flag, title: t('redflag.title'), lead: t('redflag.lead') });
+}
+
 function helpPlate() {
   return plateLink({ href: '#/help', icon: icons.sparkle, title: t('help.title'), lead: t('help.lead') });
+}
+
+function libraryPlate() {
+  return plateLink({ href: '#/library', icon: icons.journal, title: t('library.title'), lead: t('library.lead') });
 }
 
 function lettersPlate(ctx) {

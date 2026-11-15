@@ -119,3 +119,17 @@ a.plate,
 .plate--red .plate__title {
   color: var(--c-red-flag);
 }
+
+/* Экран «Красный флаг» (screens/redflag/): флаг в красном круге рядом с заголовком */
+.redflag__head {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+}
+.redflag__head .plate__icon {
+  flex: none;
+  color: var(--c-red-flag);
+  border: 2px solid var(--c-red-flag);
+  background: color-mix(in srgb, var(--c-red-flag) 18%, transparent);
+}
+.redflag__title { color: var(--c-red-flag); margin: 0; }

@@ -29,6 +29,8 @@ import * as goalsScreen from './screens/goals/goals.js';
 import * as loveScreen from './screens/love/love.js';
 import * as meetScreen from './screens/meet/meet.js';
 import * as helpScreen from './screens/help/help.js';
+import * as libraryScreen from './screens/library/library.js';
+import * as redflagScreen from './screens/redflag/redflag.js';
 import * as usScreen from './screens/us/us.js';
 import * as circles from './circles/circles.js';
 import { watchHabits } from './circles/goals-model.js';
@@ -74,6 +76,8 @@ router.define('settings', settingsScreen);
 router.define('love', loveScreen);
 router.define('meet', meetScreen);
 router.define('help', helpScreen);
+router.define('library', libraryScreen);
+router.define('redflag', redflagScreen);
 router.define('us', usScreen);
 
 const root = document.getElementById('app');
@@ -304,11 +308,11 @@ function draw() {
   // Каркас пересобирается целиком, чтобы смена языка сразу дошла до шапки и панели
   shell = buildShell();
   const name = router.currentRoute() || router.routeName();
-  const screen = { today, week, journal: journalScreen, path, goals: goalsScreen, settings: settingsScreen, love: loveScreen, meet: meetScreen, help: helpScreen, us: usScreen }[name] || today;
+  const screen = { today, week, journal: journalScreen, path, goals: goalsScreen, settings: settingsScreen, love: loveScreen, meet: meetScreen, help: helpScreen, library: libraryScreen, redflag: redflagScreen, us: usScreen }[name] || today;
 
   // Шапка: везде — кто вошёл (фото, имя, кабинет) и название; в настройках — «назад» вместо себя
   // «Пять языков любви» — тоже подэкран: «назад» вместо себя
-  const sub = name === 'settings' || name === 'love' || name === 'meet' || name === 'help' || name === 'us';
+  const sub = name === 'settings' || name === 'love' || name === 'meet' || name === 'help' || name === 'library' || name === 'redflag' || name === 'us';
   // «Назад» — на всех экранах, кроме «Сегодня» (владелец 14.11.2026)
   noteRoute(name);
   shell.back.hidden = name === 'today';

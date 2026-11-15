@@ -834,7 +834,17 @@ export default {
     from: 'from week {week}',
     tier: { month: 'monthly', two: 'every 2 months', three: 'every 3 months' },
   },
+  // «Библиотека» и «Красный флаг» — свои экраны (владелец 15.11.2026)
+  library: {
+    title: 'Библиотека',
+    lead: 'Читать и возвращаться: слова, которые его поднимают, КПК, книга для его роста, темы, правила дома, идеи свиданий, комплименты.',
+  },
+  redflag: {
+    title: 'Красный флаг: оценка',
+    lead: 'Оценка — для школы. В паре — я-сообщение',
+  },
   help: {
+    intro: 'Быстро, под рукой: первое свидание и вопросы для разговора с ним.',
     flagsHint: 'Under each question, tick how the person answered — the result appears below.',
     total: 'Result',
     greenCount: 'Green flags',
@@ -850,7 +860,7 @@ export default {
     rulesEdit: 'Tap to edit',
     rulesSaved: 'Rule added',
     title: 'Help',
-    lead: 'First date, questions, topics to discuss, compliments',
+    lead: 'Первое свидание и вопросы для разговора — быстро, под рукой',
     meetTitle: 'First date',
     library: 'Library',
     draft: 'draft',

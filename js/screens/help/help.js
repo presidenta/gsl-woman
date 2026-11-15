@@ -8,7 +8,9 @@ import * as help from '../../help/help.js';
 import * as rules from '../../help/rules.js';
 import * as meet from '../../meet/meet.js';
 
-/* ЭКРАН «ПОМОЩЬ» (#/help, владелец 14–15.11.2026) — библиотека. Все пункты — одним видом (ui/plate.js): значок в
+/* ЭКРАН «ПОМОЩЬ» (#/help, владелец 14–15.11.2026) — быстрое: первое свидание и вопросы для разговора. С 15.11.2026
+   остальные пункты — на экране «Библиотека» (screens/library/), «Красный флаг» — отдельный экран (screens/redflag/);
+   их плашки и папки — отсюда (itemPlate, folder). Все пункты — одним видом (ui/plate.js): значок в
    круге, название, число, стрелка («на экране всё в одном стиле, без хаоса»).
    - Сверху «Первое свидание» — переход в «Знакомство».
    - Вопросы для разговора — сразу отдельными плашками по числу вопросов: три → о деле → шесть → Арон (36) →
@@ -86,7 +88,7 @@ function folderBody(g, verdicts) {
 }
 
 /** Папка внутри пункта: с заголовком — раскрывается по нажатию; без заголовка — просто список. */
-function folder(g, { open = false, verdicts } = {}) {
+export function folder(g, { open = false, verdicts } = {}) {
   const body = folderBody(g, verdicts);
   if (!g.title) return h('div', { class: 'help__group' }, ...body);
   const node = h('details', { class: 'help__folder' },
@@ -156,7 +158,7 @@ function questionPlates(item, verdicts) {
   ];
 }
 
-function itemPlate(item, ctx, verdicts) {
+export function itemPlate(item, ctx, verdicts) {
   const rulesPart = item.editable ? rulesBody(item, () => { opened.add(item.key); ctx.rerender(); }) : null;
   const n = rulesPart ? rulesPart.count : item.groups.filter((g) => g.unit === item.unit).reduce((s, g) => s + entriesOf(g).length, 0);
   return remember(platePanel({
@@ -180,13 +182,13 @@ export function render(view, ctx) {
   }
   // Подсказки итога — те же, что в «Знакомстве» (у каждой части свои слова)
   const verdicts = meet.content(ctx.lang)?.verdicts || null;
-  const [questions, ...rest] = data.items;
+  const questions = data.items.find((i) => i.key === 'questions');
+  // «Помощь» — только быстрое: первое свидание и вопросы для разговора. Остальное — в «Библиотеке» (library/),
+  // «Красный флаг» — отдельным разделом (redflag/) (владелец 15.11.2026: «библиотека — это уже другое, это не помощь»)
   add(view,
     h('h1', { class: 'screen-title' }, data.title),
-    h('p', { class: 'help__intro' }, data.intro),
+    h('p', { class: 'help__intro' }, data.helpIntro || t('help.intro')),
     plateLink({ href: '#/meet', icon: icons.rings, title: t('help.meetTitle'), lead: data.meetLead }),
-    ...(questions?.key === 'questions' ? questionPlates(questions, verdicts) : [itemPlate(questions, ctx, verdicts)]),
-    h('h2', { class: 'caps plates__heading' }, t('help.library')),
-    ...rest.map((item) => itemPlate(item, ctx, verdicts)),
+    ...(questions ? questionPlates(questions, verdicts) : []),
   );
 }
