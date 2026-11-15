@@ -358,7 +358,8 @@ addEventListener('sheet-closed', () => {
 subscribe((key) => {
   // Отметки отправленных напоминаний и служебное состояние синхронизации экран не меняют
   // Раскрыта ли карточка (ui/fold.js) — вид, его карточка меняет сама, плавно; перерисовка оборвала бы движение
-  if (key === 'reminders-sent' || key === 'sync' || key === 'photo-sync' || key === 'fold') return;
+  // Черновик новой цели (goals/draft.js) пишется на каждую букву — строку ввода перерисовка оборвала бы
+  if (key === 'reminders-sent' || key === 'sync' || key === 'photo-sync' || key === 'fold' || key === 'goal-draft') return;
   scheduleDraw();
 });
 

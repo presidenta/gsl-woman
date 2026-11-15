@@ -22,12 +22,14 @@ export function all() {
   return Array.isArray(list) ? list.filter(isGoal) : [];
 }
 
-/** Новая цель; пустой текст — null. */
-export function add(text, now = new Date()) {
+/** Новая цель; пустой текст — null. id и photos — из черновика (goals/draft.js): голос и фото уже лежат под этим номером. */
+export function add(text, now = new Date(), { id, photos } = {}) {
   const clean = String(text || '').trim().slice(0, MAX_TEXT);
   const list = all();
   if (!clean || list.length >= MAX_GOALS) return null;
-  const goal = { id: newId(), text: clean, done: false, createdAt: now.toISOString(), doneAt: null };
+  const goodId = typeof id === 'string' && /^[A-Za-z0-9_-]{1,40}$/.test(id) && !list.some((g) => g.id === id);
+  const goal = { id: goodId ? id : newId(), text: clean, done: false, createdAt: now.toISOString(), doneAt: null };
+  if (photos?.length) goal.photos = cleanPhotos(photos);
   write(KEY, [goal, ...list]);
   return goal;
 }

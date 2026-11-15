@@ -305,8 +305,11 @@ export default {
   },
   goals: {
     boxTitle: 'My goals',
-    boxEmpty: 'Tap «+» and write the first one — big or small',
+    boxEmpty: 'Tap «+»: write a goal, add your voice and photos',
     boxCount: 'In progress: {open} · Came true: {done}',
+    ready: 'Done',
+    saved: 'Goal saved',
+    composeHint: 'Write a goal, add your voice or photos — then save with the disk icon beside the line',
     addHint: 'New goal',
     note: 'Description — why it matters, what is the first step',
     audio: {

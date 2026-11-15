@@ -1,5 +1,5 @@
 import { h, svg, add } from '../../core/dom.js';
-import { t, formatDate } from '../../core/i18n.js';
+import { t, formatDate, getLang } from '../../core/i18n.js';
 import * as goals from '../../goals/goals.js';
 import { field } from '../../ui/controls.js';
 import { icons } from '../../ui/icons.js';
@@ -12,10 +12,13 @@ import { lettersBody } from '../../letters/letters-view.js';
 import { ownBox } from '../../letters/letters.js';
 import { lt } from '../../letters/texts.js';
 import { plateLink, platePanel } from '../../ui/plate.js';
-import { photoField, photoStrip } from '../../media/photo-field.js';
-import * as media from '../../media/photos.js';
+import { photoStrip } from '../../media/photo-field.js';
+import * as mediaStore from '../../media/photos.js';
 import { usedPhotoIds } from '../../media/used.js';
-import { goalAudioField, deleteGoalAudio } from '../../goals/goal-media.js';
+import { goalAudioField, deleteGoalAudio, getGoalAudioMeta } from '../../goals/goal-media.js';
+import { formatDuration } from '../../goals/audio.js';
+import { draft, setDraft, resetDraft } from '../../goals/draft.js';
+import { now as syncNow } from '../../sync/sync.js';
 
 /* ЭКРАН «ЦЕЛИ»: вкладки «Мои · Пара · Семья» (владелец 13.11.2026: «цели у женщины, если она одна, и цели пары,
    если они вместе; и семьи»). «Мои» — сверху строка «Новая цель» и золотой «+», ниже — цели в работе, внизу —
@@ -27,11 +30,19 @@ import { goalAudioField, deleteGoalAudio } from '../../goals/goal-media.js';
    С 64 (владелец 15.11.2026: «нелогично — „+“ отдельно, а „здесь будут твои цели“ ниже»): «Мои цели» — ОДНА плашка.
    Слева золотой «+» — сразу раскрывает плашку и ставит курсор в строку новой цели; справа стрелка — раскрыть и
    свернуть. Внутри — строка новой цели, цели в работе и «Сбылось». В карточке цели — текст, описание, фото и голос
-   (фото — поле записей media/, голос — перенесён из «Дверей» «Кванта», goals/goal-media.js). */
+   (фото — поле записей media/, голос — перенесён из «Дверей» «Кванта», goals/goal-media.js).
+
+   С 68 (владелец 15.11.2026: «нажимаю плюсик — и нет даже упоминания, что можно добавить; сделай, как на снимке»)
+   строка новой цели — как дверь «Кванта»: сверху справа «✓ Готово» (горит, когда цель написана), поле и дискета
+   ростом с него, под ними «Записать · Файл · Фото n/3», голос с плеером и снимки. Голос и фото можно добавить ещё до
+   дискеты — они лежат в черновике (goals/draft.js) под номером будущей цели. Строка строится один раз и переживает
+   перерисовку экрана: идущая запись голоса и набранный текст не обрываются. В карточке цели — тот же ряд, внизу
+   «✓ Готово» (сохранить и закрыть). */
 
 let tab = 'mine';
 let boxOpen = false; // плашка «Мои цели» раскрыта — переживает перерисовку
 let lettersOpen = false; // плашка письма раскрыта — переживает перерисовку («Написать», «Запечатать»)
+let composer = null; // строка новой цели: { id, lang, node, input } — одна на черновик
 
 function goalRow(g) {
   const mark = h('button', {
@@ -45,9 +56,17 @@ function goalRow(g) {
     },
   }, svg(icons.check));
 
+  // Есть голос — пометка «🎤 0:12» (длина из базы звука, приходит чуть позже)
+  const voice = h('span', { class: 'goal__voice', hidden: true });
+  getGoalAudioMeta(g.id).then((m) => {
+    if (!m) return;
+    voice.textContent = '🎤 ' + (formatDuration(m.durationMs) || t('goals.audio.recName'));
+    voice.hidden = false;
+  }).catch(() => {});
   const body = h('button', { type: 'button', class: 'goal__body', onclick: () => editGoal(g) },
     h('span', { class: 'goal__text' }, g.text),
     g.note ? h('span', { class: 'goal__note' }, g.note) : null,
+    voice,
     g.photos?.length ? photoStrip(g.photos) : null,
     g.done && g.doneAt ? h('span', { class: 'goal__date' }, t('goals.doneOn', { date: formatDate(g.doneAt.slice(0, 10)) })) : null,
   );
@@ -59,24 +78,24 @@ function editGoal(g) {
   const f = field({ label: t('goals.text'), multiline: true, rows: 3, maxlength: goals.MAX_TEXT, value: g.text });
   const note = field({ label: t('goals.note'), multiline: true, rows: 4, maxlength: goals.MAX_NOTE, value: g.note || '' });
   let photoIds = [...(g.photos || [])];
-  const photosNode = photoField({ ids: photoIds, onChange: (ids) => { photoIds = ids; } });
-  // Голос — сразу на телефон, как у «Дверей» «Кванта»: «Сохранить» для него не нужно
-  const voice = goalAudioField(g.id);
+  // Голос и фото — одним рядом, как у двери «Кванта»; голос ложится на телефон сразу, фото — по «Готово»
+  const media = goalAudioField(g.id, { photos: photoIds, onPhotos: (ids) => { photoIds = ids; } });
   // Снимки, которые больше никому не нужны (убрали, не сохранили), — стереть
-  const tidy = () => media.prune(usedPhotoIds()).catch(() => {});
+  const tidy = () => mediaStore.prune(usedPhotoIds()).catch(() => {});
 
-  const save = h('button', { type: 'button', class: 'btn btn--gold btn--block' }, t('common.save'));
-  save.addEventListener('click', () => {
+  const ready = h('button', { type: 'button', class: 'goal-ready-btn' }, t('goals.ready'));
+  ready.addEventListener('click', () => {
     goals.rename(g.id, f.control.value);
     goals.update(g.id, { note: note.control.value, photos: photoIds });
-    voice.close();
+    media.close();
     closeSheet();
     tidy();
+    syncNow();
   });
   const del = h('button', { type: 'button', class: 'btn btn--danger btn--block' }, svg(icons.trash), t('common.delete'));
   del.addEventListener('click', async () => {
     if (!confirm(t('goals.deleteConfirm'))) return;
-    await voice.close();
+    await media.close();
     goals.remove(g.id);
     deleteGoalAudio(g.id);
     closeSheet();
@@ -84,10 +103,59 @@ function editGoal(g) {
   });
   openSheet({
     title: t('goals.edit'),
-    content: h('div', { class: 'stack' }, f.node, note.node, photosNode, voice.node, save, del),
-    onClose: () => { voice.close(); tidy(); },
+    content: h('div', { class: 'stack' }, f.node, media.node, note.node, ready, del),
+    onClose: () => { media.close(); tidy(); },
   });
   setTimeout(() => f.control.focus(), 300);
+}
+
+/* Строка новой цели (как строка двери «Кванта»): «✓ Готово» — поле и дискета — «Записать · Файл · Фото». */
+function goalComposer() {
+  const d = draft();
+  if (composer && composer.id === d.id && composer.lang === getLang()) return composer;
+  composer?.media.close();
+
+  const badge = h('span', { class: 'goal-ready', hidden: true }, t('goals.ready'));
+  const input = h('input', {
+    class: 'input goal-new__input',
+    placeholder: t('goals.placeholder'),
+    maxlength: goals.MAX_TEXT,
+    'aria-label': t('goals.placeholder'),
+    enterkeyhint: 'done',
+    value: d.text,
+  });
+  const save = h('button', { type: 'submit', class: 'goal-save', 'aria-label': t('goals.add'), title: t('goals.add') },
+    h('span', { class: 'goal-save__ico', 'aria-hidden': 'true' }));
+  const paint = () => {
+    const has = !!input.value.trim();
+    badge.hidden = !has;
+    save.disabled = !has;
+  };
+  input.addEventListener('input', () => { setDraft({ text: input.value }); paint(); });
+
+  const media = goalAudioField(d.id, { photos: d.photos, onPhotos: (ids) => setDraft({ photos: ids }) });
+  const form = h('form', { class: 'goal-new' },
+    h('div', { class: 'goal-new__top' }, h('span', { class: 'caps goal-new__label' }, t('goals.addHint')), badge),
+    h('div', { class: 'goal-new__head' }, input, save),
+    media.node,
+    h('p', { class: 'goal-new__hint faint' }, t('goals.composeHint')),
+  );
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const cur = draft();
+    if (!input.value.trim()) { input.focus(); return; }
+    await media.close(); // идёт запись — сохранить её в цель
+    const goal = goals.add(input.value, new Date(), { id: cur.id, photos: cur.photos });
+    if (!goal) { input.focus(); return; }
+    boxOpen = true;
+    resetDraft();
+    composer = null;
+    toast({ title: t('goals.saved') });
+    syncNow(); // голос и фото — в копию сразу
+  });
+  paint();
+  composer = { id: d.id, lang: getLang(), node: form, input, media };
+  return composer;
 }
 
 export function render(view, ctx) {
@@ -105,20 +173,7 @@ export function render(view, ctx) {
   const open = list.filter((g) => !g.done);
   const done = list.filter((g) => g.done).sort((a, b) => (b.doneAt || '').localeCompare(a.doneAt || ''));
 
-  const input = h('input', {
-    class: 'input goals__input',
-    placeholder: t('goals.placeholder'),
-    maxlength: goals.MAX_TEXT,
-    'aria-label': t('goals.placeholder'),
-    enterkeyhint: 'done',
-  });
-  const addBtn = h('button', { type: 'submit', class: 'goals__add', 'aria-label': t('goals.add') }, svg(icons.plus));
-  const form = h('form', { class: 'goals__new' }, input, addBtn);
-  form.addEventListener('submit', (e) => {
-    e.preventDefault();
-    if (goals.add(input.value)) { input.value = ''; boxOpen = true; }
-    else input.focus();
-  });
+  const { node: form, input } = goalComposer();
 
   add(view,
     h('h1', { class: 'screen-title' }, t('goals.title')),

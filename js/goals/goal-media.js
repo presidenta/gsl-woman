@@ -4,17 +4,27 @@ import { saveGoalAudio, getGoalAudio, getGoalAudioMeta, deleteGoalAudio, canReco
 import { buildSeekBar, bindSeekBar } from './audio-seek.js';
 import { markDeleted } from '../sync/voices.js';
 import { now as syncNow } from '../sync/sync.js';
+import * as photos from '../media/photos.js';
+import { openViewer } from '../media/viewer.js';
+import { toast } from '../ui/toast.js';
 
 /* ГОЛОС К ЦЕЛИ — блок в карточке правки цели. Логика перенесена из «Кванта» без изменений (владелец 15.11.2026:
    «код не пиши новый, он проверенный»): planner/web/js/views/space/app.js — buildDoorMedia, toggleRecording,
    startRecTimer, applyAudioState, previewDoorAudio, stopDoorAudio, removeDoorAudio, onDoorAudioFile. Там это методы
    экрана дверей; здесь те же шаги для одной цели.
 
-   Плашки: «● Записать» (во время записи — таймер; второе нажатие останавливает и сохраняет), «Файл» (выбрать запись
-   с телефона). Есть запись — её имя и длина, ▶ слушать (с ползунком), ■ стоп, ✕ убрать. Хранится на телефоне,
-   копия — на сервере: переходит на другой телефон и восстанавливается (sync/voices.js, сборка 66). */
+   Плашки в один ряд, как у двери «Кванта»: «● Записать» (во время записи — таймер; второе нажатие останавливает и
+   сохраняет), «Файл» (выбрать запись с телефона), «Фото n/3» (с 68 — владелец 15.11.2026 прислал снимок двери:
+   «вот как должно выглядеть»; buildDoorMedia и refreshPhotoStrip «Кванта»). Есть запись — её имя и длина, ▶ слушать
+   (с ползунком), ■ стоп, ✕ убрать; под ними — снимки с ✕, нажатие — во весь экран.
+   Голос хранится на телефоне, копия — на сервере (sync/voices.js, сборка 66). Снимки — в базе фото media/, в цель
+   попадают номерами через onPhotos (в черновике — сразу, в карточке — по «Готово»).
 
-export function goalAudioField(goalId) {
+   goalAudioField(goalId, { photos, onPhotos }) → { node, close }. Без onPhotos — только голос. */
+
+export const PHOTO_LIMIT = 3; // как у двери «Кванта»
+
+export function goalAudioField(goalId, { photos: photoIds = [], onPhotos = null } = {}) {
   let recorder = null;
   let recTimer = null;
   let audioEl = null;
@@ -31,6 +41,49 @@ export function goalAudioField(goalId) {
   const fileInput = h('input', { type: 'file', accept: 'audio/*', hidden: true });
   const fileChip = h('label', { class: 'qm-chip' }, h('span', { class: 'qm-ico qm-ico-file', 'aria-hidden': 'true' }), h('span', { class: 'qm-chip-text' }, t('goals.audio.file')), fileInput);
 
+  // Фото: плашка со счётчиком и лента снимков (refreshPhotoStrip «Кванта»)
+  let shots = [...photoIds];
+  const photoInput = h('input', { type: 'file', accept: 'image/*', multiple: true, hidden: true });
+  const counter = h('span', { class: 'qm-photo-count' });
+  const photoChip = onPhotos
+    ? h('label', { class: 'qm-chip' }, h('span', { class: 'qm-ico qm-ico-photo', 'aria-hidden': 'true' }), h('span', { class: 'qm-chip-text' }, t('photos.add')), counter, photoInput)
+    : null;
+  const strip = h('div', { class: 'qm-photo-strip' });
+
+  function paintPhotos() {
+    counter.textContent = `${shots.length}/${PHOTO_LIMIT}`;
+    if (photoChip) photoChip.classList.toggle('is-full', shots.length >= PHOTO_LIMIT);
+    photoInput.disabled = shots.length >= PHOTO_LIMIT;
+    strip.replaceChildren(...shots.map((id, i) => {
+      const img = h('img', { alt: '', decoding: 'async' });
+      const cached = photos.cachedUrl(id);
+      if (cached) img.src = cached;
+      else photos.url(id).then((u) => { if (u) img.src = u; });
+      const open = h('button', { type: 'button', class: 'qm-photo-open', 'aria-label': t('photos.open'), onclick: () => openViewer(shots, i) }, img);
+      const drop = h('button', {
+        type: 'button',
+        class: 'qm-photo-drop',
+        'aria-label': t('photos.remove'),
+        onclick: () => { shots = shots.filter((x) => x !== id); paintPhotos(); onPhotos(shots); },
+      });
+      return h('div', { class: 'qm-photo-cell' }, open, drop);
+    }));
+  }
+
+  photoInput.addEventListener('change', async () => {
+    const files = [...photoInput.files].slice(0, PHOTO_LIMIT - shots.length);
+    photoInput.value = '';
+    for (const file of files) {
+      try {
+        shots = [...shots, await photos.save(file)];
+        paintPhotos();
+      } catch {
+        toast({ title: t('photos.failed') });
+      }
+    }
+    if (files.length) onPhotos(shots);
+  });
+
   const info = h('span', { class: 'qm-audio-info' });
   const preview = h('button', { type: 'button', class: 'qm-icon-btn qm-audio-preview', 'aria-label': t('goals.audio.play'), hidden: true });
   const stop = h('button', { type: 'button', class: 'qm-icon-btn qm-audio-stop', 'aria-label': t('goals.audio.stop'), hidden: true });
@@ -38,12 +91,12 @@ export function goalAudioField(goalId) {
   const seek = buildSeekBar(t('goals.audio.seek'));
 
   const node = h('div', { class: 'qm-media goal-audio' },
-    h('p', { class: 'field__label' }, t('goals.audio.title')),
-    h('div', { class: 'qm-media-actions' }, record, fileChip),
+    h('div', { class: 'qm-media-actions' }, record, fileChip, photoChip),
     h('div', { class: 'qm-media-state' }, info, preview, stop, remove),
     seek,
-    h('p', { class: 'goal-audio__note faint' }, t('goals.audio.local')),
+    strip,
   );
+  paintPhotos();
 
   function startRecTimer() {
     stopRecTimer();

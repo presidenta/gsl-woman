@@ -56,6 +56,7 @@ self.GSL_FILES = [
   './js/evening/evening.js',
   './js/goals/audio-seek.js',
   './js/goals/audio.js',
+  './js/goals/draft.js',
   './js/goals/goal-media.js',
   './js/goals/goals-media.css',
   './js/goals/goals.js',
