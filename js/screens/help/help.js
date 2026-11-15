@@ -42,12 +42,26 @@ function flagChecks(e, onChange) {
 /** Фигура типа («Кто перед тобой», вопросы на свидании): assets/archetypes/, нарезка картинки «Архетипы» (15.11.2026). */
 export const figure = (name) => h('img', { class: 'help__figure', src: `./assets/archetypes/${name}.webp`, alt: '', loading: 'lazy', decoding: 'async' });
 
+/** Текст с ключевыми словами золотом (keys — название типа рядом с его фигурой; владелец 15.11.2026: «выдели в самом
+    тексте, а подпись под фото — лишняя»). Без регистра; без ключей — просто строка. */
+export function highlight(text, keys) {
+  if (!keys?.length || !text) return text;
+  const esc = keys.filter(Boolean).map((k) => k.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).sort((a, b) => b.length - a.length);
+  const rx = new RegExp(`(${esc.join('|')})`, 'gi');
+  const out = h('span', {});
+  text.split(rx).forEach((part, i) => {
+    if (!part) return;
+    out.append(i % 2 ? h('b', { class: 'key-word' }, part) : document.createTextNode(part));
+  });
+  return out;
+}
+
 function entry(e, onFlag) {
   // img — фигура слева; best — лучший выбор («Какой быть — твой выбор»: муза и плюс), выделен золотом
   const cls = `help__entry${e.img ? ' help__entry--figure' : ''}${e.best ? ' help__entry--best' : ''}`;
   const body = [
-    h('span', { class: 'help__text' }, e.text),
-    e.note ? h('span', { class: 'help__note' }, e.note) : null,
+    h('span', { class: 'help__text' }, highlight(e.text, e.keys)),
+    e.note ? h('span', { class: 'help__note' }, highlight(e.note, e.keys)) : null,
     e.read ? readBox(e.read) : null,
     onFlag && (e.green?.length || e.red?.length) ? flagChecks(e, onFlag) : null,
   ];

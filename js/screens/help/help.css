@@ -303,3 +303,10 @@
   display: grid;
   gap: var(--sp-4);
 }
+
+/* Название типа в тексте — золотом (вместо подписи под фото, 15.11.2026) */
+.key-word {
+  color: var(--c-gold);
+  font-weight: 600;
+  font-style: normal;
+}

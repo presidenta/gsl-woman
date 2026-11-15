@@ -5,7 +5,7 @@ import * as meet from '../../meet/meet.js';
 import { counts, bump } from '../../search/steps.js';
 import { st } from '../../search/texts.js';
 import { platePanel } from '../../ui/plate.js';
-import { figure } from '../help/help.js';
+import { figure, highlight } from '../help/help.js';
 
 /* Блоки — плашками со стрелкой, как во всём приложении (владелец 15.11.2026); раскрытые переживают перерисовку. */
 const opened = new Set();
@@ -61,10 +61,10 @@ function stepsCard(steps) {
   );
 }
 
-/** Слова автора дословно и подпись: автор и книга. */
+/** Слова автора дословно и подпись: автор и книга; keys — название типа золотом в тексте. */
 function quoteBox(q) {
   return h('figure', { class: 'search-quote' },
-    h('blockquote', { class: 'search-quote__text' }, q.text),
+    h('blockquote', { class: 'search-quote__text' }, highlight(q.text, q.keys)),
     q.source ? h('figcaption', { class: 'search-quote__source' }, `— ${q.source}`) : null,
   );
 }
@@ -77,7 +77,7 @@ function levelsList(levels) {
       x.img ? h('span', { class: 'search-level__pic' }, figure(x.img), h('span', { class: 'search-level__mark search-level__mark--on', 'aria-hidden': 'true' }, x.mark)) : null,
       h('strong', { class: 'search-level__name' }, x.name),
       h('span', { class: 'search-level__text' }, x.text),
-      x.quote ? quoteBox({ text: x.quote, source: x.source }) : null,
+      x.quote ? quoteBox({ text: x.quote, source: x.source, keys: x.keys }) : null,
     ),
   )));
 }
