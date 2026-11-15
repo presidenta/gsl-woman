@@ -1,3 +1,4 @@
+import * as meet from '../../meet/meet.js';
 import { h, svg, add } from '../../core/dom.js';
 import { t, plural, formatDate } from '../../core/i18n.js';
 import { dateOfDay, daysBetween, weekOf } from '../../core/dates.js';
@@ -388,12 +389,17 @@ function callCard(ctx, plan, summary) {
   );
 }
 
-/* В поиске — вход в «Знакомство» прямо с «Сегодня»: советы, вопросы и запись после свидания. */
-function meetLink(plan) {
+/* В поиске — вход в раздел «В поиске» прямо с «Сегодня» (владелец 15.11.2026: «не знакомство, а инструкция — что
+   делать, пока ищешь»): шаги недели, где искать, как часто встречаться, переписка, как выбирать. «Знакомство» —
+   в библиотеке и по ссылке из раздела. Текстов раздела ещё нет (старая программа в памяти) — прежний вход. */
+function meetLink(plan, ctx) {
   if (plan.profile !== 'single') return null;
-  return h('a', { class: 'card settings__link', href: '#/meet' },
+  const search = meet.content(ctx.lang)?.search;
+  return h('a', { class: 'card settings__link today__search', href: search ? '#/search' : '#/meet' },
     h('span', { class: 'card__icon' }, svg(icons.rings)),
-    h('span', { class: 'settings__link-text' }, t('meet.title')),
+    search
+      ? h('span', { class: 'settings__link-text' }, h('strong', {}, search.title), h('span', { class: 'today__search-lead' }, search.card))
+      : h('span', { class: 'settings__link-text' }, t('meet.title')),
     svg(icons.chevronRight, 'settings__link-chevron'),
   );
 }
@@ -484,7 +490,7 @@ export function render(view, ctx) {
       morningCard(ctx, plan),
       main,
       repeatCard(plan),
-      meetLink(plan),
+      meetLink(plan, ctx),
       // Седьмой день — «Разговор пары» (circles/talk.js)
       talkCard(ctx, plan),
       imsgCard(ctx, plan),

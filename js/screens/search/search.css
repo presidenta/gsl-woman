@@ -1,0 +1,156 @@
+/* ЭКРАН «В ПОИСКЕ» (screens/search/search.js). Цвета и отступы — токены. */
+
+.search__intro {
+  margin: 0 0 var(--sp-4);
+  color: var(--c-text-dim);
+}
+
+.search__card + .search__card,
+.search__meet {
+  margin-top: var(--sp-4);
+}
+
+.search__heading { margin: 0 0 var(--sp-3); }
+
+.search__list {
+  margin: var(--sp-3) 0 0;
+  padding-left: var(--sp-5);
+  display: grid;
+  gap: var(--sp-2);
+}
+
+.search__author {
+  margin: var(--sp-3) 0 0;
+  font-size: var(--fs-xs);
+  text-align: right;
+}
+
+/* Шаги недели: название и подсказка, счёт, «−» и «+1»; цель есть — золото */
+.search-steps {
+  margin: var(--sp-3) 0 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: var(--sp-2);
+}
+
+.search-step {
+  display: grid;
+  grid-template-columns: 1fr auto auto auto;
+  align-items: center;
+  gap: var(--sp-2);
+  padding: var(--sp-2) var(--sp-3);
+  border: 1px solid var(--c-line);
+  border-radius: var(--r-md);
+}
+
+.search-step.is-done {
+  border-color: var(--c-line-strong);
+  background: var(--g-gold-soft);
+}
+
+.search-step__text {
+  display: grid;
+  min-width: 0;
+}
+
+.search-step__title { font-weight: 600; }
+
+.search-step__hint {
+  font-size: var(--fs-xs);
+  color: var(--c-text-dim);
+}
+
+.search-step__num {
+  font-size: var(--fs-sm);
+  font-variant-numeric: tabular-nums;
+  color: var(--c-text-dim);
+  white-space: nowrap;
+}
+
+.search-step.is-done .search-step__num { color: var(--c-gold); }
+
+.search-step__btn {
+  min-width: 44px;
+  height: 40px;
+  padding: 0 var(--sp-2);
+  border: 1px solid var(--c-line-strong);
+  border-radius: 999px;
+  background: var(--g-gold-soft);
+  color: var(--c-gold);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.search-step__btn--minus {
+  min-width: 36px;
+  background: none;
+  border-color: var(--c-line);
+  color: var(--c-text-dim);
+}
+
+.search-step__btn:active { transform: scale(0.95); }
+
+/* Уровни: буква или знак в круге, название, наш текст, ниже — слова автора */
+.search-levels {
+  margin: var(--sp-3) 0 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: var(--sp-3);
+}
+
+.search-level {
+  display: grid;
+  grid-template-columns: 36px 1fr;
+  gap: var(--sp-3);
+  align-items: start;
+}
+
+.search-level__mark {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border: 1px solid var(--c-line-strong);
+  border-radius: 50%;
+  color: var(--c-gold);
+  font-weight: 700;
+}
+
+.search-level__body {
+  display: grid;
+  gap: 4px;
+}
+
+.search-quote {
+  display: block;
+  font-style: italic;
+  font-size: var(--fs-sm);
+  color: var(--c-text-dim);
+}
+
+.search-quote::before { content: '«'; }
+.search-quote::after { content: '»'; }
+
+.search-quote--main {
+  margin: var(--sp-3) 0 0;
+  padding-left: var(--sp-3);
+  border-left: 2px solid var(--c-line-strong);
+}
+
+.search-quote--main::before,
+.search-quote--main::after { content: none; }
+
+/* Карточка «В поиске» на «Сегодня»: название и строка о том, что внутри */
+.today__search .settings__link-text {
+  display: grid;
+  gap: 2px;
+}
+
+.today__search-lead {
+  font-size: var(--fs-sm);
+  color: var(--c-text-dim);
+  font-weight: 400;
+}
