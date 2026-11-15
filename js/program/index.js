@@ -2,6 +2,7 @@ import { TASK_DAYS, WEEK_DAYS, WEEKS, MONTH_WEEKS } from '../config.js';
 import { weekOf, dayInWeek, monthOf, inProgram } from '../core/dates.js';
 import { langData } from './source.js';
 import { applyTask, current as currentProfile } from '../profile/profile.js';
+import { dueRepeats, tiersForDay } from './repeats.js';
 
 /* ПРОГРАММА: что делать в день N. Экраны и напоминания спрашивают только отсюда — сами в данные
    не лезут. Тексты — на сервере «Кванта» (source.js: приходят после входа и хранятся на телефоне);
@@ -79,8 +80,15 @@ export function dayPlan(day, lang) {
     task: kind === 'task' ? plan.tasks[n - 1] : null,
     taskIndex: kind === 'task' ? n - 1 : null,
     imsg: imsgOf(week, n, plan.imsgs, lang),
+    // Повтор по графику (repeats.js): в дни практики — навыки прошлых недель, к которым пора вернуться
+    repeats: repeatsOf(week, n, lang),
     ...plan,
   };
+}
+
+function repeatsOf(week, n, lang) {
+  const weeks = data(lang)?.weeks || [];
+  return dueRepeats(weeks, week, tiersForDay(n)).map((r) => ({ ...r, task: applyTask(r.task, currentProfile()) }));
 }
 
 /** Короткое имя дела дня — для заголовка напоминания и записи. */

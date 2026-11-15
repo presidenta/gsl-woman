@@ -806,6 +806,13 @@ export default {
   },
   // «Знакомство» — js/meet/, экран #/meet
   // «Помощь» — js/help/, экран #/help (владелец 14.11.2026)
+  // Повтор по графику — program/repeats.js (владелец 15.11.2026)
+  repeat: {
+    title: 'Scheduled review',
+    lead: 'Skills from past weeks that are due again — so they stay with you for good. Do at least one.',
+    from: 'from week {week}',
+    tier: { month: 'monthly', two: 'every 2 months', three: 'every 3 months' },
+  },
   help: {
     flagsHint: 'Under each question, tick how the person answered — the result appears below.',
     total: 'Result',
@@ -944,6 +951,8 @@ export default {
   },
 
   plural: {
+    ideas: ['idea', 'ideas'],
+    phrases: ['phrase', 'phrases'],
     questions: ['question', 'questions'],
     topics: ['topic', 'topics'],
     rules: ['rule', 'rules'],

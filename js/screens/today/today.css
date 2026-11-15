@@ -453,3 +453,39 @@
   margin: 0;
   font-size: var(--fs-xs);
 }
+
+/* Повтор по графику — навыки прошлых недель (program/repeats.js) */
+.repeat__list {
+  margin: var(--sp-3) 0 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: var(--sp-4);
+}
+
+.repeat__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-2);
+}
+
+.repeat__title {
+  font-family: var(--f-display);
+  font-size: var(--fs-lg);
+}
+
+.repeat__tier {
+  flex: none;
+  padding: 2px var(--sp-2);
+  border: 1px solid var(--c-line-strong);
+  border-radius: var(--r-pill);
+  color: var(--c-gold);
+  font-size: var(--fs-xs);
+  white-space: nowrap;
+}
+
+.repeat__from {
+  margin: var(--sp-1) 0 0;
+  font-size: var(--fs-sm);
+}

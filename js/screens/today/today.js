@@ -333,6 +333,30 @@ function flowCard(ctx, plan) {
   }).node;
 }
 
+/* Повтор по графику (program/repeats.js, владелец 15.11.2026): в дни практики — навыки прошлых недель, к которым
+   пора вернуться (главные — раз в месяц, важные — раз в два, остальные — раз в три). Не больше трёх в день. */
+function repeatCard(plan) {
+  if (!plan.repeats?.length) return null;
+  return foldCard({
+    id: 'repeat',
+    cls: 'repeat',
+    icon: icons.refresh,
+    title: t('repeat.title'),
+    lead: plan.repeats.map((r) => r.task.title).join(' · '),
+    body: [
+      h('p', { class: 'card__text' }, t('repeat.lead')),
+      h('ul', { class: 'repeat__list' }, ...plan.repeats.map((r) => h('li', { class: 'repeat__item' },
+        h('div', { class: 'repeat__head' },
+          h('strong', { class: 'repeat__title' }, r.task.title),
+          h('span', { class: 'repeat__tier' }, t(`repeat.tier.${r.tier}`)),
+        ),
+        h('p', { class: 'card__text' }, r.task.text),
+        h('p', { class: 'faint repeat__from' }, t('repeat.from', { week: r.fromWeek })),
+      ))),
+    ],
+  }).node;
+}
+
 function callCard(ctx, plan, summary) {
   return h('div', { class: 'stack' },
     foldCard({
@@ -475,6 +499,7 @@ export function render(view, ctx) {
       waterCard(ctx),
       morningCard(ctx, plan),
       main,
+      repeatCard(plan),
       meetLink(plan),
       // Седьмой день — «Разговор пары» (circles/talk.js)
       talkCard(ctx, plan),
