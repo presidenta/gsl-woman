@@ -2,9 +2,10 @@
    .card — основная поверхность. .card--hero — главная карточка экрана: тонкая металлическая рамка
    (градиент под прозрачной заливкой) и розовое свечение сверху. */
 
+/* Внутреннее поле 16 px, а не 22: текст шире на телефоне (владелец 15.11.2026: «очень узко, как колбаса») */
 .card {
   position: relative;
-  padding: var(--sp-5);
+  padding: var(--sp-4);
   border: 1px solid var(--c-line);
   border-radius: var(--r-lg);
   background: var(--c-surface);
@@ -58,8 +59,8 @@
 .card__icon {
   display: grid;
   place-items: center;
-  width: 30px;
-  height: 30px;
+  width: 38px;
+  height: 38px;
   border-radius: 50%;
   background: var(--g-gold-soft);
   border: 1px solid var(--c-line-strong);
@@ -67,9 +68,10 @@
   flex: none;
 }
 
+/* Значки крупнее (владелец 15.11.2026: «непонятно, что это значок») */
 .card__icon svg {
-  width: 16px;
-  height: 16px;
+  width: 21px;
+  height: 21px;
 }
 
 /* Метка-пилюля: «Неделя 2», «Минимум», «Сделано» */

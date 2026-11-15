@@ -238,13 +238,14 @@ function taskCard(ctx, plan) {
     icon: icons.crown,
     title: t('today.taskLabel'),
     teaser: plan.teaser,
-    lead: '«' + task.title + '»',
+    // Название и подзаголовок — в шапке под «ЗАДАНИЕ ДНЯ», и в раскрытом виде тоже (владелец 15.11.2026: «Магия рук»
+    // под словом «Задание», а не под короной); подзаголовок — своей строкой, курсивом («Тайный ритуал соблазна»)
+    lead: h('span', {}, h('span', {}, `«${task.title}»`),
+      task.subtitle ? h('span', { class: 'fold__lead-sub task__subtitle' }, task.subtitle) : null),
+    keepLead: true,
     points: taskPoints(ctx.entries, plan.day),
     body: [
     plan.intro ? h('p', { class: 'task__intro' }, plan.intro) : null,
-    h('h2', { class: 'task__title' }, `«${task.title}»`),
-    // Подзаголовок — своей строкой под названием, другим начертанием (владелец: «Магия рук» / «Тайный ритуал соблазна»)
-    task.subtitle ? h('p', { class: 'task__subtitle' }, task.subtitle) : null,
     h('p', { class: 'task__text' }, task.text),
     // Что на что заменяем (владелец 14.11.2026: «оставь то, что мы заменяем, чтобы было понятно») — «Телефон → её глаза»
     task.swap ? h('p', { class: 'task__swap' }, h('span', { class: 'caps' }, t('today.swapTitle')), ' ', task.swap) : null,

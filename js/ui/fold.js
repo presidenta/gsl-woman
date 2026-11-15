@@ -30,28 +30,33 @@ function remember(id, open) {
   write(KEY, s);
 }
 
+/** Кавычки внутри кавычек: «Где кнопка «повторить»?» → «Где кнопка „повторить“?» — по правилам русского письма. */
+const quoteInner = (s) => s.replace(/«/g, '„').replace(/»/g, '“');
+
 /**
  * id — что помнить; icon — значок шапки; title, lead — название и строка в свёрнутом виде; teaser — весёлая
- * фраза после названия через тире (карточка дня); status — узел справа
+ * фраза после названия через тире (карточка дня); keepLead — название видно и в раскрытом виде, крупно (карточка
+ * задания: «Магия рук» стоит под подписью, а не в теле под значком); lead — строка или узел; status — узел справа
  * (идущий счёт); points — баллы дня за этот раздел (score/): больше нуля — раздел сделан: стрелка светится золотом,
  * после названия зелёным «+N балл» (владелец 14.11.2026, сборка 57); body — содержимое раздела. Вернёт { node, thumb, isOpen() }: thumb — место
  * для рисунка в шапке; onToggle(open) зовётся при каждом раскрытии и сворачивании (и сразу при создании).
  */
-export function foldCard({ id, cls = '', icon, title, teaser = '', lead = '', status = null, points = 0, body = [], onToggle = null }) {
+export function foldCard({ id, cls = '', icon, title, teaser = '', lead = '', keepLead = false, status = null, points = 0, body = [], onToggle = null }) {
   let open = isOpen(id);
   const thumb = h('span', { class: 'fold__thumb', 'aria-hidden': 'true' });
   const inner = h('div', { class: 'fold__inner' }, ...body);
   const panel = h('div', { class: 'fold__body', id: `fold-${id}` }, inner);
+  // Шапка — как плашка «В поиске» (владелец 15.11.2026: «столбиком»): слева значок в золотом круге (в свёрнутом
+  // виде вместо него — рисунок, если он есть), справа столбиком подпись и название, стрелка справа
   const head = h('button', { type: 'button', class: 'fold__head', 'aria-controls': `fold-${id}` },
-    thumb,
+    h('span', { class: 'fold__mark', 'aria-hidden': 'true' }, thumb, h('span', { class: 'fold__badge' }, svg(icon, 'fold__icon'))),
     h('span', { class: 'fold__text' },
       // Баллы — сразу за последним словом названия, в той же строке (владелец 15.11.2026: «далеко от текста»)
-      h('span', { class: 'fold__eyebrow' }, svg(icon, 'fold__icon'),
-        h('span', { class: 'caps fold__title' }, title,
-          // «ЗАДАНИЕ ДНЯ — Это шутка или магия?» (владелец 15.11.2026): фраза сразу за подписью через тире
-          teaser ? h('span', { class: 'fold__teaser' }, ` — ${teaser}`) : null,
-          points > 0 ? h('span', { class: 'fold__plus' }, ` +${points} ${plural(points, 'plural.points')}`) : null)),
-      lead ? h('span', { class: 'fold__lead' }, lead) : null,
+      h('span', { class: 'caps fold__title' }, title,
+        // «ЗАДАНИЕ ДНЯ — «Это шутка или магия?»» (владелец 15.11.2026): фраза за подписью через тире, в кавычках
+        teaser ? h('span', { class: 'fold__teaser' }, ` — «${quoteInner(teaser)}»`) : null,
+        points > 0 ? h('span', { class: 'fold__plus' }, ` +${points} ${plural(points, 'plural.points')}`) : null),
+      lead ? h('span', { class: `fold__lead${keepLead ? ' fold__lead--keep' : ''}` }, lead) : null,
     ),
     h('span', { class: 'fold__side' },
       status,

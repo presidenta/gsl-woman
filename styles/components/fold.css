@@ -16,18 +16,43 @@
   -webkit-tap-highlight-color: transparent;
 }
 
-/* Маленький рисунок слева — только в свёрнутом виде */
+/* Левая колонка одной ширины у всех карточек — тогда подписи и названия стоят ровным столбиком, как у плашки
+   «В поиске» (владелец 15.11.2026). В ней значок в золотом круге; в свёрнутом виде, если есть рисунок
+   (утренняя минута, вода, шаги), — рисунок вместо значка. */
+.fold__mark {
+  display: grid;
+  place-items: center;
+  width: 48px;
+}
+
+.fold__badge {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border: 1px solid var(--c-line-strong);
+  border-radius: 50%;
+  color: var(--c-gold);
+}
+
+.fold__icon svg {
+  display: block;
+  width: 22px;
+  height: 22px;
+}
+
 .fold__thumb {
   display: grid;
   place-items: center;
-  width: 64px;
-  height: 76px;
+  width: 48px;
+  height: 64px;
   border-radius: var(--r-md);
   background: radial-gradient(60% 70% at 50% 60%, rgba(var(--rgb-gold), 0.12), transparent 75%);
 }
 
 .fold__thumb:empty,
-.fold.is-open .fold__thumb {
+.fold.is-open .fold__thumb,
+.fold:not(.is-open) .fold__thumb:not(:empty) + .fold__badge {
   display: none;
 }
 
@@ -42,19 +67,6 @@
   min-width: 0;
 }
 
-.fold__eyebrow {
-  display: flex;
-  align-items: center;
-  gap: var(--sp-2);
-  color: var(--c-gold);
-}
-
-.fold__icon svg {
-  display: block;
-  width: 18px;
-  height: 18px;
-}
-
 .fold__lead {
   color: var(--c-text);
   font-family: var(--f-display);
@@ -66,9 +78,20 @@
   display: none;
 }
 
-/* Раскрыта: рисунка в шапке нет — название слева, отметка и стрелка справа */
-.fold.is-open .fold__head {
-  grid-template-columns: minmax(0, 1fr) auto;
+/* Карточка задания: «Магия рук» и в раскрытом виде стоит под подписью — крупно, вместо заголовка в теле */
+.fold.is-open .fold__lead--keep {
+  display: grid;
+  gap: 2px;
+  font-size: var(--fs-xl);
+  line-height: 1.15;
+}
+
+.fold__lead-sub {
+  display: none;
+}
+
+.fold.is-open .fold__lead-sub {
+  display: block;
 }
 
 .fold__side {
@@ -118,15 +141,16 @@
   stroke-width: 2.4;
 }
 
-/* Весёлая фраза за подписью карточки дня («ЗАДАНИЕ ДНЯ — Это шутка или магия?», владелец 15.11.2026): обычные
-   буквы, светлее и чуть крупнее заглавной подписи — читается как живая реплика, а подпись остаётся подписью */
+/* Весёлая фраза за подписью карточки дня («ЗАДАНИЕ ДНЯ — «Это шутка или магия?»», владелец 15.11.2026): в
+   кавычках, обычные буквы почти того же размера, что заглавная подпись (крупнее — «смотрится ужасно»), чуть
+   светлее неё — читается как реплика, строка остаётся ровной */
 .fold__teaser {
   text-transform: none;
-  letter-spacing: normal;
-  color: var(--c-text);
-  font-size: var(--fs-sm);
+  letter-spacing: 0.01em;
+  color: var(--c-text-dim);
+  font-size: var(--fs-xs);
   font-weight: 500;
-  line-height: 1.35;
+  line-height: 1.4;
 }
 
 /* Внутри строки названия (caps): регистр и разрядка свои, на перенос — вместе с последним словом */

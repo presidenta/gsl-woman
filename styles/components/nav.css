@@ -35,8 +35,8 @@
 }
 
 .app-nav__item svg {
-  width: 23px;
-  height: 23px;
+  width: 26px;
+  height: 26px;
 }
 
 .app-nav__item[aria-current='page'] {
