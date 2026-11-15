@@ -31,12 +31,13 @@ function remember(id, open) {
 }
 
 /**
- * id — что помнить; icon — значок шапки; title, lead — название и строка в свёрнутом виде; status — узел справа
+ * id — что помнить; icon — значок шапки; title, lead — название и строка в свёрнутом виде; teaser — весёлая
+ * фраза после названия через тире (карточка дня); status — узел справа
  * (идущий счёт); points — баллы дня за этот раздел (score/): больше нуля — раздел сделан: стрелка светится золотом,
  * после названия зелёным «+N балл» (владелец 14.11.2026, сборка 57); body — содержимое раздела. Вернёт { node, thumb, isOpen() }: thumb — место
  * для рисунка в шапке; onToggle(open) зовётся при каждом раскрытии и сворачивании (и сразу при создании).
  */
-export function foldCard({ id, cls = '', icon, title, lead = '', status = null, points = 0, body = [], onToggle = null }) {
+export function foldCard({ id, cls = '', icon, title, teaser = '', lead = '', status = null, points = 0, body = [], onToggle = null }) {
   let open = isOpen(id);
   const thumb = h('span', { class: 'fold__thumb', 'aria-hidden': 'true' });
   const inner = h('div', { class: 'fold__inner' }, ...body);
@@ -47,6 +48,8 @@ export function foldCard({ id, cls = '', icon, title, lead = '', status = null, 
       // Баллы — сразу за последним словом названия, в той же строке (владелец 15.11.2026: «далеко от текста»)
       h('span', { class: 'fold__eyebrow' }, svg(icon, 'fold__icon'),
         h('span', { class: 'caps fold__title' }, title,
+          // «ЗАДАНИЕ ДНЯ — Это шутка или магия?» (владелец 15.11.2026): фраза сразу за подписью через тире
+          teaser ? h('span', { class: 'fold__teaser' }, ` — ${teaser}`) : null,
           points > 0 ? h('span', { class: 'fold__plus' }, ` +${points} ${plural(points, 'plural.points')}`) : null)),
       lead ? h('span', { class: 'fold__lead' }, lead) : null,
     ),

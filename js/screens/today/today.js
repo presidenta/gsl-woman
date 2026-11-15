@@ -237,6 +237,7 @@ function taskCard(ctx, plan) {
     cls: 'task',
     icon: icons.crown,
     title: t('today.taskLabel'),
+    teaser: plan.teaser,
     lead: '«' + task.title + '»',
     points: taskPoints(ctx.entries, plan.day),
     body: [
@@ -313,6 +314,7 @@ function flowCard(ctx, plan) {
     cls: 'task',
     icon: icons.sparkle,
     title: t('kinds.flow'),
+    teaser: plan.teaser,
     lead: plan.tasks.map((ex) => ex.title).join(' · ') || t('today.flowLead'),
     points: taskPoints(ctx.entries, plan.day),
     body: [

@@ -1,0 +1,28 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="stylesheet" href="styles/tokens.css">
+<link rel="stylesheet" href="styles/side-man.css">
+<link rel="stylesheet" href="styles/fonts.css">
+<link rel="stylesheet" href="styles/base.css">
+<link rel="stylesheet" href="styles/components/button.css">
+<link rel="stylesheet" href="styles/components/card.css">
+<link rel="stylesheet" href="styles/components/controls.css">
+<link rel="stylesheet" href="styles/components/overlay.css">
+<link rel="stylesheet" href="styles/components/ask.css">
+<link rel="stylesheet" href="styles/components/nav.css">
+<link rel="stylesheet" href="styles/components/progress.css">
+<link rel="stylesheet" href="styles/components/heels.css">
+<link rel="stylesheet" href="styles/components/fold.css">
+<link rel="stylesheet" href="styles/components/plate.css">
+<link rel="stylesheet" href="styles/components/flags.css">
+</head><body><main class="screen" style="padding:16px;display:grid;gap:16px">
+<div id="a"></div><div id="b"></div><div id="c"></div></main>
+<script type="module">
+import { foldCard } from './js/ui/fold.js';
+import { icons } from './js/ui/icons.js';
+import { h } from './js/core/dom.js';
+const body = [h('h2', { class: 'task__title' }, '«Магия рук»'), h('p', { class: 'task__subtitle' }, 'Тайный ритуал соблазна'), h('p', { class: 'task__text' }, 'Текст задания…')];
+localStorage.clear();
+document.getElementById('a').replaceWith(foldCard({ id: 's1', cls: 'task', icon: icons.crown, title: 'Задание дня', teaser: 'Это шутка или магия?', lead: '«Магия рук»', body }).node);
+document.getElementById('b').replaceWith(foldCard({ id: 's2', cls: 'task', icon: icons.crown, title: 'Задание дня', teaser: 'Подожди... то есть его даже не надо пилить, он сам хочет делать?', lead: '«Табу на тяжести»', points: 3, body: [] }).node);
+document.getElementById('c').replaceWith(foldCard({ id: 's3', cls: 'task', icon: icons.sparkle, title: 'Свободный поток', teaser: 'Глаза боятся, а руки делают...', lead: 'Магия рук · Табу на тяжести · Взгляд Леди', body: [] }).node);
+</script></body></html>

@@ -62,3 +62,17 @@ test('утренняя минута: пятки каждый день, доба�
   assert.deepEqual(addons, [null, 'hum', 'voice', 'shake', null]);
   assert.ok([1, 50, 168].every((d) => morningFor(d).base === 'heels' && morningFor(d).seconds === 60));
 });
+
+test('весёлая фраза в шапке: у задания своя, в дни практики — по кругу, нет фраз — пусто (владелец 15.11.2026)', () => {
+  const ru = fixture.langs.ru;
+  const w1 = { ...ru.weeks[0], tasks: ru.weeks[0].tasks.map((t, i) => ({ ...t, teaser: `задание ${i + 1}` })), teasers: ['раз', 'два'] };
+  _use({ ...fixture, langs: { ...fixture.langs, ru: { ...ru, weeks: [w1, ...ru.weeks.slice(1)] } } });
+  assert.equal(dayPlan(1, 'ru').teaser, 'задание 1');
+  assert.equal(dayPlan(3, 'ru').teaser, 'задание 3');
+  assert.equal(dayPlan(4, 'ru').teaser, 'раз');
+  assert.equal(dayPlan(5, 'ru').teaser, 'два');
+  assert.equal(dayPlan(6, 'ru').teaser, 'раз');
+  assert.equal(dayPlan(7, 'ru').teaser, '');
+  assert.equal(dayPlan(8, 'ru').teaser, '', 'старая программа без фраз — шапка как раньше');
+  _use(fixture);
+});

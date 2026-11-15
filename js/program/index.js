@@ -27,6 +27,8 @@ export function weekPlan(week, lang) {
     // Задания — в словах профиля отношений (profile/, владелец 14.11.2026): у каждого из четырёх свои слова
     tasks: w.tasks.map((t) => applyTask(t, currentProfile())),
     flow: w.flow,
+    // Весёлые фразы дней своей практики (сервер: woman/teasers/, владелец 15.11.2026); у задания — task.teaser
+    teasers: w.teasers || [],
     biz: w.biz || null,
     profile: currentProfile(),
     call: w.call,
@@ -81,11 +83,21 @@ export function dayPlan(day, lang) {
     kind,
     task: kind === 'task' ? plan.tasks[n - 1] : null,
     taskIndex: kind === 'task' ? n - 1 : null,
+    teaser: teaserOf(kind, n, plan),
     imsg: imsgOf(week, n, plan.imsgs, lang),
     // Повтор по графику (repeats.js): в дни практики — навыки прошлых недель, к которым пора вернуться
     repeats: repeatsOf(week, n, lang),
     ...plan,
   };
+}
+
+/* Фраза в шапке карточки дня («ЗАДАНИЕ ДНЯ — Это шутка или магия?»): у задания — своя, в дни практики — фразы
+   недели по порядку (день 4 — первая, день 5 — вторая, дальше по кругу). Нет фразы — шапка как раньше. */
+function teaserOf(kind, n, plan) {
+  if (kind === 'task') return plan.tasks[n - 1]?.teaser || '';
+  if (kind !== 'flow' || !plan.teasers.length) return '';
+  const first = Math.min(plan.tasks.length, TASK_DAYS) + 1;
+  return plan.teasers[(n - first) % plan.teasers.length];
 }
 
 function repeatsOf(week, n, lang) {

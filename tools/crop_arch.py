@@ -26,13 +26,17 @@ BOXES = {
 
 os.makedirs(probe, exist_ok=True)
 tiles = []
+# Границы заданы по снимку 1024 точки шириной; у оригинала крупнее — пересчитываются (Gemini, 1408×768 — 15.11.2026)
+k = im.width / 1024
 for name, box in BOXES.items():
-    c = im.crop(box)
+    c = im.crop(tuple(round(v * k) for v in box))
     tiles.append(c)
     if out:
         os.makedirs(out, exist_ok=True)
         # Вдвое крупнее для чёткости на телефоне: увеличение с LANCZOS, сжатие webp
-        big = c.resize((c.width * 2, c.height * 2), Image.LANCZOS)
+        # До ~340 точек шириной (на экране до 170 — чётко и на телефоне с плотным экраном)
+        f = max(1, 340 / c.width)
+        big = c.resize((round(c.width * f), round(c.height * f)), Image.LANCZOS)
         big.save(os.path.join(out, f'{name}.webp'), 'WEBP', quality=82, method=6)
 sheet = Image.new('RGB', (sum(t.width for t in tiles) + 4 * len(tiles), max(t.height for t in tiles)), (255, 0, 255))
 x = 0
