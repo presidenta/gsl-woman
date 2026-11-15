@@ -175,6 +175,7 @@ function questionPlates(item, verdicts) {
     ...item.groups.map((g, i) => remember(platePanel({
       icon: icons.chat,
       title: g.title,
+      author: g.author, // «Павел Раков — Темы-„опознаватели“…»
       lead: g.by, // кто автор подборки — прямо на плашке (владелец 15.11.2026)
       chip: g.themes ? count(g.sections.length, 'topics') : count(entriesOf(g).length, g.unit),
       body: folderBody(g, verdicts),
@@ -190,6 +191,7 @@ export function itemPlate(item, ctx, verdicts) {
     // «Красный флаг» — единственная красная плашка: это запрет, а не совет (владелец 15.11.2026)
     cls: item.key === 'redline' ? 'plate--red' : '',
     title: item.title,
+    author: item.author, // авторы и «Павел Раков — Кто перед тобой?»: имя другим цветом
     // byline — кто автор, прямо на плашке («Кто перед тобой»: «По трактовке Павла Ракова — …», 15.11.2026)
     lead: item.byline || null,
     chip: count(n, item.unit),

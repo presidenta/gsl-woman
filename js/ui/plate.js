@@ -8,11 +8,12 @@ import { icons } from './icons.js';
      platePanel — раскрывается на месте (пункты «Помощи», «Письмо себе в будущее»): стрелка поворачивается вниз.
    Вид — styles/components/plate.css. */
 
-function head({ icon, title, lead, chip }) {
+function head({ icon, title, author, lead, chip }) {
   return [
     h('span', { class: 'plate__icon', 'aria-hidden': 'true' }, svg(icon || icons.sparkle)),
     h('span', { class: 'plate__text' },
-      h('span', { class: 'plate__title' }, title),
+      // author — имя автора другим цветом перед названием: «Павел Раков — Кто перед тобой?» (15.11.2026)
+      h('span', { class: 'plate__title' }, author ? h('span', { class: 'plate__author' }, author) : null, author ? ' — ' : null, title),
       lead ? h('span', { class: 'plate__lead' }, lead) : null,
       // Число — под названием, а не отдельным столбцом: название не сжимается в узкую колонку
       chip ? h('span', { class: 'plate__chip' }, chip) : null,
@@ -26,7 +27,7 @@ export function plateLink({ href, cls = '', ...rest }) {
   return h('a', { class: `card plate ${cls}`.trim(), href }, ...head(rest));
 }
 
-/** Плашка, которая раскрывается на месте: { icon, title, lead?, chip?, open?, body: [узлы], cls? }. */
+/** Плашка, которая раскрывается на месте: { icon, title, author?, lead?, chip?, open?, body: [узлы], cls? }. */
 export function platePanel({ open = false, body = [], cls = '', ...rest }) {
   const node = h('details', { class: `card plate plate--panel ${cls}`.trim() },
     h('summary', { class: 'plate__head' }, ...head(rest)),

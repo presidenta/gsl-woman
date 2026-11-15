@@ -124,3 +124,8 @@ a.plate,
   color: var(--c-red-flag);
 }
 .redflag__title { margin: 0; }
+
+/* Имя автора в названии плашки — другим цветом («Павел Раков — Кто перед тобой?», «Роберт Гловер — …») */
+.plate__author {
+  color: var(--c-gold);
+}

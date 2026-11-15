@@ -24,8 +24,8 @@ import { folderBody } from '../help/help.js';
    переживают перерисовку (после записи свидания экран рисуется заново). */
 const opened = new Set();
 
-function fold(key, { icon = icons.sparkle, title, lead, chip, body, cls = '' }) {
-  const node = platePanel({ icon, title, lead, chip, body, open: opened.has(key), cls: `meet__plate ${cls}`.trim() });
+function fold(key, { icon = icons.sparkle, title, author, lead, chip, body, cls = '' }) {
+  const node = platePanel({ icon, title, author, lead, chip, body, open: opened.has(key), cls: `meet__plate ${cls}`.trim() });
   node.addEventListener('toggle', () => { if (node.open) opened.add(key); else opened.delete(key); });
   return node;
 }
@@ -36,7 +36,7 @@ function listCard(title, items, cls = '', icon = icons.sparkle) {
 
 /** Вопросы для свидания по трактовке автора (из «Библиотеки», 15.11.2026): кто он — строкой под названием. */
 function guideCard(g) {
-  return fold(`guide:${g.title}`, { icon: icons.chat, title: g.title, lead: g.by, body: folderBody({ ...g, by: null }) });
+  return fold(`guide:${g.title}`, { icon: icons.chat, title: g.title, author: g.author, lead: g.by, body: folderBody({ ...g, by: null }) });
 }
 
 function themeCard(th, n, onChange) {
