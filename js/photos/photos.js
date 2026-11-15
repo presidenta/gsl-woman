@@ -14,12 +14,11 @@ const name = (n) => String(n).padStart(3, '0');
 // Номер дня по местному календарю: в полночь фото сменяется у всех мест разом
 const dayNo = (d = new Date()) => Math.floor(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()) / 864e5);
 
-// Сдвиг по имени места: соседние места в один день показывают разные кадры общего ряда
-function salt(key) {
-  let s = 0;
-  for (const c of key) s = (s * 31 + c.codePointAt(0)) >>> 0;
-  return s;
-}
+/* Круг по порядку (владелец 16.11.2026: «первый день — одна фотография, второй — совсем другая, третий — где они вместе…
+   столько, сколько есть фотографий, а потом по кругу»): с 16.11.2026 каждое место показывает свой ряд с первого кадра,
+   по кадру в день, дошло до конца — заново. Порядок кадров — тот, что записан в catalog.js. */
+const START = dayNo(new Date(2026, 10, 16));
+const mod = (a, n) => ((a % n) + n) % n;
 
 /** Ряд места для части: свой («ключ.часть»), иначе общий; нет ни того, ни другого — null. */
 function listOf(table, key, part) {
@@ -31,7 +30,7 @@ function listOf(table, key, part) {
 export function pick(key, date, part) {
   const list = listOf(POOLS, key, part);
   if (!list?.length) return null;
-  return list[(dayNo(date) + salt(key)) % list.length];
+  return list[mod(dayNo(date) - START, list.length)];
 }
 
 /** Постоянное фото: «Вопросы» / «Библиотека», i — порядковый номер плашки. */

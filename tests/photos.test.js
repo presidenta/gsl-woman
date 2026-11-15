@@ -53,15 +53,16 @@ test('набор меняется по дням, в течение дня — о
   assert.equal(pick('love.gifts', new Date(2026, 10, 15, 8), 'man'), pick('love.gifts', new Date(2026, 10, 15, 22), 'man'));
 });
 
-// Владелец 16.11.2026: у стакана каждый день — другой кадр, где пьют воду; и у неё, и у него
-test('стакан воды: каждый день другой кадр, только где пьют воду', () => {
-  const DRINK = { woman: [83, 84, 99, 100, 101, 91, 111, 93], man: [85, 86, 102, 103, 104, 92, 112, 113] };
+// Владелец 16.11.2026: у стакана каждый день новый кадр, где пьют воду (одна, он, вдвоём); весь ряд — потом по кругу
+test('стакан воды: каждый день новый кадр, весь ряд по очереди, потом по кругу', () => {
   for (const part of ['woman', 'man']) {
     for (const key of ['water.morning', 'water.night']) {
-      const days = Array.from({ length: 14 }, (_, i) => pick(key, new Date(2026, 10, 16 + i, 9), part));
-      for (const n of days) assert.ok(DRINK[part].includes(n), `${key} ${part}: ${n} — не пьёт воду`);
-      for (let i = 1; i < days.length; i++) assert.notEqual(days[i], days[i - 1], `${key} ${part}: два дня подряд ${days[i]}`);
-      assert.ok(new Set(days).size >= 3, `${key} ${part}: за две недели разные кадры`);
+      const list = POOLS[`${key}.${part}`];
+      const days = Array.from({ length: list.length * 2 }, (_, i) => pick(key, new Date(2026, 10, 16 + i, 9), part));
+      const first = days.slice(0, list.length);
+      assert.deepEqual([...first].sort(), [...list].sort(), `${key} ${part}: за ${list.length} дней — каждый кадр ровно раз`);
+      assert.deepEqual(days.slice(list.length), first, `${key} ${part}: потом тот же круг`);
     }
   }
+  assert.ok(POOLS['water.morning.woman'].some((n) => [87, 105, 107].includes(n)), 'есть кадры, где пьют вдвоём');
 });
