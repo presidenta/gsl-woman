@@ -411,10 +411,45 @@
 }
 
 .today-hero__score {
-  color: var(--c-gold);
+  color: var(--c-score);
 }
 
 /* Отметка уровня задания прямо в карточке */
 .task__mark .minute__picks {
   margin-top: var(--sp-2);
+}
+
+/* «Получилось» у «Пяти языков любви» и «Я-сообщения» (score/deeds.js, сборка 57) */
+.deed-mark {
+  margin-top: var(--sp-5);
+}
+
+.deed-mark__hint {
+  margin: 0 0 var(--sp-2);
+  color: var(--c-text-dim);
+  font-size: var(--fs-sm);
+}
+
+.deed-mark__row {
+  display: grid;
+  gap: var(--sp-2);
+}
+
+/* Итог дня внизу «Сегодня» */
+.day-total {
+  text-align: center;
+}
+
+.day-total__value {
+  margin: var(--sp-1) 0;
+  color: var(--c-score);
+  font-family: var(--f-display);
+  font-size: var(--fs-2xl);
+  font-weight: 600;
+  text-shadow: 0 0 14px rgba(var(--rgb-score), 0.4);
+}
+
+.day-total__hint {
+  margin: 0;
+  font-size: var(--fs-xs);
 }

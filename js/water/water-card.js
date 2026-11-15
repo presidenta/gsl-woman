@@ -2,7 +2,6 @@ import { h, svg } from '../core/dom.js';
 import { t, list } from '../core/i18n.js';
 import { icons } from '../ui/icons.js';
 import { foldCard } from '../ui/fold.js';
-import { doneBadge } from '../score/score.js';
 import { KINDS, GOLDEN, chosenOf, setItem, setItems } from './water.js';
 import * as waterLog from './water-log.js';
 import { icon } from './art.js';
@@ -269,8 +268,8 @@ export function waterCard(ctx, kind = 'morning') {
     icon: kind === 'night' ? icons.moon : icons.cup,
     title: t(`${b}.title`),
     lead: t(`${b}.short`),
-    // Выпит — галочка и +1 балл (score/: у стакана уровней нет)
-    status: done ? doneBadge(1) : null,
+    // Выпит — +1 балл (score/: у стакана уровней нет): стрелка золотом, «+1 балл» после названия
+    points: done ? 1 : 0,
     body: [
       h('p', { class: 'card__text water__lead' }, t(`${b}.lead`)),
       h('p', { class: 'water__pick' }, t(`${b}.pick`)),

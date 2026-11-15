@@ -2,7 +2,7 @@ import { h, svg } from '../core/dom.js';
 import { t } from '../core/i18n.js';
 import { icons } from '../ui/icons.js';
 import { foldCard } from '../ui/fold.js';
-import { doneBadge, pointsOf } from '../score/score.js';
+import { pointsOf } from '../score/score.js';
 import { toast } from '../ui/toast.js';
 import { walkFigure } from './figures.js';
 import { LEVELS, STEP_LEVELS, MAX_STEPS, stepsOf, stepsLevel, setSteps } from './logs.js';
@@ -80,7 +80,7 @@ export function stepsCard(ctx) {
     icon: icons.footprints,
     title: t('day.steps.title'),
     lead: n ? t('day.steps.today', { n: fmt(n) }) : t('day.steps.short'),
-    status: doneBadge(pointsOf(level)),
+    points: pointsOf(level),
     body: [
       h('p', { class: 'card__text' }, t('day.steps.text')),
       stage,

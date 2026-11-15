@@ -12,9 +12,10 @@ export default {
   nav: { today: 'Today', week: 'Week', goals: 'Goals', journal: 'Journal', path: 'Path' },
   fold: { open: 'Open', close: 'Close' },
   score: {
+    totalTitle: 'Total for the day',
     today: 'Points today: {points}',
     earned: 'Earned: {points}',
-    hint: 'Points are just for you: Minimum — 1, 100% — 2, Maximum — 3, a glass of water — 1. Only you see them.',
+    hint: 'Points are just for you: Minimum — 1, 100% — 2, Maximum — 3; a glass of water, «I did it» and the couple talk — 1 each. Only you see them.',
   },
   common: {
     showPassword: 'Show password',
@@ -49,7 +50,7 @@ export default {
     // Профиль, дети, дела (js/profile/, 14.11.2026)
     swapTitle: 'We replace:',
     kidsTitle: 'For the children',
-    bizTitle: 'Work tip',
+    bizTitle: 'Wisdom of the week',
     dayOf: 'Day {day}',
     week: 'Week {n}',
     month: 'Month {n}',
@@ -434,6 +435,11 @@ export default {
   },
 
   love: {
+    mark: 'I did it',
+    markDone: 'Done — +1 point',
+    again: 'I will try again',
+    againToast: 'Every try is a step. Tomorrow is a new chance',
+    markHint: 'One word, one deed for one person — already +1 point',
     title: 'The five love languages',
     doToday: 'Today, do this',
     who: { him: 'My woman’s language', me: 'My language' },
@@ -845,6 +851,11 @@ export default {
     whoPh: 'Her name',
   },
   imsg: {
+    mark: 'I said it with «I»',
+    markDone: 'Done — +1 point',
+    again: 'I will try again',
+    againToast: 'Every try is a step. Tomorrow is a new chance',
+    markHint: 'One «I» sentence a day — already +1 point',
     title: 'I-message',
     remind: 'Everything you ask for and everything you feel — say it starting with “I”. It is a habit that changes relationships.',
     usual: 'What people usually say',

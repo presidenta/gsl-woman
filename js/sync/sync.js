@@ -44,6 +44,8 @@ export const COLLECTIONS = [
   // Стакан воды на ночь (water/water-log.js), с 43
   { key: 'waternight', kind: 'waternight', type: 'map', empty: {} },
   { key: 'steps', kind: 'steps', type: 'map', empty: {} },
+  // «Получилось» у «Пяти языков любви» и «Я-сообщения» (score/deeds.js, сборка 57)
+  { key: 'deeds', kind: 'deeds', type: 'map', empty: {} },
   { key: 'settings', kind: 'settings', type: 'single', empty: null },
   { key: 'love', kind: 'love', type: 'single', empty: null },
   // Записи после свиданий — «Знакомство» (meet/, 14.11.2026)

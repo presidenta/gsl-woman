@@ -105,23 +105,27 @@
   transform: scale(0.94);
 }
 
-/* Отметка «сделано» в шапке — золотой кружок с галочкой */
-.fold__done {
-  display: grid;
-  place-items: center;
-  width: 26px;
-  height: 26px;
-  border-radius: 50%;
+/* Раздел сделан (score/, сборка 57; владелец 14.11.2026): отдельного кружка с галочкой нет — сама стрелка
+   загорается золотом своей части (у женщины — розовое золото, у мужчины — жёлтое), а после названия зелёным —
+   «+N балл». Маленько, аккуратно, без лишних кругов. */
+.fold.is-done .fold__arrow {
   background: var(--g-gold-smooth);
+  box-shadow: 0 0 0 1px rgba(var(--rgb-glow), 0.55), 0 0 16px -2px rgba(var(--rgb-glow), 0.75);
   color: var(--c-on-gold);
-  box-shadow: 0 4px 12px -4px rgba(var(--rgb-glow), 0.8);
 }
 
-.fold__done svg {
-  display: block;
-  width: 15px;
-  height: 15px;
+.fold.is-done .fold__chevron svg {
   stroke-width: 2.4;
+}
+
+.fold__plus {
+  margin-left: 2px;
+  color: var(--c-score);
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  text-shadow: 0 0 10px rgba(var(--rgb-score), 0.45);
 }
 
 /* Раздел: высота 0 → по содержимому. Поля внутри — чтобы свечение кнопок и значков не обрезалось */
@@ -156,21 +160,6 @@
   .fold__chevron svg {
     transition: none;
   }
-}
-
-/* Отметка с баллами (score/, сборка 53): золотой круг с галочкой и «+N» рядом */
-.fold__score {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-}
-
-.fold__points {
-  font-family: var(--f-display);
-  font-size: var(--fs-md);
-  font-weight: 600;
-  line-height: 1;
-  color: var(--c-gold);
 }
 
 /* Карточка без рисунка (задание, я-сообщение, языки любви…): шапка в две колонки — текст и справа отметка со

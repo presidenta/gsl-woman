@@ -18,10 +18,10 @@ import { foldCard } from '../../ui/fold.js';
 import { kegelCard } from '../../habits/kegel-card.js';
 import { stepsCard } from '../../habits/steps-card.js';
 import { usCard } from '../../circles/today-card.js';
-import { talkCard } from '../../circles/talk.js';
+import { talkCard, talkDone } from '../../circles/talk.js';
 import { showKids, bizFor } from '../../profile/profile.js';
 import * as journal from '../../journal/journal.js';
-import { dayScore, doneBadge, pointsOf, taskPoints, pointsLabel } from '../../score/score.js';
+import { dayScore, pointsOf, taskPoints, pointsLabel } from '../../score/score.js';
 
 /* ЭКРАН «СЕГОДНЯ» — главный. Сверху вниз, в порядке дня:
    1. Шапка дня: «День N» (без «из скольких» и без номера недели — обучение постоянное, владелец 12.11.2026),
@@ -83,7 +83,7 @@ function stopMinute() {
 
 function header(ctx, plan, summary) {
   // Баллы дня (score/): личные, для себя — сколько баллов прожито сегодня
-  const score = dayScore(ctx.todayIso, plan.day, ctx.entries);
+  const score = dayScore(ctx.todayIso, plan.day, ctx.entries, { talk: talkDone(ctx, plan) });
   return h('section', { class: 'card card--hero today-hero' },
     h('div', { class: 'card__eyebrow today-hero__top' },
       h('span', { class: 'chip chip--solid' }, t('today.dayOf', { day: plan.day })),
@@ -166,7 +166,7 @@ function morningCard(ctx, plan) {
     figure.setRunning(running, (((Date.now() - minuteStart) / 1000) + LANDING) % 1);
     // Шапка свёрнутой карточки: идёт — счёт, сделана — золотая галочка
     if (running) status.replaceChildren(h('span', { class: 'minute__fold-count' }, `${minuteCount} / ${minuteTotal}`));
-    else status.replaceChildren(doneBadge(pointsOf(morningLog.levelOf(ctx.todayIso))) || '');
+    else status.replaceChildren('');
   }
 
   paintMinute = paint;
@@ -181,6 +181,7 @@ function morningCard(ctx, plan) {
     title: t('morning.title'),
     lead: t('morning.short'),
     status,
+    points: pointsOf(morningLog.levelOf(ctx.todayIso)),
     body: [
       // Текст — на всю ширину (владелец, сборка 19): таймер перенесён в панель с фигурой
       h('h2', { class: 'card__title' }, title),
@@ -234,7 +235,7 @@ function taskCard(ctx, plan) {
     icon: icons.crown,
     title: t('today.taskLabel'),
     lead: '«' + task.title + '»',
-    status: doneBadge(taskPoints(ctx.entries, plan.day)),
+    points: taskPoints(ctx.entries, plan.day),
     body: [
     plan.intro ? h('p', { class: 'task__intro' }, plan.intro) : null,
     h('h2', { class: 'task__title' }, `«${task.title}»`),
@@ -310,7 +311,7 @@ function flowCard(ctx, plan) {
     icon: icons.sparkle,
     title: t('kinds.flow'),
     lead: plan.tasks.map((ex) => ex.title).join(' · ') || t('today.flowLead'),
-    status: doneBadge(taskPoints(ctx.entries, plan.day)),
+    points: taskPoints(ctx.entries, plan.day),
     body: [
     h('p', { class: 'task__text' }, plan.flow || t('today.flowLead')),
     plan.flow ? h('p', { class: 'card__text' }, t('today.flowLead')) : null,
@@ -340,7 +341,7 @@ function callCard(ctx, plan, summary) {
       icon: icons.phone,
       title: t('kinds.call'),
       lead: t('today.callTitle'),
-      status: doneBadge(taskPoints(ctx.entries, plan.day)),
+      points: taskPoints(ctx.entries, plan.day),
       body: [
       h('h2', { class: 'card__title' }, t('today.callTitle')),
       h('p', { class: 'task__text' }, plan.call),
@@ -361,8 +362,8 @@ function callCard(ctx, plan, summary) {
   );
 }
 
-/* Подсказка по делам — одна в день, устойчивая на всю неделю (у мужчин, week.biz; владелец 14.11.2026: «по бизнесу —
-   одна лёгкая подсказка, стабильно»). Седьмой день — отдых, подсказки нет. */
+/* «Мудрость недели» (было «Подсказка по делам», «Совет недели по работе»; у мужчин, week.biz; владелец 14.11.2026:
+   «по бизнесу — одна лёгкая подсказка, стабильно»; «это как напутствие, наверху, без оценки»). Седьмой день — отдых. */
 function bizCard(plan) {
   const text = bizFor(plan.biz, plan.dayInWeek);
   if (!text) return null;
@@ -421,6 +422,16 @@ function recordedToday(ctx, plan) {
   }).node;
 }
 
+/* Итог дня внизу (владелец 14.11.2026): «итого набрано баллов за день — человек видит, сколько набрал». */
+function totalCard(ctx, plan) {
+  const score = dayScore(ctx.todayIso, plan.day, ctx.entries, { talk: talkDone(ctx, plan) });
+  return h('section', { class: 'card card--soft day-total' },
+    h('p', { class: 'caps day-total__title' }, t('score.totalTitle')),
+    h('p', { class: 'day-total__value' }, pointsLabel(score.total)),
+    h('p', { class: 'faint day-total__hint' }, t('score.hint')),
+  );
+}
+
 function outside(ctx) {
   if (ctx.day < 1) {
     const left = daysBetween(ctx.todayIso, ctx.settings.startDate);
@@ -458,11 +469,12 @@ export function render(view, ctx) {
       // Новое от близкого (пара, семья) — сразу на виду; «Срочно» — красным
       usCard(),
       catchUp(ctx, summary),
+      // «Мудрость недели» (у мужчин) — напутствие на день, над стаканом; баллов за неё нет (владелец 14.11.2026)
+      bizCard(plan),
       // Сначала стакан тёплой воды — сразу после пробуждения, потом утренняя минута (js/water/README.md)
       waterCard(ctx),
       morningCard(ctx, plan),
       main,
-      bizCard(plan),
       meetLink(plan),
       // Седьмой день — «Разговор пары» (circles/talk.js)
       talkCard(ctx, plan),
@@ -474,6 +486,8 @@ export function render(view, ctx) {
       stepsCard(ctx),
       // Стакан воды на ночь — последним, перед сном (сборка 43, js/water/: вид night)
       waterCard(ctx, 'night'),
+      // Итог дня — сколько баллов набрано (score/)
+      totalCard(ctx, plan),
     ),
   );
 }

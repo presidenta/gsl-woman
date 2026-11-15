@@ -4,6 +4,8 @@ import { icons } from '../ui/icons.js';
 import { content, ideaFor, groupIdeas } from './love.js';
 import { KIND_ICON } from './kind-icons.js';
 import { foldCard } from '../ui/fold.js';
+import { toast } from '../ui/toast.js';
+import * as deeds from '../score/deeds.js';
 
 /* Подписи групп: дети и родные устроены одинаково (love.js → GROUPS), различаются только словами. */
 export const GROUP_TEXT = {
@@ -44,6 +46,31 @@ function deed({ who = '', kind, name, text }) {
   );
 }
 
+/* «Получилось» (владелец 14.11.2026, сборка 57): хоть одно слово, хоть одно дело — уже +1 балл (score/deeds.js).
+   Второе нажатие снимает отметку; «Попробую ещё» — без балла, просто доброе слово. */
+export function deedMark(ctx, what) {
+  const done = deeds.isDone(ctx.todayIso, what);
+  return h('div', { class: 'deed-mark' },
+    h('p', { class: 'deed-mark__hint' }, t(`${what}.markHint`)),
+    h('div', { class: 'deed-mark__row' },
+      h('button', {
+        type: 'button',
+        class: done ? 'btn btn--block water__drink is-done' : 'btn btn--gold btn--block',
+        'aria-pressed': String(done),
+        onclick: () => {
+          deeds.toggle(ctx.todayIso, what);
+          if (!done) toast({ title: t(`${what}.markDone`) });
+        },
+      }, svg(icons.check, 'water__drink-icon'), t(done ? `${what}.markDone` : `${what}.mark`)),
+      done ? null : h('button', {
+        type: 'button',
+        class: 'btn btn--ghost btn--block',
+        onclick: () => toast({ title: t(`${what}.againToast`) }),
+      }, t(`${what}.again`)),
+    ),
+  );
+}
+
 function section(title, ...rows) {
   return h('div', { class: 'love-card__part' }, h('p', { class: 'love-card__part-title caps' }, title), ...rows);
 }
@@ -77,10 +104,12 @@ export function loveCard(ctx, plan) {
     icon: icons.heart,
     title: t('love.title'),
     lead: him ? him.text : t('love.inviteTitle'),
+    points: deeds.isDone(ctx.todayIso, 'love') ? 1 : 0,
     body: [
       himPart,
       groupBlock('children', groupIdeas('children', plan.day, ctx.lang)),
       groupBlock('family', groupIdeas('family', plan.day, ctx.lang)),
+      deedMark(ctx, 'love'),
       h('a', { class: 'love-card__link', href: '#/love' }, t('love.more'), svg(icons.chevronRight, 'love-card__chevron')),
     ],
   }).node;

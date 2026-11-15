@@ -6,6 +6,7 @@ import { pointsOf, taskPoints, dayScore } from '../js/score/score.js';
 import * as morningLog from '../js/journal/morning-log.js';
 import * as waterLog from '../js/water/water-log.js';
 import { markKegel, setSteps } from '../js/habits/logs.js';
+import * as deeds from '../js/score/deeds.js';
 
 beforeEach(() => clearAll());
 
@@ -42,7 +43,10 @@ test('сумма дня складывается из всех отметок', 
   markKegel(ISO, 'full');
   setSteps(ISO, 6500);
   waterLog.night.setDone(ISO, true);
-  const s = dayScore(ISO, 2, [{ day: 2, kind: 'task', level: 'min' }]);
-  assert.deepEqual(s.parts, { water: 1, minute: 3, task: 1, kegel: 2, steps: 2, night: 1 });
-  assert.equal(s.total, 10);
+  deeds.toggle(ISO, 'love');
+  deeds.toggle(ISO, 'imsg');
+  deeds.toggle(ISO, 'imsg'); // второе нажатие снимает
+  const s = dayScore(ISO, 2, [{ day: 2, kind: 'task', level: 'min' }], { talk: true });
+  assert.deepEqual(s.parts, { water: 1, minute: 3, task: 1, imsg: 0, love: 1, talk: 1, kegel: 2, steps: 2, night: 1 });
+  assert.equal(s.total, 12);
 });

@@ -3,6 +3,8 @@ import { t } from '../core/i18n.js';
 import { icons } from '../ui/icons.js';
 import { content, myLanguage } from '../love/love.js';
 import { foldCard } from '../ui/fold.js';
+import { deedMark } from '../love/cards.js';
+import * as deeds from '../score/deeds.js';
 
 /* «Я-СООБЩЕНИЕ» на экране «Сегодня» — КАЖДЫЙ ДЕНЬ (владелец 13.11.2026; до 40 — дни 4–6). Какой пример в какой
    день — program/index.js → imsgOf; в дни 4–6 он связан с заданием дня 1, 2 или 3 этой недели: ситуация,
@@ -21,6 +23,7 @@ export function imsgCard(ctx, plan) {
     icon: icons.sparkle,
     title: t('imsg.title'),
     lead: m.title,
+    points: deeds.isDone(ctx.todayIso, 'imsg') ? 1 : 0,
     body: [
     h('p', { class: 'imsg__remind' }, t('imsg.remind')),
     h('div', { class: 'imsg__example' },
@@ -48,6 +51,7 @@ export function imsgCard(ctx, plan) {
           h('a', { class: 'love-card__link', href: '#/love' }, t('imsg.loveBtn'), svg(icons.chevronRight, 'love-card__chevron')),
         )
         : null,
+    deedMark(ctx, 'imsg'),
     ],
   }).node;
 }

@@ -1,20 +1,21 @@
-import { h, svg } from '../core/dom.js';
-import { t, plural } from '../core/i18n.js';
-import { icons } from '../ui/icons.js';
+import { plural } from '../core/i18n.js';
 import * as morningLog from '../journal/morning-log.js';
 import * as waterLog from '../water/water-log.js';
 import { kegelLevel, stepsOf, stepsLevel } from '../habits/logs.js';
+import * as deeds from './deeds.js';
 
-/* БАЛЛЫ ДНЯ (владелец 14.11.2026, сборка 53): «не просто „выполнено“, а балл — человек сам видит, сколько баллов
+/* БАЛЛЫ ДНЯ (владелец 14.11.2026, сборки 56–57): «не просто „выполнено“, а балл — человек сам видит, сколько баллов
    он прожил за день, и анализирует для себя». Баллы — личные: никуда не уходят, ни с кем не сравниваются (проверить
-   их нельзя, поэтому и рейтинга на них нет); преувеличит — обманет только себя. Считаются прямо из отметок, своего
-   хранилища у баллов нет.
+   их нельзя, поэтому и рейтинга на них нет); преувеличит — обманет только себя. Считаются прямо из отметок.
 
-     уровень: Минимум — 1, 100% — 2, Максимум — 3;
-     стакан воды утром и на ночь — по 1 (уровней у стакана нет);
+     уровень: Минимум — 1, 100% — 2, Максимум — 3 (утренняя минута, задание дня, Кегель, шаги);
+     стакан воды утром и на ночь — по 1;
+     «Пять языков любви» и «Я-сообщение» — «Получилось» по 1 (deeds.js);
+     «Разговор пары» (7-й день) — «Мы поговорили» 1;
      задание дня — лучший уровень из записей этого дня (созвон — 2).
+   «Мудрость недели» (у мужчин) — напутствие, без баллов.
 
-   doneBadge(points) — отметка в шапке свёрнутой карточки: золотой круг с галочкой и «+N». */
+   Как видно (ui/fold.js, points): сделано — стрелка карточки светится золотом, после названия зелёным «+N балл». */
 
 export const POINTS = { min: 1, full: 2, max: 3 };
 export const pointsOf = (level) => POINTS[level] || 0;
@@ -29,28 +30,22 @@ export function taskPoints(entries, day) {
   return best;
 }
 
-/** Все баллы дня по частям — для шапки и итогов. */
-export function dayScore(iso, day, entries) {
+/** Все баллы дня по частям — для шапки и итога. talk — отметка «Мы поговорили» (знает circles/talk.js). */
+export function dayScore(iso, day, entries, { talk = false } = {}) {
   const parts = {
     water: waterLog.isDone(iso) ? 1 : 0,
     minute: pointsOf(morningLog.levelOf(iso)),
     task: taskPoints(entries, day),
+    imsg: deeds.isDone(iso, 'imsg') ? 1 : 0,
+    love: deeds.isDone(iso, 'love') ? 1 : 0,
+    talk: talk ? 1 : 0,
     kegel: pointsOf(kegelLevel(iso)),
     steps: pointsOf(stepsLevel(stepsOf(iso))),
     night: waterLog.night.isDone(iso) ? 1 : 0,
   };
   const total = Object.values(parts).reduce((a, b) => a + b, 0);
-  return { parts, total, max: 14 };
+  return { parts, total };
 }
 
 /** «3 балла» на языке приложения. */
 export const pointsLabel = (n) => `${n} ${plural(n, 'plural.points')}`;
-
-/** Отметка «сделано» с баллами: галочка и «+N». points = 0 — ничего. */
-export function doneBadge(points) {
-  if (!points) return null;
-  return h('span', { class: 'fold__score', title: t('score.earned', { points: pointsLabel(points) }) },
-    h('span', { class: 'fold__done' }, svg(icons.check)),
-    h('span', { class: 'fold__points' }, `+${points}`),
-  );
-}

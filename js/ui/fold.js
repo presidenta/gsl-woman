@@ -1,5 +1,5 @@
 import { h, svg } from '../core/dom.js';
-import { t } from '../core/i18n.js';
+import { t, plural } from '../core/i18n.js';
 import { read, write } from '../core/store.js';
 import { icons } from './icons.js';
 
@@ -32,10 +32,11 @@ function remember(id, open) {
 
 /**
  * id — что помнить; icon — значок шапки; title, lead — название и строка в свёрнутом виде; status — узел справа
- * (отметка «сделано», идущий счёт); body — содержимое раздела. Вернёт { node, thumb, isOpen() }: thumb — место
+ * (идущий счёт); points — баллы дня за этот раздел (score/): больше нуля — раздел сделан: стрелка светится золотом,
+ * после названия зелёным «+N балл» (владелец 14.11.2026, сборка 57); body — содержимое раздела. Вернёт { node, thumb, isOpen() }: thumb — место
  * для рисунка в шапке; onToggle(open) зовётся при каждом раскрытии и сворачивании (и сразу при создании).
  */
-export function foldCard({ id, cls = '', icon, title, lead = '', status = null, body = [], onToggle = null }) {
+export function foldCard({ id, cls = '', icon, title, lead = '', status = null, points = 0, body = [], onToggle = null }) {
   let open = isOpen(id);
   const thumb = h('span', { class: 'fold__thumb', 'aria-hidden': 'true' });
   const inner = h('div', { class: 'fold__inner' }, ...body);
@@ -43,7 +44,8 @@ export function foldCard({ id, cls = '', icon, title, lead = '', status = null, 
   const head = h('button', { type: 'button', class: 'fold__head', 'aria-controls': `fold-${id}` },
     thumb,
     h('span', { class: 'fold__text' },
-      h('span', { class: 'fold__eyebrow' }, svg(icon, 'fold__icon'), h('span', { class: 'caps' }, title)),
+      h('span', { class: 'fold__eyebrow' }, svg(icon, 'fold__icon'), h('span', { class: 'caps' }, title),
+        points > 0 ? h('span', { class: 'fold__plus' }, `+${points} ${plural(points, 'plural.points')}`) : null),
       lead ? h('span', { class: 'fold__lead' }, lead) : null,
     ),
     h('span', { class: 'fold__side' },
@@ -51,7 +53,7 @@ export function foldCard({ id, cls = '', icon, title, lead = '', status = null, 
       h('span', { class: 'fold__arrow' }, svg(icons.chevronRight, 'fold__chevron')),
     ),
   );
-  const node = h('section', { class: `card fold ${cls}`.trim() }, head, panel);
+  const node = h('section', { class: `card fold ${cls}${points > 0 ? ' is-done' : ''}`.trim() }, head, panel);
 
   function apply() {
     node.classList.toggle('is-open', open);

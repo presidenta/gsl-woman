@@ -34,6 +34,11 @@ function mark(week) {
   write(LOCAL, s);
 }
 
+/** Отметка «Мы поговорили» на этой неделе — для баллов дня (score/). */
+export function talkDone(ctx, plan) {
+  return plan.dayInWeek === 7 && !!plan.talk && state(circles.weekOf(ctx.todayIso)).mine;
+}
+
 /** Карточка на «Сегодня» в седьмой день. */
 export function talkCard(ctx, plan) {
   if (plan.dayInWeek !== 7 || !plan.talk) return null;
@@ -47,7 +52,7 @@ export function talkCard(ctx, plan) {
     icon: icons.rings,
     title: t('us.talk.title'),
     lead: plan.talk.title,
-    status: s.mine ? h('span', { class: 'fold__done' }, svg(icons.check)) : null,
+    points: s.mine ? 1 : 0,
     body: [
     h('p', { class: 'card__text faint' }, t('us.talk.lead')),
     h('p', { class: 'caps talk__theme-label' }, t('us.talk.theme')),

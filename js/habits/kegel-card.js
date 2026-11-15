@@ -2,7 +2,7 @@ import { h, svg } from '../core/dom.js';
 import { t } from '../core/i18n.js';
 import { icons } from '../ui/icons.js';
 import { foldCard } from '../ui/fold.js';
-import { doneBadge, pointsOf } from '../score/score.js';
+import { pointsOf } from '../score/score.js';
 import * as sound from '../ui/tick.js';
 import { kegelFigure } from './figures.js';
 import { LEVELS, kegelLevel, markKegel } from './logs.js';
@@ -133,7 +133,7 @@ export function kegelCard(ctx) {
     picks.hidden = running;
     runningRow.hidden = !running;
     if (running) status.replaceChildren(h('span', { class: 'minute__fold-count' }, `${Math.ceil(c.left)} · ${c.phase.rep}/${PLAN[run.level].reps}`));
-    else status.replaceChildren(doneBadge(pointsOf(kegelLevel(iso))) || '');
+    else status.replaceChildren('');
   }
   paint = draw;
   draw();
@@ -145,6 +145,7 @@ export function kegelCard(ctx) {
     title: t('day.kegel.title'),
     lead: t('day.kegel.short'),
     status,
+    points: pointsOf(kegelLevel(iso)),
     body: [
       h('p', { class: 'card__text' }, t('day.kegel.text')),
       stage,
