@@ -9,7 +9,7 @@ export default {
     sharedTagline: 'Trainings for women and men',
   },
 
-  nav: { today: 'Today', week: 'Week', goals: 'Goals', journal: 'Journal', path: 'Path' },
+  nav: { today: 'Today', week: 'Week', goals: 'Artifacts', journal: 'Journal', path: 'Path' },
   fold: { open: 'Open', close: 'Close' },
   score: {
     totalTitle: 'Total for the day',
@@ -327,8 +327,8 @@ export default {
       noMic: 'The microphone is busy or switched off',
       local: 'The voice is backed up and moves to your other phone',
     },
-    title: 'My goals',
-    lead: 'Write down what you want. When it comes true, mark it in gold.',
+    title: 'Артефакты',
+    lead: 'Всё ценное — под рукой: цели, вопросы, комплименты, знания.',
     placeholder: 'New goal',
     add: 'Add goal',
     text: 'Goal',
@@ -564,7 +564,7 @@ export default {
       talk: 'Talk',
       dreams: 'Children’s dreams',
     },
-    goalsLink: 'Shared goals live in “Goals”',
+    goalsLink: 'Shared goals live in “Artifacts”, the “Couple” tab',
     leavePair: 'Leave the couple',
     leavePairAsk: 'The couple’s shared space — chat, wishes, goals — will be erased for both. Your programme and journal stay.',
     leaveFamily: 'Leave the family',
@@ -838,14 +838,18 @@ export default {
   // «Библиотека» и «Красный флаг» — свои экраны (владелец 15.11.2026)
   library: {
     title: 'Библиотека',
-    lead: 'Читать и возвращаться: что ей нужно от тебя, авторы мужской стороны, темы, правила дома, идеи свиданий, комплименты.',
+    lead: 'Читать и возвращаться: что ей нужно от тебя, авторы мужской стороны, темы, правила дома, идеи свиданий.',
+  },
+  // У «compliments» уже есть пул фраз (массив) — подпись плашки под своим именем
+  complimentsPlate: {
+    lead: 'Готовые слова — открыть и сказать сегодня',
   },
   redflag: {
-    title: 'Красный флаг: оценка',
-    lead: 'Оценка — для школы. В паре — я-сообщение',
+    title: 'Красный флаг',
+    ban: 'Оценивать запрещено',
   },
   help: {
-    intro: 'Быстро, под рукой: первое свидание и вопросы для разговора с ней.',
+    intro: 'Короткие — если мало времени, глубокие — когда есть целый вечер. Под вопросами — как понимать ответ.',
     flagsHint: 'Under each question, tick how the person answered — the result appears below.',
     total: 'Result',
     greenCount: 'Green flags',
@@ -860,8 +864,8 @@ export default {
     rulesRemove: 'Remove the rule',
     rulesEdit: 'Tap to edit',
     rulesSaved: 'Rule added',
-    title: 'Help',
-    lead: 'Первое свидание и вопросы для разговора — быстро, под рукой',
+    title: 'Вопросы',
+    lead: 'Для разговора: коротко, если мало времени, и глубоко, когда есть вечер',
     meetTitle: 'First date',
     library: 'Library',
     draft: 'draft',

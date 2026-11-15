@@ -103,24 +103,17 @@ a.plate,
   margin: var(--sp-5) 0 var(--sp-2);
 }
 
-/* «Красный флаг» (запрет оценок, владелец 15.11.2026): та же плашка, но кружок — красный флаг на красном, и красная
-   рамка — сразу видно, что это важно. Единственное место с этим цветом. */
-.plate--red {
-  border-color: color-mix(in srgb, var(--c-red-flag) 55%, transparent);
-}
-
+/* «Красный флаг — Оценивать запрещено» (владелец 15.11.2026): кружок и рамка — как у всех; флаг в кружке красный,
+   «Красный флаг» — обычным цветом, запрет через черточку — красным. Единственное место с этим цветом. */
 .plate--red .plate__icon {
   color: var(--c-red-flag);
-  border: 2px solid var(--c-red-flag);
-  background: color-mix(in srgb, var(--c-red-flag) 18%, transparent);
-  box-shadow: 0 0 0 4px color-mix(in srgb, var(--c-red-flag) 12%, transparent);
 }
 
-.plate--red .plate__title {
+.plate__ban {
   color: var(--c-red-flag);
 }
 
-/* Экран «Красный флаг» (screens/redflag/): флаг в красном круге рядом с заголовком */
+/* Экран «Красный флаг» (screens/redflag/): тот же кружок с красным флагом рядом с заголовком */
 .redflag__head {
   display: flex;
   align-items: center;
@@ -129,7 +122,5 @@ a.plate,
 .redflag__head .plate__icon {
   flex: none;
   color: var(--c-red-flag);
-  border: 2px solid var(--c-red-flag);
-  background: color-mix(in srgb, var(--c-red-flag) 18%, transparent);
 }
-.redflag__title { color: var(--c-red-flag); margin: 0; }
+.redflag__title { margin: 0; }

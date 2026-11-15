@@ -185,10 +185,10 @@ export function render(view, ctx) {
   const questions = data.items.find((i) => i.key === 'questions');
   // «Помощь» — только быстрое: первое свидание и вопросы для разговора. Остальное — в «Библиотеке» (library/),
   // «Красный флаг» — отдельным разделом (redflag/) (владелец 15.11.2026: «библиотека — это уже другое, это не помощь»)
+  // С 76 — «Вопросы» (бывшая «Помощь»): только вопросы; «Первое свидание» и «Комплименты» — свои плашки в «Артефактах»
   add(view,
-    h('h1', { class: 'screen-title' }, data.title),
-    h('p', { class: 'help__intro' }, data.helpIntro || t('help.intro')),
-    plateLink({ href: '#/meet', icon: icons.rings, title: t('help.meetTitle'), lead: data.meetLead }),
-    ...(questions ? questionPlates(questions, verdicts) : []),
+    h('h1', { class: 'screen-title' }, t('help.title')),
+    h('p', { class: 'help__intro' }, t('help.intro')),
+    ...(questions ? questionPlates(questions, verdicts).slice(1) : []),
   );
 }

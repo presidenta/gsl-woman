@@ -17,7 +17,7 @@ export function render(view, ctx) {
   add(view,
     h('div', { class: 'redflag__head' },
       h('span', { class: 'plate__icon redflag__icon', 'aria-hidden': 'true' }, svg(icons.flag)),
-      h('h1', { class: 'screen-title redflag__title' }, item.title)),
+      h('h1', { class: 'screen-title redflag__title' }, t('redflag.title'), h('span', { class: 'plate__ban' }, ` — ${t('redflag.ban')}`))),
     h('p', { class: 'help__intro' }, item.lead),
     // Все папки — в одной карточке, как внутри плашки «Помощи»
     h('div', { class: 'card' }, ...item.groups.map((g, i) => folder(g, { open: i === 0 }))),

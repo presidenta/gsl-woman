@@ -12,6 +12,8 @@ import { lettersBody } from '../../letters/letters-view.js';
 import { ownBox } from '../../letters/letters.js';
 import { lt } from '../../letters/texts.js';
 import { plateLink, platePanel } from '../../ui/plate.js';
+import * as help from '../../help/help.js';
+import { itemPlate } from '../help/help.js';
 import { photoStrip } from '../../media/photo-field.js';
 import * as mediaStore from '../../media/photos.js';
 import { usedPhotoIds } from '../../media/used.js';
@@ -181,7 +183,9 @@ export function render(view, ctx) {
     h('p', { class: 'screen-lead' }, t('goals.lead')),
     goalsBox({ list, open, done, form, input }),
     redFlagPlate(),
+    meetPlate(ctx),
     helpPlate(),
+    complimentsPlate(ctx),
     libraryPlate(),
     lettersPlate(ctx),
   );
@@ -220,14 +224,30 @@ function goalsBox({ list, open, done, form, input }) {
   return box;
 }
 
-/* Владелец 15.11.2026: «Красный флаг» — отдельным разделом рядом с «Моими целями» (красная плашка — запрет оценок);
-   «Помощь» — быстрое (первое свидание, вопросы); «Библиотека» — отдельно, «это уже другое, это не помощь». */
+/* «АРТЕФАКТЫ» (было «Цели», владелец 15.11.2026: «у нас всё как игра — артефакты»). Порядок: «Мои цели» →
+   «Красный флаг — Оценивать запрещено» (кружок как у всех, флаг красный, запрет — красным через черточку) →
+   «Первое свидание» → «Вопросы» (бывшая «Помощь») → «Комплименты» (раскрываются на месте) → «Библиотека» → письмо. */
 function redFlagPlate() {
-  return plateLink({ href: '#/redflag', cls: 'plate--red', icon: icons.flag, title: t('redflag.title'), lead: t('redflag.lead') });
+  return plateLink({
+    href: '#/redflag',
+    cls: 'plate--red',
+    icon: icons.flag,
+    title: [t('redflag.title'), h('span', { class: 'plate__ban' }, ` — ${t('redflag.ban')}`)],
+  });
+}
+
+function meetPlate(ctx) {
+  return plateLink({ href: '#/meet', icon: icons.rings, title: t('help.meetTitle'), lead: help.content(ctx.lang)?.meetLead });
 }
 
 function helpPlate() {
-  return plateLink({ href: '#/help', icon: icons.sparkle, title: t('help.title'), lead: t('help.lead') });
+  return plateLink({ href: '#/help', icon: icons.chat, title: t('help.title'), lead: t('help.lead') });
+}
+
+// Комплименты — те же, что были в «Помощи»; плашка раскрывается прямо здесь (itemPlate из screens/help/)
+function complimentsPlate(ctx) {
+  const item = help.content(ctx.lang)?.items.find((i) => i.key === 'compliments');
+  return item ? itemPlate({ ...item, lead: t('complimentsPlate.lead') }, ctx, null) : null;
 }
 
 function libraryPlate() {

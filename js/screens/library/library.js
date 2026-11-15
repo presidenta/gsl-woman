@@ -16,7 +16,8 @@ export function render(view, ctx) {
     return;
   }
   const verdicts = meet.content(ctx.lang)?.verdicts || null;
-  const items = data.items.filter((i) => i.key !== 'questions' && i.key !== 'redline');
+  // Без вопросов («Вопросы»), «Красного флага» (свой экран) и комплиментов (своя плашка в «Артефактах», с 76)
+  const items = data.items.filter((i) => !['questions', 'redline', 'compliments'].includes(i.key));
   add(view,
     h('h1', { class: 'screen-title' }, t('library.title')),
     h('p', { class: 'help__intro' }, data.libraryIntro || t('library.lead')),
