@@ -373,7 +373,7 @@
 /* Утренняя минута свёрнута (ui/fold.js): фигура — маленькая в шапке, справа — счёт, пока минута идёт */
 .fold__thumb .heels__svg {
   width: auto;
-  height: 76px;
+  height: 88px;
   opacity: 1;
 }
 
