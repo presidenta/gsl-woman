@@ -778,7 +778,7 @@ export default {
   day: {
     kegel: {
       title: 'Kegel exercise',
-      short: 'Pelvic floor muscles — squeeze, hold, relax',
+      short: 'Pelvic floor muscles — squeeze, hold, relax (on the bus, at work, on a break — only you know)',
       text: 'Find your pelvic floor muscles — the ones that stop the flow of urine: that is only for finding them, train at other times. Squeeze, hold, then relax for just as long. Breathe freely, keep your belly and buttocks soft. Sitting, standing or lying down.',
       levels: {
         min: '10 × 3 s',

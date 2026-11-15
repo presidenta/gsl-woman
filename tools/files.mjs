@@ -12,7 +12,8 @@ const ROOT = fileURLToPath(new URL('..', import.meta.url));
 // Что в кэш не идёт: служебное, проверки, исходники значков и сам работник
 // android-app — оболочка приложения для Android, сайту в кэше она не нужна
 const SKIP_DIRS = new Set(['.git', '.github', 'node_modules', 'tests', 'tools', 'android-app']);
-const SKIP_FILES = new Set(['sw.js', 'package.json', 'package-lock.json', '.gitattributes', '.gitignore', '.nojekyll']);
+// .git бывает и файлом — в рабочей копии git worktree (сборка 70 положила './.git' в кэш)
+const SKIP_FILES = new Set(['.git', 'sw.js', 'package.json', 'package-lock.json', '.gitattributes', '.gitignore', '.nojekyll']);
 const SKIP_EXT = ['.md', '.svg'];
 
 function walk(dir, out) {
