@@ -4,6 +4,7 @@ import * as access from '../access/access.js';
 import * as side from '../side/side.js';
 import * as media from '../media/photos.js';
 import { syncPhotos, _use as usePhotos } from './photos.js';
+import { syncVoices, _use as useVoices } from './voices.js';
 
 /* СИНХРОНИЗАЦИЯ GSL WOMAN+ МЕЖДУ УСТРОЙСТВАМИ (владелец 13.11.2026: «это очень важно, обязательно»).
 
@@ -296,6 +297,8 @@ async function run() {
     }
     // Фото — после записей: теперь видно, какие снимки к ним нужны (sync/photos.js)
     await syncPhotos().catch(() => {});
+    // Голос к целям — тоже после записей: видно, к каким целям он нужен (sync/voices.js)
+    await syncVoices().catch(() => {});
     s.savedAt = new Date().toISOString();
     s.status = 'ok';
   } catch (err) {
@@ -334,4 +337,5 @@ export function _useRequest(fn) {
   requestFn = fn;
   // Фото ходят тем же подставным сервером; сами снимки в проверках не качаются
   usePhotos({ request: fn, raw: async () => null });
+  useVoices(fn);
 }

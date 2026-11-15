@@ -114,6 +114,20 @@ export async function saveGoalAudio(goalId, blob, fileName) {
     return describe(record);
 }
 
+/** Вернуть запись с сервера на этот телефон как была (sync/voices.js): та же дата — тот же номер версии. */
+export async function restoreGoalAudio(goalId, blob, { fileName, durationMs, createdAt }) {
+    const record = {
+        goalId,
+        blob,
+        fileName: fileName || 'audio',
+        durationMs: durationMs || 0,
+        mimeType: blob.type || 'audio/webm',
+        createdAt
+    };
+    await runTransaction('readwrite', store => store.put(record));
+    return describe(record);
+}
+
 /** Метаданные без самого файла — для списка целей. */
 function describe(record) {
     if (!record) return null;
@@ -195,7 +209,9 @@ export async function startRecording() {
     const chunks = [];
 
     // Тип выбирает браузер: Chrome отдаёт webm, Safari — mp4.
-    const recorder = new MediaRecorder(stream);
+    // GSL: голос сжимается до 32 кбит/с (минута — около 240 КБ) — копия на сервере и переход между телефонами
+    // (sync/voices.js); речь при этом слышна чисто. В «Кванте» — без этой строки.
+    const recorder = new MediaRecorder(stream, { audioBitsPerSecond: 32000 });
     recorder.ondataavailable = event => {
         if (event.data && event.data.size > 0) chunks.push(event.data);
     };

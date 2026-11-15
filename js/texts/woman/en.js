@@ -321,7 +321,7 @@ export default {
       recName: 'Recording',
       micDenied: 'The microphone is blocked — allow it in the phone settings',
       noMic: 'The microphone is busy or switched off',
-      local: 'The voice is kept on this phone',
+      local: 'The voice is backed up and moves to your other phone',
     },
     title: 'My goals',
     lead: 'Write down what you want. When it comes true, mark it in gold.',

@@ -2,6 +2,8 @@ import { h } from '../core/dom.js';
 import { t } from '../core/i18n.js';
 import { saveGoalAudio, getGoalAudio, getGoalAudioMeta, deleteGoalAudio, canRecord, startRecording, formatDuration } from './audio.js';
 import { buildSeekBar, bindSeekBar } from './audio-seek.js';
+import { markDeleted } from '../sync/voices.js';
+import { now as syncNow } from '../sync/sync.js';
 
 /* ГОЛОС К ЦЕЛИ — блок в карточке правки цели. Логика перенесена из «Кванта» без изменений (владелец 15.11.2026:
    «код не пиши новый, он проверенный»): planner/web/js/views/space/app.js — buildDoorMedia, toggleRecording,
@@ -9,7 +11,8 @@ import { buildSeekBar, bindSeekBar } from './audio-seek.js';
    экрана дверей; здесь те же шаги для одной цели.
 
    Плашки: «● Записать» (во время записи — таймер; второе нажатие останавливает и сохраняет), «Файл» (выбрать запись
-   с телефона). Есть запись — её имя и длина, ▶ слушать (с ползунком), ■ стоп, ✕ убрать. Хранится на телефоне. */
+   с телефона). Есть запись — её имя и длина, ▶ слушать (с ползунком), ■ стоп, ✕ убрать. Хранится на телефоне,
+   копия — на сервере: переходит на другой телефон и восстанавливается (sync/voices.js, сборка 66). */
 
 export function goalAudioField(goalId) {
   let recorder = null;
@@ -94,6 +97,7 @@ export function goalAudioField(goalId) {
       const blob = await r.stop();
       const stamp = new Date().toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
       applyAudioState(await saveGoalAudio(goalId, blob, t('goals.audio.recName') + ' ' + stamp));
+      syncNow(); // копия на сервер сразу — запись перейдёт и на другой телефон (sync/voices.js)
       return;
     }
     // Играющая запись попала бы в микрофон
@@ -148,7 +152,9 @@ export function goalAudioField(goalId) {
   async function removeAudio() {
     stopAudio();
     await deleteGoalAudio(goalId);
+    markDeleted(goalId);
     applyAudioState(null);
+    syncNow();
   }
 
   record.addEventListener('click', toggleRecording);
@@ -160,6 +166,7 @@ export function goalAudioField(goalId) {
     fileInput.value = '';
     if (!file) return;
     applyAudioState(await saveGoalAudio(goalId, file, file.name));
+    syncNow();
   });
 
   getGoalAudioMeta(goalId).then(applyAudioState).catch(() => {});
