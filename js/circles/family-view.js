@@ -3,6 +3,8 @@ import { t } from '../core/i18n.js';
 import { icons } from '../ui/icons.js';
 import { toast } from '../ui/toast.js';
 import * as circles from './circles.js';
+import { ask } from '../ui/ask.js';
+import { kt } from '../kids/texts.js';
 
 /* СЕМЬЯ: дети и их мечты (владелец 13.11.2026: «родители видят про ребёнка его цели, желания, о чём мечтает — чтобы
    помогать ему это реализовывать»; ТЗ раздел 1). Профиль ребёнка заводит родитель (свой вход у ребёнка — позже).
@@ -65,7 +67,7 @@ export function dreamsView(circle) {
           }, svg(icons.check)),
           h('span', { class: 'dreams__type' }, t(`us.dreams.kinds.${d.data.type}`)),
           h('span', { class: 'dreams__text' }, d.data.text),
-          h('button', { type: 'button', class: 'cgoal__remove', 'aria-label': t('us.children.remove'), onclick: () => circles.drop(circle.id, 'dream', d.id) }, svg(icons.trash)),
+          h('button', { type: 'button', class: 'cgoal__remove', 'aria-label': t('us.children.remove'), onclick: async () => { if (await ask({ title: kt('dreams.removeAsk', { text: d.data.text }), text: kt('dreams.removeText'), no: kt('keep') })) circles.drop(circle.id, 'dream', d.id); } }, svg(icons.trash)),
         ))),
         form,
       );

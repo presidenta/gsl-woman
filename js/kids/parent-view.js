@@ -10,6 +10,7 @@ import { chosenOf, progressOf } from './careers.js';
 import { PROF_BY_ID } from './dreams-catalog.js';
 import { isSealed } from '../letters/letters.js';
 import { gamesFor, gameForm, minusButton, hiddenBlock } from './games-list.js';
+import { ask } from '../ui/ask.js';
 
 /* «СЕМЬЯ» → «ДЕТИ» — КАБИНЕТ РЕБЁНКА ГЛАЗАМИ РОДИТЕЛЯ (владелец 14.11.2026: «в кабинете родителя всё должно
    отображаться»; ТЗ — docs/TZ-deti.md).
@@ -93,7 +94,9 @@ function loginBlock(ctx, circle, kid) {
     }
   });
 
-  const decide = async (device, approve) => {
+  const decide = async (device, approve, name = '') => {
+    // Отклонить или убрать телефон — только после вопроса (владелец: «чтобы случайно не поудалять»)
+    if (!approve && !(await ask({ title: name ? kt('parent.removeDeviceAsk', { device: name }) : kt('parent.rejectAsk'), text: kt('parent.deviceText'), yes: name ? kt('games.removeYes') : kt('parent.reject'), no: kt('keep') }))) return;
     try {
       await request(`${BASE}/${circle.id}/devices/${device}`, { body: { approve } });
       refresh();
@@ -131,11 +134,11 @@ function loginBlock(ctx, circle, kid) {
     login.devices.some((d) => d.status === 'active') ? h('p', { class: 'field__label' }, kt('parent.devices')) : null,
     ...login.devices.filter((d) => d.status === 'active').map((d) => h('div', { class: 'kid-device' },
       h('span', {}, `📱 ${kt('parent.active', { device: d.device || '—' })}`),
-      h('button', { type: 'button', class: 'btn btn--ghost kid-row__btn', onclick: () => decide(d.id, false) }, kt('parent.removeDevice')))),
+      h('button', { type: 'button', class: 'btn btn--ghost kid-row__btn', onclick: () => decide(d.id, false, d.device || '—') }, kt('parent.removeDevice')))),
     h('button', {
       type: 'button', class: 'btn btn--danger btn--block kid-close',
       onclick: async () => {
-        if (!confirm(kt('parent.closeAsk'))) return;
+        if (!(await ask({ title: kt('parent.closeAsk'), text: kt('parent.closeText'), yes: kt('parent.closeYes'), no: kt('keep') }))) return;
         try {
           await request(`${BASE}/${circle.id}/${kid.id}/close`, { body: {} });
         } catch (err) {

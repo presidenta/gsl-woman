@@ -2,6 +2,7 @@ import { h } from '../core/dom.js';
 import { toast } from '../ui/toast.js';
 import { lt } from './texts.js';
 import { MAX_SEALED, YEAR_CHOICES, MAX_YEARS, MAX_TEXT, isSealed, daysLeft, canWrite, compose } from './letters.js';
+import { ask } from '../ui/ask.js';
 
 /* ПИСЬМО СЕБЕ В БУДУЩЕЕ — карточка (взрослый: «Цели» → «Мои»; ребёнок: «Мечты» → «Письма»).
    Конверты: запечатанный — дата и «откроется через N дней» (текст скрыт); пришедший — «Письмо из прошлого!» и
@@ -37,7 +38,7 @@ function envelope(box, l, { rerender, kid }) {
     h('div', { class: 'letter__main' },
       h('span', { class: 'letter__meta' }, lt('written', { date: fmt(l.writtenAt) })),
       h('p', { class: 'letter__text' }, l.text),
-      h('button', { type: 'button', class: 'btn btn--ghost letter__keep', onclick: () => { if (confirm(lt('removeAsk'))) { box.remove(l.id); rerender?.(); } } }, lt('remove'))));
+      h('button', { type: 'button', class: 'btn btn--ghost letter__keep', onclick: async () => { if (await ask({ title: lt('removeAsk'), text: lt('removeText'), no: lt('keep') })) { box.remove(l.id); rerender?.(); } } }, lt('remove'))));
 }
 
 function composer(box, { rerender, kid, prompts }) {

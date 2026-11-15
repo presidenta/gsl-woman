@@ -1,0 +1,61 @@
+/* «ВЫ ТОЧНО ХОТИТЕ УДАЛИТЬ?» — окно-вопрос посреди экрана (js/ui/ask.js). */
+
+.ask-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  display: grid;
+  place-items: center;
+  padding: var(--sp-5) var(--gutter);
+  background: var(--c-scrim);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  opacity: 0;
+  transition: opacity 0.18s ease;
+}
+
+.ask-backdrop.is-open {
+  opacity: 1;
+}
+
+.ask {
+  width: min(100%, 360px);
+  display: grid;
+  gap: var(--sp-3);
+  padding: var(--sp-5);
+  border-radius: 22px;
+  text-align: center;
+  background: var(--c-bg-raise);
+  border: 1px solid var(--c-line-strong);
+  box-shadow: 0 24px 60px -20px rgba(0, 0, 0, 0.8);
+  transform: scale(0.94);
+  transition: transform 0.18s ease;
+}
+
+.ask-backdrop.is-open .ask {
+  transform: scale(1);
+}
+
+.ask__icon {
+  font-size: 40px;
+  line-height: 1;
+}
+
+.ask__title {
+  font-size: var(--fs-lg, 1.15rem);
+  font-weight: 800;
+  margin: 0;
+}
+
+.ask__text {
+  margin: 0;
+  color: var(--c-text-dim);
+  line-height: 1.5;
+}
+
+.ask__actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--sp-2);
+  margin-top: var(--sp-2);
+}

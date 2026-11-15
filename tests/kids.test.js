@@ -195,3 +195,16 @@ test('список игр: «−» убирает игру каталога (в�
   assert.equal(gamesFor(kidApi, 'ira').length, all, 'своя игра убрана совсем');
   assert.equal(hiddenGames(kidApi, 'ira').length, 0);
 });
+
+test('удаление — только после вопроса: нигде в кабинете ребёнка и в письмах нет удаления без ask()', async () => {
+  const { readFileSync } = await import('node:fs');
+  const files = ['js/kids/games-list.js', 'js/kids/careers.js', 'js/kids/kid-app.js', 'js/kids/parent-view.js', 'js/letters/letters-view.js', 'js/circles/family-view.js'];
+  for (const f of files) {
+    const src = readFileSync(new URL(`../${f}`, import.meta.url), 'utf8');
+    assert.doesNotMatch(src, /\bconfirm\(/, `${f}: системный confirm заменён окном ask()`);
+    // Каждая кнопка, которая сама что-то удаляет (drop / remove / removeGame / decide(…, false)), спрашивает ask()
+    for (const m of src.matchAll(/onclick: (async )?\(\) => \{?[^\n]*?(\.drop\(|box\.remove\(|removeGame\(|decide\(d\.id, false)[^\n]*/g)) {
+      assert.match(m[0], /ask\(|decide\(/, `${f}: удаление без вопроса — ${m[0].slice(0, 90)}`);
+    }
+  }
+});

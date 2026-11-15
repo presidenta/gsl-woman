@@ -17,6 +17,7 @@ import { familyDreamCard } from './family-dream.js';
 import { careersView, stepTitle, doStep } from './careers.js';
 import { KID_LETTER_PROMPTS } from './dreams-catalog.js';
 import { lettersCard } from '../letters/letters-view.js';
+import { ask } from '../ui/ask.js';
 
 /* ДЕТСКИЙ КАБИНЕТ НА ТЕЛЕФОНЕ РЕБЁНКА (владелец 14.11.2026, ТЗ — docs/TZ-deti.md). Своё приложение внутри GSL:
    js/boot.js открывает его вместо взрослого, когда на телефоне вход ребёнка или пришла ссылка #kid=КОД.
@@ -441,7 +442,7 @@ function myDreams(api) {
             d.data.month ? h('span', { class: 'kid-badge is-ok' }, kt('dreams.month')) : null,
             status ? h('span', { class: `kid-badge is-${status}` }, kt(`dreams.status.${status}`)) : null,
             d.data.note ? h('span', { class: 'kid-dream__note' }, kt('dreams.from', { name: api.name(d.data.noteBy), note: d.data.note })) : null),
-          d.author === api.me && !status ? h('button', { type: 'button', class: 'btn btn--ghost kid-row__btn', onclick: () => api.drop('dream', d.id) }, kt('dreams.remove')) : null,
+          d.author === api.me && !status ? h('button', { type: 'button', class: 'btn btn--ghost kid-row__btn', onclick: async () => { if (await ask({ title: kt('dreams.removeAsk', { text: d.data.text }), text: kt('dreams.removeText'), no: kt('keep') })) api.drop('dream', d.id); } }, kt('dreams.remove')) : null,
         );
       })) : h('p', { class: 'card__text faint' }, kt('dreams.empty')),
     ),
@@ -459,7 +460,7 @@ function shellView(api) {
   if (tab === 'today') {
     view.append(h('button', {
       type: 'button', class: 'btn btn--ghost btn--block kid-logout',
-      onclick: () => { if (confirm(kt('logoutAsk'))) { store.logout(); draw(); } },
+      onclick: async () => { if (await ask({ title: kt('logoutAsk'), text: kt('logoutText'), yes: kt('logoutYes'), no: kt('keep') })) { store.logout(); draw(); } },
     }, kt('logout')));
   }
   const nav = h('nav', { class: 'app-nav kid-nav', 'aria-label': kt('app.title') }, ...TABS.map((k) => h('button', {

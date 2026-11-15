@@ -3,6 +3,7 @@ import { isoDate } from '../core/dates.js';
 import { kt } from './texts.js';
 import { PROFESSIONS, PROF_BY_ID, MAX_PROFESSIONS, routeOf } from './dreams-catalog.js';
 import { okMap, skillCount } from './stars.js';
+import { ask } from '../ui/ask.js';
 
 /* КЕМ Я ХОЧУ СТАТЬ (владелец 14.11.2026: «ребёнок выбирает профессию — и ему подтягиваются навыки: что надо делать,
    чтобы стать автомехаником, бизнесменом…»). До трёх профессий; у каждой — путь из шагов (dreams-catalog.js).
@@ -75,7 +76,7 @@ export function careersView(api, { togglePlan, inPlan }) {
             h('button', { type: 'button', class: 'btn btn--gold kid-row__btn', onclick: () => doStep(api, p.id, s) }, kt('career.stepDone'))),
         );
       })),
-      h('button', { type: 'button', class: 'btn btn--ghost kid-career__remove', onclick: () => api.drop('career', c.id) }, kt('career.remove')),
+      h('button', { type: 'button', class: 'btn btn--ghost kid-career__remove', onclick: async () => { if (await ask({ title: kt('career.removeAsk', { title: p.title }), text: kt('career.removeText'), yes: kt('games.removeYes'), no: kt('keep') })) api.drop('career', c.id); } }, kt('career.remove')),
     );
   });
 

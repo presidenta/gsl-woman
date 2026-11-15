@@ -1,6 +1,7 @@
 import { h } from '../core/dom.js';
 import { GAMES, GAME_BY_ID } from './catalog.js';
 import { kt } from './texts.js';
+import { ask } from '../ui/ask.js';
 
 /* СПИСОК ЖИВЫХ ИГР РЕБЁНКА — ПРАВИТСЯ В САМОМ ПРИЛОЖЕНИИ (владелец 14.11.2026: «плюсик и минус: игра не нравится —
    нажал минус, и она удалилась; можно записать любую игру, какая нравится; и родитель может вписывать игры, которые
@@ -88,8 +89,11 @@ export function gameForm(api, member, onDone) {
 export function minusButton(api, member, game, after) {
   return h('button', {
     type: 'button', class: 'kid-minus', 'aria-label': kt('games.removeLabel', { title: game.title }), title: kt('games.removeLabel', { title: game.title }),
-    onclick: () => {
-      if (!confirm(game.custom ? kt('games.removeCustomAsk', { title: game.title }) : kt('games.removeAsk', { title: game.title }))) return;
+    onclick: async () => {
+      const yes = await ask(game.custom
+        ? { title: kt('games.removeCustomAsk', { title: game.title }), text: kt('games.removeCustomText'), yes: kt('games.removeYes'), no: kt('keep') }
+        : { title: kt('games.removeAsk', { title: game.title }), text: kt('games.removeAskText'), yes: kt('games.removeYes'), no: kt('keep') });
+      if (!yes) return;
       removeGame(api, member, game);
       after?.();
     },

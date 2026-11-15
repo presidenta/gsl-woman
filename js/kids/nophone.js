@@ -1,6 +1,7 @@
 import { h, mount } from '../core/dom.js';
 import { read, write, remove } from '../core/store.js';
 import { kt } from './texts.js';
+import { ask } from '../ui/ask.js';
 
 /* «ИГРАЕМ ВЖИВУЮ» — ТЕЛЕФОН ОТДЫХАЕТ (владелец 14.11.2026: «открыть телефон, начать игру — и телефон закрыт, программа
    отслеживает, что пока играют, телефон никто не открывает; кроме звонков»; главная цель — снизить зависимость от
@@ -141,8 +142,8 @@ export function render(root, onFinish) {
     h('p', { class: 'kid-play__lead' }, kt(canPin() ? 'play.leadApp' : 'play.lead')),
     h('button', {
       type: 'button', class: 'btn btn--gold btn--block kid-play__finish',
-      onclick: () => {
-        if (!confirm(kt('play.finishAsk'))) return;
+      onclick: async () => {
+        if (!(await ask({ title: kt('play.finishAsk'), yes: kt('play.finishYes'), no: kt('play.finishNo'), danger: false }))) return;
         clearInterval(tickTimer);
         onFinish(finish());
       },
