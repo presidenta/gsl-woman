@@ -8,6 +8,25 @@ import { isoDate, addDays } from '../core/dates.js';
 
 const KEY = 'searchsteps';
 const MAX = 99;
+// Отметки сегодняшнего дня (владелец 15.11.2026: карточка «В поиске» на «Сегодня» — как все, с «+1 балл» у названия):
+// searchday: { 'ISO дня': { n: сколько шагов отмечено в этот день } } (копия принимает только объекты); уходит в копию (sync.js, вид searchday), как и шаги,
+// — балл тот же на любом телефоне; хранятся последние 60 дней
+const DAY_KEY = 'searchday';
+const KEEP_DAYS = 60;
+
+/** Сколько шагов отмечено в день iso (по умолчанию — сегодня). */
+export function today(iso = isoDate(new Date())) {
+  return Number(read(DAY_KEY, {})?.[iso]?.n) || 0;
+}
+
+function bumpDay(delta) {
+  const iso = isoDate(new Date());
+  const all = { ...(read(DAY_KEY, {}) || {}) };
+  all[iso] = { n: Math.max(0, (Number(all[iso]?.n) || 0) + delta) };
+  const keys = Object.keys(all).sort();
+  for (const k of keys.slice(0, Math.max(0, keys.length - KEEP_DAYS))) delete all[k];
+  write(DAY_KEY, all);
+}
 
 /** Понедельник недели даты — ключ недели. */
 export function weekKey(d = new Date()) {
@@ -25,7 +44,9 @@ export function bump(step, delta, week = weekKey()) {
   if (!/^[a-z]{1,20}$/.test(step)) return 0;
   const all = read(KEY, {}) || {};
   const cur = counts(week);
-  const n = Math.max(0, Math.min(MAX, (Number(cur[step]) || 0) + delta));
+  const was = Number(cur[step]) || 0;
+  const n = Math.max(0, Math.min(MAX, was + delta));
   write(KEY, { ...all, [week]: { ...cur, [step]: n } });
+  if (n !== was && week === weekKey()) bumpDay(n - was);
   return n;
 }

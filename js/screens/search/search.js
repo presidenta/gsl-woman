@@ -21,7 +21,8 @@ const BLOCK_ICON = { self: 'sun', where: 'eye', rhythm: 'week', chat: 'chat', py
      3. Ссылка в «Знакомство» — шпаргалка к встрече и запись после свидания.
    Тексты — с сервера (meet.search), подробно — js/search/README.md. */
 
-function stepsCard(steps) {
+/** Шаги недели с «+1» / «−» и тремя целями — список; его ставят экран «В поиске» и карточка на «Сегодня». */
+export function stepsList(steps) {
   const now = counts();
   const rows = steps.items.map((s) => {
     // Три цели недели: минимум / 100% / максимум (владелец 15.11.2026: «чтобы был разгон»); старые тексты — одна цель
@@ -55,10 +56,14 @@ function stepsCard(steps) {
     paint(Number(now[s.key]) || 0);
     return row;
   });
+  return h('ul', { class: 'search-steps' }, ...rows);
+}
+
+function stepsCard(steps) {
   return h('section', { class: 'card card--hero search__card' },
     h('h2', { class: 'caps search__heading' }, steps.title),
     steps.lead ? h('p', { class: 'card__text' }, steps.lead) : null,
-    h('ul', { class: 'search-steps' }, ...rows),
+    stepsList(steps),
   );
 }
 

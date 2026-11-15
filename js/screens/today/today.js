@@ -22,6 +22,10 @@ import { usCard } from '../../circles/today-card.js';
 import { talkCard, talkDone } from '../../circles/talk.js';
 import { eveningCard } from '../../evening/evening.js';
 import { stemCard } from '../../stem/stem.js';
+// «В поиске» — карточка дня: шаги недели (search/) тем же списком, что на экране «В поиске»
+import * as searchSteps from '../../search/steps.js';
+import { st } from '../../search/texts.js';
+import { stepsList } from '../search/search.js';
 import { showKids } from '../../profile/profile.js';
 import * as journal from '../../journal/journal.js';
 import { dayScore, pointsOf, taskPoints, pointsLabel } from '../../score/score.js';
@@ -395,16 +399,32 @@ function callCard(ctx, plan, summary) {
 /* В поиске — вход в раздел «В поиске» прямо с «Сегодня» (владелец 15.11.2026: «не знакомство, а инструкция — что
    делать, пока ищешь»): шаги недели, где искать, как часто встречаться, переписка, как выбирать. «Знакомство» —
    в библиотеке и по ссылке из раздела. Текстов раздела ещё нет (старая программа в памяти) — прежний вход. */
+/* «В ПОИСКЕ» на «Сегодня» (профиль «в поиске») — карточка дня, как все (владелец 15.11.2026: «чтобы опять было всё
+   в одинаковом дизайне»): подпись, строка, круглая стрелка; раскрывается на месте — шаги недели с «+1» и ссылка на
+   весь раздел. Отметила хоть один шаг сегодня — «+1 балл» зелёным у названия (score/: search). */
 function meetLink(plan, ctx) {
   if (plan.profile !== 'single') return null;
   const search = meet.content(ctx.lang)?.search;
-  return h('a', { class: 'card settings__link today__search', href: search ? '#/search' : '#/meet' },
-    h('span', { class: 'card__icon' }, svg(icons.rings)),
-    search
-      ? h('span', { class: 'settings__link-text' }, h('strong', {}, search.title), h('span', { class: 'today__search-lead' }, search.card))
-      : h('span', { class: 'settings__link-text' }, t('meet.title')),
-    svg(icons.chevronRight, 'settings__link-chevron'),
-  );
+  if (!search?.steps) {
+    return h('a', { class: 'card settings__link today__search', href: '#/meet' },
+      h('span', { class: 'card__icon' }, svg(icons.rings)),
+      h('span', { class: 'settings__link-text' }, t('meet.title')),
+      svg(icons.chevronRight, 'settings__link-chevron'),
+    );
+  }
+  return foldCard({
+    id: 'search',
+    cls: 'today__search-card',
+    icon: icons.rings,
+    title: search.title,
+    lead: search.card,
+    points: searchSteps.today(ctx.todayIso) > 0 ? 1 : 0,
+    body: [
+      h('p', { class: 'caps search__heading' }, search.steps.title),
+      stepsList(search.steps),
+      h('a', { class: 'love-card__link', href: '#/search' }, st('open'), svg(icons.chevronRight, 'love-card__chevron')),
+    ],
+  }).node;
 }
 
 function recordedToday(ctx, plan) {

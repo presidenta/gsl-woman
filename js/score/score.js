@@ -3,6 +3,7 @@ import * as morningLog from '../journal/morning-log.js';
 import * as waterLog from '../water/water-log.js';
 import { kegelLevel, stepsOf, stepsLevel } from '../habits/logs.js';
 import * as deeds from './deeds.js';
+import * as searchSteps from '../search/steps.js';
 
 /* БАЛЛЫ ДНЯ (владелец 14.11.2026, сборки 56–57): «не просто „выполнено“, а балл — человек сам видит, сколько баллов
    он прожил за день, и анализирует для себя». Баллы — личные: никуда не уходят, ни с кем не сравниваются (проверить
@@ -14,6 +15,7 @@ import * as deeds from './deeds.js';
      «Разговор пары» (7-й день) — «Мы поговорили» 1;
      задание дня — лучший уровень из записей этого дня (созвон — 2).
    «Стержень недели» (у мужчин, вместо «Мудрости недели», 15.11.2026) — «Сделал» 1 (deeds.js).
+   «В поиске» (профиль «в поиске») — хоть один шаг недели отмечен сегодня — 1 (search/steps.js).
 
    Как видно (ui/fold.js, points): сделано — стрелка карточки светится золотом, после названия зелёным «+N балл». */
 
@@ -44,6 +46,7 @@ export function dayScore(iso, day, entries, { talk = false } = {}) {
     kegel: pointsOf(kegelLevel(iso)),
     steps: pointsOf(stepsLevel(stepsOf(iso))),
     night: waterLog.night.isDone(iso) ? 1 : 0,
+    search: searchSteps.today(iso) > 0 ? 1 : 0,
   };
   const total = Object.values(parts).reduce((a, b) => a + b, 0);
   return { parts, total };

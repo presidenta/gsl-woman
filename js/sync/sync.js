@@ -49,6 +49,8 @@ export const COLLECTIONS = [
   { key: 'deeds', kind: 'deeds', type: 'map', empty: {} },
   // «В поиске» — шаги недели: выходы, знакомства, свидания (search/steps.js, 15.11.2026)
   { key: 'searchsteps', kind: 'searchstep', type: 'map', empty: {} },
+  // …и сколько шагов отмечено в каждый день — балл «В поиске» на «Сегодня» (search/steps.js, сборка 90)
+  { key: 'searchday', kind: 'searchday', type: 'map', empty: {} },
   { key: 'settings', kind: 'settings', type: 'single', empty: null },
   { key: 'love', kind: 'love', type: 'single', empty: null },
   // Записи после свиданий — «Знакомство» (meet/, 14.11.2026)

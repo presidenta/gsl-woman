@@ -49,6 +49,19 @@ test('сумма дня складывается из всех отметок', 
   deeds.toggle(ISO, 'evening'); // «Мы поговорили» — вопрос на вечер (evening/)
   deeds.toggle(ISO, 'stem'); // «Сделал» — стержень недели (stem/)
   const s = dayScore(ISO, 2, [{ day: 2, kind: 'task', level: 'min' }], { talk: true });
-  assert.deepEqual(s.parts, { water: 1, minute: 3, task: 1, imsg: 0, love: 1, evening: 1, stem: 1, talk: 1, kegel: 2, steps: 2, night: 1 });
+  assert.deepEqual(s.parts, { water: 1, minute: 3, task: 1, imsg: 0, love: 1, evening: 1, stem: 1, talk: 1, kegel: 2, steps: 2, night: 1, search: 0 });
   assert.equal(s.total, 14);
+});
+
+// «В поиске» на «Сегодня» (15.11.2026): отметила хоть один шаг недели сегодня — +1 балл; убрала все — балла нет
+test('«В поиске»: шаг сегодня — +1 балл, убран — ноль', async () => {
+  const steps = await import('../js/search/steps.js');
+  const { isoDate } = await import('../js/core/dates.js');
+  const iso = isoDate(new Date());
+  assert.equal(dayScore(iso, 1, []).parts.search, 0);
+  steps.bump('out', +1);
+  assert.equal(steps.today(iso), 1);
+  assert.equal(dayScore(iso, 1, []).parts.search, 1);
+  steps.bump('out', -1);
+  assert.equal(dayScore(iso, 1, []).parts.search, 0, 'ошибочное нажатие снято — балла нет');
 });
