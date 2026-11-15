@@ -4,6 +4,7 @@ import { read, write } from '../core/store.js';
 import { icons } from '../ui/icons.js';
 import * as circles from './circles.js';
 import { foldCard } from '../ui/fold.js';
+import { photoOf } from '../photos/photos.js';
 
 /* «РАЗГОВОР ПАРЫ» — седьмой день недели (владелец 13.11.2026: «день обсуждений, итогов и разговоров»; ТЗ раздел 7).
    Сверху — «Итоги недели» (plan.weekReview: как прошла неделя, кто как себя вёл, что улучшить — по вопросам Готтманов,
@@ -49,12 +50,13 @@ export function talkCard(ctx, plan) {
   // Сворачивается стрелкой (владелец 14.11.2026); свёрнута — тема недели, поговорили — золотая галочка
   return foldCard({
     id: 'talk',
-    cls: 'talk',
+    cls: 'talk has-photo',
     icon: icons.rings,
     title: t('us.talk.title'),
     lead: plan.talk.title,
     points: s.mine ? 1 : 0,
     body: [
+    photoOf('talk'), // карточки с вопросами у костра — js/photos/
     h('p', { class: 'card__text faint' }, t('us.talk.lead')),
     ...(plan.weekReview ? [
       h('p', { class: 'caps talk__theme-label' }, plan.weekReview.title),

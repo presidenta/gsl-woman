@@ -6,6 +6,8 @@ import { counts, bump } from '../../search/steps.js';
 import { st } from '../../search/texts.js';
 import { platePanel } from '../../ui/plate.js';
 import { figure, highlight } from '../help/help.js';
+import { photoOf } from '../../photos/photos.js';
+import * as side from '../../side/side.js';
 
 /* Блоки — плашками со стрелкой, как во всём приложении (владелец 15.11.2026); раскрытые переживают перерисовку. */
 const opened = new Set();
@@ -82,14 +84,19 @@ function levelsList(levels) {
   )));
 }
 
+// Фото блока на сегодня (js/photos/catalog.js): сначала набор для его/её части, потом общий
+const blockPhoto = (key) => photoOf(`search.${key}.${side.get() || 'woman'}`) || photoOf(`search.${key}`);
+
 function blockCard(b) {
+  const pic = b.levels ? null : blockPhoto(b.key); // у пирамиды и уровней — свои фигуры
   const node = platePanel({
     icon: icons[BLOCK_ICON[b.key]] || icons.sparkle,
     title: b.title,
     lead: b.by || null, // кто автор — строкой под названием («По трактовке Павла Ракова — …»)
     open: opened.has(b.key),
-    cls: 'search__plate',
+    cls: `search__plate${pic ? ' has-photo' : ''}`,
     body: [
+      pic,
       b.lead ? h('p', { class: 'card__text' }, b.lead) : null,
       b.levels ? levelsList(b.levels) : null,
       h('ul', { class: 'search__list' }, ...b.items.map((x) => h('li', {}, x))),

@@ -5,6 +5,7 @@ import { content, myLanguage } from '../love/love.js';
 import { foldCard } from '../ui/fold.js';
 import { deedMark } from '../love/cards.js';
 import * as deeds from '../score/deeds.js';
+import { photoOf } from '../photos/photos.js';
 
 /* «Я-СООБЩЕНИЕ» на экране «Сегодня» — КАЖДЫЙ ДЕНЬ (владелец 13.11.2026; до 40 — дни 4–6). Какой пример в какой
    день — program/index.js → imsgOf; в дни 4–6 он связан с заданием дня 1, 2 или 3 этой недели: ситуация,
@@ -25,6 +26,9 @@ export function imsgCard(ctx, plan) {
     lead: m.title,
     points: deeds.isDone(ctx.todayIso, 'imsg') ? 1 : 0,
     body: [
+    // Фото разговора (js/photos/: imsg) слева; напоминание и пример его обтекают
+    h('div', { class: 'has-photo imsg__top' },
+    photoOf('imsg'),
     h('p', { class: 'imsg__remind' }, t('imsg.remind')),
     h('div', { class: 'imsg__example' },
       h('p', { class: 'imsg__situation' }, m.title),
@@ -36,6 +40,7 @@ export function imsgCard(ctx, plan) {
         h('span', { class: 'imsg__tag' }, t('imsg.fresh')),
         h('q', { class: 'imsg__text' }, m.say),
       ),
+    ),
     ),
     h('p', { class: 'imsg__formula' }, t('imsg.formula')),
     h('p', { class: 'imsg__rule' }, t('imsg.rule')),

@@ -2,6 +2,7 @@ import { h, svg, add } from '../../core/dom.js';
 import { t, plural } from '../../core/i18n.js';
 import { icons } from '../../ui/icons.js';
 import { toast } from '../../ui/toast.js';
+import { photo as photoNode, fixed } from '../../photos/photos.js';
 import { plateLink, platePanel } from '../../ui/plate.js';
 import { flagRow, flagTotal, picked } from '../../ui/flags.js';
 import * as help from '../../help/help.js';
@@ -112,15 +113,17 @@ export function folderBody(g, verdicts) {
 }
 
 /** Папка внутри пункта: с заголовком — раскрывается по нажатию; без заголовка — просто список. */
-export function folder(g, { open = false, verdicts } = {}) {
+export function folder(g, { open = false, verdicts, photo = null } = {}) {
   const body = folderBody(g, verdicts);
-  if (!g.title) return h('div', { class: 'help__group' }, ...body);
+  if (photo) body.unshift(photo); // фото слева, текст папки обтекает (js/photos/)
+  const hp = photo ? ' has-photo' : '';
+  if (!g.title) return h('div', { class: `help__group${hp}` }, ...body);
   const node = h('details', { class: 'help__folder' },
     h('summary', { class: 'help__folder-summary' },
       svg(icons.chevronRight, 'help__chevron'),
       h('span', { class: 'help__folder-title' }, g.title),
       count(entriesOf(g).length, g.unit) ? h('span', { class: 'help__count' }, count(entriesOf(g).length, g.unit)) : null),
-    h('div', { class: 'help__folder-body' }, ...body),
+    h('div', { class: `help__folder-body${hp}` }, ...body),
   );
   node.open = open;
   return node;
@@ -173,29 +176,32 @@ function questionPlates(item, verdicts) {
   return [
     h('h2', { class: 'caps plates__heading' }, item.title),
     ...item.groups.map((g, i) => remember(platePanel({
+      cls: 'has-photo',
       icon: icons.chat,
       title: g.title,
       author: g.author, // «Павел Раков — Темы-„опознаватели“…»
       lead: g.by, // кто автор подборки — прямо на плашке (владелец 15.11.2026)
       chip: g.themes ? count(g.sections.length, 'topics') : count(entriesOf(g).length, g.unit),
-      body: folderBody(g, verdicts),
+      // Постоянное фото плашки (js/photos/catalog.js → FIXED.questions): пирамиды, «JSL», игры — по порядку
+      body: [photoNode(fixed('questions', i)), ...folderBody(g, verdicts)],
     }), `q${i}`)),
   ];
 }
 
-export function itemPlate(item, ctx, verdicts) {
+export function itemPlate(item, ctx, verdicts, { photo = null } = {}) {
   const rulesPart = item.editable ? rulesBody(item, () => { opened.add(item.key); ctx.rerender(); }) : null;
   const n = rulesPart ? rulesPart.count : item.groups.filter((g) => g.unit === item.unit).reduce((s, g) => s + entriesOf(g).length, 0);
   return remember(platePanel({
     icon: iconOf(item.key),
     // «Красный флаг» — единственная красная плашка: это запрет, а не совет (владелец 15.11.2026)
-    cls: item.key === 'redline' ? 'plate--red' : '',
+    cls: `${item.key === 'redline' ? 'plate--red' : ''}${photo ? ' has-photo' : ''}`.trim(),
     title: item.title,
     author: item.author, // авторы и «Павел Раков — Кто перед тобой?»: имя другим цветом
     // byline — кто автор, прямо на плашке («Кто перед тобой»: «По трактовке Павла Ракова — …», 15.11.2026)
     lead: item.byline || null,
     chip: count(n, item.unit),
     body: [
+      photo,
       h('p', { class: 'card__text help__lead' }, item.lead),
       ...(rulesPart ? rulesPart.nodes : item.groups.map((g) => folder(g, { open: !!item.openFolders, verdicts }))),
     ],

@@ -6,6 +6,7 @@ import { KIND_ICON } from './kind-icons.js';
 import { foldCard } from '../ui/fold.js';
 import { toast } from '../ui/toast.js';
 import * as deeds from '../score/deeds.js';
+import { photoOf } from '../photos/photos.js';
 
 /* Подписи групп: дети и родные устроены одинаково (love.js → GROUPS), различаются только словами. */
 export const GROUP_TEXT = {
@@ -72,7 +73,8 @@ export function deedMark(ctx, what) {
 }
 
 function section(title, ...rows) {
-  return h('div', { class: 'love-card__part' }, h('p', { class: 'love-card__part-title caps' }, title), ...rows);
+  const photo = rows.some((r) => r?.classList?.contains('photo'));
+  return h('div', { class: `love-card__part${photo ? ' has-photo' : ''}` }, h('p', { class: 'love-card__part-title caps' }, title), ...rows);
 }
 
 function groupBlock(group, ideas) {
@@ -88,8 +90,10 @@ export function loveCard(ctx, plan) {
   const c = content(ctx.lang);
   if (!c) return null;
   const him = ideaFor('him', plan.day, ctx.lang);
+  // Фото языка дня (js/photos/catalog.js → love.<язык>): слева, дело его обтекает; меняется по дням
+  const himPhoto = him ? photoOf(`love.${him.kind}`) : null;
   const himPart = him
-    ? section(t('love.himSection'), deed({ kind: him.kind, name: him.name, text: him.text }))
+    ? section(t('love.himSection'), himPhoto, deed({ kind: him.kind, name: him.name, text: him.text }))
     : h('div', { class: 'love-card__part' },
       h('p', { class: 'love-card__part-title caps' }, t('love.himSection')),
       h('h2', { class: 'card__title' }, t('love.inviteTitle')),

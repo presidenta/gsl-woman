@@ -1,0 +1,73 @@
+/* ФОТО (js/photos/). Как «Архетипы» (владелец 15.11.2026): крупно, фото целиком — голова и фигура, без обрезки;
+   портретное слева — текст его обтекает «без пустоты и длинных простыней»; широкое — во всю ширину карточки.
+   Рамка — тонкая золотая линия и мягкая тень: премиально, без лишнего. */
+
+.photo {
+  display: block;
+  height: auto;
+  border-radius: var(--r-md);
+  border: 1px solid rgba(var(--rgb-gold), 0.45);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
+  background: var(--c-surface-2, rgba(255, 255, 255, 0.04));
+}
+
+.photo--side {
+  float: left;
+  width: 44%;
+  max-width: 180px;
+  margin: 2px var(--sp-3) var(--sp-2) 0;
+}
+
+.photo--wide {
+  width: 100%;
+  margin: 0 0 var(--sp-3);
+}
+
+/* Место с фото держит его внутри себя: следующая карточка не заезжает под фото */
+.has-photo {
+  display: flow-root;
+}
+
+/* Списки рядом с фото текут вокруг него: обычная сетка встала бы узкой колонкой на всю длину */
+.has-photo :is(.search__list, .help__list, .talk__questions):not(:has(> .help__entry--figure)) {
+  display: block;
+  list-style-position: inside;
+  padding-left: 0;
+}
+
+.has-photo :is(.search__list, .help__list, .talk__questions) > li + li {
+  margin-top: var(--sp-2);
+}
+
+/* «Я-сообщение»: пример течёт вокруг фото; рамки строк («как обычно» / «по-новому») встают рядом с фото, не под ним */
+.has-photo .imsg__example {
+  display: block;
+}
+
+.has-photo .imsg__example > * + * {
+  margin-top: var(--sp-2);
+}
+
+/* Папки («Четыре категории мужчин» и др.) — всегда под фото, во всю ширину: строка папки рядом с фото сжалась бы
+   в узкую колонку */
+.has-photo .help__folder {
+  clear: both;
+}
+
+/* Пункт «Помощи» рядом с фото — обычный блок: сетка держала бы длинную цитату узкой колонкой и под фото */
+.has-photo .help__entry:not(.help__entry--figure) {
+  display: block;
+}
+
+.has-photo .help__entry:not(.help__entry--figure) > :is(.help__text, .help__note) {
+  display: block;
+}
+
+.has-photo .help__entry:not(.help__entry--figure) > .help__note {
+  margin-top: var(--sp-1);
+}
+
+/* Дело дня («Пять языков любви») — рядом с фото целиком: золотая черта панели не уходит под фото */
+.has-photo > .deed {
+  display: flow-root;
+}

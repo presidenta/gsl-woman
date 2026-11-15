@@ -14,6 +14,7 @@ import { kt } from '../../kids/texts.js';
 import { familyDreamCard } from '../../kids/family-dream.js';
 import { familyApi } from '../../kids/family-api.js';
 import { kidAlerts } from '../../kids/alerts.js';
+import { photoOf } from '../../photos/photos.js';
 
 /* ЭКРАН «МЫ» (#/us) — «Пара» и «Семья» (владелец 13.11.2026; ТЗ — docs/TZ-para-semya.md). Вверху переключатель
    «Пара · Семья». Нет контура — что это и «Создать» / «У меня есть код». Создан, но второго ещё нет — код для
@@ -141,7 +142,8 @@ function pairView(view, ctx, circle) {
   if (!circles.isComplete(circle)) return [memberList(circle), codeCard(ctx, circle), leaveButton(ctx, circle)];
   const tabs = ['chat', 'wishes'];
   return [
-    h('section', { class: 'card us-head' }, memberList(circle)),
+    // Фото пары (js/photos/: us.pair) — меняется по дням
+    h('section', { class: 'card us-head has-photo' }, photoOf('us.pair'), memberList(circle)),
     segmented({ label: t('us.pair'), options: tabs.map((k) => ({ value: k, label: t(`us.tabs.${k}`) })), value: pairTab, onChange: (v) => { pairTab = v; ctx.rerender(); } }),
     pairTab === 'wishes' ? wishesView(circle) : chatView(circle),
     h('a', { class: 'love-card__link us-goals-link', href: '#/goals' }, t('us.goalsLink'), svg(icons.chevronRight, 'love-card__chevron')),
@@ -155,7 +157,7 @@ function familyView(view, ctx, circle) {
   const alerts = kidAlerts(circle).total;
   const tabLabel = (k) => (k === 'kids' ? `${kt('parent.tab')}${alerts ? ` · ${alerts} 🔴` : ''}` : t(`us.tabs.${k}`));
   return [
-    h('section', { class: 'card us-head' }, memberList(circle)),
+    h('section', { class: 'card us-head has-photo' }, photoOf('us.family'), memberList(circle)),
     // Мечта нашей семьи — общий котёл звёзд (kids/family-dream.js)
     familyDreamCard(familyApi(circle), { rerender: ctx.rerender }),
     childrenBlock(circle, fail),

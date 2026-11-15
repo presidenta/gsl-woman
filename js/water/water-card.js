@@ -2,6 +2,8 @@ import { h, svg } from '../core/dom.js';
 import { t, list } from '../core/i18n.js';
 import { icons } from '../ui/icons.js';
 import { foldCard } from '../ui/fold.js';
+import { photoOf } from '../photos/photos.js';
+import * as side from '../side/side.js';
 import { KINDS, GOLDEN, chosenOf, setItem, setItems } from './water.js';
 import * as waterLog from './water-log.js';
 import { icon } from './art.js';
@@ -271,7 +273,10 @@ export function waterCard(ctx, kind = 'morning') {
     // Выпит — +1 балл (score/: у стакана уровней нет): стрелка золотом, «+1 балл» после названия
     points: done ? 1 : 0,
     body: [
-      h('p', { class: 'card__text water__lead' }, t(`${b}.lead`)),
+      // Фото (js/photos/): утром — его или её набор (иногда вдвоём), на ночь — общий; вступление обтекает
+      h('div', { class: 'has-photo' },
+        photoOf(kind === 'night' ? 'water.night' : `water.morning.${side.get() || 'woman'}`),
+        h('p', { class: 'card__text water__lead' }, t(`${b}.lead`))),
       h('p', { class: 'water__pick' }, t(`${b}.pick`)),
       stage,
       nowLine(items, kind),
