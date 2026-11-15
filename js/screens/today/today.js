@@ -19,6 +19,7 @@ import { kegelCard } from '../../habits/kegel-card.js';
 import { stepsCard } from '../../habits/steps-card.js';
 import { usCard } from '../../circles/today-card.js';
 import { talkCard, talkDone } from '../../circles/talk.js';
+import { eveningCard } from '../../evening/evening.js';
 import { showKids, bizFor } from '../../profile/profile.js';
 import * as journal from '../../journal/journal.js';
 import { dayScore, pointsOf, taskPoints, pointsLabel } from '../../score/score.js';
@@ -504,6 +505,8 @@ export function render(view, ctx) {
       // Седьмой день — «Разговор пары» (circles/talk.js)
       talkCard(ctx, plan),
       imsgCard(ctx, plan),
+      // Вопрос на вечер — вдвоём (js/evening/): дни 1–6, только у пары
+      eveningCard(ctx, plan),
       loveCard(ctx, plan),
       recordedToday(ctx, plan),
       // Привычки дня — в конце (владелец 13.11.2026): утром — вода и минута, Кегель и шаги — в течение дня

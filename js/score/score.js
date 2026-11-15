@@ -38,6 +38,7 @@ export function dayScore(iso, day, entries, { talk = false } = {}) {
     task: taskPoints(entries, day),
     imsg: deeds.isDone(iso, 'imsg') ? 1 : 0,
     love: deeds.isDone(iso, 'love') ? 1 : 0,
+    evening: deeds.isDone(iso, 'evening') ? 1 : 0, // «Мы поговорили» — вопрос на вечер (evening/)
     talk: talk ? 1 : 0,
     kegel: pointsOf(kegelLevel(iso)),
     steps: pointsOf(stepsLevel(stepsOf(iso))),

@@ -854,6 +854,14 @@ export default {
     removeConfirm: 'Delete this note?',
     whoPh: 'His name',
   },
+  // Вопрос на вечер — вдвоём (js/evening/, 15.11.2026)
+  evening: {
+    markHint: 'Even five minutes together is a talk — and +1 point.',
+    mark: 'We talked',
+    markDone: 'We talked — +1 point',
+    again: 'Later tonight',
+    againToast: 'The question will wait for the evening',
+  },
   imsg: {
     mark: 'I said it with «I»',
     markDone: 'Done — +1 point',

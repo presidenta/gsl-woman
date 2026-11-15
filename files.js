@@ -54,6 +54,7 @@ self.GSL_FILES = [
   './js/core/router.js',
   './js/core/store.js',
   './js/core/updates.js',
+  './js/evening/evening.js',
   './js/goals/goals.js',
   './js/habits/figures.js',
   './js/habits/habits.css',
