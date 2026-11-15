@@ -22,7 +22,7 @@ const entriesOf = (g) => [...(g.entries || []), ...(g.sections || []).flatMap((s
 const count = (n, unit) => (unit && n ? `${n} ${plural(n, `plural.${unit}`)}` : null);
 
 // Значок каждого пункта — свой, вид один
-const ITEM_ICON = { questions: 'chat', her: 'heart', words: 'heart', kpk: 'crown', authors: 'journal', topics: 'rings', rules: 'home', dates: 'calendar', compliments: 'sparkle' };
+const ITEM_ICON = { redline: 'lock', questions: 'chat', her: 'heart', words: 'heart', kpk: 'crown', authors: 'journal', topics: 'rings', rules: 'home', dates: 'calendar', compliments: 'sparkle' };
 const iconOf = (key) => icons[ITEM_ICON[key]] || icons.sparkle;
 
 function readBox(text) {

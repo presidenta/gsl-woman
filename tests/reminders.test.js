@@ -35,12 +35,12 @@ test('по умолчанию текст задания на экран блок
   assert.ok(open.body.includes('Задание 1.1'));
 });
 
-test('записала днём — обед и вечер не спрашивают «как успехи», а хвалят', () => {
+test('записала днём — обед и вечер не спрашивают «как успехи», а отмечают запись (без оценок — красная линия, 15.11.2026)', () => {
   setLang('ru');
   const entries = [{ id: 'a', day: 1, kind: 'task', level: 'full' }];
   const items = buildPlan({ settings: base, entries, now: new Date(2026, 10, 11, 10, 0), days: 1 });
   assert.equal(items.length, 2); // утро уже прошло
-  assert.equal(items[1].title, 'Ты сегодня молодец');
+  assert.equal(items[1].title, 'День записан');
 });
 
 test('прошедшее не планируется, до старта и после финала — пусто', () => {

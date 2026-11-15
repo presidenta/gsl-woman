@@ -969,7 +969,7 @@ export default {
     evening: {
       title: 'How was your day?',
       body: 'What worked for you today? Write it down while it is fresh.',
-      doneTitle: 'You did great today',
+      doneTitle: 'Day saved',
       doneBody: 'Entry saved. Look at your week — you can see yourself growing.',
       callTitle: 'The week is behind you',
       callBody: 'Review your week in the app.',
