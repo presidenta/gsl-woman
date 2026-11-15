@@ -6,7 +6,8 @@ import * as circles from './circles.js';
 import { foldCard } from '../ui/fold.js';
 
 /* «РАЗГОВОР ПАРЫ» — седьмой день недели (владелец 13.11.2026: «день обсуждений, итогов и разговоров»; ТЗ раздел 7).
-   Тема недели и три вопроса — из программы (plan.talk, сервер gsl/talks/). «Мы поговорили»: в паре — отметка в
+   Сверху — «Итоги недели» (plan.weekReview: как прошла неделя, кто как себя вёл, что улучшить — по вопросам Готтманов,
+   владелец 15.11.2026), ниже — тема недели и три вопроса (plan.talk, сервер gsl/talks/). «Мы поговорили»: в паре — отметка в
    контуре (talk, id «неделя.участник»), видна обоим; без пары — на этом телефоне (talks-local). */
 
 const LOCAL = 'talks-local';
@@ -55,6 +56,10 @@ export function talkCard(ctx, plan) {
     points: s.mine ? 1 : 0,
     body: [
     h('p', { class: 'card__text faint' }, t('us.talk.lead')),
+    ...(plan.weekReview ? [
+      h('p', { class: 'caps talk__theme-label' }, plan.weekReview.title),
+      h('ol', { class: 'talk__questions' }, ...plan.weekReview.questions.map((q) => h('li', {}, q))),
+    ] : []),
     h('p', { class: 'caps talk__theme-label' }, t('us.talk.theme')),
     h('h2', { class: 'card__title talk__theme' }, plan.talk.title),
     h('ol', { class: 'talk__questions' }, ...plan.talk.questions.map((q) => h('li', {}, q))),

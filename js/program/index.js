@@ -33,6 +33,8 @@ export function weekPlan(week, lang) {
     imsgs: w.imsg || [],
     // «Разговор пары» — тема недели для седьмого дня (сервер: gsl/talks/, общая для обеих частей), по кругу
     talk: talkOf(week, lang),
+    // «Итоги недели» — над темой седьмого дня, каждую неделю одни и те же (сервер: gsl/talks/review.js, 15.11.2026)
+    weekReview: data(lang)?.review || null,
     review: isReviewWeek(week),
     final: week === WEEKS,
   };
