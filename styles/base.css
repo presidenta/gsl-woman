@@ -212,7 +212,7 @@ img, svg {
 }
 
 /* Раскрывающийся блок — всегда со стрелкой «развернуть / свернуть» (владелец 14.11.2026: «открывается раздел, а
-   свернуть его нечем»). Свою стрелку несут .fold__arrow и .help__chevron; остальным она рисуется здесь: вправо —
+   свернуть его нечем»). Свою стрелку несут .fold__arrow, .help__chevron и .plate__arrow; остальным она рисуется здесь: вправо —
    свёрнуто, вниз — раскрыто. */
 details > summary {
   cursor: pointer;
@@ -223,12 +223,12 @@ details > summary::-webkit-details-marker {
   display: none;
 }
 
-details > summary:not(:has(.fold__arrow, .help__chevron)) {
+details > summary:not(:has(.fold__arrow, .help__chevron, .plate__arrow)) {
   position: relative;
   padding-right: 30px;
 }
 
-details > summary:not(:has(.fold__arrow, .help__chevron))::after {
+details > summary:not(:has(.fold__arrow, .help__chevron, .plate__arrow))::after {
   content: '';
   position: absolute;
   right: 8px;
@@ -241,6 +241,6 @@ details > summary:not(:has(.fold__arrow, .help__chevron))::after {
   transition: transform var(--t-fast) var(--ease);
 }
 
-details[open] > summary:not(:has(.fold__arrow, .help__chevron))::after {
+details[open] > summary:not(:has(.fold__arrow, .help__chevron, .plate__arrow))::after {
   transform: translateY(-75%) rotate(45deg);
 }

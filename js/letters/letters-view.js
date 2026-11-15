@@ -81,17 +81,25 @@ function composer(box, { rerender, kid, prompts }) {
   return form;
 }
 
-/** Карточка писем. box — { list, save, remove }; kid — детский вид; prompts — с чего начать. */
-export function lettersCard(box, { rerender, kid = false, prompts = [] } = {}) {
+/** Содержимое писем без рамки: пояснение, конверты, новое письмо. box — { list, save, remove }; kid — детский вид;
+    prompts — с чего начать. Взрослый показывает его внутри плашки «Целей» (ui/plate.js), ребёнок — в карточке. */
+export function lettersBody(box, { rerender, kid = false, prompts = [] } = {}) {
   const list = box.list().sort((a, b) => a.openAt.localeCompare(b.openAt));
   const can = canWrite(list);
-  return h('section', { class: 'card letters' },
-    h('h2', { class: 'card__title' }, `💌 ${lt('title')}`),
+  return [
     h('p', { class: 'card__text faint' }, lt(kid ? 'leadKid' : 'lead', { n: MAX_SEALED })),
     list.length ? h('ul', { class: 'letters__list' }, ...list.map((l) => envelope(box, l, { rerender, kid }))) : null,
     can
       ? (open ? composer(box, { rerender, kid, prompts: prompts.length ? prompts : lt('prompts').split('|') })
         : h('button', { type: 'button', class: 'btn btn--gold btn--block', onclick: () => { open = true; rerender?.(); } }, lt('write')))
       : h('p', { class: 'faint' }, lt('full', { n: MAX_SEALED })),
+  ];
+}
+
+/** Карточка писем (детский кабинет). */
+export function lettersCard(box, opts = {}) {
+  return h('section', { class: 'card letters' },
+    h('h2', { class: 'card__title' }, `💌 ${lt('title')}`),
+    ...lettersBody(box, opts),
   );
 }

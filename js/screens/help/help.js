@@ -2,53 +2,38 @@ import { h, svg, add } from '../../core/dom.js';
 import { t, plural } from '../../core/i18n.js';
 import { icons } from '../../ui/icons.js';
 import { toast } from '../../ui/toast.js';
+import { plateLink, platePanel } from '../../ui/plate.js';
+import { flagRow, flagTotal, picked } from '../../ui/flags.js';
 import * as help from '../../help/help.js';
 import * as rules from '../../help/rules.js';
 import * as meet from '../../meet/meet.js';
 
-/* ЭКРАН «ПОМОЩЬ» (#/help, владелец 14.11.2026) — библиотека: сверху «Первое свидание» (переход в «Знакомство»),
-   ниже пункты — вопросы для разговора, общие темы для обсуждения, «Правила нашего дома», комплименты.
-   - На каждой плашке — сколько внутри: «3 вопроса», «36 вопросов», «10 тем» (unit с сервера, число считается здесь),
-     чтобы сразу было видно, коротко это или надолго.
-   - Пункт и папки внутри раскрываются по нажатию; у комплиментов папки раскрыты сразу (openFolders), их можно закрыть.
-   - Папки с флагами (flags) — как калькулятор в «Знакомстве»: под каждым вопросом «как понимать ответ» и галочки
-     зелёных и красных флагов, внизу папки — итог: сколько каких и что делать с этим человеком (meet.verdictOf).
-     Галочки нигде не хранятся: отметил, посмотрел подсказку — и всё.
-   - «Правила нашего дома» человек ведёт сам: «＋» — дописать, нажать — изменить, крестик — убрать (с вопросом
-     «Вы точно хотите удалить?»), help/rules.js. */
+/* ЭКРАН «ПОМОЩЬ» (#/help, владелец 14–15.11.2026) — библиотека. Все пункты — одним видом (ui/plate.js): значок в
+   круге, название, число, стрелка («на экране всё в одном стиле, без хаоса»).
+   - Сверху «Первое свидание» — переход в «Знакомство».
+   - Вопросы для разговора — сразу отдельными плашками по числу вопросов: три → о деле → шесть → Готтманы (20) →
+     Арон (36) → как слушать. Короткие — первыми: мало времени — открыл и подсмотрел.
+   - Дальше — остальные пункты; внутри — папки (раскрываются по нажатию; у комплиментов раскрыты сразу).
+   - Папки с флагами (flags) — как калькулятор в «Знакомстве»: под вопросом «как понимать ответ» и галочки зелёных и
+     красных флагов, внизу — итог и подсказка (ui/flags.js — тот же вид, что в «Знакомстве»). Галочки не хранятся.
+   - «Правила нашего дома» человек ведёт сам: «＋», нажать — изменить, крестик — убрать (с подтверждением). */
 
 const entriesOf = (g) => [...(g.entries || []), ...(g.sections || []).flatMap((s) => s.entries || [])];
+const count = (n, unit) => (unit && n ? `${n} ${plural(n, `plural.${unit}`)}` : null);
 
-/** «3 вопроса», «10 тем» — по unit; без unit или пусто — null. */
-function countChip(n, unit) {
-  if (!unit || !n) return null;
-  return h('span', { class: 'help__count' }, `${n} ${plural(n, `plural.${unit}`)}`);
-}
-
-function meetCard(data) {
-  return h('a', { class: 'card settings__link help__meet', href: '#/meet' },
-    h('span', { class: 'card__icon' }, svg(icons.rings)),
-    h('span', { class: 'settings__link-text' }, h('strong', {}, t('help.meetTitle')), h('br'), h('span', { class: 'faint' }, data.meetLead)),
-    svg(icons.chevronRight, 'settings__link-chevron'),
-  );
-}
+// Значок каждого пункта — свой, вид один
+const ITEM_ICON = { questions: 'chat', her: 'heart', words: 'heart', kpk: 'crown', topics: 'rings', rules: 'home', dates: 'calendar', compliments: 'sparkle' };
+const iconOf = (key) => icons[ITEM_ICON[key]] || icons.sparkle;
 
 function readBox(text) {
   return h('p', { class: 'help__read' }, h('span', { class: 'caps help__read-label' }, t('help.read')), ' ', text);
 }
 
-/** Галочки флагов под вопросом; onChange — пересчитать итог папки. */
+/** Галочки флагов под вопросом; onChange — пересчитать итог. */
 function flagChecks(e, onChange) {
-  const row = (color, text) => {
-    const box = h('input', { type: 'checkbox', class: 'help__flag-box' });
-    box.dataset.color = color;
-    box.addEventListener('change', onChange);
-    return h('label', { class: `help__flag help__flag--${color}` }, box, h('span', { class: 'help__flag-mark', 'aria-hidden': 'true' }), h('span', {}, text));
-  };
-  return h('div', { class: 'help__flags' },
-    ...(e.green || []).map((x) => row('green', x)),
-    ...(e.red || []).map((x) => row('red', x)),
-  );
+  return h('div', { class: 'flags' },
+    ...(e.green || []).map((x) => flagRow('green', x, { onChange })),
+    ...(e.red || []).map((x) => flagRow('red', x, { onChange })));
 }
 
 function entry(e, onFlag) {
@@ -64,18 +49,13 @@ function sources(list) {
   if (!list?.length) return null;
   return h('div', { class: 'help__sources' },
     h('p', { class: 'caps help__read-label' }, t('help.sources')),
-    h('ul', { class: 'help__source-list' },
-      ...list.map((s) => h('li', {},
-        s.url ? h('a', { href: s.url, target: '_blank', rel: 'noopener' }, s.text) : s.text,
-      )),
-    ),
+    h('ul', { class: 'help__source-list' }, ...list.map((s) => h('li', {}, s.url ? h('a', { href: s.url, target: '_blank', rel: 'noopener' }, s.text) : s.text))),
   );
 }
 
-/** Раздел внутри папки: заголовок, вступление, вопросы, «как понимать», источники. */
 function section(s) {
   return h('section', { class: 'help__section' },
-    h('h4', { class: 'help__section-title' }, s.title, countChip(s.entries?.length, 'questions')),
+    h('h4', { class: 'help__section-title' }, s.title, s.entries?.length ? h('span', { class: 'help__count' }, count(s.entries.length, 'questions')) : null),
     s.lead ? h('p', { class: 'help__section-lead' }, s.lead) : null,
     s.entries?.length ? h('ol', { class: 'help__list' }, ...s.entries.map((e) => entry(e))) : null,
     s.read ? readBox(s.read) : null,
@@ -83,43 +63,17 @@ function section(s) {
   );
 }
 
-/** Итог папки с флагами — как в «Знакомстве»: сколько зелёных и красных и подсказка, что делать. */
-function totalBox(verdicts) {
-  const box = h('div', { class: 'help__total' });
-  function paint(green, red) {
-    const verdict = meet.verdictOf(Array(green).fill('g'), Array(red).fill('r'));
-    box.className = `help__total${verdict ? ` help__total--${verdict}` : ''}`;
-    box.replaceChildren(
-      h('p', { class: 'caps help__total-title' }, t('help.total')),
-      h('p', { class: 'help__total-counts' },
-        h('span', { class: 'help__total-green' }, `${t('help.greenCount')}: ${green}`),
-        ' · ',
-        h('span', { class: 'help__total-red' }, `${t('help.redCount')}: ${red}`),
-      ),
-      verdict
-        ? h('div', {},
-          h('p', { class: 'help__total-verdict' }, t(`meet.verdict.${verdict}`)),
-          verdicts?.[verdict] ? h('p', { class: 'card__text' }, verdicts[verdict]) : null,
-          h('p', { class: 'faint' }, t('help.verdictNote')),
-        )
-        : h('p', { class: 'faint' }, t('help.totalEmpty')),
-    );
-  }
-  paint(0, 0);
-  return { node: box, paint };
-}
-
-/** Папка: с заголовком — раскрывается по нажатию; без заголовка — просто список. */
-function folder(g, { open = false, verdicts } = {}) {
+/** Содержимое папки: вступление, вопросы (с флагами — и итог), разделы, «как понимать», источники. */
+function folderBody(g, verdicts) {
   let total = null;
   let list = null;
   const recount = () => {
-    const checked = [...list.querySelectorAll('.help__flag-box:checked')];
-    total.paint(checked.filter((b) => b.dataset.color === 'green').length, checked.filter((b) => b.dataset.color === 'red').length);
+    const { green, red } = picked(list);
+    total.paint(green.length, red.length);
   };
-  if (g.flags) total = totalBox(verdicts);
+  if (g.flags) total = flagTotal(verdicts);
   list = g.entries?.length ? h('ol', { class: 'help__list' }, ...g.entries.map((e) => entry(e, g.flags ? recount : null))) : null;
-  const body = [
+  return [
     g.lead ? h('p', { class: 'help__section-lead' }, g.lead) : null,
     g.flags ? h('p', { class: 'faint help__flags-hint' }, t('help.flagsHint')) : null,
     list,
@@ -128,13 +82,17 @@ function folder(g, { open = false, verdicts } = {}) {
     g.read ? readBox(g.read) : null,
     sources(g.sources),
   ];
+}
+
+/** Папка внутри пункта: с заголовком — раскрывается по нажатию; без заголовка — просто список. */
+function folder(g, { open = false, verdicts } = {}) {
+  const body = folderBody(g, verdicts);
   if (!g.title) return h('div', { class: 'help__group' }, ...body);
   const node = h('details', { class: 'help__folder' },
     h('summary', { class: 'help__folder-summary' },
       svg(icons.chevronRight, 'help__chevron'),
       h('span', { class: 'help__folder-title' }, g.title),
-      countChip(entriesOf(g).length, g.unit),
-    ),
+      count(entriesOf(g).length, g.unit) ? h('span', { class: 'help__count' }, count(entriesOf(g).length, g.unit)) : null),
     h('div', { class: 'help__folder-body' }, ...body),
   );
   node.open = open;
@@ -148,10 +106,7 @@ function rulesBody(item, rerender) {
     const text = h('button', { type: 'button', class: 'help__rule-text', title: t('help.rulesEdit') }, r.text);
     text.addEventListener('click', () => {
       const input = h('input', { class: 'input help__rule-input', value: r.text, maxlength: String(rules.MAX_TEXT) });
-      const done = () => {
-        rules.update(r.id, input.value);
-        rerender();
-      };
+      const done = () => { rules.update(r.id, input.value); rerender(); };
       input.addEventListener('keydown', (e) => { if (e.key === 'Enter') done(); });
       input.addEventListener('blur', done);
       text.replaceWith(input);
@@ -171,39 +126,47 @@ function rulesBody(item, rerender) {
     h('button', { type: 'submit', class: 'help__rule-btn help__rule-btn--add', 'aria-label': t('help.rulesAdd'), title: t('help.rulesAdd') }, svg(icons.plus)));
   form.addEventListener('submit', (e) => {
     e.preventDefault();
-    if (!rules.add(input.value, defaults)) {
-      input.focus();
-      return;
-    }
+    if (!rules.add(input.value, defaults)) { input.focus(); return; }
     toast({ title: t('help.rulesSaved') });
     rerender();
   });
   return { nodes: [h('ol', { class: 'help__rules' }, ...rows), form], count: rows.length };
 }
 
-let openRules = false;
+// Какие плашки раскрыты — переживают перерисовку экрана (правила, отметки флагов)
+const opened = new Set();
+function remember(node, id) {
+  if (opened.has(id)) node.open = true;
+  node.addEventListener('toggle', () => (node.open ? opened.add(id) : opened.delete(id)));
+  return node;
+}
 
-function itemCard(item, ctx, verdicts) {
-  const rulesPart = item.editable ? rulesBody(item, () => { openRules = true; ctx.rerender(); }) : null;
-  const count = rulesPart
-    ? rulesPart.count
-    : item.groups.filter((g) => g.unit === item.unit).reduce((n, g) => n + entriesOf(g).length, 0);
-  const card = h('details', { class: 'card help__item' },
-    h('summary', { class: 'help__summary' },
-      h('span', { class: 'help__title' }, item.title),
-      countChip(count, item.unit),
-      item.draft ? h('span', { class: 'chip help__draft' }, t('help.draft')) : null,
-      svg(icons.chevronRight, 'help__chevron'),
-    ),
-    h('p', { class: 'card__text help__lead' }, item.lead),
-    ...(rulesPart ? rulesPart.nodes : item.groups.map((g) => folder(g, { open: !!item.openFolders, verdicts }))),
-  );
-  // Правила только что изменили — пункт остаётся раскрытым после перерисовки
-  if (rulesPart && openRules) {
-    card.open = true;
-    openRules = false;
-  }
-  return card;
+/** Вопросы для разговора — сразу отдельными плашками, по числу вопросов (короткие первыми). */
+function questionPlates(item, verdicts) {
+  return [
+    h('h2', { class: 'caps plates__heading' }, item.title),
+    ...item.groups.map((g, i) => remember(platePanel({
+      icon: icons.chat,
+      title: g.title,
+      lead: g.by, // кто автор подборки — прямо на плашке (владелец 15.11.2026)
+      chip: count(entriesOf(g).length, g.unit),
+      body: folderBody(g, verdicts),
+    }), `q${i}`)),
+  ];
+}
+
+function itemPlate(item, ctx, verdicts) {
+  const rulesPart = item.editable ? rulesBody(item, () => { opened.add(item.key); ctx.rerender(); }) : null;
+  const n = rulesPart ? rulesPart.count : item.groups.filter((g) => g.unit === item.unit).reduce((s, g) => s + entriesOf(g).length, 0);
+  return remember(platePanel({
+    icon: iconOf(item.key),
+    title: item.title,
+    chip: count(n, item.unit),
+    body: [
+      h('p', { class: 'card__text help__lead' }, item.lead),
+      ...(rulesPart ? rulesPart.nodes : item.groups.map((g) => folder(g, { open: !!item.openFolders, verdicts }))),
+    ],
+  }), item.key);
 }
 
 export function render(view, ctx) {
@@ -214,10 +177,13 @@ export function render(view, ctx) {
   }
   // Подсказки итога — те же, что в «Знакомстве» (у каждой части свои слова)
   const verdicts = meet.content(ctx.lang)?.verdicts || null;
+  const [questions, ...rest] = data.items;
   add(view,
     h('h1', { class: 'screen-title' }, data.title),
     h('p', { class: 'help__intro' }, data.intro),
-    meetCard(data),
-    ...data.items.map((item) => itemCard(item, ctx, verdicts)),
+    plateLink({ href: '#/meet', icon: icons.rings, title: t('help.meetTitle'), lead: data.meetLead }),
+    ...(questions?.key === 'questions' ? questionPlates(questions, verdicts) : [itemPlate(questions, ctx, verdicts)]),
+    h('h2', { class: 'caps plates__heading' }, t('help.library')),
+    ...rest.map((item) => itemPlate(item, ctx, verdicts)),
   );
 }

@@ -118,8 +118,9 @@
   stroke-width: 2.4;
 }
 
+/* Внутри строки названия (caps): регистр и разрядка свои, на перенос — вместе с последним словом */
 .fold__plus {
-  margin-left: 2px;
+  text-transform: none;
   color: var(--c-score);
   font-size: var(--fs-xs);
   font-weight: 700;

@@ -66,7 +66,7 @@
   margin-top: var(--sp-3);
 }
 
-/* Технология знакомства: номер темы, вопросы, зелёные и красные сигналы, галочки и подсказка */
+/* Технология знакомства: номер темы, вопросы, зелёные и красные сигналы с галочками, итог */
 .meet__num {
   display: inline-grid;
   place-items: center;
@@ -88,57 +88,14 @@
   color: var(--c-gold);
 }
 
-.meet__signals {
-  display: grid;
-  gap: var(--sp-3);
+/* Сигналы темы — общий вид флагов (styles/components/flags.css); итог — под тремя темами */
+.meet__flags {
+  margin-top: var(--sp-2);
 }
 
-.meet__signal {
-  padding: var(--sp-2) var(--sp-3);
-  border-radius: var(--r-md);
-  border-left: 3px solid;
+.meet__total .faint {
+  margin: 0;
 }
-
-.meet__signal--green { border-color: var(--c-done); }
-.meet__signal--red { border-color: rgb(var(--rgb-urgent)); }
-
-.meet__picker {
-  display: grid;
-  gap: var(--sp-4);
-}
-
-.meet__pick {
-  display: grid;
-  gap: var(--sp-2);
-  margin-bottom: var(--sp-2);
-}
-
-.meet__check-row {
-  display: flex;
-  gap: var(--sp-2);
-  align-items: flex-start;
-  cursor: pointer;
-}
-
-.meet__check {
-  margin-top: 0.2em;
-  flex: none;
-  width: 1.15em;
-  height: 1.15em;
-}
-
-.meet__pick--green .meet__check { accent-color: var(--c-done); }
-.meet__pick--red .meet__check { accent-color: rgb(var(--rgb-urgent)); }
-
-.meet__verdict {
-  padding: var(--sp-3) var(--sp-4);
-  border-radius: var(--r-md);
-  border: 1px solid var(--c-line);
-}
-
-.meet__verdict--build { border-color: var(--c-done); }
-.meet__verdict--look { border-color: var(--c-gold); }
-.meet__verdict--pass { border-color: rgb(var(--rgb-urgent)); }
 
 .meet__chip {
   margin-left: var(--sp-2);

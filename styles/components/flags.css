@@ -1,0 +1,76 @@
+/* ФЛАГИ И ИТОГ (js/ui/flags.js) — один вид в «Помощи» и «Знакомстве»: золотисто-зелёный и золотисто-красный
+   сигнал с галочкой, под ними итог. Цвета — только токены. */
+
+.flags {
+  display: grid;
+  gap: var(--sp-1);
+  margin-top: var(--sp-2);
+}
+
+.flag {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--sp-2);
+  padding: var(--sp-2) var(--sp-3);
+  border-radius: var(--r-md);
+  border-left: 3px solid;
+  font-size: var(--fs-sm);
+  cursor: pointer;
+}
+
+.flag--green {
+  color: var(--c-flag-green);
+  border-color: var(--c-flag-green);
+  background: color-mix(in srgb, var(--c-flag-green) 9%, transparent);
+}
+
+.flag--red {
+  color: var(--c-flag-red);
+  border-color: var(--c-flag-red);
+  background: color-mix(in srgb, var(--c-flag-red) 9%, transparent);
+}
+
+.flag__box {
+  flex: none;
+  width: 1.15em;
+  height: 1.15em;
+  margin-top: 0.15em;
+}
+
+.flag--green .flag__box { accent-color: var(--c-flag-green); }
+.flag--red .flag__box { accent-color: var(--c-flag-red); }
+
+/* Итог под всеми сигналами */
+.flags-total {
+  margin-top: var(--sp-4);
+  padding: var(--sp-3) var(--sp-4);
+  border-radius: var(--r-md);
+  border: 1px solid var(--c-line-strong);
+}
+
+.flags-total__-build { border-color: var(--c-flag-green); }
+.flags-total__-look { border-color: var(--c-gold); }
+.flags-total__-pass { border-color: var(--c-flag-red); }
+
+.flags-total__title {
+  margin: 0 0 var(--sp-1);
+  color: var(--c-gold);
+}
+
+.flags-total__counts {
+  margin: 0 0 var(--sp-2);
+  font-weight: 600;
+}
+
+.flags-total__green { color: var(--c-flag-green); }
+.flags-total__red { color: var(--c-flag-red); }
+
+.flags-total__verdict {
+  margin: 0 0 var(--sp-1);
+  font-family: var(--f-display);
+  font-size: var(--fs-lg);
+}
+
+.flags-total__-build .flags-total__verdict { color: var(--c-flag-green); }
+.flags-total__-look .flags-total__verdict { color: var(--c-gold); }
+.flags-total__-pass .flags-total__verdict { color: var(--c-flag-red); }

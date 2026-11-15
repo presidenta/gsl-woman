@@ -8,15 +8,20 @@ import { toast } from '../../ui/toast.js';
 import { segmented } from '../../ui/controls.js';
 import { circleGoals } from '../../circles/goals-view.js';
 // Письмо себе в будущее — через год, 5, 10 лет (letters/, 14.11.2026)
-import { lettersCard } from '../../letters/letters-view.js';
+import { lettersBody } from '../../letters/letters-view.js';
 import { ownBox } from '../../letters/letters.js';
+import { lt } from '../../letters/texts.js';
+import { plateLink, platePanel, plateNote } from '../../ui/plate.js';
 
 /* ЭКРАН «ЦЕЛИ»: вкладки «Мои · Пара · Семья» (владелец 13.11.2026: «цели у женщины, если она одна, и цели пары,
    если они вместе; и семьи»). «Мои» — сверху строка «Новая цель» и золотой «+», ниже — цели в работе, внизу —
    «Сбылось» с датами; кружок слева отмечает «сбылось», нажатие на текст открывает правку (данные — js/goals/).
+   Под целями — плашки одного вида (ui/plate.js, владелец 15.11.2026: «чтобы не было хаоса»): «Помощь», в самом
+   низу — «Письмо себе в будущее» (раскрывается на месте, золотая кнопка не утяжеляет середину экрана).
    «Пара» и «Семья» — общие цели контура (js/circles/goals-view.js). */
 
 let tab = 'mine';
+let lettersOpen = false; // плашка письма раскрыта — переживает перерисовку («Написать», «Запечатать»)
 
 function goalRow(g) {
   const mark = h('button', {
@@ -92,14 +97,9 @@ export function render(view, ctx) {
     form,
   );
 
-  // Под письмом — «Помощь» (владелец 14.11.2026): библиотека — первое свидание, вопросы, общие темы, комплименты
-  const letters = () => [lettersCard(ownBox, { rerender: ctx.rerender }), helpLink()];
+  const bottom = () => [helpPlate(), lettersPlate(ctx)];
   if (!list.length) {
-    add(view, h('div', { class: 'card empty goals__empty' },
-      h('div', { class: 'goals__emblem' }, svg(icons.goals)),
-      h('div', { class: 'empty__title' }, t('goals.emptyTitle')),
-      h('p', {}, t('goals.emptyText')),
-    ), ...letters());
+    add(view, plateNote({ icon: icons.goals, title: t('goals.emptyTitle'), lead: t('goals.emptyText') }), ...bottom());
     return;
   }
 
@@ -110,13 +110,21 @@ export function render(view, ctx) {
       h('ul', { class: 'goals__list' }, ...done.map(goalRow)),
     );
   }
-  add(view, ...letters());
+  add(view, ...bottom());
 }
 
-function helpLink() {
-  return h('a', { class: 'card settings__link goals__help', href: '#/help' },
-    h('span', { class: 'card__icon' }, svg(icons.sparkle)),
-    h('span', { class: 'settings__link-text' }, h('strong', {}, t('help.title')), h('br'), h('span', { class: 'faint' }, t('help.lead'))),
-    svg(icons.chevronRight, 'settings__link-chevron'),
-  );
+// «Помощь» — библиотека: первое свидание, вопросы, общие темы, комплименты (владелец 14.11.2026)
+function helpPlate() {
+  return plateLink({ href: '#/help', icon: icons.sparkle, title: t('help.title'), lead: t('help.lead') });
+}
+
+function lettersPlate(ctx) {
+  const node = platePanel({
+    icon: icons.mail,
+    title: lt('title'),
+    open: lettersOpen,
+    body: lettersBody(ownBox, { rerender: () => { lettersOpen = true; ctx.rerender(); } }),
+  });
+  node.addEventListener('toggle', () => { lettersOpen = node.open; });
+  return node;
 }
