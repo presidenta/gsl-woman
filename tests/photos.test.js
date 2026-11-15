@@ -1,4 +1,5 @@
-// Фото (js/photos/): каждый номер из наборов и постоянных — есть файлом; брак не стоит нигде; фото меняется по дням.
+// Фото (js/photos/): каждый номер — есть файлом; брак не стоит нигде; у него и у неё в одном месте — разные кадры;
+// фото меняется по дням.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { existsSync } from 'node:fs';
@@ -25,10 +26,29 @@ test('брак не стоит нигде и не лежит в assets', () => {
   }
 });
 
-test('набор меняется по дням, постоянные — всегда одни и те же', () => {
-  const days = Array.from({ length: 6 }, (_, i) => pick('search.rhythm', new Date(2026, 10, 15 + i)));
-  assert.ok(new Set(days).size > 1, 'за неделю — разные фото');
-  assert.equal(pick('search.rhythm', new Date(2026, 10, 15, 8)), pick('search.rhythm', new Date(2026, 10, 15, 22)), 'в течение дня — одно');
-  assert.equal(fixed('questions', 0), 82, 'первая плашка вопросов — карточки «JSL»');
+// Владелец 15.11.2026: «мужчинам поставь одну фотографию, женщинам — другую… где логика?»
+test('у мужской и женской части в одном месте — ни одного общего кадра', () => {
+  for (const table of [POOLS, FIXED]) {
+    for (const key of Object.keys(table).filter((k) => k.endsWith('.woman'))) {
+      const man = table[key.replace(/\.woman$/, '.man')];
+      assert.ok(man, `у «${key}» нет пары для него`);
+      const common = table[key].filter((n) => man.includes(n));
+      assert.deepEqual(common, [], `общие кадры в «${key.replace(/\.woman$/, '')}»`);
+    }
+  }
+});
+
+test('место берёт ряд своей части; пустой ряд — без фото, чужой не подставляется', () => {
+  assert.ok(POOLS['redflag.no.man'].includes(pick('redflag.no', undefined, 'man')));
+  assert.equal(pick('redflag.no', undefined, 'woman'), null, 'кадра «она оценивает его» нет — пусто');
+  assert.ok(POOLS['us.family'].includes(pick('us.family', undefined, 'man')), 'общий ряд — когда своего нет');
+  assert.equal(fixed('questions', 0, 'woman'), 82, 'первая плашка вопросов у неё — карточки «JSL»');
+  assert.equal(fixed('questions', 0, 'man'), 10, 'у него — «Game of Sage»');
   assert.equal(pick('нет-такого'), null);
+});
+
+test('набор меняется по дням, в течение дня — одно фото', () => {
+  const days = Array.from({ length: 6 }, (_, i) => pick('love.gifts', new Date(2026, 10, 15 + i), 'man'));
+  assert.ok(new Set(days).size > 1, 'за неделю — разные фото');
+  assert.equal(pick('love.gifts', new Date(2026, 10, 15, 8), 'man'), pick('love.gifts', new Date(2026, 10, 15, 22), 'man'));
 });

@@ -12,7 +12,6 @@ import { lettersBody } from '../../letters/letters-view.js';
 import { ownBox } from '../../letters/letters.js';
 import { lt } from '../../letters/texts.js';
 import { photoOf } from '../../photos/photos.js';
-import * as side from '../../side/side.js';
 import { plateLink, platePanel } from '../../ui/plate.js';
 import * as help from '../../help/help.js';
 import { itemPlate } from '../help/help.js';
@@ -265,7 +264,7 @@ function lettersPlate(ctx) {
     open: lettersOpen,
     // Фото «пишет в блокноте» слева, вступление обтекает (js/photos/: letters.<часть>)
     cls: 'has-photo',
-    body: ((nodes) => [h('div', { class: 'has-photo' }, photoOf(`letters.${side.get() || 'woman'}`), nodes[0]), ...nodes.slice(1)])(
+    body: ((nodes) => [h('div', { class: 'has-photo' }, photoOf('letters'), nodes[0]), ...nodes.slice(1)])(
       lettersBody(ownBox, { rerender: () => { lettersOpen = true; ctx.rerender(); } })),
   });
   node.addEventListener('toggle', () => { lettersOpen = node.open; });

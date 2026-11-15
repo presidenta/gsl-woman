@@ -8,7 +8,6 @@ import { flagRow, flagTotal, picked } from '../../ui/flags.js';
 import { platePanel } from '../../ui/plate.js';
 import { folderBody } from '../help/help.js';
 import { photoOf } from '../../photos/photos.js';
-import * as side from '../../side/side.js';
 
 /* ЭКРАН «ЗНАКОМСТВО» (#/meet, владелец 14.11.2026) — технология знакомства по «темам-опознавателям»:
      1. Перед встречей — шпаргалка.
@@ -98,7 +97,7 @@ function notesCard(ctx, data, signals) {
   });
 
   // Фото «записывает после свидания» (js/photos/: meet.notes.<часть>) — слева, пояснение обтекает
-  const pic = photoOf(`meet.notes.${side.get() || 'woman'}`);
+  const pic = photoOf('meet.notes');
   return fold('notes', { icon: icons.journal, title: data.notes.title, body: [h('div', { class: 'has-photo' }, pic, h('p', { class: 'card__text' }, data.notes.text)), form] });
 }
 

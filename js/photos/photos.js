@@ -1,10 +1,13 @@
 import { h } from '../core/dom.js';
 import { POOLS, FIXED } from './catalog.js';
 import { SIZES } from './sizes.js';
+import * as side from '../side/side.js';
 
 /* ФОТО В ПРИЛОЖЕНИИ (js/photos/, владелец 15.11.2026). Где какие — catalog.js; файлы — assets/photos/NNN.webp
    (tools/photos.py). Вёрстка — как «Архетипы»: портретное фото слева, крупно, текст его обтекает; широкое — во всю
-   ширину. Фото не обрезается никогда (ни object-fit, ни рамка с пропорцией) — голова и фигура целиком. */
+   ширину. Фото не обрезается никогда (ни object-fit, ни рамка с пропорцией) — голова и фигура целиком.
+   У каждой части свои фото: место ищется сначала как «ключ.woman» / «ключ.man»; есть такой ключ, но пустой —
+   фото нет совсем (чужая роль не подставляется). */
 
 const name = (n) => String(n).padStart(3, '0');
 
@@ -14,20 +17,26 @@ const dayNo = (d = new Date()) => Math.floor(Date.UTC(d.getFullYear(), d.getMont
 // Сдвиг по имени места: соседние места в один день показывают разные кадры общего ряда
 function salt(key) {
   let s = 0;
-  for (const c of key) s = (s * 31 + c.charCodeAt(0)) >>> 0;
+  for (const c of key) s = (s * 31 + c.codePointAt(0)) >>> 0;
   return s;
 }
 
-/** Номер фото места key на сегодня (набор меняется по дням) или null, если такого набора нет. */
-export function pick(key, date) {
-  const list = POOLS[key];
+/** Ряд места для части: свой («ключ.часть»), иначе общий; нет ни того, ни другого — null. */
+function listOf(table, key, part) {
+  const own = `${key}.${part || side.get() || 'woman'}`;
+  return own in table ? table[own] : table[key] ?? null;
+}
+
+/** Номер фото места key на сегодня (набор меняется по дням) или null. part — 'woman' / 'man', по умолчанию текущая. */
+export function pick(key, date, part) {
+  const list = listOf(POOLS, key, part);
   if (!list?.length) return null;
   return list[(dayNo(date) + salt(key)) % list.length];
 }
 
 /** Постоянное фото: «Вопросы» / «Библиотека», i — порядковый номер плашки. */
-export function fixed(kind, i) {
-  const list = FIXED[kind];
+export function fixed(kind, i, part) {
+  const list = listOf(FIXED, kind, part);
   return list?.length ? list[i % list.length] : null;
 }
 

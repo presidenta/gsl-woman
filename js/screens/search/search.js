@@ -7,7 +7,6 @@ import { st } from '../../search/texts.js';
 import { platePanel } from '../../ui/plate.js';
 import { figure, highlight } from '../help/help.js';
 import { photoOf } from '../../photos/photos.js';
-import * as side from '../../side/side.js';
 
 /* Блоки — плашками со стрелкой, как во всём приложении (владелец 15.11.2026); раскрытые переживают перерисовку. */
 const opened = new Set();
@@ -84,8 +83,8 @@ function levelsList(levels) {
   )));
 }
 
-// Фото блока на сегодня (js/photos/catalog.js): сначала набор для его/её части, потом общий
-const blockPhoto = (key) => photoOf(`search.${key}.${side.get() || 'woman'}`) || photoOf(`search.${key}`);
+// Фото блока на сегодня (js/photos/catalog.js): у его и её части — свои кадры
+const blockPhoto = (key) => photoOf(`search.${key}`);
 
 function blockCard(b) {
   const pic = b.levels ? null : blockPhoto(b.key); // у пирамиды и уровней — свои фигуры
