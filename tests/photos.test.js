@@ -8,7 +8,7 @@ import { SIZES } from '../js/photos/sizes.js';
 import { pick, fixed } from '../js/photos/photos.js';
 
 // Красные на листах разбора (владелец 15.11.2026) и 22, 24 — номер Gemini на волосах
-const RED = [4, 22, 24, 39, 56, 57, 58, 72, 74, 75, 78, 79, 80, 81];
+const RED = [4, 22, 24, 39, 56, 57, 58, 72, 74, 75, 78, 79, 80, 81, 128, 129, 148, 150];
 const id = (n) => String(n).padStart(3, '0');
 const all = [...Object.values(POOLS), ...Object.values(FIXED)].flat();
 
@@ -40,7 +40,7 @@ test('у мужской и женской части в одном месте �
 
 test('место берёт ряд своей части; пустой ряд — без фото, чужой не подставляется', () => {
   assert.ok(POOLS['redflag.no.man'].includes(pick('redflag.no', undefined, 'man')));
-  assert.equal(pick('redflag.no', undefined, 'woman'), null, 'кадра «она оценивает его» нет — пусто');
+  assert.ok([153, 154].includes(pick('redflag.no', undefined, 'woman')), 'у неё — она оценивает его');
   assert.ok(POOLS['us.family'].includes(pick('us.family', undefined, 'man')), 'общий ряд — когда своего нет');
   assert.equal(fixed('questions', 0, 'woman'), 82, 'первая плашка вопросов у неё — карточки «JSL»');
   assert.equal(fixed('questions', 0, 'man'), 10, 'у него — «Game of Sage»');

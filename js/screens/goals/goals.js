@@ -170,7 +170,7 @@ export function render(view, ctx) {
   });
   if (tab !== 'mine') {
     // Фото цели пары / семьи — лентой во всю ширину (js/photos/: goals.pair, goals.family)
-    add(view, h('h1', { class: 'screen-title' }, t('goals.title')), tabs, photoOf(`goals.${tab}`), circleGoals(tab));
+    add(view, h('h1', { class: 'screen-title' }, t('goals.title')), tabs, photoOf(`goals.${tab}`, 'photo--hero'), circleGoals(tab));
     return;
   }
   const list = goals.all();
@@ -183,7 +183,7 @@ export function render(view, ctx) {
     h('h1', { class: 'screen-title' }, t('goals.title')),
     tabs,
     h('p', { class: 'screen-lead' }, t('goals.lead')),
-    photoOf('goals.mine'), // мечта вместе: лайнер, дом на колёсах, доска мечты, купола — лентой (js/photos/)
+    photoOf('goals.mine', 'photo--hero'), // мечта вместе: лайнер, дом на колёсах, доска мечты, купола — лентой (js/photos/)
     goalsBox({ list, open, done, form, input }),
     redFlagPlate(),
     meetPlate(ctx),
