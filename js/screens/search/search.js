@@ -7,6 +7,7 @@ import { st } from '../../search/texts.js';
 
 /* ЭКРАН «В ПОИСКЕ» (#/search, владелец 15.11.2026): действия для тех, кто ищет своего человека.
      1. «Мои шаги этой недели» — отметки: выходы в люди, знакомства, свидания; цель недели, золото — когда цель есть.
+        Цели — минимум / 100% / максимум (владелец 15.11.2026: «чтобы был разгон»): дошёл — отметка золотом.
      2. Блоки: сначала ты, где искать, ритм недели, переписка, пирамида мужчин (у женщин) или женщина плюс / ноль /
         минус (у мужчин) — уровни с дословными словами автора, признаки надёжного человека, уважение и близость.
         Под каждым блоком — подпись (тренинг или психологи).
@@ -16,24 +17,32 @@ import { st } from '../../search/texts.js';
 function stepsCard(steps) {
   const now = counts();
   const rows = steps.items.map((s) => {
+    // Три цели недели: минимум / 100% / максимум (владелец 15.11.2026: «чтобы был разгон»); старые тексты — одна цель
+    const goals = [['min', s.min ?? s.goal], ['full', s.full ?? s.goal], ['max', s.max ?? s.goal]];
     const num = h('span', { class: 'search-step__num' });
+    const marks = goals.map(([k, v]) => h('span', { class: 'search-step__goal' }, st(k, { n: v })));
     const row = h('li', { class: 'search-step' });
+    const levelOf = (n) => goals.filter(([, v]) => n >= v).map(([k]) => k).pop() || null;
     const paint = (n) => {
-      num.textContent = st('of', { n, goal: s.goal });
-      row.classList.toggle('is-done', n >= s.goal);
+      num.textContent = String(n);
+      goals.forEach(([, v], i) => marks[i].classList.toggle('is-reached', n >= v));
+      row.dataset.level = levelOf(n) || '';
     };
     const minus = h('button', { type: 'button', class: 'search-step__btn search-step__btn--minus', 'aria-label': st('undo') }, '−');
     const plus = h('button', { type: 'button', class: 'search-step__btn', 'aria-label': st('add') }, '+1');
     minus.addEventListener('click', () => paint(bump(s.key, -1)));
     plus.addEventListener('click', () => {
+      const before = levelOf(Number(counts()[s.key]) || 0);
       const n = bump(s.key, +1);
       paint(n);
-      if (n === s.goal) toast({ title: st('done') });
+      const after = levelOf(n);
+      if (after && after !== before) toast({ title: st('reached.' + after) });
     });
     row.append(
       h('span', { class: 'search-step__text' },
         h('span', { class: 'search-step__title' }, s.title),
-        h('span', { class: 'search-step__hint' }, s.hint)),
+        h('span', { class: 'search-step__hint' }, s.hint),
+        h('span', { class: 'search-step__goals' }, ...marks)),
       num, minus, plus,
     );
     paint(Number(now[s.key]) || 0);
@@ -46,13 +55,21 @@ function stepsCard(steps) {
   );
 }
 
+/** Слова автора дословно и подпись: автор и книга. */
+function quoteBox(q) {
+  return h('figure', { class: 'search-quote' },
+    h('blockquote', { class: 'search-quote__text' }, q.text),
+    q.source ? h('figcaption', { class: 'search-quote__source' }, `— ${q.source}`) : null,
+  );
+}
+
 function levelsList(levels) {
   return h('ol', { class: 'search-levels' }, ...levels.map((x) => h('li', { class: 'search-level' },
     h('span', { class: 'search-level__mark', 'aria-hidden': 'true' }, x.mark),
     h('span', { class: 'search-level__body' },
       h('strong', { class: 'search-level__name' }, x.name),
       h('span', { class: 'search-level__text' }, x.text),
-      x.quote ? h('q', { class: 'search-quote' }, x.quote.replace(/^«|»$/g, '')) : null,
+      x.quote ? quoteBox({ text: x.quote, source: x.source }) : null,
     ),
   )));
 }
@@ -62,8 +79,10 @@ function blockCard(b) {
     h('h2', { class: 'caps search__heading' }, b.title),
     b.lead ? h('p', { class: 'card__text' }, b.lead) : null,
     b.levels ? levelsList(b.levels) : null,
-    b.quote ? h('p', { class: 'search-quote search-quote--main' }, b.quote) : null,
     h('ul', { class: 'search__list' }, ...b.items.map((x) => h('li', {}, x))),
+    b.quotes?.length ? h('div', { class: 'search-quotes' },
+      b.quotesLead ? h('p', { class: 'caps search-quotes__lead' }, b.quotesLead) : null,
+      ...b.quotes.map(quoteBox)) : null,
     b.author ? h('p', { class: 'search__author faint' }, `— ${b.author}`) : null,
   );
 }

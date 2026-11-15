@@ -44,8 +44,14 @@
   border-radius: var(--r-md);
 }
 
-.search-step.is-done {
+.search-step[data-level='min'],
+.search-step[data-level='full'],
+.search-step[data-level='max'] {
   border-color: var(--c-line-strong);
+}
+
+.search-step[data-level='full'],
+.search-step[data-level='max'] {
   background: var(--g-gold-soft);
 }
 
@@ -62,13 +68,39 @@
 }
 
 .search-step__num {
-  font-size: var(--fs-sm);
+  font-size: var(--fs-lg, 20px);
+  font-weight: 700;
   font-variant-numeric: tabular-nums;
   color: var(--c-text-dim);
   white-space: nowrap;
 }
 
-.search-step.is-done .search-step__num { color: var(--c-gold); }
+.search-step[data-level='max'] .search-step__num,
+.search-step[data-level='full'] .search-step__num { color: var(--c-gold); }
+
+/* Три цели недели под названием: дошёл — золото */
+.search-step__goals {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 4px;
+}
+
+.search-step__goal {
+  font-size: 11px;
+  padding: 1px 7px;
+  border: 1px solid var(--c-line);
+  border-radius: 999px;
+  color: var(--c-text-dim);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.search-step__goal.is-reached {
+  color: var(--c-gold);
+  border-color: var(--c-line-strong);
+  background: var(--g-gold-soft);
+}
 
 .search-step__btn {
   min-width: 44px;
@@ -124,24 +156,33 @@
   gap: 4px;
 }
 
+.search-quotes {
+  margin-top: var(--sp-3);
+  display: grid;
+  gap: var(--sp-3);
+}
+
+.search-quotes__lead { margin: 0; color: var(--c-text-dim); }
+
+/* Слова автора: курсив, черта слева, ниже — подпись «— автор, книга» */
 .search-quote {
-  display: block;
+  margin: 0;
+  padding-left: var(--sp-3);
+  border-left: 2px solid var(--c-line-strong);
+}
+
+.search-quote__text {
+  margin: 0;
   font-style: italic;
   font-size: var(--fs-sm);
   color: var(--c-text-dim);
 }
 
-.search-quote::before { content: '«'; }
-.search-quote::after { content: '»'; }
-
-.search-quote--main {
-  margin: var(--sp-3) 0 0;
-  padding-left: var(--sp-3);
-  border-left: 2px solid var(--c-line-strong);
+.search-quote__source {
+  margin-top: 4px;
+  font-size: var(--fs-xs);
+  color: var(--c-gold);
 }
-
-.search-quote--main::before,
-.search-quote--main::after { content: none; }
 
 /* Карточка «В поиске» на «Сегодня»: название и строка о том, что внутри */
 .today__search .settings__link-text {
