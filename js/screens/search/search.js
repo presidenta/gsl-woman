@@ -71,9 +71,10 @@ function quoteBox(q) {
 
 function levelsList(levels) {
   return h('ol', { class: 'search-levels' }, ...levels.map((x) => h('li', { class: 'search-level' },
-    x.img ? h('span', { class: 'search-level__pic' }, figure(x.img), h('span', { class: 'search-level__mark search-level__mark--on', 'aria-hidden': 'true' }, x.mark))
-      : h('span', { class: 'search-level__mark', 'aria-hidden': 'true' }, x.mark),
+    x.img ? null : h('span', { class: 'search-level__mark', 'aria-hidden': 'true' }, x.mark),
     h('span', { class: 'search-level__body' },
+      // Фигура в полный рост слева, название, текст и слова автора её обтекают
+      x.img ? h('span', { class: 'search-level__pic' }, figure(x.img), h('span', { class: 'search-level__mark search-level__mark--on', 'aria-hidden': 'true' }, x.mark)) : null,
       h('strong', { class: 'search-level__name' }, x.name),
       h('span', { class: 'search-level__text' }, x.text),
       x.quote ? quoteBox({ text: x.quote, source: x.source }) : null,

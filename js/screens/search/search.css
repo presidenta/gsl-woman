@@ -199,14 +199,36 @@
 /* Блоки — плашки со стрелкой (15.11.2026); у уровня — фигура, знак — в углу фигуры */
 .search__plate { margin-top: var(--sp-3); }
 
-.search-level:has(.search-level__pic) { grid-template-columns: 76px 1fr; }
+/* Уровень с фигурой: одна колонка, фигура плавает слева, всё остальное её обтекает */
+.search-level:has(.search-level__pic) { grid-template-columns: 1fr; }
+
+.search-level:has(.search-level__pic) .search-level__body { display: flow-root; }
+
+.search-level:has(.search-level__pic) .search-level__name,
+.search-level:has(.search-level__pic) .search-level__text { display: block; }
 
 .search-level__pic {
   position: relative;
-  width: 76px;
+  float: left;
+  width: 42%;
+  max-width: 170px;
+  margin: 6px var(--sp-3) var(--sp-2) 6px;
 }
 
-.search-level__pic .help__figure { display: block; }
+.search-level__pic .help__figure {
+  float: none;
+  display: block;
+  width: 100%;
+  max-width: none;
+  margin: 0;
+}
+
+/* Слова автора рядом с фигурой — без черты слева (её закрыла бы фигура) */
+.search-level .search-quote {
+  margin-top: var(--sp-2);
+  padding-left: 0;
+  border-left: 0;
+}
 
 .search-level__mark--on {
   position: absolute;

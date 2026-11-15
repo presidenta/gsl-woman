@@ -866,7 +866,7 @@ export default {
     rulesSaved: 'Rule added',
     title: 'Вопросы',
     lead: 'Для разговора: коротко, если мало времени, и глубоко, когда есть вечер',
-    meetTitle: 'First date',
+    meetTitle: 'How to go on a date',
     library: 'Library',
     draft: 'draft',
     waiting: 'This section arrives together with the programme — open the app online.',

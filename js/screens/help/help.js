@@ -25,7 +25,8 @@ const count = (n, unit) => (unit && n ? `${n} ${plural(n, `plural.${unit}`)}` : 
 
 // Значок каждого пункта — свой, вид один
 const ITEM_ICON = { redline: 'flag', questions: 'chat', her: 'heart', words: 'heart', kpk: 'crown', authors: 'journal', types: 'rings', topics: 'rings', rules: 'home', dates: 'calendar', compliments: 'sparkle' };
-const iconOf = (key) => icons[ITEM_ICON[key]] || icons.sparkle;
+// Авторы — каждый своей плашкой (author-glover…, с 80) — значок книги
+const iconOf = (key) => icons[ITEM_ICON[key] || (key.startsWith('author-') ? 'journal' : '')] || icons.sparkle;
 
 function readBox(text) {
   return h('p', { class: 'help__read' }, h('span', { class: 'caps help__read-label' }, t('help.read')), ' ', text);
@@ -50,8 +51,8 @@ function entry(e, onFlag) {
     e.read ? readBox(e.read) : null,
     onFlag && (e.green?.length || e.red?.length) ? flagChecks(e, onFlag) : null,
   ];
-  if (!e.img) return h('li', { class: cls }, ...body);
-  return h('li', { class: cls }, figure(e.img), h('span', { class: 'help__entry-body' }, ...body));
+  // Фигура в полный рост слева, текст её обтекает (владелец 15.11.2026: «без пустоты и длинных простыней»)
+  return h('li', { class: cls }, e.img ? figure(e.img) : null, ...body);
 }
 
 function sources(list) {

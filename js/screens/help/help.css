@@ -254,24 +254,25 @@
 }
 
 
-/* Фигура типа слева от записи («Кто перед тобой», вопросы на свидании; assets/archetypes/, 15.11.2026) */
+/* Фигура типа — в полный рост слева, текст её обтекает (с 80; владелец 15.11.2026: «увеличь, текст вокруг фото,
+   без пустоты; голову и фигуру не обрезать») */
 .help__entry--figure {
-  grid-template-columns: 76px 1fr;
-  align-items: start;
-  gap: var(--sp-3);
+  display: flow-root;
 }
 
-.help__entry-body {
-  display: grid;
-  gap: var(--sp-1);
-  min-width: 0;
+.help__entry--figure .help__text,
+.help__entry--figure .help__note {
+  display: block;
 }
+
+.help__entry--figure .help__note { margin-top: var(--sp-1); }
 
 .help__figure {
-  width: 76px;
+  float: left;
+  width: 42%;
+  max-width: 170px;
   height: auto;
-  aspect-ratio: 116 / 136;
-  object-fit: cover;
+  margin: 2px var(--sp-3) var(--sp-2) 0;
   border-radius: var(--r-md);
   border: 1px solid var(--c-line);
   background: var(--c-surface-2, rgba(255, 255, 255, 0.04));
@@ -300,5 +301,5 @@
   padding-left: 0;
   list-style: none;
   display: grid;
-  gap: var(--sp-3);
+  gap: var(--sp-4);
 }
