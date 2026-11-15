@@ -5,6 +5,8 @@ import { toast } from '../../ui/toast.js';
 import { field } from '../../ui/controls.js';
 import * as meet from '../../meet/meet.js';
 import { flagRow, flagTotal, picked } from '../../ui/flags.js';
+import { platePanel } from '../../ui/plate.js';
+import { folderBody } from '../help/help.js';
 
 /* ЭКРАН «ЗНАКОМСТВО» (#/meet, владелец 14.11.2026) — технология знакомства по «темам-опознавателям»:
      1. Перед встречей — шпаргалка.
@@ -13,14 +15,28 @@ import { flagRow, flagTotal, picked } from '../../ui/flags.js';
      4. Галочки — прямо у сигналов каждой темы, под тремя темами — один итог: строить / присмотрись / своей дорогой
         (ui/flags.js — тот же вид, что в «Помощи»; владелец 15.11.2026: «не надо по два раза дублировать»).
         Отмеченное сохраняется вместе с записью «пока помнишь».
+     С 79 — каждый раздел плашкой со стрелкой; вопросы для свидания по трактовке Павла Ракова (data.guides, перенесены
+     из «Библиотеки») — с его статусом строкой под названием.
      5. Прежние записи; ниже — как держаться, комплименты или где встретить, первое свидание, вопросы глубже.
    Тексты — с сервера (meet/), у каждой части свои. Вход — «Цели», под «Письмом себе в будущее». */
 
-function listCard(title, items, cls = '') {
-  return h('section', { class: `card meet__card ${cls}` },
-    h('h2', { class: 'caps meet__heading' }, title),
-    h('ul', { class: 'meet__list' }, ...items.map((x) => h('li', {}, x))),
-  );
+/* Каждый раздел — плашка со стрелкой (владелец 15.11.2026: «везде галочки, чтобы всё скрывалось»). Раскрытые
+   переживают перерисовку (после записи свидания экран рисуется заново). */
+const opened = new Set();
+
+function fold(key, { icon = icons.sparkle, title, lead, chip, body, cls = '' }) {
+  const node = platePanel({ icon, title, lead, chip, body, open: opened.has(key), cls: `meet__plate ${cls}`.trim() });
+  node.addEventListener('toggle', () => { if (node.open) opened.add(key); else opened.delete(key); });
+  return node;
+}
+
+function listCard(title, items, cls = '', icon = icons.sparkle) {
+  return fold(`list:${title}`, { icon, title, cls, body: [h('ul', { class: 'meet__list' }, ...items.map((x) => h('li', {}, x)))] });
+}
+
+/** Вопросы для свидания по трактовке автора (из «Библиотеки», 15.11.2026): кто он — строкой под названием. */
+function guideCard(g) {
+  return fold(`guide:${g.title}`, { icon: icons.chat, title: g.title, lead: g.by, body: folderBody({ ...g, by: null }) });
 }
 
 function themeCard(th, n, onChange) {
@@ -28,14 +44,18 @@ function themeCard(th, n, onChange) {
   const signals = (color) => h('div', { class: 'flags meet__flags' },
     h('p', { class: 'caps meet__sub' }, t(`meet.${color}`)),
     ...th[color].map((text, i) => flagRow(color, text, { value: `${th.key}.${i}`, onChange })));
-  return h('section', { class: 'card meet__card meet__theme' },
-    h('div', { class: 'card__eyebrow' }, h('span', { class: 'meet__num' }, String(n)), h('span', { class: 'caps' }, th.title)),
-    h('p', { class: 'card__text' }, th.why),
-    h('p', { class: 'caps meet__sub' }, t('meet.ask')),
-    h('ul', { class: 'meet__list meet__list--ask' }, ...th.questions.map((q) => h('li', {}, q))),
-    signals('green'),
-    signals('red'),
-  );
+  return fold(`theme:${th.key}`, {
+    icon: icons.chat,
+    title: `${n}. ${th.title}`,
+    cls: 'meet__theme',
+    body: [
+      h('p', { class: 'card__text' }, th.why),
+      h('p', { class: 'caps meet__sub' }, t('meet.ask')),
+      h('ul', { class: 'meet__list meet__list--ask' }, ...th.questions.map((q) => h('li', {}, q))),
+      signals('green'),
+      signals('red'),
+    ],
+  });
 }
 
 /** Три темы с галочками и итог под ними; signals() — что отмечено (для записи). */
@@ -75,18 +95,13 @@ function notesCard(ctx, data, signals) {
     ctx.rerender();
   });
 
-  return h('section', { class: 'card card--hero meet__card' },
-    h('div', { class: 'card__eyebrow' }, h('span', { class: 'card__icon' }, svg(icons.journal)), h('span', { class: 'caps' }, data.notes.title)),
-    h('p', { class: 'card__text' }, data.notes.text),
-    form,
-  );
+  return fold('notes', { icon: icons.journal, title: data.notes.title, body: [h('p', { class: 'card__text' }, data.notes.text), form] });
 }
 
 function pastNotes(ctx, data) {
   const notes = meet.all();
   if (!notes.length) return null;
-  return h('section', { class: 'card meet__card meet__notes' },
-    h('h2', { class: 'caps meet__heading' }, t('meet.notesTitle')),
+  return fold('past', { icon: icons.journal, title: t('meet.notesTitle'), chip: String(notes.length), cls: 'meet__notes', body: [
     ...notes.map((n) => h('details', { class: 'meet__note' },
       h('summary', {},
         h('strong', {}, n.name || t('meet.noName')),
@@ -106,7 +121,7 @@ function pastNotes(ctx, data) {
         },
       }, t('meet.remove')),
     )),
-  );
+  ] });
 }
 
 export function render(view, ctx) {
@@ -119,13 +134,15 @@ export function render(view, ctx) {
   add(view,
     h('h1', { class: 'screen-title' }, data.title),
     h('p', { class: 'meet__intro' }, data.intro),
-    data.before ? listCard(data.before.title, data.before.items, 'card--hero') : null,
+    data.before ? listCard(data.before.title, data.before.items, '', icons.check) : null,
     themes?.node,
-    data.time ? listCard(data.time.title, data.time.items) : null,
+    data.time ? listCard(data.time.title, data.time.items, '', icons.week) : null,
     themes ? notesCard(ctx, data, themes.signals) : null,
     pastNotes(ctx, data),
+    // Вопросы для свидания по трактовке автора — сразу после своих записей
+    ...(data.guides || []).map(guideCard),
     ...data.sections.map((s) => listCard(s.title, s.items)),
-    ...data.questions.map((q) => listCard(q.title, q.items, 'meet__card--questions')),
-    listCard(data.signs.title, data.signs.items, 'meet__card--signs'),
+    ...data.questions.map((q) => listCard(q.title, q.items, 'meet__card--questions', icons.chat)),
+    listCard(data.signs.title, data.signs.items, 'meet__card--signs', icons.heart),
   );
 }

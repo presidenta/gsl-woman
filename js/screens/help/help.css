@@ -253,3 +253,52 @@
   margin: 0 0 var(--sp-3);
 }
 
+
+/* Фигура типа слева от записи («Кто перед тобой», вопросы на свидании; assets/archetypes/, 15.11.2026) */
+.help__entry--figure {
+  grid-template-columns: 76px 1fr;
+  align-items: start;
+  gap: var(--sp-3);
+}
+
+.help__entry-body {
+  display: grid;
+  gap: var(--sp-1);
+  min-width: 0;
+}
+
+.help__figure {
+  width: 76px;
+  height: auto;
+  aspect-ratio: 116 / 136;
+  object-fit: cover;
+  border-radius: var(--r-md);
+  border: 1px solid var(--c-line);
+  background: var(--c-surface-2, rgba(255, 255, 255, 0.04));
+}
+
+/* Лучший выбор («Какой быть — твой выбор»: муза и плюс) — золотом; остальные — тише */
+.help__entry--best {
+  padding: var(--sp-2);
+  border: 1px solid var(--c-line-strong);
+  border-radius: var(--r-md);
+  background: var(--g-gold-soft);
+}
+
+.help__entry--best .help__text { color: var(--c-gold); font-weight: 600; }
+.help__entry--best .help__figure { border-color: var(--c-line-strong); }
+
+/* Кто автор — строкой над вопросами («По трактовке Павла Ракова — …») */
+.help__by {
+  margin: 0 0 var(--sp-2);
+  font-size: var(--fs-xs);
+  color: var(--c-gold);
+}
+
+/* Список с фигурами — без отступа нумерации: фигура сама отмечает запись, текст шире */
+.help__list:has(> .help__entry--figure) {
+  padding-left: 0;
+  list-style: none;
+  display: grid;
+  gap: var(--sp-3);
+}

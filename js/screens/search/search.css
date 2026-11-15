@@ -195,3 +195,25 @@
   color: var(--c-text-dim);
   font-weight: 400;
 }
+
+/* Блоки — плашки со стрелкой (15.11.2026); у уровня — фигура, знак — в углу фигуры */
+.search__plate { margin-top: var(--sp-3); }
+
+.search-level:has(.search-level__pic) { grid-template-columns: 76px 1fr; }
+
+.search-level__pic {
+  position: relative;
+  width: 76px;
+}
+
+.search-level__pic .help__figure { display: block; }
+
+.search-level__mark--on {
+  position: absolute;
+  left: -6px;
+  top: -6px;
+  width: 28px;
+  height: 28px;
+  background: var(--c-bg, #120b0f);
+  font-size: var(--fs-sm);
+}

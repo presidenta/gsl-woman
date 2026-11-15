@@ -4,6 +4,12 @@ import { toast } from '../../ui/toast.js';
 import * as meet from '../../meet/meet.js';
 import { counts, bump } from '../../search/steps.js';
 import { st } from '../../search/texts.js';
+import { platePanel } from '../../ui/plate.js';
+import { figure } from '../help/help.js';
+
+/* Блоки — плашками со стрелкой, как во всём приложении (владелец 15.11.2026); раскрытые переживают перерисовку. */
+const opened = new Set();
+const BLOCK_ICON = { self: 'sun', where: 'eye', rhythm: 'week', chat: 'chat', pyramid: 'crown', plus: 'crown', level: 'sparkle', choose: 'check', respect: 'heart' };
 
 /* ЭКРАН «В ПОИСКЕ» (#/search, владелец 15.11.2026): действия для тех, кто ищет своего человека.
      1. «Мои шаги этой недели» — отметки: выходы в люди, знакомства, свидания; цель недели, золото — когда цель есть.
@@ -65,7 +71,8 @@ function quoteBox(q) {
 
 function levelsList(levels) {
   return h('ol', { class: 'search-levels' }, ...levels.map((x) => h('li', { class: 'search-level' },
-    h('span', { class: 'search-level__mark', 'aria-hidden': 'true' }, x.mark),
+    x.img ? h('span', { class: 'search-level__pic' }, figure(x.img), h('span', { class: 'search-level__mark search-level__mark--on', 'aria-hidden': 'true' }, x.mark))
+      : h('span', { class: 'search-level__mark', 'aria-hidden': 'true' }, x.mark),
     h('span', { class: 'search-level__body' },
       h('strong', { class: 'search-level__name' }, x.name),
       h('span', { class: 'search-level__text' }, x.text),
@@ -75,16 +82,24 @@ function levelsList(levels) {
 }
 
 function blockCard(b) {
-  return h('section', { class: 'card search__card' },
-    h('h2', { class: 'caps search__heading' }, b.title),
-    b.lead ? h('p', { class: 'card__text' }, b.lead) : null,
-    b.levels ? levelsList(b.levels) : null,
-    h('ul', { class: 'search__list' }, ...b.items.map((x) => h('li', {}, x))),
-    b.quotes?.length ? h('div', { class: 'search-quotes' },
-      b.quotesLead ? h('p', { class: 'caps search-quotes__lead' }, b.quotesLead) : null,
-      ...b.quotes.map(quoteBox)) : null,
-    b.author ? h('p', { class: 'search__author faint' }, `— ${b.author}`) : null,
-  );
+  const node = platePanel({
+    icon: icons[BLOCK_ICON[b.key]] || icons.sparkle,
+    title: b.title,
+    lead: b.by || null, // кто автор — строкой под названием («По трактовке Павла Ракова — …»)
+    open: opened.has(b.key),
+    cls: 'search__plate',
+    body: [
+      b.lead ? h('p', { class: 'card__text' }, b.lead) : null,
+      b.levels ? levelsList(b.levels) : null,
+      h('ul', { class: 'search__list' }, ...b.items.map((x) => h('li', {}, x))),
+      b.quotes?.length ? h('div', { class: 'search-quotes' },
+        b.quotesLead ? h('p', { class: 'caps search-quotes__lead' }, b.quotesLead) : null,
+        ...b.quotes.map(quoteBox)) : null,
+      b.author ? h('p', { class: 'search__author faint' }, `— ${b.author}`) : null,
+    ],
+  });
+  node.addEventListener('toggle', () => { if (node.open) opened.add(b.key); else opened.delete(b.key); });
+  return node;
 }
 
 export function render(view, ctx) {

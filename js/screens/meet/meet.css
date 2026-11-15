@@ -100,3 +100,8 @@
 .meet__chip {
   margin-left: var(--sp-2);
 }
+
+/* С 79 — каждый раздел плашкой со стрелкой; между плашками — тот же шаг, что в «Библиотеке» */
+.meet__plate { margin-top: var(--sp-3); }
+
+.meet__themes > .meet__plate:first-child { margin-top: var(--sp-3); }

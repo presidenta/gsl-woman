@@ -38,13 +38,20 @@ function flagChecks(e, onChange) {
     ...(e.red || []).map((x) => flagRow('red', x, { onChange })));
 }
 
+/** Фигура типа («Кто перед тобой», вопросы на свидании): assets/archetypes/, нарезка картинки «Архетипы» (15.11.2026). */
+export const figure = (name) => h('img', { class: 'help__figure', src: `./assets/archetypes/${name}.webp`, alt: '', loading: 'lazy', decoding: 'async' });
+
 function entry(e, onFlag) {
-  return h('li', { class: 'help__entry' },
+  // img — фигура слева; best — лучший выбор («Какой быть — твой выбор»: муза и плюс), выделен золотом
+  const cls = `help__entry${e.img ? ' help__entry--figure' : ''}${e.best ? ' help__entry--best' : ''}`;
+  const body = [
     h('span', { class: 'help__text' }, e.text),
     e.note ? h('span', { class: 'help__note' }, e.note) : null,
     e.read ? readBox(e.read) : null,
     onFlag && (e.green?.length || e.red?.length) ? flagChecks(e, onFlag) : null,
-  );
+  ];
+  if (!e.img) return h('li', { class: cls }, ...body);
+  return h('li', { class: cls }, figure(e.img), h('span', { class: 'help__entry-body' }, ...body));
 }
 
 function sources(list) {
@@ -66,7 +73,7 @@ function section(s) {
 }
 
 /** Содержимое папки: вступление, вопросы (с флагами — и итог), разделы, «как понимать», источники. */
-function folderBody(g, verdicts) {
+export function folderBody(g, verdicts) {
   let total = null;
   let list = null;
   const recount = () => {
@@ -76,6 +83,8 @@ function folderBody(g, verdicts) {
   if (g.flags) total = flagTotal(verdicts);
   list = g.entries?.length ? h('ol', { class: 'help__list' }, ...g.entries.map((e) => entry(e, g.flags ? recount : null))) : null;
   return [
+    // by — кто автор, одной строкой («По трактовке Павла Ракова — …»), как у психологов
+    g.by && g.by.length > 40 ? h('p', { class: 'help__by' }, g.by) : null,
     g.lead ? h('p', { class: 'help__section-lead' }, g.lead) : null,
     g.flags ? h('p', { class: 'faint help__flags-hint' }, t('help.flagsHint')) : null,
     list,
@@ -166,6 +175,8 @@ export function itemPlate(item, ctx, verdicts) {
     // «Красный флаг» — единственная красная плашка: это запрет, а не совет (владелец 15.11.2026)
     cls: item.key === 'redline' ? 'plate--red' : '',
     title: item.title,
+    // byline — кто автор, прямо на плашке («Кто перед тобой»: «По трактовке Павла Ракова — …», 15.11.2026)
+    lead: item.byline || null,
     chip: count(n, item.unit),
     body: [
       h('p', { class: 'card__text help__lead' }, item.lead),
