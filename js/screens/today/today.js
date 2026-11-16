@@ -421,6 +421,7 @@ function meetLink(plan, ctx) {
     points: searchSteps.today(ctx.todayIso) > 0 ? 1 : 0,
     body: [
       h('p', { class: 'caps search__heading' }, search.steps.title),
+      search.steps.lead ? h('p', { class: 'card__text search__steps-lead' }, search.steps.lead) : null,
       stepsList(search.steps),
       h('a', { class: 'love-card__link', href: '#/search' }, st('open'), svg(icons.chevronRight, 'love-card__chevron')),
     ],

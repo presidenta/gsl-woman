@@ -50,7 +50,8 @@ export function stepsList(steps) {
       h('span', { class: 'search-step__text' },
         h('span', { class: 'search-step__title' }, s.title),
         h('span', { class: 'search-step__hint' }, s.hint),
-        h('span', { class: 'search-step__goals' }, ...marks)),
+        // Цели — за неделю, и это написано прямо у чисел (владелец 16.11.2026: «мин 7» читалось как «за день»)
+        h('span', { class: 'search-step__goals' }, h('span', { class: 'search-step__per' }, st('perWeek')), ...marks)),
       num, minus, plus,
     );
     paint(Number(now[s.key]) || 0);

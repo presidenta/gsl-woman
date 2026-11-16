@@ -239,3 +239,17 @@
   background: var(--c-bg, #120b0f);
   font-size: var(--fs-sm);
 }
+
+/* «за неделю:» — перед целями мин / 100% / макс: сразу видно, что числа — на 7 дней */
+.search-step__per {
+  align-self: center;
+  font-size: var(--fs-2xs);
+  color: var(--c-text-faint);
+  letter-spacing: 0.02em;
+}
+
+.search__steps-lead {
+  margin-bottom: var(--sp-3);
+  font-size: var(--fs-sm);
+  color: var(--c-text-dim);
+}
