@@ -1,10 +1,11 @@
 import { read, write } from '../core/store.js';
-import { isoDate, addDays } from '../core/dates.js';
+import { isoDate, addDays, daysBetween, isValidIso } from '../core/dates.js';
+import * as settings from '../settings/settings.js';
 
-/* ШАГИ НЕДЕЛИ «В ПОИСКЕ» (владелец 15.11.2026: «нужно действие — что делать человеку»): выходы в люди, знакомства,
-   свидания — человек отмечает каждый шаг, счёт идёт по календарной неделе (с понедельника). Цель недели — в текстах
-   с сервера (meet.search.steps). Ключ searchsteps: { 'понедельник ISO': { out: 2, date: 1 } } — уходит в копию
-   (sync.js, вид searchstep). */
+/* «МОИ ДЕЙСТВИЯ НА 7 ДНЕЙ» — «В ПОИСКЕ» (владелец 15–16.11.2026): переписка, выходы в люди, знакомства, свидания —
+   человек отмечает каждое действие. Счёт — 7 дней ОТ ДНЯ СТАРТА человека («проплатил и подключился в среду — как
+   будет?»): дни 1–7, 8–14… программы; старта ещё нет — с понедельника. Цели — в текстах с сервера (meet.search.steps).
+   Ключ searchsteps: { 'первый день семидневки ISO': { out: 2, date: 1 } } — уходит в копию (sync.js, вид searchstep). */
 
 const KEY = 'searchsteps';
 const MAX = 99;
@@ -28,9 +29,14 @@ function bumpDay(delta) {
   write(DAY_KEY, all);
 }
 
-/** Понедельник недели даты — ключ недели. */
-export function weekKey(d = new Date()) {
-  return addDays(isoDate(d), -((d.getDay() + 6) % 7));
+/** Ключ семидневки даты: первый её день — от дня старта шагами по 7 дней; старта нет — понедельник. */
+export function weekKey(d = new Date(), start = settings.get().startDate) {
+  const iso = isoDate(d);
+  if (start && isValidIso(start)) {
+    const n = daysBetween(start, iso);
+    if (n >= 0) return addDays(start, n - (n % 7));
+  }
+  return addDays(iso, -((d.getDay() + 6) % 7));
 }
 
 /** Счёт недели { шаг: число }. */

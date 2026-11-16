@@ -22,3 +22,12 @@ test('шаги уходят в копию; подписи — одни ключ�
   assert.ok(COLLECTIONS.some((c) => c.key === 'searchsteps' && c.type === 'map'));
   for (const l of ['ua', 'en']) assert.deepEqual(Object.keys(_TEXTS[l]).sort(), Object.keys(_TEXTS.ru).sort());
 });
+
+// Владелец 16.11.2026: «проплатил и подключился в среду — как будет?» — 7 дней считаются от дня старта
+test('7 дней — от дня старта: начала в среду — со среды по вторник, потом новая семидневка', () => {
+  const start = '2026-11-18'; // среда
+  assert.equal(weekKey(new Date(2026, 10, 18), start), '2026-11-18', 'день 1');
+  assert.equal(weekKey(new Date(2026, 10, 24), start), '2026-11-18', 'день 7 — вторник, та же семидневка');
+  assert.equal(weekKey(new Date(2026, 10, 25), start), '2026-11-25', 'день 8 — новая семидневка');
+  assert.equal(weekKey(new Date(2026, 10, 17), start), '2026-11-16', 'до старта — как раньше, с понедельника');
+});

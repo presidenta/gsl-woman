@@ -25,105 +25,6 @@
   text-align: right;
 }
 
-/* Шаги недели: название и подсказка, счёт, «−» и «+1»; цель есть — золото */
-.search-steps {
-  margin: var(--sp-3) 0 0;
-  padding: 0;
-  list-style: none;
-  display: grid;
-  gap: var(--sp-2);
-}
-
-.search-step {
-  display: grid;
-  grid-template-columns: 1fr auto auto auto;
-  align-items: center;
-  gap: var(--sp-2);
-  padding: var(--sp-2) var(--sp-3);
-  border: 1px solid var(--c-line);
-  border-radius: var(--r-md);
-}
-
-.search-step[data-level='min'],
-.search-step[data-level='full'],
-.search-step[data-level='max'] {
-  border-color: var(--c-line-strong);
-}
-
-.search-step[data-level='full'],
-.search-step[data-level='max'] {
-  background: var(--g-gold-soft);
-}
-
-.search-step__text {
-  display: grid;
-  min-width: 0;
-}
-
-.search-step__title { font-weight: 600; }
-
-.search-step__hint {
-  font-size: var(--fs-xs);
-  color: var(--c-text-dim);
-}
-
-.search-step__num {
-  font-size: var(--fs-lg, 20px);
-  font-weight: 700;
-  font-variant-numeric: tabular-nums;
-  color: var(--c-text-dim);
-  white-space: nowrap;
-}
-
-.search-step[data-level='max'] .search-step__num,
-.search-step[data-level='full'] .search-step__num { color: var(--c-gold); }
-
-/* Три цели недели под названием: дошёл — золото */
-.search-step__goals {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 4px;
-  margin-top: 4px;
-}
-
-.search-step__goal {
-  font-size: 11px;
-  padding: 1px 7px;
-  border: 1px solid var(--c-line);
-  border-radius: 999px;
-  color: var(--c-text-dim);
-  font-variant-numeric: tabular-nums;
-  white-space: nowrap;
-}
-
-.search-step__goal.is-reached {
-  color: var(--c-gold);
-  border-color: var(--c-line-strong);
-  background: var(--g-gold-soft);
-}
-
-.search-step__btn {
-  min-width: 44px;
-  height: 40px;
-  padding: 0 var(--sp-2);
-  border: 1px solid var(--c-line-strong);
-  border-radius: 999px;
-  background: var(--g-gold-soft);
-  color: var(--c-gold);
-  font: inherit;
-  font-weight: 700;
-  cursor: pointer;
-}
-
-.search-step__btn--minus {
-  min-width: 36px;
-  background: none;
-  border-color: var(--c-line);
-  color: var(--c-text-dim);
-}
-
-.search-step__btn:active { transform: scale(0.95); }
-
 /* Уровни: буква или знак в круге, название, наш текст, ниже — слова автора */
 .search-levels {
   margin: var(--sp-3) 0 0;
@@ -240,16 +141,157 @@
   font-size: var(--fs-sm);
 }
 
-/* «за неделю:» — перед целями мин / 100% / макс: сразу видно, что числа — на 7 дней */
-.search-step__per {
-  align-self: center;
-  font-size: var(--fs-2xs);
-  color: var(--c-text-faint);
-  letter-spacing: 0.02em;
+/* «МОИ ДЕЙСТВИЯ НА 7 ДНЕЙ» — утверждённый эскиз 16.11.2026: одно поле, тонкая линия между действиями.
+   Сетка: [−] [полоска] [+]; название — над полоской, кружок «что считается» — над «+». Зелёный — тот же, что «+1 балл». */
+.acts {
+  display: grid;
 }
 
-.search__steps-lead {
-  margin-bottom: var(--sp-3);
+.act {
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr) 34px;
+  /* Каждому — своё место: название и «что считается» сверху, пояснение, 100%, [−][полоска][+], мин и макс */
+  grid-template-areas:
+    'name  name  info'
+    'about about about'
+    '.     top   .'
+    'minus track plus'
+    '.     labs  .';
+  column-gap: var(--sp-2);
+  align-items: center;
+  padding: var(--sp-3) 0 var(--sp-1);
+}
+
+.act + .act {
+  border-top: 1px solid var(--c-line);
+}
+
+.act__name {
+  grid-area: name;
+  margin: 0;
+  font-size: var(--fs-md);
+  font-weight: 600;
+  color: var(--c-text);
+}
+
+.act__n {
+  margin-left: 6px;
+  color: var(--c-score);
+  font-size: var(--fs-lg);
+  font-variant-numeric: tabular-nums;
+}
+
+.act__about {
+  grid-area: about;
+  margin: var(--sp-1) 0 0;
   font-size: var(--fs-sm);
   color: var(--c-text-dim);
 }
+
+.act__about[hidden] { display: none; }
+
+/* Кружки: «что считается» (золото), «−», «+» (зелёный) — один размер */
+.act__btn {
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 1px solid var(--c-line-strong);
+  border-radius: 50%;
+  background: none;
+  color: var(--c-gold);
+  font: inherit;
+  font-size: 19px;
+  font-weight: 600;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.act__btn:active { transform: scale(0.94); }
+
+.act__btn--info { grid-area: info; }
+.act__btn--minus { grid-area: minus; }
+
+.act__chev {
+  width: 16px;
+  height: 16px;
+  transform: rotate(90deg);
+  transition: transform 0.2s ease;
+}
+
+.act__btn--info.is-open .act__chev { transform: rotate(-90deg); }
+
+.act__btn--plus {
+  grid-area: plus;
+  border-color: rgba(var(--rgb-score), 0.55);
+  background: rgba(var(--rgb-score), 0.12);
+  color: var(--c-score);
+}
+
+/* Полоска-батарея: деление — одно действие; после максимума — пунктир «можно больше» */
+.act__track {
+  grid-area: track;
+  position: relative;
+  height: 16px;
+  display: flex;
+  gap: 2px;
+}
+
+.act__seg {
+  flex: 1;
+  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.07);
+}
+
+.act__seg--more {
+  background: none;
+  border: 1px dashed rgba(255, 255, 255, 0.16);
+}
+
+.act__seg.is-on {
+  border: 0;
+  background: linear-gradient(180deg, #c6ec8a, var(--c-score));
+  box-shadow: 0 0 6px rgba(var(--rgb-score), 0.45);
+}
+
+.act__mark {
+  position: absolute;
+  top: -4px;
+  bottom: -4px;
+  width: 2px;
+  margin-left: -1px;
+  border-radius: 2px;
+  background: var(--c-gold);
+}
+
+.act__mark.is-hit {
+  background: var(--c-score);
+  box-shadow: 0 0 8px rgba(var(--rgb-score), 0.8);
+}
+
+/* Подписи отметок: 100% — над полоской, мин и макс — под ней (так подписи не слипаются, когда числа рядом) */
+.act__labels {
+  grid-area: labs;
+  position: relative;
+  height: 16px;
+  margin-top: 4px;
+}
+
+.act__labels--top {
+  grid-area: top;
+  margin: var(--sp-2) 0 2px;
+}
+
+.act__lab {
+  position: absolute;
+  transform: translateX(-50%);
+  font-size: 10.5px;
+  font-weight: 600;
+  color: var(--c-text-faint);
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.act__lab--full { color: var(--c-gold); }
+.act__lab.is-hit { color: var(--c-score); }

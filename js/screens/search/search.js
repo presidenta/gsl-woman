@@ -13,57 +13,82 @@ const opened = new Set();
 const BLOCK_ICON = { self: 'sun', where: 'eye', rhythm: 'week', chat: 'chat', pyramid: 'crown', plus: 'crown', level: 'sparkle', choose: 'check', respect: 'heart' };
 
 /* ЭКРАН «В ПОИСКЕ» (#/search, владелец 15.11.2026): действия для тех, кто ищет своего человека.
-     1. «Мои шаги этой недели» — отметки: выходы в люди, знакомства, свидания; цель недели, золото — когда цель есть.
-        Цели — минимум / 100% / максимум (владелец 15.11.2026: «чтобы был разгон»): дошёл — отметка золотом.
+     1. «Мои действия на 7 дней» — переписка, выходы в люди, знакомства, свидания: полоска-батарея с целями
+        мин / 100% / макс (владелец 15–16.11.2026: «чтобы был разгон», «как аккумулятор в телефоне»).
      2. Блоки: сначала ты, где искать, ритм недели, переписка, пирамида мужчин (у женщин) или женщина плюс / ноль /
         минус (у мужчин) — уровни с дословными словами автора, признаки надёжного человека, уважение и близость.
         Под каждым блоком — подпись (тренинг или психологи).
      3. Ссылка в «Знакомство» — шпаргалка к встрече и запись после свидания.
    Тексты — с сервера (meet.search), подробно — js/search/README.md. */
 
-/** Шаги недели с «+1» / «−» и тремя целями — список; его ставят экран «В поиске» и карточка на «Сегодня». */
+/* «МОИ ДЕЙСТВИЯ НА 7 ДНЕЙ» (утверждённый эскиз владельца 16.11.2026) — одно поле, без рамок у каждого действия:
+     название и число зелёным; справа над «+» — кружок со стрелкой: «что считается» (пояснение раскрывается под
+     названием); полоска-батарея: одно действие — одно деление, «−» слева, «+» справа; отметки мин / 100% / макс
+     подписаны всегда (100% — над полоской, мин и макс — под ней), дошёл — отметка и подпись зелёные; после максимума
+     полоска идёт дальше пунктиром — «можно больше». Счёт — 7 дней от дня старта (search/steps.js). */
+const aboutOpen = new Set(); // раскрытые пояснения переживают перерисовку (каждое «+» перерисовывает экран)
+
+function actRow(s, n) {
+  // Три цели: минимум / 100% / максимум; старые тексты — одна цель
+  const min = s.min ?? s.goal;
+  const full = s.full ?? s.goal;
+  const max = s.max ?? s.goal;
+  const total = Math.max(max + Math.max(2, Math.ceil(max * 0.25)), n + 1); // деления до максимума и «можно больше»
+  const at = (v) => ({ left: `${(v / total) * 100}%` });
+  const levelOf = (x) => [['min', min], ['full', full], ['max', max]].filter(([, v]) => x >= v).map(([k]) => k).pop() || null;
+
+  const segs = Array.from({ length: total }, (_, i) =>
+    h('span', { class: `act__seg${i >= max ? ' act__seg--more' : ''}${i < n ? ' is-on' : ''}` }));
+  const marks = [min, full, max].map((v) => h('span', { class: `act__mark${n >= v ? ' is-hit' : ''}`, style: at(v) }));
+  const label = (key, v) => h('span', { class: `act__lab act__lab--${key}${n >= v ? ' is-hit' : ''}`, style: at(v) }, st(key, { n: v }));
+
+  const open = aboutOpen.has(s.key);
+  const about = h('p', { class: 'act__about', id: `act-about-${s.key}`, hidden: !open }, s.hint);
+  const info = h('button', {
+    type: 'button',
+    class: `act__btn act__btn--info${open ? ' is-open' : ''}`,
+    'aria-expanded': String(open),
+    'aria-controls': `act-about-${s.key}`,
+    'aria-label': st('about'),
+  }, svg(icons.chevronRight, 'act__chev'));
+  info.addEventListener('click', () => {
+    const now = !aboutOpen.has(s.key);
+    if (now) aboutOpen.add(s.key); else aboutOpen.delete(s.key);
+    about.hidden = !now;
+    info.classList.toggle('is-open', now);
+    info.setAttribute('aria-expanded', String(now));
+  });
+
+  const minus = h('button', { type: 'button', class: 'act__btn act__btn--minus', 'aria-label': st('undo') }, '−');
+  const plus = h('button', { type: 'button', class: 'act__btn act__btn--plus', 'aria-label': st('add') }, '+');
+  minus.addEventListener('click', () => bump(s.key, -1));
+  plus.addEventListener('click', () => {
+    const before = levelOf(n);
+    const after = levelOf(bump(s.key, +1));
+    if (after && after !== before) toast({ title: st('reached.' + after) });
+  });
+
+  return h('div', { class: 'act' },
+    h('p', { class: 'act__name' }, s.title, ' ', h('b', { class: 'act__n' }, String(n))),
+    info,
+    about,
+    h('div', { class: 'act__labels act__labels--top' }, label('full', full)),
+    minus,
+    h('div', { class: 'act__track', role: 'img', 'aria-label': `${s.title}: ${n}` }, ...segs, ...marks),
+    plus,
+    h('div', { class: 'act__labels' }, label('min', min), label('max', max)),
+  );
+}
+
+/** «Мои действия на 7 дней» — список; его ставят экран «В поиске» и карточка на «Сегодня». */
 export function stepsList(steps) {
   const now = counts();
-  const rows = steps.items.map((s) => {
-    // Три цели недели: минимум / 100% / максимум (владелец 15.11.2026: «чтобы был разгон»); старые тексты — одна цель
-    const goals = [['min', s.min ?? s.goal], ['full', s.full ?? s.goal], ['max', s.max ?? s.goal]];
-    const num = h('span', { class: 'search-step__num' });
-    const marks = goals.map(([k, v]) => h('span', { class: 'search-step__goal' }, st(k, { n: v })));
-    const row = h('li', { class: 'search-step' });
-    const levelOf = (n) => goals.filter(([, v]) => n >= v).map(([k]) => k).pop() || null;
-    const paint = (n) => {
-      num.textContent = String(n);
-      goals.forEach(([, v], i) => marks[i].classList.toggle('is-reached', n >= v));
-      row.dataset.level = levelOf(n) || '';
-    };
-    const minus = h('button', { type: 'button', class: 'search-step__btn search-step__btn--minus', 'aria-label': st('undo') }, '−');
-    const plus = h('button', { type: 'button', class: 'search-step__btn', 'aria-label': st('add') }, '+1');
-    minus.addEventListener('click', () => paint(bump(s.key, -1)));
-    plus.addEventListener('click', () => {
-      const before = levelOf(Number(counts()[s.key]) || 0);
-      const n = bump(s.key, +1);
-      paint(n);
-      const after = levelOf(n);
-      if (after && after !== before) toast({ title: st('reached.' + after) });
-    });
-    row.append(
-      h('span', { class: 'search-step__text' },
-        h('span', { class: 'search-step__title' }, s.title),
-        h('span', { class: 'search-step__hint' }, s.hint),
-        // Цели — за неделю, и это написано прямо у чисел (владелец 16.11.2026: «мин 7» читалось как «за день»)
-        h('span', { class: 'search-step__goals' }, h('span', { class: 'search-step__per' }, st('perWeek')), ...marks)),
-      num, minus, plus,
-    );
-    paint(Number(now[s.key]) || 0);
-    return row;
-  });
-  return h('ul', { class: 'search-steps' }, ...rows);
+  return h('div', { class: 'acts' }, ...steps.items.map((s) => actRow(s, Number(now[s.key]) || 0)));
 }
 
 function stepsCard(steps) {
   return h('section', { class: 'card card--hero search__card' },
     h('h2', { class: 'caps search__heading' }, steps.title),
-    steps.lead ? h('p', { class: 'card__text' }, steps.lead) : null,
     stepsList(steps),
   );
 }
