@@ -357,7 +357,13 @@ function scheduleDraw() {
   });
 }
 
-preview.onChange(() => { draw(); scrollTo({ top: 0 }); });
+// Листание дней — страница остаётся на том же месте (владелец 16.11.2026: «переключать день в любом месте и смотреть,
+// меняется или нет»); полоска со стрелками закреплена под шапкой (preview/preview.css)
+preview.onChange(() => {
+  const y = scrollY;
+  draw();
+  scrollTo({ top: y });
+});
 
 addEventListener('sheet-closed', () => {
   if (!pending) return;
