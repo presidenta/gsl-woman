@@ -47,10 +47,8 @@ export const COLLECTIONS = [
   { key: 'steps', kind: 'steps', type: 'map', empty: {} },
   // «Получилось» у «Пяти языков любви» и «Я-сообщения» (score/deeds.js, сборка 57)
   { key: 'deeds', kind: 'deeds', type: 'map', empty: {} },
-  // «В поиске» — шаги недели: выходы, знакомства, свидания (search/steps.js, 15.11.2026)
-  { key: 'searchsteps', kind: 'searchstep', type: 'map', empty: {} },
-  // …и сколько шагов отмечено в каждый день — балл «В поиске» на «Сегодня» (search/steps.js, сборка 90)
-  { key: 'searchday', kind: 'searchday', type: 'map', empty: {} },
+  // «В поиске» — действия по дням: из одного журнала и полоски 7 дней, и балл дня (search/steps.js, сборка 98)
+  { key: 'searchlog', kind: 'searchlog', type: 'map', empty: {} },
   { key: 'settings', kind: 'settings', type: 'single', empty: null },
   { key: 'love', kind: 'love', type: 'single', empty: null },
   // Записи после свиданий — «Знакомство» (meet/, 14.11.2026)

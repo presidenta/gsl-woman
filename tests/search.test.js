@@ -1,25 +1,61 @@
-// «В поиске» (js/search/): шаги недели считаются по календарной неделе с понедельника, в пределах 0…99.
+// «В поиске» (js/search/): один журнал действий по дням; полоски — сумма дней семидневки, балл дня — из того же журнала.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { weekKey, counts, bump } from '../js/search/steps.js';
+import { weekKey, counts, bump, today } from '../js/search/steps.js';
 import { _TEXTS } from '../js/search/texts.js';
 import { COLLECTIONS } from '../js/sync/sync.js';
+import { read, write } from '../js/core/store.js';
+import { isoDate, addDays } from '../js/core/dates.js';
 
-test('неделя — с понедельника; отметки +1 и −1, ниже нуля — ноль', () => {
-  assert.equal(weekKey(new Date(2026, 10, 15)), '2026-11-09', 'воскресенье → понедельник той же недели');
-  assert.equal(weekKey(new Date(2026, 10, 16)), '2026-11-16');
-  const w = '2026-11-09';
-  assert.equal(bump('out', 1, w), 1);
-  assert.equal(bump('out', 1, w), 2);
-  assert.equal(bump('out', -1, w), 1);
-  assert.equal(bump('date', -1, w), 0);
-  assert.deepEqual(counts(w), { out: 1, date: 0 });
-  assert.deepEqual(counts('2026-11-16'), {}, 'новая неделя — с нуля');
-  assert.equal(bump('Плохой ключ', 1, w), 0);
+test('старта нет — семидневка с понедельника', () => {
+  assert.equal(weekKey(new Date(2026, 10, 15), null), '2026-11-09', 'воскресенье → понедельник той же недели');
+  assert.equal(weekKey(new Date(2026, 10, 16), null), '2026-11-16');
+});
+
+test('отметки +1 и −1, ниже нуля — ноль; неверный ключ не пишется', () => {
+  write('searchlog', {});
+  assert.equal(bump('out', 1), 1);
+  assert.equal(bump('out', 1), 2);
+  assert.equal(bump('out', -1), 1);
+  assert.equal(bump('date', -1), 0);
+  assert.deepEqual(counts(), { out: 1 });
+  assert.equal(bump('Плохой ключ', 1), 0);
+});
+
+// Владелец 16.11.2026: «везде 0, а вверху +1 — это как понимать?» — балл и полоски из одного журнала
+test('балл дня и полоски не расходятся: есть балл — есть и число на полоске', () => {
+  write('searchlog', {});
+  const iso = isoDate(new Date());
+  assert.equal(today(iso), 0);
+  bump('chat', 1);
+  assert.equal(today(iso), 1);
+  assert.equal(counts().chat, 1);
+  bump('chat', -1);
+  assert.equal(today(iso), 0, 'сняла отметку — балла нет');
+  assert.deepEqual(counts(), {});
+  assert.deepEqual(read('searchlog', {}), {}, 'пустой день из журнала убран');
+});
+
+test('«−» без сегодняшних отметок снимает последнюю в семидневке; чужие семидневки не считаются', () => {
+  const now = new Date();
+  const iso = isoDate(now);
+  const week = weekKey(now);
+  const old = addDays(week, -1); // день прошлой семидневки
+  const log = { [old]: { out: 5 } };
+  if (week !== iso) log[week] = { out: 2 };
+  write('searchlog', log);
+  const had = week !== iso ? 2 : 0;
+  assert.equal(counts().out || 0, had, 'прошлая семидневка в счёт не идёт');
+  if (had) {
+    assert.equal(bump('out', -1), 1);
+    assert.deepEqual(read('searchlog', {})[week], { out: 1 }, 'снята отметка первого дня семидневки');
+    assert.equal(today(iso), 0, 'сегодня отметок нет — и балла нет');
+  }
+  assert.deepEqual(read('searchlog', {})[old], { out: 5 }, 'прошлая семидневка не тронута');
 });
 
 test('шаги уходят в копию; подписи — одни ключи на трёх языках', () => {
-  assert.ok(COLLECTIONS.some((c) => c.key === 'searchsteps' && c.type === 'map'));
+  assert.ok(COLLECTIONS.some((c) => c.key === 'searchlog' && c.type === 'map'));
   for (const l of ['ua', 'en']) assert.deepEqual(Object.keys(_TEXTS[l]).sort(), Object.keys(_TEXTS.ru).sort());
 });
 
