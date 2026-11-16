@@ -357,7 +357,7 @@ export default {
     title: 'Icon on home screen',
     lead: 'GSL Woman+ will open from your home screen with one tap, like a regular app.',
     button: 'Add the icon',
-    ios: 'In Safari tap “Share” at the bottom, then “Add to Home Screen”.',
+    ios: 'Safari: tap “Share” at the bottom, then “Add to Home Screen”. Chrome: tap “Share” at the top right of the address bar, then “Add to Home Screen”.',
     menu: 'Open the browser menu (⋮) and choose “Install app” or “Add to Home screen”.',
   },
   preview: {
