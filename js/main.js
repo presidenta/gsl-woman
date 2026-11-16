@@ -3,6 +3,7 @@ import { t, setLang } from './core/i18n.js';
 import { subscribe } from './core/store.js';
 import * as backup from './backup/index.js';
 import { isoDate, programDay } from './core/dates.js';
+import * as photos from './photos/photos.js';
 import * as router from './core/router.js';
 import { register as registerWorker } from './core/updates.js';
 import * as settings from './settings/settings.js';
@@ -92,12 +93,14 @@ let gate = { mode: 'form', message: '' };
 function context() {
   const s = settings.get();
   const todayIso = isoDate();
+  // У администратора — день, который он листает стрелками (js/preview/), у участницы — настоящий
+  const day = preview.dayFor(s.startDate ? programDay(s.startDate, todayIso) : 0);
+  photos.useDay(day); // фото мест идут по этому дню: листаешь дни — меняются и фото (js/photos/)
   return {
     settings: s,
     entries: journal.all(),
     todayIso,
-    // У администратора — день, который он листает стрелками (js/preview/), у участницы — настоящий
-    day: preview.dayFor(s.startDate ? programDay(s.startDate, todayIso) : 0),
+    day,
     realDay: s.startDate ? programDay(s.startDate, todayIso) : 0,
     lang: s.lang,
     version: VERSION,

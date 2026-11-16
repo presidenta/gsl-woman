@@ -20,6 +20,20 @@ const dayNo = (d = new Date()) => Math.floor(Date.UTC(d.getFullYear(), d.getMont
 const START = dayNo(new Date(2026, 10, 16));
 const mod = (a, n) => ((a % n) + n) % n;
 
+/* ДЕНЬ НА ЭКРАНЕ (16.11.2026, причина «фото не меняется»): фото брались по дате на часах, а администратор листает дни
+   стрелками (js/preview/) — день на экране меняется, дата нет, и на всех днях стояла одна картинка. Теперь фото идут
+   по дню программы, который показан: у участницы он растёт каждый день сам, у администратора — за стрелками.
+   main.js → context() сообщает его перед каждой отрисовкой. Дня ещё нет (старт не задан) — по дате, как раньше. */
+let shownDay = null;
+
+/** День программы на экране (1, 2, 3…): с ним фото места — кадр № день по кругу. */
+export function useDay(day) {
+  shownDay = Number.isInteger(day) && day > 0 ? day : null;
+}
+
+// Сколько шагов круга прошло: дата задана (проверки) — по ней; иначе — день на экране; нет дня — по часам
+const stepOf = (date) => (date ? dayNo(date) - START : shownDay ? shownDay - 1 : dayNo() - START);
+
 /** Ряд места для части: свой («ключ.часть»), иначе общий; нет ни того, ни другого — null. */
 function listOf(table, key, part) {
   const own = `${key}.${part || side.get() || 'woman'}`;
@@ -30,7 +44,7 @@ function listOf(table, key, part) {
 export function pick(key, date, part) {
   const list = listOf(POOLS, key, part);
   if (!list?.length) return null;
-  return list[mod(dayNo(date) - START, list.length)];
+  return list[mod(stepOf(date), list.length)];
 }
 
 /** Постоянное фото: «Вопросы» / «Библиотека», i — порядковый номер плашки. */

@@ -5,7 +5,7 @@ import assert from 'node:assert/strict';
 import { existsSync } from 'node:fs';
 import { POOLS, FIXED } from '../js/photos/catalog.js';
 import { SIZES } from '../js/photos/sizes.js';
-import { pick, fixed } from '../js/photos/photos.js';
+import { pick, fixed, useDay } from '../js/photos/photos.js';
 
 // Красные на листах разбора (владелец 15.11.2026) и 22, 24 — номер Gemini на волосах
 const RED = [4, 22, 24, 39, 56, 57, 58, 72, 74, 75, 78, 79, 80, 81, 128, 129, 148, 150];
@@ -29,7 +29,8 @@ test('брак не стоит нигде и не лежит в assets', () => {
 // Владелец 15.11.2026: «мужчинам поставь одну фотографию, женщинам — другую… где логика?»
 test('у мужской и женской части в одном месте — ни одного общего кадра', () => {
   for (const table of [POOLS, FIXED]) {
-    for (const key of Object.keys(table).filter((k) => k.endsWith('.woman'))) {
+    // Стакан — исключение владельца (16.11.2026): кадры, где пьют вдвоём, «можно ставить и мужчине, и женщине»
+    for (const key of Object.keys(table).filter((k) => k.endsWith('.woman') && !k.startsWith('water.'))) {
       const man = table[key.replace(/\.woman$/, '.man')];
       assert.ok(man, `у «${key}» нет пары для него`);
       const common = table[key].filter((n) => man.includes(n));
@@ -64,5 +65,22 @@ test('стакан воды: каждый день новый кадр, весь
       assert.deepEqual(days.slice(list.length), first, `${key} ${part}: потом тот же круг`);
     }
   }
-  assert.ok(POOLS['water.morning.woman'].some((n) => [87, 105, 107].includes(n)), 'есть кадры, где пьют вдвоём');
+  for (const part of ['woman', 'man']) assert.ok([87, 88, 105, 106, 107].every((n) => POOLS[`water.morning.${part}`].includes(n)), 'вдвоём — у обоих');
+});
+
+// 16.11.2026, причина «на всех днях одна картинка»: администратор листает дни стрелками — фото идут по дню на экране
+test('фото идут по дню программы на экране: день 1, 2, 3… — кадры ряда по порядку, утром и вечером', () => {
+  for (const part of ['woman', 'man']) {
+    for (const key of ['water.morning', 'water.night']) {
+      const list = POOLS[`${key}.${part}`];
+      const shown = [];
+      for (let day = 1; day <= list.length + 1; day++) {
+        useDay(day);
+        shown.push(pick(key, undefined, part));
+      }
+      assert.deepEqual(shown.slice(0, list.length), list, `${key} ${part}: день 1 — первый кадр, дальше по порядку`);
+      assert.equal(shown[list.length], list[0], `${key} ${part}: потом снова с первого`);
+    }
+  }
+  useDay(null);
 });
