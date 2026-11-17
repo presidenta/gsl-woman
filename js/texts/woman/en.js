@@ -985,7 +985,8 @@ export default {
     record: "Record your voice",
     again: "Record again",
     stop: "Stop recording",
-    hint: "Recording {time}: listen to how you sound. It stays on this phone only while the app is open.",
+    hint: "Recording {time}. It stays on this phone until the end of the day, then deletes itself. Want to keep it? Tap “Save it for yourself”.",
+    save: "Save it for yourself (Telegram, phone)",
     denied: "Microphone access is needed: allow it in your phone settings.",
   },
   // Замер недели (js/pulse/, владелец 17.11.2026)

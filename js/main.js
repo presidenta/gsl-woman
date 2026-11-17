@@ -462,3 +462,5 @@ native.start(() => ({ settings: settings.get(), entries: journal.all() }));
 registerWorker({ onUpdated: () => toast({ title: t('update.ready') }) });
 // Уведомления о новых сообщениях пары и семьи: разрешение уже есть — подписаться на пуши сервера (js/push/)
 push.ensure();
+// Записи «Проверь свой голос» живут до конца дня: вчерашние стираются при открытии (js/voice-check/)
+import('./voice-check/voice-check.js').then((m) => m.sweep()).catch(() => {});
