@@ -30,8 +30,19 @@ const LOCALES = { ua: 'uk-UA', ru: 'ru-RU', en: 'en-GB' };
 
 let lang = FALLBACK_LANG;
 
+// Кто хочет знать о смене языка (каталоги детского кабинета — kids/l10n.js)
+const listeners = new Set();
+
+/** Подписка на смену языка: сразу вызывается с текущим, потом — при каждой смене. */
+export function onLang(fn) {
+  listeners.add(fn);
+  fn(lang);
+  return () => listeners.delete(fn);
+}
+
 export function setLang(next) {
   lang = LANGS.includes(next) ? next : FALLBACK_LANG;
+  for (const fn of listeners) fn(lang);
   // В тестах (node) страницы нет — язык меняется только в памяти
   if (globalThis.document) document.documentElement.lang = lang === 'ua' ? 'uk' : lang;
 }

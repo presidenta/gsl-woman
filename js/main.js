@@ -7,6 +7,8 @@ import * as photos from './photos/photos.js';
 import * as router from './core/router.js';
 import * as pace from './pace/pace.js';
 import * as cycle from './cycle/cycle.js';
+// Каталоги детского кабинета на языке приложения (kids/l10n.js, 17.11.2026)
+import './kids/l10n.js';
 import * as push from './push/push.js';
 import { register as registerWorker } from './core/updates.js';
 import * as settings from './settings/settings.js';

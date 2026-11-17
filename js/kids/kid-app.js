@@ -2,6 +2,8 @@ import { h, svg, mount } from '../core/dom.js';
 import { icons } from '../ui/icons.js';
 import { subscribe } from '../core/store.js';
 import { setLang, setSide, detectLang } from '../core/i18n.js';
+// Каталоги детского кабинета на языке приложения (kids/l10n.js, 17.11.2026)
+import './l10n.js';
 import { isoDate, addDays } from '../core/dates.js';
 import { toast } from '../ui/toast.js';
 import { t } from '../core/i18n.js';

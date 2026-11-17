@@ -224,3 +224,37 @@ test('тексты кабинета на украинском и английс�
     for (const s of vals(x)) assert.doesNotMatch(s, NEG[l], `${l}: ${s}`);
   }
 });
+
+// Каталоги кабинета на трёх языках (kids/l10n.js, 17.11.2026)
+test('каталоги кабинета: переводы на каждую запись, только положительные слова, русский возвращается', async () => {
+  const { setLang } = await import('../js/core/i18n.js');
+  const { applyLang, _ru } = await import('../js/kids/l10n.js');
+  const UA = (await import('../js/kids/l10n-ua.js')).default;
+  const EN = (await import('../js/kids/l10n-en.js')).default;
+  const { PROFESSIONS } = await import('../js/kids/dreams-catalog.js');
+  const { POWER } = await import('../js/kids/ages.js');
+  const NEG = {
+    ua: /(^|[^а-яіїєґ'’])(не|ні|нема|немає|без)(?=[^а-яіїєґ'’]|$)/i,
+    en: /\b(not|no|never|nothing|nobody|none|without|don[’']t|can[’']t|won[’']t)\b/i,
+  };
+  const vals = (o) => (typeof o === 'string' ? [o] : Object.values(o).flatMap(vals));
+  for (const [l, T] of Object.entries({ ua: UA, en: EN })) {
+    assert.deepEqual(Object.keys(T.sections).sort(), SKILL_SECTIONS.map((s) => s.id).sort(), `${l}: разделы`);
+    assert.deepEqual(Object.keys(T.skills).sort(), Object.keys(SKILLS).sort(), `${l}: навыки`);
+    assert.deepEqual(Object.keys(T.games).sort(), GAMES.map((g) => g.id).sort(), `${l}: игры`);
+    assert.equal(T.tasks.length, TASK_IDEAS.length, `${l}: дела`);
+    assert.equal(T.levels.length, LEVELS.length, `${l}: ступени`);
+    for (const p of PROFESSIONS) {
+      for (const [id] of p.steps.filter(([id]) => !id.startsWith('skill:'))) assert.ok(T.professions[p.id]?.steps?.[id], `${l}: ${p.id}.${id}`);
+    }
+    for (const k of Object.keys(POWER)) assert.equal(T.power[k].length, _ru.power[k].length, `${l}: суперсила ${k}`);
+    // Только положительные слова
+    for (const s of vals(T)) assert.doesNotMatch(s, NEG[l], `${l}: ${s}`);
+  }
+  setLang('en');
+  assert.equal(SKILLS.kettle.title, EN.skills.kettle);
+  setLang('ru');
+  applyLang('ru');
+  assert.equal(SKILLS.kettle.title, _ru.sections[0].skills[0]);
+  assert.equal(GAMES[0].title, _ru.games[0].title);
+});
