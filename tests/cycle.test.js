@@ -23,3 +23,17 @@ test('за один-два дня до ожидаемых — «near», рань
 test('без отметок — обычный день', () => {
   assert.equal(careToday([], null, '2026-10-27'), null);
 });
+
+test('мужчина без пары отмечает её дни сам: они в календаре, отметки — на его телефоне', async () => {
+  const { clearAll, write, read } = await import('../js/core/store.js');
+  const side = await import('../js/side/side.js');
+  const { _shown } = await import('../js/cycle/cycle.js');
+  clearAll();
+  side._use('man');
+  write('cycle-her', { days, cycle: null });
+  assert.deepEqual(_shown().days, days);
+  assert.deepEqual(read('cycle', {}), {});
+  side._use('woman');
+  assert.deepEqual(_shown().days, []);
+  clearAll();
+});

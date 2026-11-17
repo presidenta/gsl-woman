@@ -14,13 +14,19 @@ import { openSheet } from '../ui/sheet.js';
      длину месячных и красит ожидаемые дни следующих месячных розовым: «чтобы женщина помнила».
    - Мужчина в паре видит её календарь: отмеченные дни — красным, ожидаемые — розовым. Для чего: «чтобы понимать,
      что она может быть раздражённой или нервной в эти дни — женщина же не будет рассказывать».
+   - Мужчина отмечает её дни и сам — в паре и без пары (владелец 17.11.2026: «даже если они встречаются и не пара,
+     он может узнать, когда у неё были, и себе приблизительно знать»). Его отметки — только на его телефоне; в паре
+     к ним добавляются её. Есть дни в календаре — расчёт и пульсация работают.
    - Календарь открывается у всех (владелец: «у мужчины тоже — просто без отметок»): выходные, государственные
      праздники и свои праздники пары — золотом.
 
    Хранение: у женщины — на телефоне (ключ cycle: { days: [iso…], cycle: своя длина | null }); в паре — копия записью
-   cycle/days, мужчина читает её оттуда. Держим последние 400 дней. */
+   cycle/days, мужчина читает её оттуда. Отметки мужчины — на его телефоне, ключ cycle-her (тот же вид); в пару они
+   не уходят. Держим последние 400 дней. */
 
 const KEY = 'cycle';
+const KEY_MAN = 'cycle-her';
+const key = () => (side.get() === 'man' ? KEY_MAN : KEY);
 const KEEP = 400;
 const DEFAULT_CYCLE = 28;
 const DEFAULT_LEN = 5;
@@ -33,7 +39,7 @@ export const CYCLE_MAX = 45;
 const clamp = (n, a, b) => Math.min(b, Math.max(a, n));
 
 function own() {
-  const v = read(KEY, {});
+  const v = read(key(), {});
   return {
     days: Array.isArray(v?.days) ? v.days.filter(isValidIso) : [],
     cycle: Number.isInteger(v?.cycle) && v.cycle >= CYCLE_MIN && v.cycle <= CYCLE_MAX ? v.cycle : null,
@@ -44,7 +50,7 @@ const ownDays = () => own().days;
 
 function saveOwn(days, cycle = own().cycle) {
   const list = [...new Set(days)].sort().slice(-KEEP);
-  write(KEY, { days: list, cycle });
+  write(key(), { days: list, cycle });
   share();
 }
 
@@ -65,15 +71,24 @@ export function share() {
   }
 }
 
-/** Что показывать: свои дни у женщины, её — у мужчины в паре. null — мужчина без пары. */
+/** Что показывать: у женщины — свои дни; у мужчины — его отметки её дней и, в паре, её отметки. Длина цикла у
+    мужчины — его своя, а без неё — её. */
 function shown() {
-  if (side.get() !== 'man') return own();
-  const pair = circles.pair();
-  if (!pair || !circles.isComplete(pair)) return null;
-  const d = circles.item(pair.id, 'cycle', 'days')?.data || {};
+  const mine = own();
+  if (side.get() !== 'man') return mine;
+  const her = herShared();
+  return { days: [...new Set([...mine.days, ...her.days])].sort(), cycle: mine.cycle ?? her.cycle };
+}
+
+/** Для проверок: что сейчас показывает календарь. */
+export const _shown = () => shown();
+
+/** Её дни из пары (у мужчины). Пары нет — пусто. */
+function herShared() {
+  const pair = pairOk();
+  const d = pair ? circles.item(pair.id, 'cycle', 'days')?.data || {} : {};
   return { days: Array.isArray(d.days) ? d.days.filter(isValidIso) : [], cycle: Number.isInteger(d.cycle) ? d.cycle : null };
 }
-const shownDays = () => shown()?.days ?? null;
 
 /** Отрезки подряд идущих дней: [{ start, len }]. */
 function episodes(days) {
@@ -126,7 +141,7 @@ export function paint() {
   const now = new Date();
   button.querySelector('.cycle-btn__day').textContent = String(now.getDate());
   button.querySelector('.cycle-btn__week').textContent = new Intl.DateTimeFormat(locale(), { weekday: 'short' }).format(now).replace('.', '');
-  const sh = shown() || { days: [], cycle: null };
+  const sh = shown();
   const today = isoDate();
   const care = careToday(sh.days, sh.cycle, today);
   button.classList.toggle('is-period', care === 'period');
@@ -281,10 +296,9 @@ let editing = null;
 function content() {
   mergeEvents();
   const man = side.get() === 'man';
-  const sh = shown() || { days: [], cycle: null };
+  const sh = shown();
   const days = sh.days;
   const alone = man && !pairOk();
-  if (man) mode = 'event';
   const box = h('div', { class: 'cycle' });
   const redraw = () => { box.replaceWith(content()); paint(); };
   const today = isoDate();
@@ -307,23 +321,23 @@ function content() {
   const next = s.last ? addDays(s.last.start, s.cycle * Math.max(1, Math.ceil((daysBetween(s.last.start, today) + 1) / s.cycle))) : null;
   add(box,
     h('p', { class: 'card__text cycle__lead' }, alone ? t('cycle.manAlone') : t(man ? 'cycle.manLead' : 'cycle.lead')),
-    // У женщины — что отмечаем нажатием: месячные или праздник; у мужчины — только праздники
-    man ? null : h('div', { class: 'cycle-mode', role: 'group' },
+    // Что отмечаем нажатием: месячные (у мужчины — её дни) или праздник
+    h('div', { class: 'cycle-mode', role: 'group' },
       ...['period', 'event'].map((m) => h('button', {
         type: 'button', class: `btn ${mode === m ? 'btn--gold' : 'btn--ghost'} cycle-mode__btn`, 'aria-pressed': String(mode === m),
         onclick: () => { mode = m; editing = null; redraw(); },
-      }, t(`cycle.mode.${m}`)))),
-    // Длина цикла: ‹ 27 дн. › — своё число; «по отметкам» — вернуть расчёт (только у женщины)
-    man ? null : cycleStepper(s, sh.cycle, redraw),
-    editing ? eventForm(editing, () => { editing = null; redraw(); }) : h('p', { class: 'faint cycle__hint' }, t(mode === 'event' ? 'cycle.eventHint' : 'cycle.periodHint')),
+      }, t(man && m === 'period' ? 'cycle.manMode' : `cycle.mode.${m}`)))),
+    // Длина цикла: ‹ 27 дн. › — своё число; «по отметкам» — вернуть расчёт
+    cycleStepper(s, man ? own().cycle : sh.cycle, redraw),
+    editing ? eventForm(editing, () => { editing = null; redraw(); }) : h('p', { class: 'faint cycle__hint' }, t(mode === 'event' ? 'cycle.eventHint' : man ? 'cycle.manPeriodHint' : 'cycle.periodHint')),
     ...[-1, 0, 1].map((k) => monthGrid(now.getFullYear(), now.getMonth() + k, ctx)),
     h('ul', { class: 'cycle__legend' },
-      alone ? null : h('li', {}, h('span', { class: 'cycle-dot is-period' }), t('cycle.period')),
-      alone ? null : h('li', {}, h('span', { class: 'cycle-dot is-soon' }), t('cycle.soon')),
+      h('li', {}, h('span', { class: 'cycle-dot is-period' }), t('cycle.period')),
+      h('li', {}, h('span', { class: 'cycle-dot is-soon' }), t('cycle.soon')),
       h('li', {}, h('span', { class: 'cycle-dot is-event' }), t('cycle.event')),
       h('li', {}, h('span', { class: 'cycle-dot is-state' }), t('cycle.state')),
       h('li', {}, h('span', { class: 'cycle-dot is-weekend' }), t('cycle.weekend'))),
-    alone ? null : (s.count >= 1
+    (s.count >= 1
       ? h('p', { class: 'faint cycle__stats' }, t('cycle.stats', { cycle: s.cycle, len: s.len, next: next ? dayMonth(next) : '—' }))
       : h('p', { class: 'faint cycle__stats' }, t(man ? 'cycle.manEmpty' : 'cycle.empty'))),
   );
