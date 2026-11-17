@@ -113,13 +113,19 @@ function header(ctx, plan, summary, buttons) {
 
 function catchUp(ctx, summary) {
   if (!summary.catchUp.length) return null;
-  return h('section', { class: 'card card--soft' },
-    h('div', { class: 'card__eyebrow' }, h('span', { class: 'card__icon' }, svg(icons.heart)), h('span', { class: 'caps' }, t('today.catchTitle'))),
-    h('p', { class: 'card__text' }, t('today.catchText', {
+  /* Свёрнуто в одну строку (владелец 17.11.2026: «огромное, каждый день видно… нажал — открылось, догнал, если хочет»):
+     на виду только «Отстаёшь на N%», дни — по стрелке. */
+  return foldCard({
+    id: 'catchup',
+    cls: 'catchup',
+    icon: icons.heart,
+    title: t('today.catchTitle'),
+    lead: t('today.catchText', {
       percent: summary.lagPercent,
       days: `${summary.lagDays} ${plural(summary.lagDays, 'plural.days')}`,
-    })),
-    h('div', { class: 'catch-list' },
+    }),
+    keepLead: true,
+    body: [h('div', { class: 'catch-list' },
       ...summary.catchUp.map((day) => {
         const p = dayPlan(day, ctx.lang);
         return h('button', {
@@ -135,8 +141,8 @@ function catchUp(ctx, summary) {
           svg(icons.plus, 'catch-list__plus'),
         );
       }),
-    ),
-  );
+    )],
+  }).node;
 }
 
 function morningCard(ctx, plan) {
