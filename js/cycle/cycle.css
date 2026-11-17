@@ -45,3 +45,13 @@ button.cycle-day { cursor: pointer; }
 
 /* Шапка стала теснее: на узком телефоне знак части уступает место кружку с датой */
 @media (max-width: 400px) { .app-header__brand { display: none; } }
+
+/* Длина цикла: ‹ 27 дн. › и пояснение */
+.cycle-len { display: grid; gap: 4px; padding: 8px 10px; border: 1px solid var(--c-line, rgba(255,255,255,.12)); border-radius: 14px; }
+.cycle-len__row { display: flex; align-items: center; gap: 8px; }
+.cycle-len__label { flex: 1; font-weight: 600; font-size: 14px; }
+.cycle-len__btn { width: 36px; height: 36px; font-size: 20px; line-height: 1; }
+.cycle-len__btn:disabled { opacity: .35; }
+.cycle-len__value { min-width: 64px; text-align: center; color: var(--gold, #d9b56a); font-size: 16px; }
+.cycle-len__hint { margin: 0; font-size: 12.5px; line-height: 1.4; }
+.cycle-len__auto { margin-left: 4px; padding: 0; border: 0; background: none; color: var(--gold, #d9b56a); font: inherit; text-decoration: underline; cursor: pointer; }

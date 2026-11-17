@@ -994,6 +994,7 @@ export default {
   },
   // Календарь цикла — кружок с датой в шапке (js/cycle/, владелец 17.11.2026)
   cycle: {
+    len: { title: "Cycle length", less: "Shorter", more: "Longer", days: "{n} days", hint: "Menstrual cycle length is the number of days from the first day of one period to the first day of the next. Usually 21–35 days. The app expects your next period by this number.", auto: "Count from my marks ({n} days)", isAuto: "Right now it is counted from your marks." },
     mode: { period: "Period", event: "Holiday" },
     periodHint: "Tap a date to mark a period day.",
     eventHint: "Tap a date and name the holiday: the day you met, your wedding, a birthday.",

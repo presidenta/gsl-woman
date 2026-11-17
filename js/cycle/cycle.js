@@ -17,44 +17,63 @@ import { openSheet } from '../ui/sheet.js';
    - Календарь открывается у всех (владелец: «у мужчины тоже — просто без отметок»): выходные, государственные
      праздники и свои праздники пары — золотом.
 
-   Хранение: у женщины — на телефоне (ключ cycle: { days: [iso…] }); в паре она кладёт копию в пару записью
+   Хранение: у женщины — на телефоне (ключ cycle: { days: [iso…], cycle: своя длина | null }); в паре — копия записью
    cycle/days, мужчина читает её оттуда. Держим последние 400 дней. */
 
 const KEY = 'cycle';
 const KEEP = 400;
 const DEFAULT_CYCLE = 28;
 const DEFAULT_LEN = 5;
+/* Длина цикла — своя (владелец 17.11.2026: «у кого-то больше, у кого-то меньше; стандартно пускай как сейчас, но с
+   возможностью изменить»). Пока не трогала — считается по отметкам; стрелками ‹ › — своё число. Пределы — как у
+   врачей с запасом: от 18 до 45 дней (норма — 21–35). */
+export const CYCLE_MIN = 18;
+export const CYCLE_MAX = 45;
 
 const clamp = (n, a, b) => Math.min(b, Math.max(a, n));
 
-function ownDays() {
+function own() {
   const v = read(KEY, {});
-  return Array.isArray(v?.days) ? v.days.filter(isValidIso) : [];
+  return {
+    days: Array.isArray(v?.days) ? v.days.filter(isValidIso) : [],
+    cycle: Number.isInteger(v?.cycle) && v.cycle >= CYCLE_MIN && v.cycle <= CYCLE_MAX ? v.cycle : null,
+  };
 }
 
-function saveOwn(days) {
+const ownDays = () => own().days;
+
+function saveOwn(days, cycle = own().cycle) {
   const list = [...new Set(days)].sort().slice(-KEEP);
-  write(KEY, { days: list });
-  share(list);
+  write(KEY, { days: list, cycle });
+  share();
 }
 
-/** У женщины в паре — копия её дней в паре (мужчина видит). Ничего не изменилось — ничего не шлём. */
-export function share(days = ownDays()) {
+/** Своя длина цикла (null — считать по отметкам). */
+function setCycle(n) {
+  saveOwn(ownDays(), n === null ? null : clamp(n, CYCLE_MIN, CYCLE_MAX));
+}
+
+/** У женщины в паре — копия её дней и длины цикла в паре (мужчина видит). Ничего не изменилось — ничего не шлём. */
+export function share() {
   if (side.get() === 'man') return;
   const pair = circles.pair();
   if (!pair || !circles.isComplete(pair)) return;
-  const now = circles.item(pair.id, 'cycle', 'days')?.data?.days || [];
-  if (JSON.stringify(now) !== JSON.stringify(days)) circles.put(pair.id, 'cycle', 'days', { days });
+  const mine = own();
+  const now = circles.item(pair.id, 'cycle', 'days')?.data || {};
+  if (JSON.stringify(now.days || []) !== JSON.stringify(mine.days) || (now.cycle ?? null) !== mine.cycle) {
+    circles.put(pair.id, 'cycle', 'days', { days: mine.days, cycle: mine.cycle });
+  }
 }
 
-/** Дни для календаря: свои у женщины, её — у мужчины в паре. null — мужчина без пары. */
-function shownDays() {
-  if (side.get() !== 'man') return ownDays();
+/** Что показывать: свои дни у женщины, её — у мужчины в паре. null — мужчина без пары. */
+function shown() {
+  if (side.get() !== 'man') return own();
   const pair = circles.pair();
   if (!pair || !circles.isComplete(pair)) return null;
-  const d = circles.item(pair.id, 'cycle', 'days')?.data?.days;
-  return Array.isArray(d) ? d.filter(isValidIso) : [];
+  const d = circles.item(pair.id, 'cycle', 'days')?.data || {};
+  return { days: Array.isArray(d.days) ? d.days.filter(isValidIso) : [], cycle: Number.isInteger(d.cycle) ? d.cycle : null };
 }
+const shownDays = () => shown()?.days ?? null;
 
 /** Отрезки подряд идущих дней: [{ start, len }]. */
 function episodes(days) {
@@ -69,18 +88,18 @@ function episodes(days) {
 }
 
 /** Средний цикл и длина месячных по последним шести, в разумных пределах. */
-export function stats(days) {
+export function stats(days, own = null) {
   const eps = episodes(days).slice(-7);
   const gaps = eps.slice(1).map((e, i) => daysBetween(eps[i].start, e.start)).filter((g) => g >= 18 && g <= 45);
   const cycle = gaps.length ? Math.round(gaps.reduce((a, b) => a + b, 0) / gaps.length) : DEFAULT_CYCLE;
   const lens = eps.map((e) => e.len);
   const len = lens.length ? Math.round(lens.reduce((a, b) => a + b, 0) / lens.length) : DEFAULT_LEN;
-  return { cycle: clamp(cycle, 21, 40), len: clamp(len, 2, 8), last: eps[eps.length - 1] || null, count: eps.length };
+  return { cycle: own || clamp(cycle, 21, 40), auto: clamp(cycle, 21, 40), len: clamp(len, 2, 8), last: eps[eps.length - 1] || null, count: eps.length };
 }
 
 /** Ожидаемые дни: от последнего начала — ещё три цикла вперёд. */
-export function predicted(days) {
-  const s = stats(days);
+export function predicted(days, own = null) {
+  const s = stats(days, own);
   if (!s.last) return new Set();
   const out = new Set();
   for (let k = 1; k <= 3; k++) {
@@ -107,10 +126,10 @@ export function paint() {
   const now = new Date();
   button.querySelector('.cycle-btn__day').textContent = String(now.getDate());
   button.querySelector('.cycle-btn__week').textContent = new Intl.DateTimeFormat(locale(), { weekday: 'short' }).format(now).replace('.', '');
-  const days = shownDays() || [];
+  const sh = shown() || { days: [], cycle: null };
   const today = isoDate();
-  button.classList.toggle('is-period', days.includes(today));
-  button.classList.toggle('is-soon', !days.includes(today) && predicted(days).has(today));
+  button.classList.toggle('is-period', sh.days.includes(today));
+  button.classList.toggle('is-soon', !sh.days.includes(today) && predicted(sh.days, sh.cycle).has(today));
 }
 
 /* ---------- Праздники ---------- */
@@ -223,13 +242,31 @@ function eventForm(iso, done) {
   );
 }
 
+/** ‹ 27 дн. › и пояснение, что это за число. own — своё число или null (считается по отметкам). */
+function cycleStepper(s, ownCycle, redraw) {
+  const value = ownCycle || s.cycle;
+  const step = (d) => { setCycle(clamp(value + d, CYCLE_MIN, CYCLE_MAX)); redraw(); };
+  return h('div', { class: 'cycle-len' },
+    h('div', { class: 'cycle-len__row' },
+      h('span', { class: 'cycle-len__label' }, t('cycle.len.title')),
+      h('button', { type: 'button', class: 'icon-btn cycle-len__btn', 'aria-label': t('cycle.len.less'), disabled: value <= CYCLE_MIN, onclick: () => step(-1) }, '‹'),
+      h('b', { class: 'cycle-len__value' }, t('cycle.len.days', { n: value })),
+      h('button', { type: 'button', class: 'icon-btn cycle-len__btn', 'aria-label': t('cycle.len.more'), disabled: value >= CYCLE_MAX, onclick: () => step(1) }, '›')),
+    h('p', { class: 'faint cycle-len__hint' }, t('cycle.len.hint'),
+      ownCycle
+        ? h('button', { type: 'button', class: 'cycle-len__auto', onclick: () => { setCycle(null); redraw(); } }, t('cycle.len.auto', { n: s.auto }))
+        : h('span', {}, ` ${t('cycle.len.isAuto')}`)),
+  );
+}
+
 let mode = 'period';
 let editing = null;
 
 function content() {
   mergeEvents();
   const man = side.get() === 'man';
-  const days = shownDays() || [];
+  const sh = shown() || { days: [], cycle: null };
+  const days = sh.days;
   const alone = man && !pairOk();
   if (man) mode = 'event';
   const box = h('div', { class: 'cycle' });
@@ -238,7 +275,7 @@ function content() {
   const now = new Date();
   const ctx = {
     days,
-    soon: predicted(days),
+    soon: predicted(days, sh.cycle),
     events: events(),
     today,
     editing,
@@ -249,7 +286,7 @@ function content() {
       redraw();
     },
   };
-  const s = stats(days);
+  const s = stats(days, sh.cycle);
   const next = s.last ? addDays(s.last.start, s.cycle * Math.max(1, Math.ceil((daysBetween(s.last.start, today) + 1) / s.cycle))) : null;
   add(box,
     h('p', { class: 'card__text cycle__lead' }, alone ? t('cycle.manAlone') : t(man ? 'cycle.manLead' : 'cycle.lead')),
@@ -259,6 +296,8 @@ function content() {
         type: 'button', class: `btn ${mode === m ? 'btn--gold' : 'btn--ghost'} cycle-mode__btn`, 'aria-pressed': String(mode === m),
         onclick: () => { mode = m; editing = null; redraw(); },
       }, t(`cycle.mode.${m}`)))),
+    // Длина цикла: ‹ 27 дн. › — своё число; «по отметкам» — вернуть расчёт (только у женщины)
+    man ? null : cycleStepper(s, sh.cycle, redraw),
     editing ? eventForm(editing, () => { editing = null; redraw(); }) : h('p', { class: 'faint cycle__hint' }, t(mode === 'event' ? 'cycle.eventHint' : 'cycle.periodHint')),
     ...[-1, 0, 1].map((k) => monthGrid(now.getFullYear(), now.getMonth() + k, ctx)),
     h('ul', { class: 'cycle__legend' },
