@@ -980,13 +980,13 @@ export default {
     chartEmpty: "Your first check comes on the weekly review day: three marks from 1 to 10.",
     chartOne: "The first check is in. A line will appear here in a week.",
   },
-  // Раздел «Здоровье» — Кегель и шаги по желанию (js/health/, владелец 17.11.2026)
-  health: {
-    title: "Health",
-    offer: "Kegel exercise and steps are optional. Open the section and they will appear here every day.",
-    open: "Open the Health section",
-    setting: "Health section on Today",
-    settingHint: "Kegel exercise and steps. Off means a shorter day: the task, water and the morning minute.",
+  // Разделы дня — кнопки в шапке «Сегодня» (js/sections/, владелец 17.11.2026)
+  sections: {
+    group: "Sections of the day",
+    rel: "Relationship",
+    health: "Health",
+    biz: "Work",
+    bizTip: "Work tip of the week",
   },
   notice: {
     morning: {

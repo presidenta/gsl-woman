@@ -16,7 +16,9 @@ import { imsgCard } from '../../imsg/imsg-card.js';
 import { loveCard } from '../../love/cards.js';
 import { waterCard } from '../../water/water-card.js';
 import { foldCard } from '../../ui/fold.js';
-import { healthCards } from '../../health/health.js';
+import { kegelCard } from '../../habits/kegel-card.js';
+import { stepsCard } from '../../habits/steps-card.js';
+import { state as sectionsOpen, sectionButtons, sectionBlock, bizCard } from '../../sections/sections.js';
 import { pulseCard } from '../../pulse/pulse.js';
 import { usCard } from '../../circles/today-card.js';
 import { talkCard, talkDone } from '../../circles/talk.js';
@@ -88,7 +90,7 @@ function stopMinute() {
   paintMinute?.();
 }
 
-function header(ctx, plan, summary) {
+function header(ctx, plan, summary, buttons) {
   // Баллы дня (score/): личные, для себя — сколько баллов прожито сегодня
   const score = dayScore(ctx.todayIso, plan.day, ctx.entries, { talk: talkDone(ctx, plan) });
   return h('section', { class: 'card card--hero today-hero' },
@@ -103,6 +105,8 @@ function header(ctx, plan, summary) {
       h('div', { class: 'bar' }, h('div', { class: 'bar__fill', style: { width: `${summary.percent}%` } })),
       h('span', { class: 'faint' }, t('today.weekProgress', { done: summary.done })),
     ),
+    // Кнопки разделов дня: «Отношения», «Здоровье», «Дело» — нажал, открылось; нажал ещё раз, закрылось (js/sections/)
+    buttons,
   );
 }
 
@@ -500,33 +504,38 @@ export function render(view, ctx) {
   else if (plan.kind === 'flow') main = flowCard(ctx, plan);
   else main = callCard(ctx, plan, summary);
 
+  /* Ядро дня всегда на виду: задание, стакан воды утром и на ночь, итог. Остальное — разделы с кнопками в шапке
+     (js/sections/, владелец 17.11.2026: день не перегружать). Карточки закрытого раздела даже не строятся. */
+  const open = sectionsOpen(ctx.settings);
+  const biz = [bizCard(ctx, plan), stemCard(ctx, plan)].filter(Boolean);
+  const buttons = sectionButtons(ctx, { rel: true, health: true, biz: biz.length > 0 });
+
   add(view,
     h('div', { class: 'stack' },
-      header(ctx, plan, summary),
+      header(ctx, plan, summary, buttons),
       // Новое от близкого (пара, семья) — сразу на виду; «Срочно» — красным
       usCard(),
       catchUp(ctx, summary),
-      // «Стержень недели» (у мужчин, js/stem/) — вместо «Мудрости недели», наверху, над стаканом (владелец 15.11.2026)
-      stemCard(ctx, plan),
-      // Сначала стакан тёплой воды — сразу после пробуждения, потом утренняя минута (js/water/README.md)
+      // Стакан тёплой воды — сразу после пробуждения (js/water/README.md)
       waterCard(ctx),
-      morningCard(ctx, plan),
       main,
       // Замер недели — в день итога: три оценки «что изменилось» (js/pulse/, владелец 17.11.2026)
       pulseCard(ctx, plan),
-      repeatCard(plan),
-      meetLink(plan, ctx),
-      // Седьмой день — «Разговор пары» (circles/talk.js)
-      talkCard(ctx, plan),
-      imsgCard(ctx, plan),
-      // Вопрос на вечер — вдвоём (js/evening/): дни 1–6, только у пары
-      eveningCard(ctx, plan),
-      loveCard(ctx, plan),
+      // «Отношения»: повтор навыков, «В поиске», «Разговор пары» (день 7), я-сообщение, вопрос на вечер, языки любви
+      open.rel ? sectionBlock(ctx, 'rel', [
+        repeatCard(plan),
+        meetLink(plan, ctx),
+        talkCard(ctx, plan),
+        imsgCard(ctx, plan),
+        eveningCard(ctx, plan),
+        loveCard(ctx, plan),
+      ]) : null,
+      // «Здоровье»: утренняя минута, Кегель, шаги
+      open.health ? sectionBlock(ctx, 'health', [morningCard(ctx, plan), kegelCard(ctx), stepsCard(ctx)]) : null,
+      // «Дело» (у мужской части): совет недели по работе и «Стержень недели»
+      sectionBlock(ctx, 'biz', biz),
       recordedToday(ctx, plan),
-      // Раздел «Здоровье» — Кегель и шаги ПО ЖЕЛАНИЮ (js/health/, владелец 17.11.2026: день не перегружать);
-      // закрыт — одна строка-приглашение, открыт — две карточки, как раньше
-      ...healthCards(ctx),
-      // Стакан воды на ночь — последним, перед сном (сборка 43, js/water/: вид night)
+      // Стакан воды на ночь — перед сном (сборка 43, js/water/: вид night)
       waterCard(ctx, 'night'),
       // Итог дня — сколько баллов набрано (score/)
       totalCard(ctx, plan),

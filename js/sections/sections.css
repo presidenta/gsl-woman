@@ -1,0 +1,15 @@
+/* РАЗДЕЛЫ ДНЯ (js/sections/): кнопки в шапке «Сегодня» и подписи открытых разделов */
+.day-sections { display: flex; flex-wrap: wrap; gap: 8px; margin-top: var(--sp-4, 14px); }
+.day-sections__btn {
+  display: inline-flex; align-items: center; gap: 7px; min-height: 40px; padding: 0 14px;
+  border: 1px solid var(--c-line-strong, rgba(255, 255, 255, .22)); border-radius: var(--r-pill, 999px);
+  background: transparent; color: inherit; font: inherit; font-size: 14px; font-weight: 600; cursor: pointer;
+  opacity: .75;
+}
+.day-sections__btn.is-open { opacity: 1; border-color: var(--gold, #d9b56a); background: rgba(217, 181, 106, .14); }
+.day-sections__btn svg { width: 17px; height: 17px; display: block; }
+.day-sections__mark svg { width: 14px; height: 14px; }
+.day-sections__btn:focus-visible { outline: 2px solid var(--gold, #d9b56a); outline-offset: 2px; }
+
+.day-section__title { display: flex; align-items: center; gap: 8px; margin: 6px 4px 0; opacity: .8; }
+.day-section__icon svg { width: 16px; height: 16px; display: block; }
