@@ -33,7 +33,7 @@ const ICON = { rel: icons.heart, health: icons.pulse, biz: icons.crown };
 export const ITEMS = {
   rel: ['imsg', 'evening', 'love', 'talk', 'repeat', 'search'],
   health: ['minute', 'kegel', 'steps', 'waterNight'],
-  biz: ['tip', 'stem'],
+  biz: ['tip', 'stem', 'soon'],
 };
 
 const hasLogs = (key) => {
@@ -165,6 +165,7 @@ export function bizCard(ctx, plan) {
 const WP_KEY = 'womanplus';
 const ownPlus = () => { const v = read(WP_KEY, {}); return Array.isArray(v?.own) ? v.own.filter((x) => typeof x === 'string' && x.trim()) : []; };
 
+/** Карточка практик «⁺» — у женщин «Женщина⁺», у мужчин часть «Мужчина⁺» (списки — в текстах своей части). */
 export function womanPlusCard(ctx) {
   const own = ownPlus();
   const input = h('input', { type: 'text', class: 'input womanplus__input', maxlength: '80', placeholder: t('sections.soon.addPh'), 'aria-label': t('sections.soon.add') });

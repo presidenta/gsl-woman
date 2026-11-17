@@ -979,6 +979,15 @@ export default {
     channelRemind: 'Reminders',
     channelAlarm: 'Alarm',
   },
+  // Микрофон в задании на голос (js/voice-check/, 17.11.2026)
+  voiceCheck: {
+    title: "Check your voice",
+    record: "Record your voice",
+    again: "Record again",
+    stop: "Stop recording",
+    hint: "Recording {time}: listen to how you sound. It stays on this phone only while the app is open.",
+    denied: "Microphone access is needed: allow it in your phone settings.",
+  },
   // Замер недели (js/pulse/, владелец 17.11.2026)
   pulse: {
     title: "Weekly check",

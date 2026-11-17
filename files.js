@@ -353,6 +353,8 @@ self.GSL_FILES = [
   './js/ui/sheet.js',
   './js/ui/tick.js',
   './js/ui/toast.js',
+  './js/voice-check/voice-check.css',
+  './js/voice-check/voice-check.js',
   './js/water/art.js',
   './js/water/glass.js',
   './js/water/water-card.js',

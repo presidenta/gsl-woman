@@ -21,6 +21,7 @@ import { stepsCard } from '../../habits/steps-card.js';
 import { state as sectionsOpen, sectionButtons, sectionBlock, bizCard, womanPlusCard } from '../../sections/sections.js';
 import * as sideOf from '../../side/side.js';
 import { pulseCard } from '../../pulse/pulse.js';
+import { voiceCheck } from '../../voice-check/voice-check.js';
 import * as settingsStore from '../../settings/settings.js';
 import { usCard } from '../../circles/today-card.js';
 import { talkCard, talkDone } from '../../circles/talk.js';
@@ -271,6 +272,8 @@ function taskCard(ctx, plan) {
         h('ol', { class: 'task__how' }, ...task.how.map((step) => h('li', {}, step))),
       )
       : null,
+    // Задание на голос — микрофон: записать и прослушать себя (js/voice-check/, владелец 17.11.2026)
+    task.voice ? voiceCheck(plan.day) : null,
     h('ul', { class: 'task__levels' },
       ...['min', 'full', 'max'].map((l, i) =>
         h('li', {},
@@ -574,6 +577,8 @@ export function render(view, ctx) {
       open.biz ? sectionBlock(ctx, 'biz', man ? [
         { id: 'tip', build: () => bizCard(ctx, plan) },
         { id: 'stem', build: () => stemCard(ctx, plan) },
+        // Практики «Мужчина⁺»: йога, тантра, массажи — в разработке, со своим списком (владелец 17.11.2026)
+        { id: 'soon', build: () => womanPlusCard(ctx) },
       ] : [{ id: 'soon', build: () => womanPlusCard(ctx) }]) : null,
       recordedToday(ctx, plan),
       // Итог дня — сколько баллов набрано (score/)

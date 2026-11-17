@@ -980,6 +980,15 @@ export default {
     channelRemind: 'Reminders',
     channelAlarm: 'Alarm',
   },
+  // Микрофон в задании на голос (js/voice-check/, 17.11.2026)
+  voiceCheck: {
+    title: "Check your voice",
+    record: "Record your voice",
+    again: "Record again",
+    stop: "Stop recording",
+    hint: "Recording {time}: listen to how you sound. It stays on this phone only while the app is open.",
+    denied: "Microphone access is needed: allow it in your phone settings.",
+  },
   // Замер недели (js/pulse/, владелец 17.11.2026)
   pulse: {
     title: "Weekly check",
@@ -1021,14 +1030,14 @@ export default {
   },
   // Разделы дня — кнопки в шапке «Сегодня» (js/sections/, владелец 17.11.2026)
   sections: {
-    soon: { lead: "Coming soon", text: "Everything that helps you grow and makes you interesting, for yourself and for him:", note: "This section is still being built; tasks will appear here soon.", mine: "Mine", addPh: "What I want to do…", add: "Add my own", remove: "Remove", items: ["Dancing, ideally with your man", "Handicrafts: embroidery, knitting, sewing", "Learning: languages, courses, books", "Creativity: drawing, music, singing, photography", "Women’s practices and self-care", "Harmony: breathing, quiet, nature", "Beauty and your own style", "Your interests and hobbies, and how to share them with him", "Yoga", "Tantra, for couples", "Lingam massage, for couples"] },
+    soon: { lead: "Practices: coming soon", text: "Everything that makes you stronger and closer to her:", note: "This section is still being built; tasks will appear here soon.", mine: "Mine", addPh: "What I want to do…", add: "Add my own", remove: "Remove", items: ["Yoga", "Tantra, for couples", "Yoni massage, for couples", "Massages for her: back, legs, head, feet", "Sport and strength", "Breathing and calm", "Your own work and goals", "Your hobbies, and how to share them with her"] },
     setup: "Set up sections",
     setupShort: "Set up",
     setupTitle: "Sections of the day",
     setupLead: "Build your day: which sections are open on Today and what is inside each. The task and the morning glass of water are always there.",
     hint: { rel: "I-message, evening question, love languages, couple talk", health: "Morning minute, Kegel, steps, night glass", biz: "Work tip of the week and Core of the week" },
     pick: "What to show in this section",
-    items: { imsg: "I-message", evening: "Evening question", love: "Love languages", talk: "Couple talk", repeat: "Skill review", search: "Searching", minute: "Morning minute", kegel: "Kegel", steps: "Steps", tip: "Work tip", stem: "Core of the week", waterNight: "Night glass of water", soon: "What will be here" },
+    items: { imsg: "I-message", evening: "Evening question", love: "Love languages", talk: "Couple talk", repeat: "Skill review", search: "Searching", minute: "Morning minute", kegel: "Kegel", steps: "Steps", tip: "Work tip", stem: "Core of the week", waterNight: "Night glass of water", soon: "Practices" },
     group: "Sections of the day",
     rel: "Relationship",
     health: "Health",
