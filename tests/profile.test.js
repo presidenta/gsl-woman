@@ -49,6 +49,13 @@ test('слова профиля: основной — как есть; у пар
   assert.equal(dating.text, 'Встречаемся.');
   assert.equal(dating.say, task.say, 'своих фраз нет — общие');
   assert.deepEqual(applyTask(task, 'single').say.map((s) => s.label), ['Рядом']);
+  // Свои шаги и уровни у профиля — вместо общих; своих нет — общие (месяц 3, «Взгляд с паузой»)
+  const gaze = { text: 'Своему мужчине.', how: ['Общий шаг.'], levels: { min: 'а', full: 'б', max: 'в' },
+    variants: { single: { text: 'Мужчинам вокруг.', how: ['Свой шаг.'], levels: { min: '1', full: '5', max: '10' } }, dating: { text: 'На свидании.' } } };
+  assert.deepEqual(applyTask(gaze, 'single').how, ['Свой шаг.']);
+  assert.equal(applyTask(gaze, 'single').levels.max, '10');
+  assert.deepEqual(applyTask(gaze, 'dating').how, ['Общий шаг.']);
+  assert.equal(applyTask(gaze, 'dating').levels.max, 'в');
   const self = { title: 'Зеркало', text: 'Про неё саму.' };
   assert.equal(applyTask(self, 'single'), self, 'задание про себя — одно для всех');
 });

@@ -16,12 +16,14 @@ export const current = () => {
 /**
  * Задание в словах профиля. Нет варианта (задание про себя: зеркало, подруга) — задание как есть.
  * Фразы: в поиске — только свои; у пары — свои первыми, следом общие (они тоже про своего человека).
+ * Шаги и уровни: свои у профиля — вместо общих (месяц 3: «Взгляд с паузой» в поиске — на мужчин вокруг, у пары —
+ * на своего мужчину; паузы у «встречаемся» и «в поиске» — по автору).
  */
 export function applyTask(task, profile = current()) {
   const v = profile !== 'married' ? task?.variants?.[profile] : null;
   if (!v) return task;
   const say = v.say?.length ? (profile === 'single' ? v.say : [...v.say, ...(task.say || [])]) : task.say;
-  return { ...task, text: v.text || task.text, say };
+  return { ...task, text: v.text || task.text, say, how: v.how?.length ? v.how : task.how, levels: v.levels || task.levels };
 }
 
 /** Я-сообщение в словах профиля (сервер: gsl/imsg/, владелец 17.11.2026: «разнообразие фраз — в поиске, замужем,
