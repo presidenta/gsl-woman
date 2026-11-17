@@ -37,8 +37,10 @@ test('неделя 5 (зеркало) — шесть дней заданий б�
   assert.equal(dayPlan(35, 'ru').kind, 'call');
 });
 
-test('последняя неделя — свободная практика и выпускной', () => {
-  for (let d = 162; d <= 166; d++) assert.equal(dayPlan(d, 'ua').kind, 'flow');
+// Неделя 24 — три повтора главных навыков (сервер, владелец 18.11.2026), потом практика, выходной и итоговый созвон
+test('последняя неделя — три повтора, практика и итоговый созвон', () => {
+  for (let d = 162; d <= 164; d++) assert.equal(dayPlan(d, 'ua').kind, 'task');
+  for (let d = 165; d <= 166; d++) assert.equal(dayPlan(d, 'ua').kind, 'flow');
   assert.equal(dayPlan(167, 'ua').kind, 'rest');
   const last = dayPlan(PROGRAM_DAYS, 'ua');
   assert.equal(last.kind, 'call');
