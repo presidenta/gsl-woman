@@ -10,6 +10,7 @@
 .cycle-month__title { margin: 0 0 6px; }
 .cycle-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
 .cycle-grid__head { font-size: 11px; text-align: center; opacity: .55; text-transform: uppercase; }
+.cycle-grid__head.is-weekend { color: #e6a08f; opacity: .8; }
 .cycle-day {
   display: grid; place-items: center; aspect-ratio: 1; min-height: 36px; border-radius: 50%;
   border: 1px solid transparent; background: none; color: inherit; font: inherit; font-size: 14px;
@@ -18,12 +19,28 @@ button.cycle-day { cursor: pointer; }
 .cycle-day.is-empty { visibility: hidden; }
 .cycle-day.is-period { background: #c94a62; color: #fff; font-weight: 700; }
 .cycle-day.is-soon { background: rgba(233, 163, 177, .28); color: #f3c6cf; }
+.cycle-day.is-weekend { color: #e6a08f; }
+.cycle-day.is-state { color: #e6a08f; text-decoration: underline; text-underline-offset: 3px; }
+.cycle-day.is-event { box-shadow: inset 0 0 0 2px var(--gold, #d9b56a); color: var(--gold, #d9b56a); font-weight: 700; }
 .cycle-day.is-today { border-color: var(--gold, #d9b56a); }
+.cycle-day.is-editing { outline: 2px dashed var(--gold, #d9b56a); outline-offset: 1px; }
 .cycle__legend { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px 16px; font-size: 13px; }
 .cycle__legend li { display: flex; align-items: center; gap: 6px; }
 .cycle-dot { width: 12px; height: 12px; border-radius: 50%; display: inline-block; }
 .cycle-dot.is-period { background: #c94a62; }
 .cycle-dot.is-soon { background: rgba(233, 163, 177, .5); }
+.cycle-dot.is-event { box-shadow: inset 0 0 0 2px var(--gold, #d9b56a); }
+.cycle-dot.is-state { background: #e6a08f; opacity: .6; }
+.cycle-dot.is-weekend { border: 1px solid #e6a08f; }
+.cycle-mode { display: flex; gap: 6px; }
+.cycle-mode__btn { flex: 1; min-height: 38px; font-size: 13px; }
+.cycle__hint { margin: 0; font-size: 13px; }
+.cycle-event { display: grid; gap: 8px; padding: 10px; border: 1px solid var(--gold, #d9b56a); border-radius: 14px; }
+.cycle-event__date { margin: 0; }
+.cycle-event__actions { display: flex; gap: 6px; flex-wrap: wrap; }
+.cycle-month__events { list-style: none; margin: 6px 0 0; padding: 0; display: grid; gap: 2px; font-size: 13px; }
+.cycle-month__events .is-state { color: #e6a08f; }
+.cycle-month__events .is-event { color: var(--gold, #d9b56a); font-weight: 600; }
 .cycle__stats { margin: 0; font-size: 13px; }
 
 /* Шапка стала теснее: на узком телефоне знак части уступает место кружку с датой */

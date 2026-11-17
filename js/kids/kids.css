@@ -999,3 +999,10 @@
 .kid-age__btn { min-height: 36px; padding: 0 12px; font-size: 13px; }
 .kid-age__hint { margin: 0; font-size: 13px; }
 .kid-power__slogan { margin: 0 0 6px; font-weight: 600; }
+.kid-setup { margin: 8px 0; padding: 8px 0; border-top: 1px solid var(--c-line, rgba(255,255,255,.1)); }
+.kid-setup__summary { cursor: pointer; font-weight: 600; min-height: 40px; display: flex; align-items: center; }
+.kid-show { list-style: none; margin: 0 0 8px; padding: 0; display: grid; gap: 4px; }
+.kid-show__row { display: flex; align-items: center; gap: 10px; min-height: 36px; }
+.kid-show__row input { width: 20px; height: 20px; }
+.kid-power__form { display: flex; gap: 6px; margin-top: 6px; }
+.kid-power__input { flex: 1; min-width: 0; }
