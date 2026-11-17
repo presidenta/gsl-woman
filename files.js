@@ -238,6 +238,7 @@ self.GSL_FILES = [
   './js/install/install.js',
   './js/journal/journal.js',
   './js/journal/morning-log.js',
+  './js/kids/ages.js',
   './js/kids/alerts.js',
   './js/kids/careers.js',
   './js/kids/catalog.js',

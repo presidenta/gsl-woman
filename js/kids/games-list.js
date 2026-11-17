@@ -1,5 +1,6 @@
 import { h } from '../core/dom.js';
 import { GAMES, GAME_BY_ID } from './catalog.js';
+import { groupOf, fits } from './ages.js';
 import { kt } from './texts.js';
 import { ask } from '../ui/ask.js';
 
@@ -30,7 +31,9 @@ export function hiddenIds(api, member) {
 /** Игры в списке ребёнка: сначала свои, потом каталог без убранных. */
 export function gamesFor(api, member) {
   const hidden = hiddenIds(api, member);
-  return [...customGames(api, member), ...GAMES.filter((g) => !hidden.has(g.id))];
+  // Ступень возраста (ages.js): игры каталога — по возрасту; свои игры — всегда
+  const group = groupOf(api, member);
+  return [...customGames(api, member), ...GAMES.filter((g) => !hidden.has(g.id) && fits(g, group))];
 }
 
 /** Убранные игры каталога (их можно вернуть). */

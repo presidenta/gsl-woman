@@ -10,6 +10,7 @@ import { chosenOf, progressOf } from './careers.js';
 import { PROF_BY_ID } from './dreams-catalog.js';
 import { isSealed } from '../letters/letters.js';
 import { gamesFor, gameForm, minusButton, hiddenBlock } from './games-list.js';
+import { groupPicker } from './ages.js';
 import { ask } from '../ui/ask.js';
 
 /* «СЕМЬЯ» → «ДЕТИ» — КАБИНЕТ РЕБЁНКА ГЛАЗАМИ РОДИТЕЛЯ (владелец 14.11.2026: «в кабинете родителя всё должно
@@ -279,6 +280,8 @@ export function kidsView(ctx, circle) {
       return h('section', { class: 'card kid-card' },
         h('h3', { class: 'card__title kid-card__name' }, `${level.icon} ${kid.name}`),
         h('p', { class: 'gold-text' }, `${level.title} · ${kt('parent.stars', { n: total, w: starsOf(kid.id, data, monday) })}`),
+        // Возраст: игры, навыки и нормы по ступени (ages.js)
+        groupPicker(api, kid, ctx.rerender),
         loginBlock(ctx, circle, kid),
         waitingBlock(api, kid),
         skillsBlock(api, kid),

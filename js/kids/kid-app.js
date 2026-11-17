@@ -18,6 +18,7 @@ import { careersView, stepTitle, doStep } from './careers.js';
 import { KID_LETTER_PROMPTS } from './dreams-catalog.js';
 import { lettersCard } from '../letters/letters-view.js';
 import { ask } from '../ui/ask.js';
+import { groupOf, fits, powerCard } from './ages.js';
 
 /* ДЕТСКИЙ КАБИНЕТ НА ТЕЛЕФОНЕ РЕБЁНКА (владелец 14.11.2026, ТЗ — docs/TZ-deti.md). Своё приложение внутри GSL:
    js/boot.js открывает его вместо взрослого, когда на телефоне вход ребёнка или пришла ссылка #kid=КОД.
@@ -225,7 +226,7 @@ function familyCard(api) {
 }
 
 function todayView(api) {
-  return [levelCard(api), familyDreamCard(api, { rerender: draw }), planCard(api), helpCard(api), familyCard(api)];
+  return [levelCard(api), powerCard(api), familyDreamCard(api, { rerender: draw }), planCard(api), helpCard(api), familyCard(api)];
 }
 
 /* ---------- Навыки ---------- */
@@ -236,7 +237,8 @@ function skillsView(api) {
   return [
     h('h1', { class: 'screen-title' }, kt('skills.title')),
     h('p', { class: 'card__text faint kid-lead' }, kt('skills.lead')),
-    ...SKILL_SECTIONS.map((sec) => h('section', { class: 'card' },
+    // Разделы по возрасту (ages.js): ступень не выбрана — все
+    ...SKILL_SECTIONS.filter((sec) => fits(sec, groupOf(api, api.me))).map((sec) => h('section', { class: 'card' },
       h('h2', { class: 'card__title' }, `${sec.icon} ${sec.title}`),
       h('ul', { class: 'kid-rows' }, ...sec.skills.map(([id, title]) => {
         const n = skillCount(api.me, id, deeds, oks);

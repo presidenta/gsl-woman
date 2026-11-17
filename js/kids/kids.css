@@ -991,3 +991,11 @@
   font-weight: 700;
   color: var(--c-text-dim);
 }
+
+/* Возраст ребёнка у родителя и «Моя суперсила для семьи» (ages.js) */
+.kid-age { display: grid; gap: 6px; margin: 8px 0; }
+.kid-age__title { margin: 0; }
+.kid-age__row { display: flex; gap: 6px; flex-wrap: wrap; }
+.kid-age__btn { min-height: 36px; padding: 0 12px; font-size: 13px; }
+.kid-age__hint { margin: 0; font-size: 13px; }
+.kid-power__slogan { margin: 0 0 6px; font-weight: 600; }
