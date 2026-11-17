@@ -1,25 +1,32 @@
-/* РАЗДЕЛЫ ДНЯ (js/sections/): кнопки в шапке «Сегодня» и подписи открытых разделов */
-.day-sections { display: flex; flex-wrap: wrap; gap: 8px; margin-top: var(--sp-4, 14px); }
-.day-sections__btn {
-  display: inline-flex; align-items: center; gap: 7px; min-height: 40px; padding: 0 14px;
-  border: 1px solid var(--c-line-strong, rgba(255, 255, 255, .22)); border-radius: var(--r-pill, 999px);
-  background: transparent; color: inherit; font: inherit; font-size: 14px; font-weight: 600; cursor: pointer;
-  opacity: .75;
+/* РАЗДЕЛЫ ДНЯ (js/sections/): маленькие круглые кнопки в шапке «Сегодня» — значок и подпись под ним, в одну строку,
+   и шестерёнка (владелец 17.11.2026: «на телефоне занимает много места… сделать маленькими, в одну строчку») */
+.day-sections {
+  display: flex; align-items: flex-start; justify-content: space-between; gap: 6px;
+  margin-top: var(--sp-4, 14px); padding-top: var(--sp-3, 10px);
+  border-top: 1px solid var(--c-line, rgba(255, 255, 255, .1));
 }
-.day-sections__btn.is-open { opacity: 1; border-color: var(--gold, #d9b56a); background: rgba(217, 181, 106, .14); }
-.day-sections__btn svg { width: 17px; height: 17px; display: block; }
-.day-sections__mark svg { width: 14px; height: 14px; }
-.day-sections__btn:focus-visible { outline: 2px solid var(--gold, #d9b56a); outline-offset: 2px; }
+.day-sections__btn {
+  flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; align-items: center; gap: 4px;
+  padding: 2px 0; border: 0; background: none; color: inherit; font: inherit; cursor: pointer; opacity: .6;
+}
+.day-sections__ring {
+  display: grid; place-items: center; width: 36px; height: 36px; border-radius: 50%;
+  border: 1px solid var(--c-line-strong, rgba(255, 255, 255, .22));
+}
+.day-sections__icon svg { width: 17px; height: 17px; display: block; }
+.day-sections__name { font-size: 11px; line-height: 1.2; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.day-sections__btn.is-open { opacity: 1; }
+.day-sections__btn.is-open .day-sections__ring { border-color: var(--gold, #d9b56a); background: rgba(217, 181, 106, .16); }
+.day-sections__btn.is-open .day-sections__name { color: var(--gold, #d9b56a); font-weight: 600; }
+.day-sections__gear { flex: 0 0 auto; opacity: .75; }
+.day-sections__gear .day-sections__ring { border-style: dashed; }
+.day-sections__btn:focus-visible .day-sections__ring { outline: 2px solid var(--gold, #d9b56a); outline-offset: 2px; }
 
 .day-section__title { display: flex; align-items: center; gap: 8px; margin: 6px 4px 0; opacity: .8; }
 .day-section__icon svg { width: 16px; height: 16px; display: block; }
 
-/* Конструктор раздела: галочки «что показывать» под названием открытого раздела */
-.day-section__picks { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 2px; }
-.day-section__pick {
-  display: inline-flex; align-items: center; gap: 5px; min-height: 32px; padding: 0 10px;
-  border: 1px dashed var(--c-line-strong, rgba(255, 255, 255, .22)); border-radius: var(--r-pill, 999px);
-  background: transparent; color: inherit; font: inherit; font-size: 12.5px; cursor: pointer; opacity: .6;
-}
-.day-section__pick.is-on { opacity: 1; border-style: solid; border-color: var(--gold, #d9b56a); }
-.day-section__pick-mark svg { width: 13px; height: 13px; display: block; }
+/* Настройки → «Разделы дня»: у раздела переключатель и под ним его пункты */
+.day-sections-setup__group { padding: 6px 0; border-top: 1px solid var(--c-line, rgba(255, 255, 255, .1)); }
+.day-sections-setup__items { padding-left: 14px; }
+.day-sections-setup__items.is-off { opacity: .45; }
+#day-sections-setup { scroll-margin-top: 84px; }

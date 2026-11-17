@@ -989,8 +989,13 @@ export default {
   },
   // Разделы дня — кнопки в шапке «Сегодня» (js/sections/, владелец 17.11.2026)
   sections: {
+    setup: "Set up sections",
+    setupShort: "Set up",
+    setupTitle: "Sections of the day",
+    setupLead: "Build your day: which sections are open on Today and what is inside each. The task and the morning glass of water are always there.",
+    hint: { rel: "I-message, evening question, love languages, couple talk", health: "Morning minute, Kegel, steps, night glass", biz: "Work tip of the week and Core of the week" },
     pick: "What to show in this section",
-    items: { imsg: "I-message", evening: "Evening question", love: "Love languages", talk: "Couple talk", repeat: "Skill review", search: "Searching", minute: "Morning minute", kegel: "Kegel", steps: "Steps", tip: "Work tip", stem: "Core of the week" },
+    items: { imsg: "I-message", evening: "Evening question", love: "Love languages", talk: "Couple talk", repeat: "Skill review", search: "Searching", minute: "Morning minute", kegel: "Kegel", steps: "Steps", tip: "Work tip", stem: "Core of the week", waterNight: "Night glass of water" },
     group: "Sections of the day",
     rel: "Relationship",
     health: "Health",

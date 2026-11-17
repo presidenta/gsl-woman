@@ -8,6 +8,7 @@ import { clearAll } from '../../core/store.js';
 import * as sync from '../../sync/sync.js';
 import { nativeCard } from './native-card.js';
 import { field, switchRow, segmented } from '../../ui/controls.js';
+import * as sections from '../../sections/sections.js';
 import * as side from '../../side/side.js';
 import { icons } from '../../ui/icons.js';
 import { toast } from '../../ui/toast.js';
@@ -215,6 +216,9 @@ export function render(view, ctx) {
       }),
     ),
 
+    // «Разделы дня» — конструктор: что показывать на «Сегодня» (js/sections/; сюда ведёт шестерёнка в шапке дня)
+    sections.settingsBlock(switchRow),
+
     h('section', { class: 'card settings__section' },
       h('h2', { class: 'caps settings__heading' }, t('settings.notifications')),
       notificationsBlock(ctx),
@@ -230,4 +234,6 @@ export function render(view, ctx) {
     h('p', { class: 'settings__version faint' }, `${t('app.name')} · ${t('settings.version', { v: ctx.version })}`),
     h('div', { class: 'settings__danger' }, reset),
   );
+  // Пришли шестерёнкой из шапки дня — сразу к «Разделам дня»
+  if (sections.takeFocus()) requestAnimationFrame(() => document.getElementById('day-sections-setup')?.scrollIntoView({ block: 'start', behavior: 'smooth' }));
 }

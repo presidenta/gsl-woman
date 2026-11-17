@@ -529,7 +529,7 @@ export function render(view, ctx) {
   else if (plan.kind === 'rest') main = restCard(ctx, shape);
   else main = h('div', { class: 'stack' }, callCard(ctx, plan, summary), moveCall(ctx, shape));
 
-  /* Ядро дня всегда на виду: задание, стакан воды утром и на ночь, итог. Остальное — разделы с кнопками в шапке
+  /* Ядро дня всегда на виду: стакан воды утром, задание, итог. Остальное — разделы с кнопками в шапке
      (js/sections/, владелец 17.11.2026: день не перегружать). Карточки закрытого раздела даже не строятся. */
   const open = sectionsOpen(ctx.settings);
   const buttons = sectionButtons(ctx, { rel: true, health: true, biz: !!(plan.biz || stemCard(ctx, plan)) });
@@ -556,9 +556,11 @@ export function render(view, ctx) {
       ]) : null,
       // «Здоровье»: утренняя минута, Кегель, шаги — человек сам собирает, что показывать
       open.health ? sectionBlock(ctx, 'health', [
-        { id: 'minute', lazy: true, build: () => morningCard(ctx, plan) },
+        { id: 'minute', build: () => morningCard(ctx, plan) },
         { id: 'kegel', build: () => kegelCard(ctx) },
         { id: 'steps', build: () => stepsCard(ctx) },
+        // Стакан на ночь — в «Здоровье», по выбору (владелец 17.11.2026: «утром — всегда, на ночь — если надо»)
+        { id: 'waterNight', build: () => waterCard(ctx, 'night') },
       ]) : null,
       // Третий раздел (у мужской части — «Мужчина⁺»): совет недели по работе и «Стержень недели»
       open.biz ? sectionBlock(ctx, 'biz', [
@@ -566,8 +568,6 @@ export function render(view, ctx) {
         { id: 'stem', build: () => stemCard(ctx, plan) },
       ]) : null,
       recordedToday(ctx, plan),
-      // Стакан воды на ночь — перед сном (сборка 43, js/water/: вид night)
-      waterCard(ctx, 'night'),
       // Итог дня — сколько баллов набрано (score/)
       totalCard(ctx, plan),
     ),
