@@ -31,12 +31,14 @@ export function dayState(day, entries, today) {
 }
 
 /** Сводка недели: дни, процент, отставание и что можно наверстать. */
-export function weekSummary(week, entries, today) {
+export function weekSummary(week, entries, today, shape = { call: WEEK_DAYS, rest: null }) {
   const first = firstDayOfWeek(week);
   const days = [];
   for (let i = 0; i < WEEK_DAYS; i++) days.push({ ...dayState(first + i, entries, today), dayInWeek: i + 1 });
 
-  const taskDays = days.slice(0, TASK_DAYS);
+  // Дни с делом: все, кроме дня созвона и выходного (ритм 3-2-1-1, program/index.js → weekShape)
+  const taskDays = days.filter((d) => d.dayInWeek !== shape.call && d.dayInWeek !== shape.rest);
+  const total = taskDays.length;
   const done = taskDays.filter((d) => d.status === 'done').length;
   const missed = taskDays.filter((d) => d.status === 'missed');
   const isCurrent = today >= first && today < first + WEEK_DAYS;
@@ -45,12 +47,12 @@ export function weekSummary(week, entries, today) {
     week,
     days,
     done,
-    total: TASK_DAYS,
-    percent: Math.round((done / TASK_DAYS) * 100),
+    total,
+    percent: Math.round((done / total) * 100),
     // Отставание — пропущенные дни, которые ещё можно догнать (только в текущей неделе)
     lagDays: isCurrent ? missed.length : 0,
-    lagPercent: isCurrent ? Math.round((missed.length / TASK_DAYS) * 100) : 0,
+    lagPercent: isCurrent ? Math.round((missed.length / total) * 100) : 0,
     catchUp: isCurrent ? missed.map((d) => d.day) : [],
-    callDone: days[WEEK_DAYS - 1].status === 'done',
+    callDone: days[shape.call - 1].status === 'done',
   };
 }

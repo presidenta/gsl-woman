@@ -3,6 +3,7 @@ import { weekOf, dayInWeek, monthOf, inProgram } from '../core/dates.js';
 import { langData } from './source.js';
 import { applyTask, current as currentProfile } from '../profile/profile.js';
 import { dueRepeats, tiersForDay } from './repeats.js';
+import * as settings from '../settings/settings.js';
 
 /* ПРОГРАММА: что делать в день N. Экраны и напоминания спрашивают только отсюда — сами в данные
    не лезут. Тексты — на сервере «Кванта» (source.js: приходят после входа и хранятся на телефоне);
@@ -42,12 +43,27 @@ export function weekPlan(week, lang) {
   };
 }
 
-/* Вид дня по его месту в неделе:
-   - task — новое задание (обычно дни 1–3; в неделе с шестью заданиями — все 1–6);
-   - flow — свободная практика всех упражнений недели (дни 4–6);
-   - call — седьмой день: итог недели и созвон. */
+/* Вид дня по его месту в неделе — ритм 3-2-1-1 (владелец 17.11.2026: «три дня новое, два — свободный полёт и
+   повторение, один день созвон, один полностью выходной — у мужчин и у женщин одинаково»):
+   - task — новое задание (дни 1–3; в неделе с шестью заданиями — все 1–6);
+   - flow — свободная практика упражнений недели (дни 4–5);
+   - call — итог недели и созвон: 6-й или 7-й день, на выбор человека (настройки, поле callDay; обычно 7-й);
+   - rest — выходной: второй из дней 6 и 7. В неделе с шестью заданиями выходного нет — созвон на 7-й день. */
+export function weekShape(tasksCount, callDay = settings.get().callDay) {
+  if (tasksCount >= TASK_DAYS) return { call: WEEK_DAYS, rest: null };
+  const call = callDay === 6 ? 6 : WEEK_DAYS;
+  return { call, rest: call === 6 ? WEEK_DAYS : 6 };
+}
+
+/** Раскладка недели по её номеру — для подсчёта прогресса (progress.js) и экранов. */
+export function shapeOfWeek(week, lang) {
+  return weekShape(data(lang)?.weeks[week - 1]?.tasks.length || 0);
+}
+
 function kindOf(n, tasksCount) {
-  if (n === WEEK_DAYS) return 'call';
+  const shape = weekShape(tasksCount);
+  if (n === shape.call) return 'call';
+  if (n === shape.rest) return 'rest';
   return n <= Math.min(tasksCount, TASK_DAYS) ? 'task' : 'flow';
 }
 

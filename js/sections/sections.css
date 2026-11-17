@@ -13,3 +13,13 @@
 
 .day-section__title { display: flex; align-items: center; gap: 8px; margin: 6px 4px 0; opacity: .8; }
 .day-section__icon svg { width: 16px; height: 16px; display: block; }
+
+/* Конструктор раздела: галочки «что показывать» под названием открытого раздела */
+.day-section__picks { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 2px; }
+.day-section__pick {
+  display: inline-flex; align-items: center; gap: 5px; min-height: 32px; padding: 0 10px;
+  border: 1px dashed var(--c-line-strong, rgba(255, 255, 255, .22)); border-radius: var(--r-pill, 999px);
+  background: transparent; color: inherit; font: inherit; font-size: 12.5px; cursor: pointer; opacity: .6;
+}
+.day-section__pick.is-on { opacity: 1; border-style: solid; border-color: var(--gold, #d9b56a); }
+.day-section__pick-mark svg { width: 13px; height: 13px; display: block; }

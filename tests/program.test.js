@@ -21,12 +21,13 @@ test('нет языка — берётся основной', () => {
   assert.equal(langData('de'), fixture.langs.ru);
 });
 
-test('ритм 3 + 3 + 1: задания, свободный поток, созвон', () => {
+test('ритм 3 + 2 + 1 + 1: задания, свободный поток, выходной, созвон (владелец 17.11.2026)', () => {
   _use(fixture);
   assert.equal(dayPlan(1, 'ru').kind, 'task');
   assert.equal(dayPlan(3, 'ru').kind, 'task');
   assert.equal(dayPlan(4, 'ru').kind, 'flow');
-  assert.equal(dayPlan(6, 'ru').kind, 'flow');
+  assert.equal(dayPlan(5, 'ru').kind, 'flow');
+  assert.equal(dayPlan(6, 'ru').kind, 'rest', 'созвон на 7-й день — выходной 6-й');
   assert.equal(dayPlan(7, 'ru').kind, 'call');
   assert.equal(dayPlan(1, 'ru').task.levels.full, 'сто');
 });
@@ -37,7 +38,8 @@ test('неделя 5 (зеркало) — шесть дней заданий б�
 });
 
 test('последняя неделя — свободная практика и выпускной', () => {
-  for (let d = 162; d <= 167; d++) assert.equal(dayPlan(d, 'ua').kind, 'flow');
+  for (let d = 162; d <= 166; d++) assert.equal(dayPlan(d, 'ua').kind, 'flow');
+  assert.equal(dayPlan(167, 'ua').kind, 'rest');
   const last = dayPlan(PROGRAM_DAYS, 'ua');
   assert.equal(last.kind, 'call');
   assert.equal(last.final, true);
@@ -71,7 +73,7 @@ test('весёлая фраза в шапке: у задания своя, в д
   assert.equal(dayPlan(3, 'ru').teaser, 'задание 3');
   assert.equal(dayPlan(4, 'ru').teaser, 'раз');
   assert.equal(dayPlan(5, 'ru').teaser, 'два');
-  assert.equal(dayPlan(6, 'ru').teaser, 'раз');
+  assert.equal(dayPlan(6, 'ru').teaser, '', 'выходной — без фразы');
   assert.equal(dayPlan(7, 'ru').teaser, '');
   assert.equal(dayPlan(8, 'ru').teaser, '', 'старая программа без фраз — шапка как раньше');
   _use(fixture);

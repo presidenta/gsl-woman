@@ -25,6 +25,13 @@ const SIGNAL_ICON = { help: icons.bell, support: icons.heart, urgent: icons.bell
 const MAX = 1000;
 
 const drafts = {};
+
+/** Положить начало фразы в поле чата (карточка я-сообщения на «Сегодня»): человек дописывает сам. */
+export function setDraft(circleId, text) { drafts[circleId] = text; }
+
+/* Начала тёплых фраз (владелец 17.11.2026: «начало отправляется автоматически, а остальное дописывает человек —
+   чтобы каждый раз было своё»): нажал — начало встало в поле, дописал «за что» — отправил. */
+const STARTERS = ['thanks', 'when', 'glad'];
 let focused = null;
 
 // Идущая запись голосового: { circleId, handle, timer } — одна на приложение
@@ -274,6 +281,11 @@ export function chatView(circle, api = familyApi(circle)) {
       quick),
     composer,
     feed,
+    api.role === 'child' ? null : h('div', { class: 'chat__starters', role: 'group', 'aria-label': t('us.chat.startersTitle') },
+      ...STARTERS.map((k) => h('button', {
+        type: 'button', class: 'chat__starter',
+        onclick: () => { input.value = `${t(`us.chat.starters.${k}`)} `; drafts[circle.id] = input.value; input.focus(); input.setSelectionRange(input.value.length, input.value.length); },
+      }, t(`us.chat.starters.${k}`), '…'))),
     composeNode,
   );
   // Последнее — внизу на виду; поле в фокусе — вернуть фокус после перерисовки

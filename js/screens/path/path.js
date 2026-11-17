@@ -1,7 +1,7 @@
 import { h, add } from '../../core/dom.js';
 import { t } from '../../core/i18n.js';
 import { weekOf, monthOf } from '../../core/dates.js';
-import { outline } from '../../program/index.js';
+import { outline, shapeOfWeek } from '../../program/index.js';
 import { weekSummary } from '../../progress/progress.js';
 import { pulseChart } from '../../pulse/pulse.js';
 
@@ -14,7 +14,7 @@ function weekItem(ctx, w, currentWeek) {
   const isPast = w.week < currentWeek;
   let badge;
   if (isCurrent) badge = h('span', { class: 'chip chip--solid' }, t('path.current'));
-  else if (isPast) badge = h('span', { class: 'chip' }, `${weekSummary(w.week, ctx.entries, ctx.day).percent}%`);
+  else if (isPast) badge = h('span', { class: 'chip' }, `${weekSummary(w.week, ctx.entries, ctx.day, shapeOfWeek(w.week, ctx.lang)).percent}%`);
   else badge = h('span', { class: 'chip chip--muted' }, t('path.ahead'));
 
   return h('li', { class: `path-week${isCurrent ? ' is-current' : ''}${!isPast && !isCurrent ? ' is-ahead' : ''}` },

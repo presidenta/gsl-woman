@@ -2,7 +2,7 @@ import { h, svg, add } from '../../core/dom.js';
 import { t, formatDate, weekdayShort } from '../../core/i18n.js';
 import { WEEKS } from '../../config.js';
 import { weekOf, dateOfDay } from '../../core/dates.js';
-import { dayPlan, weekPlan } from '../../program/index.js';
+import { dayPlan, weekPlan, shapeOfWeek } from '../../program/index.js';
 import { weekSummary } from '../../progress/progress.js';
 import { icons } from '../../ui/icons.js';
 import { weekRing, levelDots } from '../../ui/ring.js';
@@ -26,7 +26,7 @@ export function onEnter() {
 function dayRow(ctx, d, summary) {
   const plan = dayPlan(d.day, ctx.lang);
   const iso = dateOfDay(ctx.settings.startDate, d.day);
-  const label = plan.kind === 'task' ? plan.task.title : plan.kind === 'call' ? t('week.call') : t('kinds.flow');
+  const label = plan.kind === 'task' ? plan.task.title : plan.kind === 'call' ? t('week.call') : t(`kinds.${plan.kind}`);
   const canRecord = d.status === 'today' || summary.catchUp.includes(d.day);
 
   const inner = [
@@ -53,7 +53,7 @@ export function render(view, ctx) {
   if (shown === null || shown > current) shown = current;
 
   const plan = weekPlan(shown, ctx.lang);
-  const summary = weekSummary(shown, ctx.entries, ctx.day);
+  const summary = weekSummary(shown, ctx.entries, ctx.day, shapeOfWeek(shown, ctx.lang));
 
   const prev = h('button', { type: 'button', class: 'icon-btn', 'aria-label': t('common.prev'), disabled: shown <= 1 }, svg(icons.chevronLeft));
   const next = h('button', { type: 'button', class: 'icon-btn', 'aria-label': t('common.next'), disabled: shown >= current }, svg(icons.chevronRight));

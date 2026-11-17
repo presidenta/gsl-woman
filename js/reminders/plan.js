@@ -26,6 +26,7 @@ function morning(plan, s) {
   let body;
   if (plan.kind === 'call') body = t(plan.review ? 'notice.morning.callReview' : 'notice.morning.call');
   else if (plan.kind === 'flow') body = t('notice.morning.flow');
+  else if (plan.kind === 'rest') body = t('notice.morning.rest');
   else body = s.showTaskInNotice ? `«${plan.task.title}» — ${plan.task.text}` : t('notice.morning.task');
   // Язык любви выбран — каждое утро одно дело на его языке (владелец, 12.11.2026)
   const idea = ideaFor('him', plan.day, getLang());

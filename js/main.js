@@ -5,6 +5,7 @@ import * as backup from './backup/index.js';
 import { isoDate, programDay } from './core/dates.js';
 import * as photos from './photos/photos.js';
 import * as router from './core/router.js';
+import * as pace from './pace/pace.js';
 import { register as registerWorker } from './core/updates.js';
 import * as settings from './settings/settings.js';
 import * as journal from './journal/journal.js';
@@ -91,6 +92,8 @@ let pending = false;
 let gate = { mode: 'form', message: '' };
 
 function context() {
+  // Пара идёт день в день: вошедший в пару берёт дату старта того, кто её создал (js/pace/)
+  pace.apply();
   const s = settings.get();
   const todayIso = isoDate();
   // У администратора — день, который он листает стрелками (js/preview/), у участницы — настоящий

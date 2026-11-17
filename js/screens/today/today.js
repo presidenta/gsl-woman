@@ -2,7 +2,7 @@ import * as meet from '../../meet/meet.js';
 import { h, svg, add } from '../../core/dom.js';
 import { t, plural, formatDate } from '../../core/i18n.js';
 import { dateOfDay, daysBetween, weekOf } from '../../core/dates.js';
-import { dayPlan } from '../../program/index.js';
+import { dayPlan, shapeOfWeek } from '../../program/index.js';
 import { morningFor } from '../../program/morning.js';
 import { weekSummary } from '../../progress/progress.js';
 import * as morningLog from '../../journal/morning-log.js';
@@ -20,6 +20,7 @@ import { kegelCard } from '../../habits/kegel-card.js';
 import { stepsCard } from '../../habits/steps-card.js';
 import { state as sectionsOpen, sectionButtons, sectionBlock, bizCard } from '../../sections/sections.js';
 import { pulseCard } from '../../pulse/pulse.js';
+import * as settingsStore from '../../settings/settings.js';
 import { usCard } from '../../circles/today-card.js';
 import { talkCard, talkDone } from '../../circles/talk.js';
 import { eveningCard } from '../../evening/evening.js';
@@ -371,6 +372,28 @@ function repeatCard(plan) {
   }).node;
 }
 
+/* ВЫХОДНОЙ (ритм 3-2-1-1, владелец 17.11.2026: «один день полностью выходной… максимум лёгкое — что-то обсудить»):
+   заданий нет, записывать нечего. У пары в этот день — «Разговор пары», если он выпал на седьмой день. */
+function restCard(ctx, shape) {
+  return h('div', { class: 'stack' },
+    h('section', { class: 'card card--soft day-rest' },
+      h('div', { class: 'card__eyebrow' }, h('span', { class: 'card__icon' }, svg(icons.sun)), h('span', { class: 'caps' }, t('kinds.rest'))),
+      h('h2', { class: 'card__title' }, t('today.restTitle')),
+      h('p', { class: 'card__text' }, t('today.restText')),
+    ),
+    moveCall(ctx, shape),
+  );
+}
+
+/* Созвон — на 6-й или на 7-й день, выбирает человек (у наставника свои дни): второй из них — выходной. */
+function moveCall(ctx, shape) {
+  if (!shape.rest) return null;
+  return h('button', {
+    type: 'button', class: 'btn btn--block day-rest__move',
+    onclick: () => { settingsStore.update({ callDay: shape.rest }); ctx.rerender(); },
+  }, t('today.callMove', { day: shape.rest }));
+}
+
 function callCard(ctx, plan, summary) {
   return h('div', { class: 'stack' },
     foldCard({
@@ -498,17 +521,18 @@ export function render(view, ctx) {
     add(view, outside(ctx));
     return;
   }
-  const summary = weekSummary(weekOf(ctx.day), ctx.entries, ctx.day);
+  const shape = shapeOfWeek(weekOf(ctx.day), ctx.lang);
+  const summary = weekSummary(weekOf(ctx.day), ctx.entries, ctx.day, shape);
   let main;
   if (plan.kind === 'task') main = taskCard(ctx, plan);
   else if (plan.kind === 'flow') main = flowCard(ctx, plan);
-  else main = callCard(ctx, plan, summary);
+  else if (plan.kind === 'rest') main = restCard(ctx, shape);
+  else main = h('div', { class: 'stack' }, callCard(ctx, plan, summary), moveCall(ctx, shape));
 
   /* Ядро дня всегда на виду: задание, стакан воды утром и на ночь, итог. Остальное — разделы с кнопками в шапке
      (js/sections/, владелец 17.11.2026: день не перегружать). Карточки закрытого раздела даже не строятся. */
   const open = sectionsOpen(ctx.settings);
-  const biz = [bizCard(ctx, plan), stemCard(ctx, plan)].filter(Boolean);
-  const buttons = sectionButtons(ctx, { rel: true, health: true, biz: biz.length > 0 });
+  const buttons = sectionButtons(ctx, { rel: true, health: true, biz: !!(plan.biz || stemCard(ctx, plan)) });
 
   add(view,
     h('div', { class: 'stack' },
@@ -523,17 +547,24 @@ export function render(view, ctx) {
       pulseCard(ctx, plan),
       // «Отношения»: повтор навыков, «В поиске», «Разговор пары» (день 7), я-сообщение, вопрос на вечер, языки любви
       open.rel ? sectionBlock(ctx, 'rel', [
-        repeatCard(plan),
-        meetLink(plan, ctx),
-        talkCard(ctx, plan),
-        imsgCard(ctx, plan),
-        eveningCard(ctx, plan),
-        loveCard(ctx, plan),
+        { id: 'imsg', build: () => imsgCard(ctx, plan) },
+        { id: 'evening', build: () => eveningCard(ctx, plan) },
+        { id: 'love', build: () => loveCard(ctx, plan) },
+        { id: 'talk', build: () => talkCard(ctx, plan) },
+        { id: 'repeat', build: () => repeatCard(plan) },
+        { id: 'search', build: () => meetLink(plan, ctx) },
       ]) : null,
-      // «Здоровье»: утренняя минута, Кегель, шаги
-      open.health ? sectionBlock(ctx, 'health', [morningCard(ctx, plan), kegelCard(ctx), stepsCard(ctx)]) : null,
-      // «Дело» (у мужской части): совет недели по работе и «Стержень недели»
-      sectionBlock(ctx, 'biz', biz),
+      // «Здоровье»: утренняя минута, Кегель, шаги — человек сам собирает, что показывать
+      open.health ? sectionBlock(ctx, 'health', [
+        { id: 'minute', lazy: true, build: () => morningCard(ctx, plan) },
+        { id: 'kegel', build: () => kegelCard(ctx) },
+        { id: 'steps', build: () => stepsCard(ctx) },
+      ]) : null,
+      // Третий раздел (у мужской части — «Мужчина⁺»): совет недели по работе и «Стержень недели»
+      open.biz ? sectionBlock(ctx, 'biz', [
+        { id: 'tip', build: () => bizCard(ctx, plan) },
+        { id: 'stem', build: () => stemCard(ctx, plan) },
+      ]) : null,
       recordedToday(ctx, plan),
       // Стакан воды на ночь — перед сном (сборка 43, js/water/: вид night)
       waterCard(ctx, 'night'),

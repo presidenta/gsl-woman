@@ -40,7 +40,7 @@ export default {
     },
   },
 
-  kinds: { task: 'New exercise', flow: 'Free flow', call: 'Day of live connection' },
+  kinds: { task: 'New exercise', flow: 'Free flow', call: 'Day of live connection', rest: "Day off" },
 
   today: {
     markTitle: 'How it went today — mark it',
@@ -65,6 +65,9 @@ export default {
     record: 'Record the result',
     recordMore: 'Add another entry',
     recordedToday: 'Recorded today',
+    restTitle: "Today is a day off",
+    restText: "A day to rest and be together: a walk, a talk, something you both enjoy. Today is free.",
+    callMove: "Move the call to day {day}",
     callTitle: 'Call with your mentor',
     callLead: 'Day seven is the week review. Look at what worked and bring your questions to the call.',
     callMark: 'Review the week',
@@ -579,6 +582,8 @@ export default {
       remove: 'Remove',
     },
     chat: {
+      startersTitle: "Start a phrase",
+      starters: { thanks: "Thank you for", when: "When you", glad: "I am so glad that you" },
       ph: 'Write…',
       // Голосовые и фото (circles/media.js, 14.11.2026)
       mic: 'Record a voice message',
@@ -907,6 +912,7 @@ export default {
     againToast: 'The question will wait for the evening',
   },
   imsg: {
+    toChat: "Write your own in the couple chat",
     mark: 'I said it with «I»',
     markDone: 'Done — +1 point',
     again: 'I will try again',
@@ -982,6 +988,8 @@ export default {
   },
   // Разделы дня — кнопки в шапке «Сегодня» (js/sections/, владелец 17.11.2026)
   sections: {
+    pick: "What to show in this section",
+    items: { imsg: "I-message", evening: "Evening question", love: "Love languages", talk: "Couple talk", repeat: "Skill review", search: "Searching", minute: "Morning minute", kegel: "Kegel", steps: "Steps", tip: "Work tip", stem: "Core of the week" },
     group: "Sections of the day",
     rel: "Relationship",
     health: "Health",
@@ -990,6 +998,7 @@ export default {
   },
   notice: {
     morning: {
+      rest: "Today is a day off: rest and time with your loved ones.",
       title: 'Good morning',
       titleNamed: 'Good morning, {name}',
       task: 'Today’s task is waiting for you. Start with a glass of warm water, and in 10–15 minutes — a minute of energy.',

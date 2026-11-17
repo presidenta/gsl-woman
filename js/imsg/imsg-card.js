@@ -6,12 +6,23 @@ import { foldCard } from '../ui/fold.js';
 import { deedMark } from '../love/cards.js';
 import * as deeds from '../score/deeds.js';
 import { photoOf } from '../photos/photos.js';
+import * as circles from '../circles/circles.js';
+import { setDraft } from '../circles/chat-view.js';
 
 /* «Я-СООБЩЕНИЕ» на экране «Сегодня» — КАЖДЫЙ ДЕНЬ (владелец 13.11.2026; до 40 — дни 4–6). Какой пример в какой
    день — program/index.js → imsgOf; в дни 4–6 он связан с заданием дня 1, 2 или 3 этой недели: ситуация,
    как обычно говорят и как сказать по-новому через «я». Ниже — формула и правило «после «я чувствую»
    только чувство». Если выбран свой язык любви — как сказать о нём мужчине и как поблагодарить его;
    нет — приглашение пройти тест. */
+function toChat(ctx) {
+  const pair = circles.pair();
+  if (!pair || !circles.isComplete(pair)) return null;
+  return h('button', {
+    type: 'button', class: 'btn btn--block imsg__to-chat',
+    onclick: () => { setDraft(pair.id, `${t('us.chat.starters.when')} `); ctx.go('us'); },
+  }, svg(icons.chat), t('imsg.toChat'));
+}
+
 export function imsgCard(ctx, plan) {
   const m = plan.imsg;
   if (!m) return null;
@@ -44,6 +55,8 @@ export function imsgCard(ctx, plan) {
     ),
     h('p', { class: 'imsg__formula' }, t('imsg.formula')),
     h('p', { class: 'imsg__rule' }, t('imsg.rule')),
+    // В чат пары — своими словами: начало фразы уже в поле, «за что» человек дописывает сам (владелец 17.11.2026)
+    toChat(ctx),
     mine
       ? h('div', { class: 'imsg__love' },
         h('p', { class: 'imsg__love-title' }, svg(icons.heart, 'imsg__heart'), t('imsg.myLang', { name: mine.name })),

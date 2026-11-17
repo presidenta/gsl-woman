@@ -268,6 +268,7 @@ self.GSL_FILES = [
   './js/media/viewer.js',
   './js/meet/meet.js',
   './js/native/native.js',
+  './js/pace/pace.js',
   './js/photos/catalog.js',
   './js/photos/photos.css',
   './js/photos/photos.js',

@@ -58,13 +58,40 @@ export function sectionButtons(ctx, available) {
     }, svg(ICON[k], 'day-sections__icon'), h('span', {}, t(`sections.${k}`)), svg(open[k] ? icons.check : icons.plus, 'day-sections__mark'))));
 }
 
-/** Открытый раздел на странице: подпись и его карточки. Закрыт или пуст — ничего. */
-export function sectionBlock(ctx, key, cards) {
-  const list = cards.filter(Boolean);
-  if (!list.length || !state(ctx.settings)[key]) return null;
+/* КОНСТРУКТОР РАЗДЕЛА (владелец 17.11.2026: «кнопка должна быть как конструктор: человек заходит в раздел и выбирает —
+   хочу только Кегеля, или только шаги считать»). В открытом разделе под названием — ряд галочек: что в нём показывать.
+   Снял галочку — карточка ушла, поставил — вернулась. Выбор помнится (настройки, поле sectionItems). */
+export function picked(key, id, s = settings.get()) {
+  const saved = s.sectionItems?.[key]?.[id];
+  return typeof saved === 'boolean' ? saved : true;
+}
+
+export function pick(key, id) {
+  const s = settings.get();
+  const all = s.sectionItems && typeof s.sectionItems === 'object' ? s.sectionItems : {};
+  settings.update({ sectionItems: { ...all, [key]: { ...(all[key] || {}), [id]: !picked(key, id, s) } } });
+}
+
+/** Открытый раздел на странице: название, галочки-конструктор и выбранные карточки. Закрыт или пуст — ничего.
+    entries — [{ id, build }]: build() отдаёт карточку или null, если сегодня её нет (тогда и галочки нет). */
+export function sectionBlock(ctx, key, entries) {
+  if (!state(ctx.settings)[key]) return null;
+  const rows = [];
+  for (const e of entries) {
+    const on = picked(key, e.id, ctx.settings);
+    // Невыбранное строим только чтобы узнать, есть ли оно сегодня; «ленивое» (с таймером) — считаем, что есть
+    const node = on || !e.lazy ? e.build() : true;
+    if (node) rows.push({ id: e.id, on, node: on ? node : null });
+  }
+  if (!rows.length) return null;
   return h('div', { class: `stack day-section day-section--${key}` },
     h('p', { class: 'caps day-section__title' }, svg(ICON[key], 'day-section__icon'), t(`sections.${key}`)),
-    ...list,
+    h('div', { class: 'day-section__picks', role: 'group', 'aria-label': t('sections.pick') },
+      ...rows.map((r) => h('button', {
+        type: 'button', class: `day-section__pick${r.on ? ' is-on' : ''}`, 'aria-pressed': String(r.on),
+        onclick: () => { pick(key, r.id); ctx.rerender(); },
+      }, svg(r.on ? icons.check : icons.plus, 'day-section__pick-mark'), t(`sections.items.${r.id}`)))),
+    ...rows.map((r) => r.node).filter(Boolean),
   );
 }
 
