@@ -255,6 +255,8 @@ self.GSL_FILES = [
   './js/kids/parent-view.js',
   './js/kids/stars.js',
   './js/kids/tasks-view.js',
+  './js/kids/texts-en.js',
+  './js/kids/texts-ua.js',
   './js/kids/texts.js',
   './js/letters/letters-view.js',
   './js/letters/letters.css',

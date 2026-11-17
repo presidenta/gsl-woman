@@ -1,7 +1,7 @@
 import { h, svg, mount } from '../core/dom.js';
 import { icons } from '../ui/icons.js';
 import { subscribe } from '../core/store.js';
-import { setLang, setSide } from '../core/i18n.js';
+import { setLang, setSide, detectLang } from '../core/i18n.js';
 import { isoDate, addDays } from '../core/dates.js';
 import { toast } from '../ui/toast.js';
 import { t } from '../core/i18n.js';
@@ -525,9 +525,10 @@ export function start(el, linkCode = '') {
   code = linkCode || '';
   document.documentElement.dataset.side = 'kid';
   document.querySelector('meta[name="theme-color"]')?.setAttribute('content', '#0d1430');
-  document.title = kt('app.title');
   setSide('woman');
-  setLang('ru');
+  // Язык кабинета — язык телефона ребёнка (17.11.2026: тексты кабинета на трёх языках)
+  setLang(detectLang());
+  document.title = kt('app.title');
   subscribe((key) => {
     // Игра пишет своё состояние сама; экран игры обновляет таймер без перерисовки
     if (key === 'kid-play' && play.current()) return;

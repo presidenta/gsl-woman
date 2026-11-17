@@ -1,4 +1,9 @@
-/* ТЕКСТЫ ДЕТСКОГО КАБИНЕТА — только русский (владелец 14.11.2026: «пока только русский»). Слова — положительные, как
+import { getLang } from '../core/i18n.js';
+import KT_UA from './texts-ua.js';
+import KT_EN from './texts-en.js';
+
+/* ТЕКСТЫ ДЕТСКОГО КАБИНЕТА — три языка: здесь русский, texts-ua.js и texts-en.js — переводы как есть (17.11.2026);
+   язык — тот же, что у приложения (core/i18n getLang). Слова — положительные, как
    во всей программе (проверка tests/kids.test.js). Пол ребёнка неизвестен — фразы без родовых окончаний.
 
    kt('task.take') — строка; kt('task.takenBy', { name }) — подстановка {name}. */
@@ -187,7 +192,7 @@ export const KT = {
     awardDone: '{name}: +{n} ⭐',
     awardLine: '⭐ {from} → {to}: +{n}',
     reached: 'Мечта собрана! 🎉',
-    reachedText: 'Все молодцы — пора исполнять мечту!',
+    reachedText: 'Получилось всей семьёй — пора исполнять мечту!',
     done: 'Мечта исполнена!',
     doneToast: 'Сбывшаяся мечта — в истории семьи',
     history: 'Сбывшиеся мечты семьи: {n}',
@@ -293,9 +298,17 @@ export const KT = {
 };
 
 /** Строка по пути «раздел.ключ» с подстановками {name}. Нет такой — сам путь (видно в проверке). */
-export function kt(path, vars = {}) {
-  let v = KT;
+const BY_LANG = { ru: KT, ua: KT_UA, en: KT_EN };
+
+const pick = (root, path) => {
+  let v = root;
   for (const part of path.split('.')) v = v?.[part];
+  return typeof v === 'string' ? v : null;
+};
+
+/** Строка кабинета на языке приложения; в переводе нет — русская, нет и там — сам ключ. */
+export function kt(path, vars = {}) {
+  const v = pick(BY_LANG[getLang()] || KT, path) ?? pick(KT, path);
   if (typeof v !== 'string') return path;
   return v.replace(/\{(\w+)\}/g, (_, k) => (k in vars ? String(vars[k]) : `{${k}}`));
 }

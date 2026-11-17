@@ -208,3 +208,19 @@ test('удаление — только после вопроса: нигде в
     }
   }
 });
+
+// Тексты кабинета на трёх языках (17.11.2026): те же ключи; положительные слова на своём языке
+test('тексты кабинета на украинском и английском — те же ключи, только положительные слова', async () => {
+  const ua = (await import('../js/kids/texts-ua.js')).default;
+  const en = (await import('../js/kids/texts-en.js')).default;
+  const keys = (o, p = '') => Object.entries(o).flatMap(([k, v]) => (v && typeof v === 'object' ? keys(v, `${p}${k}.`) : [`${p}${k}`])).sort();
+  const vals = (o) => Object.values(o).flatMap((v) => (v && typeof v === 'object' ? vals(v) : [v]));
+  const NEG = {
+    ua: /(^|[^а-яіїєґ'’])(не|ні|нема|немає|без)(?=[^а-яіїєґ'’]|$)/i,
+    en: /\b(not|no|never|nothing|nobody|none|without|don[’']t|can[’']t|won[’']t)\b/i,
+  };
+  for (const [l, x] of Object.entries({ ua, en })) {
+    assert.deepEqual(keys(x), keys(KT), l);
+    for (const s of vals(x)) assert.doesNotMatch(s, NEG[l], `${l}: ${s}`);
+  }
+});
