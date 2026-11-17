@@ -987,6 +987,19 @@ export default {
     chartEmpty: "Your first check comes on the weekly review day: three marks from 1 to 10.",
     chartOne: "The first check is in. A line will appear here in a week.",
   },
+  // Календарь цикла — кружок с датой в шапке (js/cycle/, владелец 17.11.2026)
+  cycle: {
+    open: "Calendar: today and cycle",
+    title: "Cycle calendar",
+    lead: "Tap a date to mark a period day, tap again to clear it. The app highlights the expected days itself.",
+    manLead: "Her cycle calendar. Red marks her days, pink marks the expected ones. These days may be harder for her: more warmth, care and patience.",
+    manAlone: "Her cycle calendar appears once you are a couple. Us → Create a couple.",
+    period: "Period",
+    soon: "Expected",
+    stats: "Cycle about {cycle} days, period about {len} days. Next one around {next}.",
+    empty: "Mark the days of your last period and the app will work out the next one.",
+    manEmpty: "Her days appear here as soon as she marks them.",
+  },
   // Разделы дня — кнопки в шапке «Сегодня» (js/sections/, владелец 17.11.2026)
   sections: {
     setup: "Set up sections",

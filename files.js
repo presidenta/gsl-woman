@@ -211,6 +211,8 @@ self.GSL_FILES = [
   './js/core/router.js',
   './js/core/store.js',
   './js/core/updates.js',
+  './js/cycle/cycle.css',
+  './js/cycle/cycle.js',
   './js/evening/evening.js',
   './js/goals/audio-seek.js',
   './js/goals/audio.js',

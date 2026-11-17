@@ -6,6 +6,7 @@ import { isoDate, programDay } from './core/dates.js';
 import * as photos from './photos/photos.js';
 import * as router from './core/router.js';
 import * as pace from './pace/pace.js';
+import * as cycle from './cycle/cycle.js';
 import { register as registerWorker } from './core/updates.js';
 import * as settings from './settings/settings.js';
 import * as journal from './journal/journal.js';
@@ -94,6 +95,9 @@ let gate = { mode: 'form', message: '' };
 function context() {
   // Пара идёт день в день: вошедший в пару берёт дату старта того, кто её создал (js/pace/)
   pace.apply();
+  // Календарь цикла (js/cycle/): у женщины в паре — копия её дней в паре; кружок в шапке — сегодняшнее число
+  cycle.share();
+  cycle.paint();
   const s = settings.get();
   const todayIso = isoDate();
   // У администратора — день, который он листает стрелками (js/preview/), у участницы — настоящий
@@ -143,7 +147,7 @@ function buildShell() {
     )),
   );
   const app = h('div', { class: 'app' },
-    h('header', { class: 'app-header' }, back, who, h('span', { class: 'spacer' }), brand, us, gear),
+    h('header', { class: 'app-header' }, back, who, h('span', { class: 'spacer' }), brand, cycle.headerButton(), us, gear),
     view,
     nav,
   );
