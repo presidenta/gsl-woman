@@ -1022,6 +1022,7 @@ export default {
     title: "Cycle calendar",
     lead: "Tap a date to mark a period day, tap again to clear it. The app highlights the expected days itself.",
     manLead: "Her cycle calendar. Red marks her days, pink marks the expected ones. These days may be harder for her: more warmth, care and patience.",
+    manAlert: 'Her days — more warmth and care',
     manAlone: "Weekends, holidays and your dates. Her cycle calendar appears once you are a couple: Us → Create a couple.",
     period: "Period",
     soon: "Expected",

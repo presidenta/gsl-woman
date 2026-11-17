@@ -1,0 +1,25 @@
+// Календарь цикла: когда у мужчины пульсирует кружок с датой (владелец 17.11.2026).
+import { test } from 'node:test';
+import assert from 'node:assert/strict';
+import { careToday } from '../js/cycle/cycle.js';
+
+// Два отмеченных цикла по 28 дней: месячные 1–5 сентября и 29 сентября — 3 октября. Следующие ожидаются с 27 октября.
+const days = ['2026-09-01', '2026-09-02', '2026-09-03', '2026-09-04', '2026-09-05',
+  '2026-09-29', '2026-09-30', '2026-10-01', '2026-10-02', '2026-10-03'];
+
+test('её отмеченный день — «period», ожидаемый — «soon»', () => {
+  assert.equal(careToday(days, null, '2026-10-01'), 'period');
+  assert.equal(careToday(days, null, '2026-10-27'), 'soon');
+  assert.equal(careToday(days, null, '2026-10-31'), 'soon');
+});
+
+test('за один-два дня до ожидаемых — «near», раньше и после — обычный день', () => {
+  assert.equal(careToday(days, null, '2026-10-25'), 'near');
+  assert.equal(careToday(days, null, '2026-10-26'), 'near');
+  assert.equal(careToday(days, null, '2026-10-24'), null);
+  assert.equal(careToday(days, null, '2026-11-05'), null);
+});
+
+test('без отметок — обычный день', () => {
+  assert.equal(careToday([], null, '2026-10-27'), null);
+});

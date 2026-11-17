@@ -128,8 +128,23 @@ export function paint() {
   button.querySelector('.cycle-btn__week').textContent = new Intl.DateTimeFormat(locale(), { weekday: 'short' }).format(now).replace('.', '');
   const sh = shown() || { days: [], cycle: null };
   const today = isoDate();
-  button.classList.toggle('is-period', sh.days.includes(today));
-  button.classList.toggle('is-soon', !sh.days.includes(today) && predicted(sh.days, sh.cycle).has(today));
+  const care = careToday(sh.days, sh.cycle, today);
+  button.classList.toggle('is-period', care === 'period');
+  button.classList.toggle('is-soon', care === 'soon' || care === 'near');
+  // У мужчины кружок пульсирует в её дни и за два дня до ожидаемых (владелец 17.11.2026: «чтобы мужчина не мог просто
+  // не обратить внимания»)
+  const pulse = side.get() === 'man' && care !== null;
+  button.classList.toggle('is-pulse', pulse);
+  button.setAttribute('aria-label', pulse ? `${t('cycle.open')}. ${t('cycle.manAlert')}` : t('cycle.open'));
+  button.title = pulse ? t('cycle.manAlert') : '';
+}
+
+/** Что сегодня: 'period' — отмеченный день, 'soon' — ожидаемый, 'near' — ожидаемые через день-два, null — обычный. */
+export function careToday(days, ownCycle, today = isoDate()) {
+  if (days.includes(today)) return 'period';
+  const soon = predicted(days, ownCycle);
+  if (soon.has(today)) return 'soon';
+  return [1, 2].some((k) => soon.has(addDays(today, k))) ? 'near' : null;
 }
 
 /* ---------- Праздники ---------- */
@@ -204,7 +219,8 @@ function monthGrid(year, month, ctx) {
     const state = STATE[md];
     const weekend = date.getDay() === 0 || date.getDay() === 6;
     const cls = `cycle-day${weekend ? ' is-weekend' : ''}${state ? ' is-state' : ''}${own.length ? ' is-event' : ''}`
-      + `${marked ? ' is-period' : ''}${soon ? ' is-soon' : ''}${iso === ctx.today ? ' is-today' : ''}${iso === ctx.editing ? ' is-editing' : ''}`;
+      + `${marked ? ' is-period' : ''}${soon ? ' is-soon' : ''}${iso === ctx.today ? ' is-today' : ''}${iso === ctx.editing ? ' is-editing' : ''}`
+      + `${ctx.pulse && (marked || soon) && iso >= ctx.today ? ' is-pulse' : ''}`;
     const names = [state ? t(state) : '', ...own.map((e) => e.title)].filter(Boolean);
     cells.push(h('button', { type: 'button', class: cls, title: names.join(' · ') || null, 'aria-pressed': String(marked), onclick: () => ctx.tap(iso) }, String(d)));
     if (state) list.push(h('li', { class: 'is-state' }, `${d} — ${t(state)}`));
@@ -279,6 +295,7 @@ function content() {
     events: events(),
     today,
     editing,
+    pulse: man, // у мужчины её дни — сегодняшние и будущие — пульсируют
     tap: (iso) => {
       if (mode === 'event') { editing = iso; redraw(); return; }
       const own = ownDays();
