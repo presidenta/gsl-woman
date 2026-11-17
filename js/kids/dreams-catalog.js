@@ -92,7 +92,7 @@ export const PROFESSIONS = [
     ['match', 'Посмотреть матч и рассказать, что понравилось'],
     ['team', 'Сыграть матч с друзьями во дворе'],
     ['skill:exercise', ''],
-    ['skill:rope', ''],
+    ['skill:squats', ''],
   ] },
   { id: 'scientist', icon: '🔬', title: 'Учёный', steps: [
     ['experiment', 'Провести дома опыт вместе со взрослым'],

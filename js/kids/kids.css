@@ -1006,3 +1006,4 @@
 .kid-show__row input { width: 20px; height: 20px; }
 .kid-power__form { display: flex; gap: 6px; margin-top: 6px; }
 .kid-power__input { flex: 1; min-width: 0; }
+.kid-norm__input { width: 96px; margin-left: auto; }

@@ -193,6 +193,7 @@ self.GSL_FILES = [
   './js/circles/catalog/en.js',
   './js/circles/catalog/ru.js',
   './js/circles/catalog/ua.js',
+  './js/circles/chat-extras.js',
   './js/circles/chat-view.js',
   './js/circles/circles.css',
   './js/circles/circles.js',

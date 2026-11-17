@@ -7,6 +7,7 @@ import { taskCard, taskComposer } from '../kids/tasks-view.js';
 import { awardCard } from '../kids/family-dream.js';
 import { kt } from '../kids/texts.js';
 import { canRecord, startRecording, preparePhoto, newMediaId, MAX_RECORD_MS } from './media.js';
+import { reactionsRow, quickReplies, thanksMeter, councilCard } from './chat-extras.js';
 
 /* ЧАТ ПАРЫ И СЕМЕЙНЫЙ ЧАТ (владелец 13.11.2026: «отдельный чат, где люди понимают, что это написал их самый близкий
    человек или ребёнок; всё по делу»; ТЗ раздел 4). Сверху — быстрые сигналы (помощь, поддержка, срочно, спасибо,
@@ -142,6 +143,8 @@ function bubble(circle, m, api) {
     d.audio && api.media ? voiceNote(api, d.audio) : null,
     d.text ? h('span', { class: 'chat__text' }, d.text) : null,
     h('span', { class: 'chat__time' }, time),
+    // Сердечки и смайлики под сообщением (chat-extras.js)
+    reactionsRow(api, m),
   );
 }
 
@@ -280,7 +283,11 @@ export function chatView(circle, api = familyApi(circle)) {
         svg(SIGNAL_ICON[s], 'chat__quick-icon'), t(`us.chat.signals.${s}`))),
       quick),
     composer,
+    // Семейный совет недели — только в семье (chat-extras.js)
+    family && api.role !== 'child' ? councilCard(api) : null,
     feed,
+    api.role === 'child' ? null : thanksMeter(api),
+    quickReplies((text) => send(api, text)),
     api.role === 'child' ? null : h('div', { class: 'chat__starters', role: 'group', 'aria-label': t('us.chat.startersTitle') },
       ...STARTERS.map((k) => h('button', {
         type: 'button', class: 'chat__starter',

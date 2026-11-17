@@ -45,11 +45,14 @@ const showOf = (api, member) => api.items('kshow').find((x) => x.data.member ===
 /** Виден ли раздел ребёнку: решение родителя, иначе — по ступени. */
 export function shown(api, member, section) {
   const v = showOf(api, member)[section.id];
-  return typeof v === 'boolean' ? v : fits(section, groupOf(api, member));
+  if (typeof v === 'boolean') return v;
+  // Безопасность — только когда родитель сам начал тренировку (parentOnly в catalog.js)
+  return !section.parentOnly && fits(section, groupOf(api, member));
 }
 
 export function setShown(api, member, sectionId, on) {
-  api.put('kshow', `show.${short(member)}`, { member, sections: { ...showOf(api, member), [sectionId]: !!on }, by: api.me, at: new Date().toISOString() });
+  const row = api.items('kshow').find((x) => x.data.member === member)?.data || {};
+  api.put('kshow', `show.${short(member)}`, { ...row, member, sections: { ...showOf(api, member), [sectionId]: !!on }, by: api.me, at: new Date().toISOString() });
 }
 
 /** Блок родителя: возраст и что показывать ребёнку (вкладка «Дети»). */
@@ -69,7 +72,14 @@ export function parentSetup(api, kid, sections, rerender) {
       return h('li', {},
         h('label', { class: 'kid-show__row' },
           h('input', { type: 'checkbox', checked: on, onchange: (e) => { setShown(api, kid.id, sec.id, e.target.checked); rerender(); } }),
-          h('span', {}, `${sec.icon} ${sec.title}`)));
+          h('span', {}, `${sec.icon} ${sec.title}`)),
+        sec.parentOnly ? h('p', { class: 'faint kid-age__hint' }, kt('ages.safetyHint')) : null);
+    })),
+    h('p', { class: 'caps kid-age__title' }, kt('ages.normsTitle')),
+    h('ul', { class: 'kid-show' }, ...Object.keys(NORMS).map((id) => {
+      const input = h('input', { type: 'number', min: '1', max: '100000', class: 'input kid-norm__input', value: String(normOf(api, kid.id, id)), 'aria-label': NORMS[id].word.replace('{n}', '') });
+      input.addEventListener('change', () => { if (Number(input.value) > 0) { setNorm(api, kid.id, id, Number(input.value)); rerender(); } });
+      return h('li', { class: 'kid-show__row' }, h('span', {}, NORMS[id].word.replace(' {n}', '').replace('{n} ', '')), input);
     })),
     h('p', { class: 'caps kid-age__title' }, kt('power.parentTitle')),
     h('p', { class: 'faint kid-age__hint' }, kt('power.parentLead')),
@@ -96,15 +106,29 @@ function powerForm(api, kid, rerender) {
 /* ---------- Нормы с цифрами ---------- */
 
 /** Минимум по ступени для навыков с числом; без ступени — младшая. */
+/* Владелец 17.11.2026: «рассчитываем, что люди вообще не приседают и не занимаются; для спортсменов — отдельное
+   спортивное приложение». Минимум по ступени — 5 / 10 / 20; хочется больше — родитель ставит своё число. */
 export const NORMS = {
-  squats: { small: 'Присесть 20 раз', middle: 'Присесть 35 раз', teen: 'Присесть 50 раз' },
-  rope: { small: 'Прыгнуть на скакалке 20 раз', middle: 'Прыгнуть на скакалке 50 раз', teen: 'Прыгнуть на скакалке 100 раз' },
-  pushups: { small: 'Отжаться 5 раз', middle: 'Отжаться 10 раз', teen: 'Отжаться 20 раз' },
-  walk: { small: 'Пройти пешком 3000 шагов', middle: 'Пройти пешком 5000 шагов', teen: 'Пройти пешком 7000 шагов' },
+  squats: { word: 'Присесть {n} раз', small: 5, middle: 10, teen: 20 },
+  pushups: { word: 'Отжаться {n} раз', small: 5, middle: 10, teen: 20 },
+  walk: { word: 'Пройти пешком {n} шагов', small: 3000, middle: 5000, teen: 7000 },
 };
 
-/** Название навыка с цифрой своей ступени. */
-export const titleFor = (id, title, group) => NORMS[id]?.[group || 'small'] || title;
+const normsOf = (api, member) => api.items('kshow').find((x) => x.data.member === member)?.data.norms || {};
+
+/** Число навыка: своё от родителя, иначе — по ступени. */
+export function normOf(api, member, id) {
+  const own = Number(normsOf(api, member)[id]);
+  return own > 0 ? own : NORMS[id][groupOf(api, member) || 'small'];
+}
+
+export function setNorm(api, member, id, n) {
+  const row = api.items('kshow').find((x) => x.data.member === member)?.data || { member, sections: {} };
+  api.put('kshow', `show.${short(member)}`, { ...row, member, norms: { ...(row.norms || {}), [id]: Math.max(1, Math.round(n)) }, by: api.me, at: new Date().toISOString() });
+}
+
+/** Название навыка с числом ребёнка. */
+export const titleFor = (api, member, id, title) => (NORMS[id] ? NORMS[id].word.replace('{n}', normOf(api, member, id)) : title);
 
 /* ---------- «Моя суперсила для семьи» ---------- */
 

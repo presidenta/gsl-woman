@@ -582,6 +582,12 @@ export default {
       remove: 'Remove',
     },
     chat: {
+      react: "Reaction",
+      repliesTitle: "Quick replies",
+      quickReplies: ["Love you ❤️", "Will do 👍", "Thank you 🙏", "Miss you 😘", "On my way 🏃"],
+      thanksWeek: "Thanks this week: {n} of {goal}. Tell someone close what you are grateful for.",
+      thanksDone: "Thanks this week: {n}. Your warmth gets through.",
+      council: { title: "Family council of the week", start: "Start the council", sets: [["What made you happy this week?", "What would you like next week?", "Who in the family shall we thank?"], ["What was the warmest moment of the week?", "What shall we do together at the weekend?", "Who helped whom this week?"], ["What did each of us learn this week?", "What do we dream about as a family?", "What shall we do for grandma and grandpa?"], ["What was hard, and how did we cope?", "What one house rule shall we add?", "What surprise shall we plan for mum or dad?"]] },
       startersTitle: "Start a phrase",
       starters: { thanks: "Thank you for", when: "When you", glad: "I am so glad that you" },
       ph: 'Write…',

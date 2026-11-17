@@ -242,7 +242,7 @@ function skillsView(api) {
     ...SKILL_SECTIONS.filter((sec) => shown(api, api.me, sec)).map((sec) => h('section', { class: 'card' },
       h('h2', { class: 'card__title' }, `${sec.icon} ${sec.title}`),
       h('ul', { class: 'kid-rows' }, ...sec.skills.map(([id, base]) => {
-        const title = titleFor(id, base, groupOf(api, api.me));
+        const title = titleFor(api, api.me, id, base);
         const n = skillCount(api.me, id, deeds, oks);
         const { step, next } = skillStep(n);
         const planned = inPlan(api, 'skill', id);

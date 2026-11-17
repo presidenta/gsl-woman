@@ -800,3 +800,21 @@
 }
 .imsg__to-chat { display: inline-flex; align-items: center; justify-content: center; gap: 8px; margin-top: 10px; }
 .imsg__to-chat svg { width: 18px; height: 18px; }
+
+/* Реакции, быстрые ответы, «спасибо за неделю», семейный совет (chat-extras.js) */
+.chat__reacts { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; margin-top: 4px; }
+.chat__react, .chat__react-add, .chat__emoji { min-height: 26px; padding: 0 7px; border-radius: 999px; border: 1px solid var(--c-line, rgba(255,255,255,.14));
+  background: rgba(0,0,0,.18); color: inherit; font: inherit; font-size: 13px; cursor: pointer; }
+.chat__react.is-mine, .chat__emoji.is-mine { border-color: var(--gold, #d9b56a); }
+.chat__react-add { opacity: .55; }
+.chat__palette { display: inline-flex; gap: 3px; flex-wrap: wrap; }
+.chat__palette[hidden] { display: none; }
+.chat__replies { display: flex; flex-wrap: wrap; gap: 6px; margin: 6px 0; }
+.chat__reply { min-height: 32px; padding: 0 10px; border-radius: 999px; border: 1px solid var(--c-line-strong, rgba(255,255,255,.22));
+  background: transparent; color: inherit; font: inherit; font-size: 12.5px; cursor: pointer; }
+.chat__thanks { margin: 6px 2px 0; font-size: 12.5px; }
+.chat__thanks.is-done { color: var(--gold, #d9b56a); opacity: 1; }
+.chat__council { display: grid; gap: 8px; padding: 12px; margin-bottom: 10px; border: 1px solid var(--gold, #d9b56a); border-radius: 16px; }
+.chat__council-title { margin: 0; }
+.chat__council-list { margin: 0; padding-left: 20px; display: grid; gap: 4px; }
+.chat__text { white-space: pre-line; }
