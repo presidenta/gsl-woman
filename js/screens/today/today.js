@@ -574,7 +574,7 @@ export function render(view, ctx) {
       open.biz ? sectionBlock(ctx, 'biz', man ? [
         { id: 'tip', build: () => bizCard(ctx, plan) },
         { id: 'stem', build: () => stemCard(ctx, plan) },
-      ] : [{ id: 'soon', build: () => womanPlusCard() }]) : null,
+      ] : [{ id: 'soon', build: () => womanPlusCard(ctx) }]) : null,
       recordedToday(ctx, plan),
       // Итог дня — сколько баллов набрано (score/)
       totalCard(ctx, plan),

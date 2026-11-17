@@ -1021,7 +1021,7 @@ export default {
   },
   // Разделы дня — кнопки в шапке «Сегодня» (js/sections/, владелец 17.11.2026)
   sections: {
-    soon: { lead: "Coming soon", text: "Everything that helps you grow and makes you interesting, for yourself and for him:", note: "This section is still being built; tasks will appear here soon.", items: ["Dancing, ideally with your man", "Handicrafts: embroidery, knitting, sewing", "Learning: languages, courses, books", "Creativity: drawing, music, singing, photography", "Women’s practices and self-care", "Harmony: breathing, quiet, nature", "Beauty and your own style", "Your interests and hobbies, and how to share them with him"] },
+    soon: { lead: "Coming soon", text: "Everything that helps you grow and makes you interesting, for yourself and for him:", note: "This section is still being built; tasks will appear here soon.", mine: "Mine", addPh: "What I want to do…", add: "Add my own", remove: "Remove", items: ["Dancing, ideally with your man", "Handicrafts: embroidery, knitting, sewing", "Learning: languages, courses, books", "Creativity: drawing, music, singing, photography", "Women’s practices and self-care", "Harmony: breathing, quiet, nature", "Beauty and your own style", "Your interests and hobbies, and how to share them with him", "Yoga", "Tantra, for couples", "Lingam massage, for couples"] },
     setup: "Set up sections",
     setupShort: "Set up",
     setupTitle: "Sections of the day",

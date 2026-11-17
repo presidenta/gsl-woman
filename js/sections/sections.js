@@ -1,6 +1,6 @@
 import { h, svg } from '../core/dom.js';
 import { t, list } from '../core/i18n.js';
-import { read } from '../core/store.js';
+import { read, write } from '../core/store.js';
 import * as settings from '../settings/settings.js';
 import * as side from '../side/side.js';
 import { icons } from '../ui/icons.js';
@@ -160,8 +160,21 @@ export function bizCard(ctx, plan) {
   }).node;
 }
 
-/** «Женщина⁺» — в разработке: что здесь будет (владелец 17.11.2026). */
-export function womanPlusCard() {
+/* «Женщина⁺» — в разработке: что здесь будет (владелец 17.11.2026). Плюсик — женщина вписывает своё: чем хочет
+   заниматься и развиваться. Своё хранится на телефоне (ключ womanplus: { own: [текст…] }), «−» убирает. */
+const WP_KEY = 'womanplus';
+const ownPlus = () => { const v = read(WP_KEY, {}); return Array.isArray(v?.own) ? v.own.filter((x) => typeof x === 'string' && x.trim()) : []; };
+
+export function womanPlusCard(ctx) {
+  const own = ownPlus();
+  const input = h('input', { type: 'text', class: 'input womanplus__input', maxlength: '80', placeholder: t('sections.soon.addPh'), 'aria-label': t('sections.soon.add') });
+  const add = () => {
+    const text = input.value.trim();
+    if (!text) return;
+    write(WP_KEY, { own: [...own, text].slice(-40) });
+    ctx.rerender();
+  };
+  input.addEventListener('keydown', (e) => { if (e.key === 'Enter') add(); });
   return foldCard({
     id: 'womanplus',
     cls: 'womanplus',
@@ -171,6 +184,13 @@ export function womanPlusCard() {
     body: [
       h('p', { class: 'card__text' }, t('sections.soon.text')),
       h('ul', { class: 'womanplus__list' }, ...list('sections.soon.items').map((x) => h('li', {}, x))),
+      own.length ? h('p', { class: 'caps womanplus__mine' }, t('sections.soon.mine')) : null,
+      own.length ? h('ul', { class: 'womanplus__list womanplus__list--own' }, ...own.map((x, i) => h('li', {},
+        h('span', {}, x),
+        h('button', { type: 'button', class: 'womanplus__remove', 'aria-label': t('sections.soon.remove'),
+          onclick: () => { write(WP_KEY, { own: own.filter((_, j) => j !== i) }); ctx.rerender(); } }, '−')))) : null,
+      h('div', { class: 'womanplus__form' }, input,
+        h('button', { type: 'button', class: 'btn btn--ghost womanplus__add', 'aria-label': t('sections.soon.add'), onclick: add }, svg(icons.plus))),
       h('p', { class: 'faint womanplus__note' }, t('sections.soon.note')),
     ],
   }).node;
