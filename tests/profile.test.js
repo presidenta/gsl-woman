@@ -3,7 +3,7 @@ import { test, beforeEach } from 'node:test';
 import assert from 'node:assert/strict';
 import { clearAll } from '../js/core/store.js';
 import * as settings from '../js/settings/settings.js';
-import { applyTask, current, hasKids, showKids, bizFor } from '../js/profile/profile.js';
+import { applyTask, applyImsg, current, hasKids, showKids, bizFor } from '../js/profile/profile.js';
 import { setCount } from '../js/love/love.js';
 import * as meet from '../js/meet/meet.js';
 import { COLLECTIONS } from '../js/sync/sync.js';
@@ -20,6 +20,17 @@ const task = {
     single: { text: 'В поиске.', say: [{ label: 'Рядом', text: 'Женщине рядом.' }] },
   },
 };
+
+test('я-сообщение в словах профиля (17.11.2026): свои слова — у профиля, нет своих — основной пример', () => {
+  const m = { title: 'Дверь', old: 'Я сама.', say: 'Мне приятно.', variants: { single: { title: 'Мужчина придержал дверь', old: 'Ой, я сама.', say: 'Благодарю вас! Мне приятно.' } } };
+  assert.equal(applyImsg(m, 'married'), m);
+  assert.equal(applyImsg(m, 'dating'), m, 'у «встречаемся» своих слов нет');
+  assert.equal(applyImsg(m, 'single').title, 'Мужчина придержал дверь');
+  assert.equal(applyImsg(m, 'single').say, 'Благодарю вас! Мне приятно.');
+  assert.equal(applyImsg(null, 'single'), null);
+  settings.update({ profile: 'single' });
+  assert.equal(applyImsg(m).old, 'Ой, я сама.', 'профиль из настроек');
+});
 
 test('профиль по умолчанию — основной; чужое значение отбрасывается', () => {
   assert.equal(current(), 'married');

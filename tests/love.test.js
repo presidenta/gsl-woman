@@ -6,6 +6,7 @@ import { _use } from '../js/program/source.js';
 import { dayPlan } from '../js/program/index.js';
 import { choose, choices, score, ideaFor, myLanguage, pickFor, setCount, setPerson, groupIdeas } from '../js/love/love.js';
 import { write } from '../js/core/store.js';
+import * as settings from '../js/settings/settings.js';
 import { clearAll } from '../js/core/store.js';
 
 beforeEach(() => {
@@ -42,6 +43,22 @@ test('свой язык: как сказать и чем поблагодари�
   const m = myLanguage(4, 'ru');
   assert.equal(m.tell, 'Скажи touch');
   assert.match(m.thanks, /^touch спасибо/);
+});
+
+test('свой язык по профилю (17.11.2026): «в поиске» и «встречаемся» — свои фразы, остальные — основные', () => {
+  const copy = structuredClone(fixture);
+  for (const lang of Object.keys(copy.langs || {})) {
+    const k = copy.langs[lang].love?.kinds?.touch;
+    if (k) k.by = { single: { tell: 'Маме о touch', thanks: ['Спасибо маме 1', 'Спасибо маме 2', 'Спасибо маме 3'] } };
+  }
+  _use(copy);
+  choose('me', 'touch');
+  assert.equal(myLanguage(4, 'ru').tell, 'Скажи touch', 'замужем — основная фраза');
+  settings.update({ profile: 'single' });
+  assert.equal(myLanguage(4, 'ru').tell, 'Маме о touch');
+  assert.match(myLanguage(4, 'ru').thanks, /^Спасибо маме/);
+  settings.update({ profile: 'dating' });
+  assert.equal(myLanguage(4, 'ru').tell, 'Скажи touch', 'своих фраз у профиля нет — основные');
 });
 
 test('я-сообщение — каждый день: дни 4–6 к заданиям недели, дни 1–3 — повторение прошлой, день 7 — одна из недели', () => {

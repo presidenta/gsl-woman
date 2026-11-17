@@ -24,6 +24,13 @@ export function applyTask(task, profile = current()) {
   return { ...task, text: v.text || task.text, say };
 }
 
+/** Я-сообщение в словах профиля (сервер: gsl/imsg/, владелец 17.11.2026: «разнообразие фраз — в поиске, замужем,
+    встречаемся»): у примера поле variants { together?, dating?, single? }; нет своих слов — основной пример. */
+export function applyImsg(m, profile = current()) {
+  const v = m && profile !== 'married' ? m.variants?.[profile] : null;
+  return v ? { ...m, ...v } : m;
+}
+
 /** Дети добавлены в «Пять языков любви» → «Мои дети». */
 export const hasKids = () => choices().children.length > 0;
 

@@ -1,5 +1,6 @@
 import { read, write } from '../core/store.js';
 import { langData } from '../program/source.js';
+import * as settings from '../settings/settings.js';
 
 /* ПЯТЬ ЯЗЫКОВ ЛЮБВИ (Гэри Чепмен) — данные и выбор. Тексты (языки, дела, я-сообщения, тест) — на сервере
    вместе с программой: langs.<язык>.love. Здесь только то, что выбрала сама женщина (ключ love в хранилище):
@@ -122,5 +123,10 @@ export function myLanguage(day, lang) {
   const kind = choices().me;
   if (!c || !kind) return null;
   const k = c.kinds[kind];
-  return { kind, name: k.name, tell: k.tell, thanks: pickFor(k.thanks, day) };
+  // «Встречаемся» и «в поиске» — свои фразы (сервер: gsl/imsg/love-*.js, поле by; владелец 17.11.2026): на свидании
+  // и в переписке; в поиске — с мамой, папой, подругой, другом. «Замужем» и «живём вместе» — основные.
+  const own = k.by?.[settings.get().profile];
+  const tell = own?.tell || k.tell;
+  const thanks = own?.thanks?.length ? own.thanks : k.thanks;
+  return { kind, name: k.name, tell, thanks: pickFor(thanks, day) };
 }

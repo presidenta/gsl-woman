@@ -1,7 +1,7 @@
 import { TASK_DAYS, WEEK_DAYS, WEEKS, MONTH_WEEKS } from '../config.js';
 import { weekOf, dayInWeek, monthOf, inProgram } from '../core/dates.js';
 import { langData } from './source.js';
-import { applyTask, current as currentProfile } from '../profile/profile.js';
+import { applyTask, applyImsg, current as currentProfile } from '../profile/profile.js';
 import { dueRepeats, tiersForDay } from './repeats.js';
 import * as settings from '../settings/settings.js';
 
@@ -100,7 +100,8 @@ export function dayPlan(day, lang) {
     task: kind === 'task' ? plan.tasks[n - 1] : null,
     taskIndex: kind === 'task' ? n - 1 : null,
     teaser: teaserOf(kind, n, plan),
-    imsg: imsgOf(week, n, plan.imsgs, lang),
+    // Я-сообщение — в словах профиля отношений (сервер: gsl/imsg/, 17.11.2026)
+    imsg: applyImsg(imsgOf(week, n, plan.imsgs, lang)),
     // Повтор по графику (repeats.js): в дни практики — навыки прошлых недель, к которым пора вернуться
     repeats: repeatsOf(week, n, lang),
     ...plan,
