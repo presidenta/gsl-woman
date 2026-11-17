@@ -37,3 +37,15 @@ test('мужчина без пары отмечает её дни сам: они
   assert.deepEqual(_shown().days, []);
   clearAll();
 });
+
+test('окно «90 дней»: 45 дней до и 45 после сегодня; история и статистика года', async () => {
+  const { windowRange, cycleHistory, yearStats } = await import('../js/cycle/cycle.js');
+  assert.deepEqual(windowRange('2026-11-17'), { from: '2026-10-03', to: '2027-01-01' });
+  const h = cycleHistory(days);
+  assert.deepEqual(h.map((c) => [c.start, c.len, c.cycle]), [['2026-09-01', 5, 28], ['2026-09-29', 5, null]]);
+  const y = yearStats(days, 2026);
+  assert.equal(y.count, 2);
+  assert.equal(y.cycle, 28);
+  assert.equal(y.len, 5);
+  assert.equal(yearStats(days, 2025).count, 0);
+});

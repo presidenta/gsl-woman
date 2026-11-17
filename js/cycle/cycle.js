@@ -112,12 +112,12 @@ export function stats(days, own = null) {
   return { cycle: own || clamp(cycle, 21, 40), auto: clamp(cycle, 21, 40), len: clamp(len, 2, 8), last: eps[eps.length - 1] || null, count: eps.length };
 }
 
-/** Ожидаемые дни: от последнего начала — ещё три цикла вперёд. */
-export function predicted(days, own = null) {
+/** Ожидаемые дни: от последнего начала — ещё cycles циклов вперёд (обычно три, для «Весь год» — до конца года). */
+export function predicted(days, own = null, cycles = 3) {
   const s = stats(days, own);
   if (!s.last) return new Set();
   const out = new Set();
-  for (let k = 1; k <= 3; k++) {
+  for (let k = 1; k <= cycles; k++) {
     const start = addDays(s.last.start, s.cycle * k);
     for (let i = 0; i < s.len; i++) out.add(addDays(start, i));
   }
@@ -213,9 +213,53 @@ function mergeEvents() {
   write(EV_KEY, { list: [] });
 }
 
+/** История циклов: [{ start, len, cycle }] — cycle от начала до начала следующих, у текущего null. */
+export function cycleHistory(days) {
+  const eps = episodes(days);
+  return eps.map((e, i) => ({ start: e.start, len: e.len, cycle: eps[i + 1] ? daysBetween(e.start, eps[i + 1].start) : null }));
+}
+
+/** Статистика года: циклы, начатые в этом году, средние, самый короткий и длинный (только правдоподобные 18–45). */
+export function yearStats(days, year) {
+  const list = cycleHistory(days).filter((c) => c.start.startsWith(`${year}-`));
+  const full = list.map((c) => c.cycle).filter((n) => n && n >= 18 && n <= 45);
+  const avg = (a) => (a.length ? Math.round(a.reduce((x, y) => x + y, 0) / a.length) : null);
+  return { list, count: list.length, cycle: avg(full), len: avg(list.map((c) => c.len)), min: full.length ? Math.min(...full) : null, max: full.length ? Math.max(...full) : null };
+}
+
+/** Окно «90 дней»: 45 дней до сегодня и 45 после (владелец 17.11.2026: «они должны смещаться»). */
+export const WINDOW = 45;
+export function windowRange(today = isoDate()) {
+  return { from: addDays(today, -WINDOW), to: addDays(today, WINDOW) };
+}
+
 /* ---------- Календарь ---------- */
 
 const dayMonth = (iso) => new Intl.DateTimeFormat(locale(), { day: 'numeric', month: 'long' }).format(new Date(`${iso}T12:00:00`));
+
+const weekHeads = () => [...Array(7)].map((_, i) => new Intl.DateTimeFormat(locale(), { weekday: 'short' }).format(new Date(2024, 0, 1 + i)).replace('.', ''))
+  .map((n, i) => h('span', { class: `cycle-grid__head${i >= 5 ? ' is-weekend' : ''}` }, n));
+
+/** Ячейка дня и строки праздников этого дня. */
+function dayCell(date, ctx) {
+  const iso = isoDate(date);
+  const md = iso.slice(5);
+  const marked = ctx.days.includes(iso);
+  const soon = !marked && ctx.soon.has(iso);
+  const own = ctx.events.filter((e) => e.md === md);
+  const state = STATE[md];
+  const weekend = date.getDay() === 0 || date.getDay() === 6;
+  const cls = `cycle-day${weekend ? ' is-weekend' : ''}${state ? ' is-state' : ''}${own.length ? ' is-event' : ''}`
+    + `${marked ? ' is-period' : ''}${soon ? ' is-soon' : ''}${iso === ctx.today ? ' is-today' : ''}${iso === ctx.editing ? ' is-editing' : ''}`
+    + `${ctx.pulse && (marked || soon) && iso >= ctx.today ? ' is-pulse' : ''}`;
+  const names = [state ? t(state) : '', ...own.map((e) => e.title)].filter(Boolean);
+  const cell = h('button', { type: 'button', class: cls, title: names.join(' · ') || null, 'aria-pressed': String(marked), 'aria-label': dayMonth(iso), onclick: () => ctx.tap(iso) }, String(date.getDate()));
+  const notes = [
+    ...(state ? [h('li', { class: 'is-state' }, `${dayMonth(iso)} — ${t(state)}`)] : []),
+    ...own.map((e) => h('li', { class: 'is-event' }, `${dayMonth(iso)} — ${e.title}`)),
+  ];
+  return { cell, notes };
+}
 
 function monthGrid(year, month, ctx) {
   const first = new Date(year, month, 1);
@@ -225,29 +269,93 @@ function monthGrid(year, month, ctx) {
   const list = [];
   for (let i = 0; i < lead; i++) cells.push(h('span', { class: 'cycle-day is-empty' }));
   for (let d = 1; d <= count; d++) {
-    const date = new Date(year, month, d);
-    const iso = isoDate(date);
-    const md = iso.slice(5);
-    const marked = ctx.days.includes(iso);
-    const soon = !marked && ctx.soon.has(iso);
-    const own = ctx.events.filter((e) => e.md === md);
-    const state = STATE[md];
-    const weekend = date.getDay() === 0 || date.getDay() === 6;
-    const cls = `cycle-day${weekend ? ' is-weekend' : ''}${state ? ' is-state' : ''}${own.length ? ' is-event' : ''}`
-      + `${marked ? ' is-period' : ''}${soon ? ' is-soon' : ''}${iso === ctx.today ? ' is-today' : ''}${iso === ctx.editing ? ' is-editing' : ''}`
-      + `${ctx.pulse && (marked || soon) && iso >= ctx.today ? ' is-pulse' : ''}`;
-    const names = [state ? t(state) : '', ...own.map((e) => e.title)].filter(Boolean);
-    cells.push(h('button', { type: 'button', class: cls, title: names.join(' · ') || null, 'aria-pressed': String(marked), onclick: () => ctx.tap(iso) }, String(d)));
-    if (state) list.push(h('li', { class: 'is-state' }, `${d} — ${t(state)}`));
-    for (const e of own) list.push(h('li', { class: 'is-event' }, `${d} — ${e.title}`));
+    const { cell, notes } = dayCell(new Date(year, month, d), ctx);
+    cells.push(cell);
+    list.push(...notes);
   }
   const name = new Intl.DateTimeFormat(locale(), { month: 'long', year: 'numeric' }).format(first);
-  const heads = [...Array(7)].map((_, i) => new Intl.DateTimeFormat(locale(), { weekday: 'short' }).format(new Date(2024, 0, 1 + i)).replace('.', ''));
   return h('section', { class: 'cycle-month' },
     h('p', { class: 'cycle-month__title caps' }, name),
-    h('div', { class: 'cycle-grid' }, ...heads.map((n, i) => h('span', { class: `cycle-grid__head${i >= 5 ? ' is-weekend' : ''}` }, n)), ...cells),
+    h('div', { class: 'cycle-grid' }, ...weekHeads(), ...cells),
     list.length ? h('ul', { class: 'cycle-month__events' }, ...list) : null,
   );
+}
+
+/** Лента «90 дней»: недели подряд с понедельника, сегодня — посередине; над неделей, где начинается месяц, — его
+    название. Дни за краем окна — бледные и без нажатия (владелец 17.11.2026: «45 дней до и 45 после»). */
+function rollingGrid(ctx) {
+  const { from, to } = windowRange(ctx.today);
+  const d0 = new Date(`${from}T12:00:00`);
+  const start = addDays(from, -((d0.getDay() + 6) % 7));
+  const d1 = new Date(`${to}T12:00:00`);
+  const end = addDays(to, (7 - d1.getDay()) % 7);
+  const thisYear = new Date().getFullYear();
+  const monthName = (date) => new Intl.DateTimeFormat(locale(), { month: 'long', ...(date.getFullYear() !== thisYear ? { year: 'numeric' } : {}) }).format(date);
+  const rows = [];
+  const list = [];
+  for (let week = start; week <= end; week = addDays(week, 7)) {
+    const dates = [...Array(7)].map((_, i) => new Date(`${addDays(week, i)}T12:00:00`));
+    const firstOfMonth = dates.find((x) => x.getDate() === 1 && isoDate(x) >= from && isoDate(x) <= to);
+    // Название месяца — над его первым числом (в первой неделе — над первым днём окна)
+    const head = firstOfMonth || (week === start ? d0 : null);
+    if (head) rows.push(h('p', { class: 'cycle-roll__month caps', style: `grid-column:${((head.getDay() + 6) % 7) + 1} / -1` }, monthName(head)));
+    for (const date of dates) {
+      const iso = isoDate(date);
+      if (iso < from || iso > to) { rows.push(h('span', { class: 'cycle-day is-out' }, String(date.getDate()))); continue; }
+      const { cell, notes } = dayCell(date, ctx);
+      rows.push(cell);
+      list.push(...notes);
+    }
+  }
+  return h('section', { class: 'cycle-month cycle-roll' },
+    h('div', { class: 'cycle-grid cycle-grid--heads' }, ...weekHeads()),
+    h('div', { class: 'cycle-grid' }, ...rows),
+    list.length ? h('ul', { class: 'cycle-month__events' }, ...list) : null,
+  );
+}
+
+/** «Весь год»: 12 маленьких месяцев с цветными днями; нажатие на месяц — он целиком, с отметками. */
+function yearGrid(year, ctx, openMonth) {
+  const months = [...Array(12)].map((_, m) => {
+    const first = new Date(year, m, 1);
+    const lead = (first.getDay() + 6) % 7;
+    const count = new Date(year, m + 1, 0).getDate();
+    const dots = [...Array(lead)].map(() => h('i', { class: 'cycle-mini__d is-empty' }));
+    for (let d = 1; d <= count; d++) {
+      const iso = isoDate(new Date(year, m, d));
+      const marked = ctx.days.includes(iso);
+      const soon = !marked && ctx.soon.has(iso);
+      const ev = ctx.events.some((e) => e.md === iso.slice(5));
+      dots.push(h('i', { class: `cycle-mini__d${marked ? ' is-period' : ''}${soon ? ' is-soon' : ''}${ev ? ' is-event' : ''}${iso === ctx.today ? ' is-today' : ''}` }, String(d)));
+    }
+    const name = new Intl.DateTimeFormat(locale(), { month: 'long' }).format(first);
+    return h('button', { type: 'button', class: 'cycle-mini', 'aria-label': t('cycle.openMonth', { month: name }), onclick: () => openMonth(m) },
+      h('span', { class: 'cycle-mini__title caps' }, name),
+      h('span', { class: 'cycle-mini__grid' }, ...dots));
+  });
+  return h('div', { class: 'cycle-year' }, ...months);
+}
+
+/** Статистика года: средние и история циклов полосками (цикл — полоса, месячные — красная часть). */
+function yearStatsView(days, year, today) {
+  const st = yearStats(days, year);
+  if (!st.count) return h('p', { class: 'faint cycle__stats' }, t('cycle.yearEmpty'));
+  const rows = st.list.map((c) => {
+    const len = c.cycle || daysBetween(c.start, today) + 1;
+    const width = Math.max(8, Math.min(100, Math.round((len / 45) * 100)));
+    const red = Math.min(100, Math.round((c.len / len) * 100));
+    return h('li', { class: 'cycle-hist__row' },
+      h('span', { class: 'cycle-hist__label' }, c.cycle
+        ? t('cycle.row', { date: dayMonth(c.start), cycle: c.cycle, len: c.len })
+        : t('cycle.rowNow', { date: dayMonth(c.start), day: len, len: c.len })),
+      h('span', { class: 'cycle-hist__bar', style: `width:${width}%` }, h('span', { class: 'cycle-hist__red', style: `width:${red}%` })));
+  });
+  return h('section', { class: 'cycle-hist' },
+    h('p', { class: 'cycle-month__title caps' }, t('cycle.yearStats', { year })),
+    h('p', { class: 'cycle__stats' }, t('cycle.count', { n: st.count })),
+    st.cycle ? h('p', { class: 'cycle__stats' }, t('cycle.avg', { cycle: st.cycle, len: st.len })) : null,
+    st.min ? h('p', { class: 'faint cycle__stats' }, t('cycle.range', { min: st.min, max: st.max })) : null,
+    h('ul', { class: 'cycle-hist__list' }, ...rows));
 }
 
 /** Форма своего праздника: подпись дня, «Сохранить», «Убрать». */
@@ -292,6 +400,10 @@ function cycleStepper(s, ownCycle, redraw) {
 
 let mode = 'period';
 let editing = null;
+// Вид календаря: 'roll' — 90 дней вокруг сегодня (по умолчанию), 'year' — весь год, 'month' — месяц из года
+let view = 'roll';
+let shownYear = new Date().getFullYear();
+let shownMonth = 0;
 
 function content() {
   mergeEvents();
@@ -305,7 +417,7 @@ function content() {
   const now = new Date();
   const ctx = {
     days,
-    soon: predicted(days, sh.cycle),
+    soon: predicted(days, sh.cycle, view === 'roll' ? 3 : 15),
     events: events(),
     today,
     editing,
@@ -330,7 +442,25 @@ function content() {
     // Длина цикла: ‹ 27 дн. › — своё число; «по отметкам» — вернуть расчёт
     cycleStepper(s, man ? own().cycle : sh.cycle, redraw),
     editing ? eventForm(editing, () => { editing = null; redraw(); }) : h('p', { class: 'faint cycle__hint' }, t(mode === 'event' ? 'cycle.eventHint' : man ? 'cycle.manPeriodHint' : 'cycle.periodHint')),
-    ...[-1, 0, 1].map((k) => monthGrid(now.getFullYear(), now.getMonth() + k, ctx)),
+    // Вид: 90 дней · весь год (владелец 17.11.2026: «стандартно 90 дней, и возможность открыть весь год»)
+    h('div', { class: 'cycle-mode cycle-view', role: 'group' },
+      ...['roll', 'year'].map((v) => h('button', {
+        type: 'button', class: `btn ${view === v || (v === 'year' && view === 'month') ? 'btn--gold' : 'btn--ghost'} cycle-mode__btn`, 'aria-pressed': String(view === v),
+        onclick: () => { view = v; shownYear = now.getFullYear(); redraw(); },
+      }, t(`cycle.view.${v}`)))),
+    ...(view === 'roll' ? [rollingGrid(ctx)] : []),
+    ...(view === 'year' ? [
+      h('div', { class: 'cycle-yearnav' },
+        h('button', { type: 'button', class: 'icon-btn', 'aria-label': t('cycle.prevYear'), onclick: () => { shownYear -= 1; redraw(); } }, '‹'),
+        h('b', { class: 'cycle-yearnav__year' }, String(shownYear)),
+        h('button', { type: 'button', class: 'icon-btn', 'aria-label': t('cycle.nextYear'), onclick: () => { shownYear += 1; redraw(); } }, '›')),
+      yearGrid(shownYear, ctx, (m) => { shownMonth = m; view = 'month'; redraw(); }),
+      yearStatsView(days, shownYear, today),
+    ] : []),
+    ...(view === 'month' ? [
+      h('button', { type: 'button', class: 'btn btn--ghost cycle-back', onclick: () => { view = 'year'; redraw(); } }, `‹ ${t('cycle.view.year')}`),
+      monthGrid(shownYear, shownMonth, ctx),
+    ] : []),
     h('ul', { class: 'cycle__legend' },
       h('li', {}, h('span', { class: 'cycle-dot is-period' }), t('cycle.period')),
       h('li', {}, h('span', { class: 'cycle-dot is-soon' }), t('cycle.soon')),
@@ -347,5 +477,9 @@ function content() {
 export function openCalendar() {
   share();
   editing = null;
-  openSheet({ title: t('cycle.title'), content: content() });
+  view = 'roll';
+  const box = content();
+  openSheet({ title: t('cycle.title'), content: box });
+  // Сегодня — посередине ленты
+  setTimeout(() => box.isConnected && box.querySelector('.cycle-roll .is-today')?.scrollIntoView({ block: 'center' }), 60);
 }

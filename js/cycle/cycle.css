@@ -67,3 +67,39 @@ button.cycle-day { cursor: pointer; }
   .cycle-btn.is-pulse { animation: none; box-shadow: 0 0 0 3px rgba(var(--pulse), .85); }
   .cycle-day.is-pulse { animation: none; }
 }
+
+/* Вид календаря (владелец 17.11.2026): «90 дней» — лента недель вокруг сегодня; «Весь год» — 12 маленьких месяцев и
+   статистика циклов; месяц из года — целиком, с отметками. */
+.cycle-view { margin-top: -4px; }
+.cycle-grid--heads { position: sticky; top: -8px; z-index: 1; background: var(--c-bg-raise, #1b1420); padding: 4px 0; }
+.cycle-roll__month { grid-column: 1 / -1; margin: 8px 0 2px; font-size: 12px; color: var(--gold, #d9b56a); }
+.cycle-day.is-out { opacity: .22; pointer-events: none; }
+.cycle-back { justify-self: start; min-height: 36px; font-size: 13px; }
+
+.cycle-yearnav { display: flex; align-items: center; justify-content: center; gap: 16px; }
+.cycle-yearnav__year { font-size: 18px; color: var(--gold, #d9b56a); min-width: 64px; text-align: center; }
+.cycle-year { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+@media (max-width: 360px) { .cycle-year { grid-template-columns: repeat(2, 1fr); } }
+.cycle-mini { display: grid; gap: 4px; padding: 6px; border: 1px solid var(--c-line, rgba(255,255,255,.12)); border-radius: 12px; background: none; color: inherit; font: inherit; text-align: left; cursor: pointer; }
+.cycle-mini__title { font-size: 11px; }
+.cycle-mini__grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 1px; }
+.cycle-mini__d { display: grid; place-items: center; aspect-ratio: 1; border-radius: 50%; font-style: normal; font-size: 7.5px; line-height: 1; opacity: .7; }
+.cycle-mini__d.is-empty { visibility: hidden; }
+.cycle-mini__d.is-period { background: #c94a62; color: #fff; opacity: 1; font-weight: 700; }
+.cycle-mini__d.is-soon { background: rgba(233, 163, 177, .35); opacity: 1; }
+.cycle-mini__d.is-event { box-shadow: inset 0 0 0 1px var(--gold, #d9b56a); opacity: 1; }
+.cycle-mini__d.is-today { outline: 1px solid var(--gold, #d9b56a); opacity: 1; }
+
+.cycle-hist { display: grid; gap: 4px; }
+.cycle-hist__list { list-style: none; margin: 6px 0 0; padding: 0; display: grid; gap: 8px; }
+.cycle-hist__row { display: grid; gap: 3px; font-size: 13px; }
+.cycle-hist__bar { display: block; height: 8px; border-radius: 4px; background: rgba(233, 163, 177, .3); overflow: hidden; }
+.cycle-hist__red { display: block; height: 100%; background: #c94a62; }
+
+/* Колонки сжимаются по ширине экрана (без этого «Весь год» и лента выходили за край на узком телефоне) */
+.cycle { grid-template-columns: minmax(0, 1fr); }
+.cycle-grid { grid-template-columns: repeat(7, minmax(0, 1fr)); }
+.cycle-year { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+@media (max-width: 360px) { .cycle-year { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.cycle-mini__grid { grid-template-columns: repeat(7, minmax(0, 1fr)); }
+.cycle-mini__title { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
