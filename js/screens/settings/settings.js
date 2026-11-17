@@ -8,6 +8,7 @@ import { clearAll } from '../../core/store.js';
 import * as sync from '../../sync/sync.js';
 import { nativeCard } from './native-card.js';
 import { field, switchRow, segmented } from '../../ui/controls.js';
+import * as health from '../../health/health.js';
 import * as side from '../../side/side.js';
 import { icons } from '../../ui/icons.js';
 import { toast } from '../../ui/toast.js';
@@ -224,6 +225,17 @@ export function render(view, ctx) {
         hint: t('settings.showTaskHint'),
         checked: s.showTaskInNotice,
         onChange: (on) => settings.update({ showTaskInNotice: on }),
+      }),
+    ),
+
+    // Раздел «Здоровье» (js/health/): Кегель и шаги на «Сегодня» — по желанию
+    h('section', { class: 'card settings__section' },
+      h('h2', { class: 'caps settings__heading' }, t('health.title')),
+      switchRow({
+        title: t('health.setting'),
+        hint: t('health.settingHint'),
+        checked: health.isOn(s),
+        onChange: (on) => health.setOn(on),
       }),
     ),
 

@@ -965,6 +965,29 @@ export default {
     channelRemind: 'Reminders',
     channelAlarm: 'Alarm',
   },
+  // Замер недели (js/pulse/, владелец 17.11.2026)
+  pulse: {
+    title: "Weekly check",
+    lead: "Three marks: what changed this week",
+    leadDone: "Marked this week",
+    how: "Rate from 1 to 10 how things are now. Once a week, and your line grows on the Path.",
+    warm: "Warmth in the relationship",
+    calm: "My calm",
+    ask: "I get what I ask for",
+    save: "Save the check",
+    saved: "Saved. Your line is on the Path.",
+    chartTitle: "What has changed in my life",
+    chartEmpty: "Your first check comes on the weekly review day: three marks from 1 to 10.",
+    chartOne: "The first check is in. A line will appear here in a week.",
+  },
+  // Раздел «Здоровье» — Кегель и шаги по желанию (js/health/, владелец 17.11.2026)
+  health: {
+    title: "Health",
+    offer: "Kegel exercise and steps are optional. Open the section and they will appear here every day.",
+    open: "Open the Health section",
+    setting: "Health section on Today",
+    settingHint: "Kegel exercise and steps. Off means a shorter day: the task, water and the morning minute.",
+  },
   notice: {
     morning: {
       title: 'Good morning',

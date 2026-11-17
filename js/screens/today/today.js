@@ -16,8 +16,8 @@ import { imsgCard } from '../../imsg/imsg-card.js';
 import { loveCard } from '../../love/cards.js';
 import { waterCard } from '../../water/water-card.js';
 import { foldCard } from '../../ui/fold.js';
-import { kegelCard } from '../../habits/kegel-card.js';
-import { stepsCard } from '../../habits/steps-card.js';
+import { healthCards } from '../../health/health.js';
+import { pulseCard } from '../../pulse/pulse.js';
 import { usCard } from '../../circles/today-card.js';
 import { talkCard, talkDone } from '../../circles/talk.js';
 import { eveningCard } from '../../evening/evening.js';
@@ -512,6 +512,8 @@ export function render(view, ctx) {
       waterCard(ctx),
       morningCard(ctx, plan),
       main,
+      // Замер недели — в день итога: три оценки «что изменилось» (js/pulse/, владелец 17.11.2026)
+      pulseCard(ctx, plan),
       repeatCard(plan),
       meetLink(plan, ctx),
       // Седьмой день — «Разговор пары» (circles/talk.js)
@@ -521,9 +523,9 @@ export function render(view, ctx) {
       eveningCard(ctx, plan),
       loveCard(ctx, plan),
       recordedToday(ctx, plan),
-      // Привычки дня — в конце (владелец 13.11.2026): утром — вода и минута, Кегель и шаги — в течение дня
-      kegelCard(ctx),
-      stepsCard(ctx),
+      // Раздел «Здоровье» — Кегель и шаги ПО ЖЕЛАНИЮ (js/health/, владелец 17.11.2026: день не перегружать);
+      // закрыт — одна строка-приглашение, открыт — две карточки, как раньше
+      ...healthCards(ctx),
       // Стакан воды на ночь — последним, перед сном (сборка 43, js/water/: вид night)
       waterCard(ctx, 'night'),
       // Итог дня — сколько баллов набрано (score/)

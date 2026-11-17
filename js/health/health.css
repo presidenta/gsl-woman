@@ -1,0 +1,5 @@
+/* РАЗДЕЛ «ЗДОРОВЬЕ» (js/health/): строка-приглашение на «Сегодня», пока раздел закрыт */
+.health-offer { display: grid; gap: 10px; }
+.health-offer .card__text { margin: 0; }
+.health-offer__open { display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
+.health-offer__open svg { width: 18px; height: 18px; }

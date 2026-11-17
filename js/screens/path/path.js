@@ -3,6 +3,7 @@ import { t } from '../../core/i18n.js';
 import { weekOf, monthOf } from '../../core/dates.js';
 import { outline } from '../../program/index.js';
 import { weekSummary } from '../../progress/progress.js';
+import { pulseChart } from '../../pulse/pulse.js';
 
 /* ЭКРАН «ПУТЬ»: шесть месяцев по четыре недели. Текущий месяц раскрыт, в нём подсвечена текущая
    неделя; у пройденных недель — процент выполнения. Названия будущих недель видны: путь целиком
@@ -33,6 +34,8 @@ export function render(view, ctx) {
   add(view,
     h('h1', { class: 'screen-title' }, t('path.title')),
     h('p', { class: 'screen-lead' }, t('path.lead')),
+    // Замер недели: три линии «что изменилось» (js/pulse/)
+    pulseChart(),
   );
 
   for (const m of outline(ctx.lang)) {

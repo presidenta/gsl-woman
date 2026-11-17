@@ -1,0 +1,25 @@
+/* ЗАМЕР НЕДЕЛИ (js/pulse/): три шкалы в день итога и линии на «Пути» */
+.pulse__row { display: grid; gap: 4px; margin: 10px 0; }
+.pulse__name { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; font-weight: 600; }
+.pulse__value { font-size: 20px; color: var(--gold, #d9b56a); min-width: 2ch; text-align: right; }
+.pulse__range { width: 100%; accent-color: var(--gold, #d9b56a); min-height: 32px; }
+.pulse__ends { display: flex; justify-content: space-between; font-size: 12px; opacity: .6; }
+.pulse__done { margin: 10px 0 0; text-align: center; font-weight: 600; }
+
+.pulse-chart { display: grid; gap: 10px; }
+.pulse-chart__title { margin: 0; }
+.pulse-chart__svg { width: 100%; height: auto; display: block; }
+.pulse-chart__line { fill: none; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+.pulse-chart__dot { stroke: none; }
+.pulse-chart__line--warm { stroke: #e58a7b; }
+.pulse-chart__line--calm { stroke: #6fb7d9; }
+.pulse-chart__line--ask { stroke: #d9b56a; }
+circle.pulse-chart__line--warm { fill: #e58a7b; }
+circle.pulse-chart__line--calm { fill: #6fb7d9; }
+circle.pulse-chart__line--ask { fill: #d9b56a; }
+.pulse-chart__legend { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.pulse-chart__key { display: flex; justify-content: space-between; gap: 10px; font-size: 14px; padding-left: 16px; position: relative; }
+.pulse-chart__key::before { content: ''; position: absolute; left: 0; top: .45em; width: 9px; height: 9px; border-radius: 50%; }
+.pulse-chart__key--warm::before { background: #e58a7b; }
+.pulse-chart__key--calm::before { background: #6fb7d9; }
+.pulse-chart__key--ask::before { background: #d9b56a; }
