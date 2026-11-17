@@ -18,7 +18,8 @@ import { waterCard } from '../../water/water-card.js';
 import { foldCard } from '../../ui/fold.js';
 import { kegelCard } from '../../habits/kegel-card.js';
 import { stepsCard } from '../../habits/steps-card.js';
-import { state as sectionsOpen, sectionButtons, sectionBlock, bizCard } from '../../sections/sections.js';
+import { state as sectionsOpen, sectionButtons, sectionBlock, bizCard, womanPlusCard } from '../../sections/sections.js';
+import * as sideOf from '../../side/side.js';
 import { pulseCard } from '../../pulse/pulse.js';
 import * as settingsStore from '../../settings/settings.js';
 import { usCard } from '../../circles/today-card.js';
@@ -538,7 +539,8 @@ export function render(view, ctx) {
   /* Ядро дня всегда на виду: стакан воды утром, задание, итог. Остальное — разделы с кнопками в шапке
      (js/sections/, владелец 17.11.2026: день не перегружать). Карточки закрытого раздела даже не строятся. */
   const open = sectionsOpen(ctx.settings);
-  const buttons = sectionButtons(ctx, { rel: true, health: true, biz: !!(plan.biz || stemCard(ctx, plan)) });
+  const man = sideOf.get() === 'man';
+  const buttons = sectionButtons(ctx, { rel: true, health: true, biz: man ? !!(plan.biz || stemCard(ctx, plan)) : true });
 
   add(view,
     h('div', { class: 'stack' },
@@ -569,10 +571,10 @@ export function render(view, ctx) {
         { id: 'waterNight', build: () => waterCard(ctx, 'night') },
       ]) : null,
       // Третий раздел (у мужской части — «Мужчина⁺»): совет недели по работе и «Стержень недели»
-      open.biz ? sectionBlock(ctx, 'biz', [
+      open.biz ? sectionBlock(ctx, 'biz', man ? [
         { id: 'tip', build: () => bizCard(ctx, plan) },
         { id: 'stem', build: () => stemCard(ctx, plan) },
-      ]) : null,
+      ] : [{ id: 'soon', build: () => womanPlusCard() }]) : null,
       recordedToday(ctx, plan),
       // Итог дня — сколько баллов набрано (score/)
       totalCard(ctx, plan),

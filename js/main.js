@@ -7,6 +7,7 @@ import * as photos from './photos/photos.js';
 import * as router from './core/router.js';
 import * as pace from './pace/pace.js';
 import * as cycle from './cycle/cycle.js';
+import * as push from './push/push.js';
 import { register as registerWorker } from './core/updates.js';
 import * as settings from './settings/settings.js';
 import * as journal from './journal/journal.js';
@@ -459,3 +460,5 @@ circles.onMessage(({ circle, msg }) => {
 native.start(() => ({ settings: settings.get(), entries: journal.all() }));
 
 registerWorker({ onUpdated: () => toast({ title: t('update.ready') }) });
+// Уведомления о новых сообщениях пары и семьи: разрешение уже есть — подписаться на пуши сервера (js/push/)
+push.ensure();

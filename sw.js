@@ -56,6 +56,25 @@ self.addEventListener('fetch', (event) => {
   })());
 });
 
+/* ПУШ С СЕРВЕРА — новое сообщение пары или семьи (js/push/, сервер circles/notify.js, 17.11.2026). Показываем каждый
+   пуш обязательно: браузер, получивший пуш без уведомления, отзывает подписку. Нажатие — «Мы» (ниже, notificationclick). */
+self.addEventListener('push', (event) => {
+  let data = {};
+  try {
+    data = event.data ? event.data.json() : {};
+  } catch {
+    data = { body: event.data ? event.data.text() : '' };
+  }
+  event.waitUntil(self.registration.showNotification(data.title || 'GSL', {
+    body: data.body || '',
+    tag: data.key || 'gsl-msg',
+    renotify: true,
+    icon: './assets/icons/icon-192.png',
+    badge: './assets/icons/badge-96.png',
+    data: { target: data.target || '#/us' },
+  }));
+});
+
 /* Нажатие на уведомление: есть открытое окно приложения — переводим его на нужный экран, нет — открываем. */
 self.addEventListener('notificationclick', (event) => {
   event.notification.close();

@@ -9,6 +9,7 @@ import * as sync from '../../sync/sync.js';
 import { nativeCard } from './native-card.js';
 import { field, switchRow, segmented } from '../../ui/controls.js';
 import * as sections from '../../sections/sections.js';
+import * as push from '../../push/push.js';
 import * as side from '../../side/side.js';
 import { icons } from '../../ui/icons.js';
 import { toast } from '../../ui/toast.js';
@@ -80,7 +81,9 @@ export function timeFields(times, onPick) {
 function notificationsBlock(ctx) {
   const state = permission.state();
   let body;
-  if (state === 'granted') body = h('p', { class: 'settings__ok' }, svg(icons.check, 'settings__ok-icon'), t('settings.notifOn'));
+  if (state === 'granted') body = h('div', {},
+    h('p', { class: 'settings__ok' }, svg(icons.check, 'settings__ok-icon'), t('settings.notifOn')),
+    h('p', { class: 'field__hint' }, push.supported() ? t('settings.notifMessages') : t('settings.notifMessagesApp')));
   else if (state === 'denied') body = h('p', { class: 'field__hint' }, t('settings.notifDenied'));
   else if (state === 'unsupported') body = h('p', { class: 'field__hint' }, t('settings.notifUnsupported'));
   else {
@@ -89,6 +92,8 @@ function notificationsBlock(ctx) {
       class: 'btn btn--gold btn--block',
       onclick: async () => {
         await permission.request();
+        // Разрешила — сразу подписка на сообщения пары и семьи (js/push/)
+        await push.ensure();
         ctx.rerender();
       },
     }, svg(icons.bell), t('settings.notifAsk'));

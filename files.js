@@ -287,6 +287,7 @@ self.GSL_FILES = [
   './js/progress/progress.js',
   './js/pulse/pulse.css',
   './js/pulse/pulse.js',
+  './js/push/push.js',
   './js/reminders/local.js',
   './js/reminders/permission.js',
   './js/reminders/plan.js',

@@ -30,3 +30,5 @@
 .day-sections-setup__items { padding-left: 14px; }
 .day-sections-setup__items.is-off { opacity: .45; }
 #day-sections-setup { scroll-margin-top: 84px; }
+.womanplus__list { margin: 6px 0; padding-left: 20px; display: grid; gap: 4px; }
+.womanplus__note { margin: 0; font-size: 13px; }

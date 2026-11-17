@@ -1,5 +1,5 @@
 import { h, svg } from '../core/dom.js';
-import { t } from '../core/i18n.js';
+import { t, list } from '../core/i18n.js';
 import { read } from '../core/store.js';
 import * as settings from '../settings/settings.js';
 import * as side from '../side/side.js';
@@ -14,7 +14,8 @@ import { NIGHT_KEY_NAME } from '../water/water-log.js';
    Всегда на виду только ядро дня: стакан тёплой воды утром, задание, итог. Остальное — три раздела:
      rel    — «Отношения»: я-сообщение, вопрос на вечер, языки любви, разговор пары, повтор навыков, «В поиске»;
      health — «Здоровье»: утренняя минута, упражнение Кегеля, шаги, стакан воды на ночь;
-     biz    — «Мужчина⁺» (только у мужской части): совет недели по работе и «Стержень недели».
+     biz    — у мужчин «Мужчина⁺»: совет недели по работе и «Стержень недели»; у женщин «Женщина⁺» — пока карточка
+              «в разработке» со списком того, что там будет (владелец 17.11.2026: «сразу выставляй»).
 
    В шапке дня — маленькие круглые кнопки со значком и подписью под ним, в одну строку, и шестерёнка (владелец: «кнопки
    на телефоне занимают много места… сделать маленькими, сбоку шестеренку»). Кнопка раздела открывает и закрывает его
@@ -40,8 +41,11 @@ const hasLogs = (key) => {
   return !!v && typeof v === 'object' && Object.keys(v).length > 0;
 };
 
-/** Разделы этой части: «Мужчина⁺» — только у мужской. */
-export const keysForSide = () => KEYS.filter((k) => k !== 'biz' || side.get() === 'man');
+/** Разделы этой части — у обеих все три (у женщин третий — «Женщина⁺»). */
+export const keysForSide = () => KEYS;
+
+/** Пункты раздела: третий у женщин — один, «в разработке». */
+export const itemsOf = (key) => (key === 'biz' && side.get() !== 'man' ? ['soon'] : ITEMS[key]);
 
 /** Какие разделы открыты. */
 export function state(s = settings.get()) {
@@ -121,7 +125,7 @@ export function settingsBlock(switchRow) {
     h('p', { class: 'card__text faint' }, t('sections.setupLead')),
     ...keysForSide().map((k) => {
       const items = h('div', { class: `day-sections-setup__items${open[k] ? '' : ' is-off'}` },
-        ...ITEMS[k].map((id) => switchRow({
+        ...itemsOf(k).map((id) => switchRow({
           title: t(`sections.items.${id}`),
           checked: picked(k, id, s),
           onChange: (on) => setPicked(k, id, on),
@@ -152,6 +156,22 @@ export function bizCard(ctx, plan) {
     body: [
       h('h2', { class: 'card__title' }, plan.biz.title),
       h('p', { class: 'card__text' }, text),
+    ],
+  }).node;
+}
+
+/** «Женщина⁺» — в разработке: что здесь будет (владелец 17.11.2026). */
+export function womanPlusCard() {
+  return foldCard({
+    id: 'womanplus',
+    cls: 'womanplus',
+    icon: icons.crown,
+    title: t('sections.biz'),
+    lead: t('sections.soon.lead'),
+    body: [
+      h('p', { class: 'card__text' }, t('sections.soon.text')),
+      h('ul', { class: 'womanplus__list' }, ...list('sections.soon.items').map((x) => h('li', {}, x))),
+      h('p', { class: 'faint womanplus__note' }, t('sections.soon.note')),
     ],
   }).node;
 }
