@@ -27,6 +27,6 @@ export function questBanner(cls = '') {
     class: `quest-banner ${cls}`.trim(),
     src: `assets/quest/banner-${lang}.webp`,
     alt: t('quest.bannerAlt'),
-    width: '1280', height: '720', decoding: 'async',
+    width: '1280', height: '720', fetchpriority: 'high',
   });
 }

@@ -201,17 +201,22 @@ img, svg {
   white-space: nowrap;
 }
 
-/* Плюс в степени — крупный и жирный, как буква (владелец 18.11.2026: «везде, где есть этот значок плюс, он должен
-   быть в степени и массивный, заметный… такой как буква») */
+/* Плюс в степени — у верхнего края букв, жирный и заметный (владелец 18.11.2026: «в степени и массивный… чтобы
+   хорошо читался»). У знака своё золото и обычная высота строки: с нулевой высотой золото обрезало его наполовину. */
 .brand__plus {
   display: inline-block;
-  margin-left: 0.04em;
+  position: relative;
+  top: -0.42em;
+  margin-left: 0.05em;
   font-family: var(--f-body);
-  font-size: 1.05em;
+  font-size: 0.66em;
   font-style: normal;
   font-weight: 800;
-  vertical-align: 0.62em;
-  line-height: 0;
+  line-height: 1;
+  background: var(--g-gold-text);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
 }
 
 /* Раскрывающийся блок — всегда со стрелкой «развернуть / свернуть» (владелец 14.11.2026: «открывается раздел, а

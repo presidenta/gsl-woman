@@ -405,8 +405,8 @@ export default {
     mark: 'I⁺ • Love',
     qOpen: '“',
     qClose: '”',
-    bannerAlt: 'GSL • Global Life Game. Quest № 1 in the world — I⁺ • Love. A lifetime game. Play. Develop. Love. Create. Earn. A new concept for personal development, relationships and income opportunities.',
-    slogan: 'Play. Develop. Love. Create. Earn.',
+    bannerAlt: 'GSL • Global Life Game. Quest № 1 in the world — I⁺ • Love. A lifetime game. Play. Evolve. Love. Create. Earn. A new concept for personal development, relationships and income opportunities.',
+    slogan: 'Play. Evolve. Love. Create. Earn.',
   },
   settings: {
     title: 'Tuning',
