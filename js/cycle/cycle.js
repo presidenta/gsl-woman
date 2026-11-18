@@ -246,7 +246,7 @@ const dayMonth = (iso) => new Intl.DateTimeFormat(locale(), { day: 'numeric', mo
 const weekHeads = () => [...Array(7)].map((_, i) => new Intl.DateTimeFormat(locale(), { weekday: 'short' }).format(new Date(2024, 0, 1 + i)).replace('.', ''))
   .map((n, i) => h('span', { class: `cycle-grid__head${i >= 5 ? ' is-weekend' : ''}` }, n));
 
-const inOpen = (iso, ctx) => !!ctx.open && iso >= ctx.open.from && iso <= ctx.open.to;
+const inOpen = (iso, ctx) => ctx.open?.kind === 'paid' && iso >= ctx.open.from && iso <= ctx.open.to;
 
 /** Ячейка дня и строки праздников этого дня. */
 function dayCell(date, ctx) {
@@ -496,11 +496,10 @@ function content() {
   return box;
 }
 
-/** Строка про доступ: сколько дней осталось; пробный режим — с предупреждением, что он может остановиться. */
+/** Строка про доступ: сколько дней осталось (тест-режим может остановиться в любой момент) или «без срока». */
 function accessNote(open) {
-  const date = formatDate(open.to, { day: 'numeric', month: 'long' });
-  const key = open.kind === 'trial' ? (open.left ? 'cycle.access.trial' : 'cycle.access.trialDone') : 'cycle.access.paid';
-  return h('p', { class: `card__text cycle__access${open.kind === 'trial' ? ' is-trial' : ''}` }, t(key, { date, n: open.left }));
+  if (open.kind !== 'paid') return h('p', { class: 'card__text cycle__access' }, t('cycle.access.unlimited'));
+  return h('p', { class: 'card__text cycle__access' }, t(open.left ? 'cycle.access.paid' : 'cycle.access.ended', { date: formatDate(open.to, { day: 'numeric', month: 'long' }), n: open.left }));
 }
 
 /** Один календарь, два входа: кружок в шапке и поле «Дата старта». С pick — выбор даты: нажатие на число отдаёт её. */

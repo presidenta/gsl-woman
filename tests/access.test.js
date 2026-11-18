@@ -63,15 +63,11 @@ test('срок с сервера: дни от сегодня до последн
   assert.equal(d.from, '2026-11-18');
   assert.ok(d.to === '2026-11-24' || d.to === '2026-11-25', 'последний день — накануне даты срока (с поправкой на пояс)');
   assert.ok(d.left >= 7 && d.left <= 8);
+  assert.equal(access.openDays('2026-12-10').left, 0, 'срок вышел — осталось 0');
 });
 
-test('срока нет — пробный режим: три недели от первого показа, потом «0 дней»; запоминается и забывается с выходом', () => {
+test('бессрочно или сервер не отвечал — красить нечего', () => {
+  assert.equal(access.openDays('2026-11-18').kind, 'unlimited');
   access.remember(null, now);
-  const first = access.openDays('2026-11-18');
-  assert.deepEqual([first.kind, first.from, first.to, first.left], ['trial', '2026-11-18', '2026-12-08', 21]);
-  const later = access.openDays('2026-11-28');
-  assert.deepEqual([later.from, later.to, later.left], ['2026-11-28', '2026-12-08', 11]);
-  assert.equal(access.openDays('2026-12-20').left, 0);
-  access.forget();
-  assert.equal(access.openDays('2027-01-05').to, '2027-01-25');
+  assert.equal(access.openDays('2026-11-18').kind, 'unlimited');
 });

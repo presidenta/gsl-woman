@@ -115,4 +115,3 @@ button.cycle-day { cursor: pointer; }
 .cycle-mini__d.is-start { outline: 1px solid rgb(var(--open)); opacity: 1; font-weight: 700; }
 .cycle-mini__d.is-picked { background: var(--gold, #d9b56a); color: #1b1420; opacity: 1; }
 .cycle__access { margin: 0; padding: 8px 10px; border: 1px solid rgba(var(--open), .5); border-radius: 14px; background: rgba(var(--open), .1); font-size: 13.5px; }
-.cycle__access.is-trial { border-style: dashed; }
