@@ -336,7 +336,8 @@ function yearGrid(year, ctx, openMonth) {
       const marked = ctx.days.includes(iso);
       const soon = !marked && ctx.soon.has(iso);
       const ev = ctx.events.some((e) => e.md === iso.slice(5));
-      dots.push(h('i', { class: `cycle-mini__d${marked ? ' is-period' : ''}${soon ? ' is-soon' : ''}${ev ? ' is-event' : ''}${iso === ctx.today ? ' is-today' : ''}${inOpen(iso, ctx) ? ' is-open' : ''}${iso === ctx.picked ? ' is-picked' : ''}` }, String(d)));
+      const dow = new Date(year, m, d).getDay();
+      dots.push(h('i', { class: `cycle-mini__d${dow === 0 || dow === 6 ? ' is-weekend' : ''}${STATE[iso.slice(5)] ? ' is-state' : ''}${marked ? ' is-period' : ''}${soon ? ' is-soon' : ''}${ev ? ' is-event' : ''}${iso === ctx.today ? ' is-today' : ''}${inOpen(iso, ctx) ? ' is-open' : ''}${iso === ctx.picked ? ' is-picked' : ''}` }, String(d)));
     }
     const name = new Intl.DateTimeFormat(locale(), { month: 'long' }).format(first);
     return h('button', { type: 'button', class: 'cycle-mini', 'aria-label': t('cycle.openMonth', { month: name }), onclick: () => openMonth(m) },

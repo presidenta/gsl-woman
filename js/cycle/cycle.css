@@ -13,21 +13,21 @@
 .cycle-day {
   position: relative; isolation: isolate;
   display: grid; place-items: center; aspect-ratio: 1; min-height: 36px; border-radius: 12px;
-  border: 0; background: none; color: inherit; font: inherit; font-size: 14px;
+  border: 0; background: none; color: inherit; font: inherit; font-size: 16px;
 }
 button.cycle-day { cursor: pointer; }
 .cycle-day.is-empty { visibility: hidden; }
 /* Выходные — клетка золотисто-красным, как в обычных календарях (владелец 18.11.2026) */
-.cycle-day.is-weekend { background: rgba(226, 150, 110, .14); color: #f0b48a; }
-.cycle-day.is-state { color: #e6a08f; text-decoration: underline; text-underline-offset: 3px; }
+.cycle-day.is-weekend { background: rgba(226, 150, 110, .2); color: #f0b48a; }
+.cycle-day.is-state { background: rgba(228, 105, 85, .32); color: #ffc2b0; font-weight: 700; text-decoration: underline; text-underline-offset: 3px; }
 .cycle-day.is-event { box-shadow: inset 0 0 0 1.5px var(--gold, #d9b56a); color: var(--gold, #d9b56a); font-weight: 700; }
 /* Месячные и ожидаемые — кружок вдвое меньше клетки (владелец 18.11.2026: «они огромные»); цифра поверх */
-.cycle-day.is-period::before, .cycle-day.is-soon::before { content: ""; position: absolute; inset: 25%; border-radius: 50%; z-index: -1; }
+.cycle-day.is-period::before, .cycle-day.is-soon::before { content: ""; position: absolute; inset: 19%; border-radius: 50%; z-index: -1; }
 .cycle-day.is-period { color: #fff; font-weight: 700; }
 .cycle-day.is-period::before { background: #c94a62; }
 .cycle-day.is-soon { color: #f3c6cf; }
 .cycle-day.is-soon::before { background: rgba(233, 163, 177, .32); }
-.cycle-day.is-today::after { content: ""; position: absolute; inset: 17%; border-radius: 50%; border: 1px solid var(--gold, #d9b56a); pointer-events: none; }
+.cycle-day.is-today::after { content: ""; position: absolute; inset: 12%; border-radius: 50%; border: 1px solid var(--gold, #d9b56a); pointer-events: none; }
 .cycle-day.is-editing { outline: 2px dashed var(--gold, #d9b56a); outline-offset: 1px; }
 .cycle__legend { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px 16px; font-size: 13px; }
 .cycle__legend li { display: flex; align-items: center; gap: 6px; }
@@ -87,10 +87,12 @@ button.cycle-day { cursor: pointer; }
 .cycle-mini { display: grid; gap: 4px; padding: 6px; border: 1px solid var(--c-line, rgba(255,255,255,.12)); border-radius: 12px; background: none; color: inherit; font: inherit; text-align: left; cursor: pointer; }
 .cycle-mini__title { font-size: 11px; }
 .cycle-mini__grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 1px; }
-.cycle-mini__d { display: grid; place-items: center; aspect-ratio: 1; border-radius: 50%; font-style: normal; font-size: 7.5px; line-height: 1; opacity: .7; }
+.cycle-mini__d { display: grid; place-items: center; aspect-ratio: 1; border-radius: 3px; font-style: normal; font-size: 9.5px; line-height: 1; opacity: .7; }
 .cycle-mini__d.is-empty { visibility: hidden; }
-.cycle-mini__d.is-period { background: #c94a62; color: #fff; opacity: 1; font-weight: 700; }
-.cycle-mini__d.is-soon { background: rgba(233, 163, 177, .35); opacity: 1; }
+.cycle-mini__d.is-weekend { background: rgba(226, 150, 110, .26); color: #f0b48a; opacity: 1; }
+.cycle-mini__d.is-state { background: rgba(228, 105, 85, .5); color: #ffd6c8; opacity: 1; font-weight: 700; }
+.cycle-mini__d.is-period { background: #c94a62; color: #fff; opacity: 1; font-weight: 700; border-radius: 50%; }
+.cycle-mini__d.is-soon { background: rgba(233, 163, 177, .35); opacity: 1; border-radius: 50%; }
 .cycle-mini__d.is-event { box-shadow: inset 0 0 0 1px var(--gold, #d9b56a); opacity: 1; }
 .cycle-mini__d.is-today { outline: 1px solid var(--gold, #d9b56a); opacity: 1; }
 
@@ -112,8 +114,11 @@ button.cycle-day { cursor: pointer; }
    выбранная дата — золотом. Ни дорожек, ни точек. */
 .cycle { --open: 96, 192, 150; }
 .cycle-day.is-open:not(.is-period):not(.is-picked) { color: rgb(var(--open)); font-weight: 700; }
+/* месячные и оплачено одновременно: зелёная цифра с белой каёмкой, чтобы читалась на красном */
+.cycle-day.is-period.is-open { color: rgb(var(--open)); -webkit-text-stroke: 2px #fff; paint-order: stroke fill; }
 .cycle-day.is-picked { background: var(--gold, #d9b56a); color: #1b1420; font-weight: 700; }
 .cycle-mini__d.is-open:not(.is-period):not(.is-picked) { color: rgb(var(--open)); font-weight: 700; opacity: 1; }
+.cycle-mini__d.is-period.is-open { color: rgb(var(--open)); -webkit-text-stroke: 1.5px #fff; paint-order: stroke fill; }
 .cycle-mini__d.is-picked { background: var(--gold, #d9b56a); color: #1b1420; opacity: 1; }
 /* легенда: «Доступ открыт» — зелёное число, «Выходные» — тонированная клетка */
 .cycle-dot.is-open { width: auto; height: auto; border-radius: 0; background: none; color: rgb(var(--open)); font-weight: 700; font-size: 13px; line-height: 1; }
