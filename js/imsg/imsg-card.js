@@ -8,6 +8,8 @@ import * as deeds from '../score/deeds.js';
 import { photoOf } from '../photos/photos.js';
 import * as circles from '../circles/circles.js';
 import { setDraft } from '../circles/chat-view.js';
+import { eveningOf } from '../evening/evening.js';
+import { langData } from '../program/source.js';
 
 /* «Я-СООБЩЕНИЕ» на экране «Сегодня» — КАЖДЫЙ ДЕНЬ (владелец 13.11.2026; до 40 — дни 4–6). Какой пример в какой
    день — program/index.js → imsgOf; в дни 4–6 он связан с заданием дня 1, 2 или 3 этой недели: ситуация,
@@ -23,10 +25,20 @@ function toChat(ctx) {
   }, svg(icons.chat), t('imsg.toChat'));
 }
 
-export function imsgCard(ctx, plan) {
+/** Я-сообщение вслух вдвоём — вечерний вопрос дней 4–6 (evening/). Владелец 18.11.2026: «две кнопки „Я-сообщение“ — объедини»:
+    он больше не отдельная карточка, а блок внутри этой, со своей отметкой «Мы поговорили» (свой балл, deeds 'evening'). */
+export function aloudOf(ctx, plan) {
+  const q = eveningOf(plan, ctx.lang);
+  return q?.imsg ? q : null;
+}
+
+/** aloud — показывать ли внутри «Я-сообщение вслух» (в настройках «Разделы дня» у него своя галочка). */
+export function imsgCard(ctx, plan, { aloud = true } = {}) {
   const m = plan.imsg;
   if (!m) return null;
   const mine = myLanguage(plan.day, ctx.lang);
+  const q = aloud ? aloudOf(ctx, plan) : null;
+  const e = q ? langData(ctx.lang)?.evening : null;
 
   // Сворачивается стрелкой, как все карточки дня (владелец 14.11.2026); свёрнута — ситуация дня одной строкой
   return foldCard({
@@ -35,7 +47,7 @@ export function imsgCard(ctx, plan) {
     icon: icons.sparkle,
     title: t('imsg.title'),
     lead: m.title,
-    points: deeds.isDone(ctx.todayIso, 'imsg') ? 1 : 0,
+    points: (deeds.isDone(ctx.todayIso, 'imsg') ? 1 : 0) + (q && deeds.isDone(ctx.todayIso, 'evening') ? 1 : 0),
     body: [
     // Фото разговора (js/photos/: imsg) слева; напоминание и пример его обтекают
     h('div', { class: 'has-photo imsg__top' },
@@ -70,6 +82,14 @@ export function imsgCard(ctx, plan) {
         )
         : null,
     deedMark(ctx, 'imsg'),
+    // Вслух вдвоём — продолжение той же темы (вечерний вопрос пары, дни 4–6)
+    q ? h('div', { class: 'imsg__aloud' },
+      h('p', { class: 'imsg__love-title' }, svg(icons.chat, 'imsg__heart'), e?.imsgLabel || ''),
+      e?.imsgLead ? h('p', { class: 'card__text faint' }, e.imsgLead) : null,
+      h('h2', { class: 'card__title talk__theme' }, q.text),
+      q.by ? h('p', { class: 'faint evening__by' }, `— ${q.by}`) : null,
+      deedMark(ctx, 'evening'),
+    ) : null,
     ],
   }).node;
 }

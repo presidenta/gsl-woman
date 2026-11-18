@@ -111,3 +111,12 @@
   height: 16px;
   color: var(--c-gold);
 }
+
+/* Я-сообщение вслух вдвоём — блок внутри карточки (вечерний вопрос дней 4–6), отделён тонкой линией */
+.imsg__aloud {
+  display: grid;
+  gap: var(--sp-3);
+  margin-top: var(--sp-4);
+  padding-top: var(--sp-4);
+  border-top: 1px solid var(--c-line, rgba(255, 255, 255, .12));
+}

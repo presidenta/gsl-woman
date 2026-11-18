@@ -12,7 +12,7 @@ import { toast } from '../../ui/toast.js';
 import { openEntry } from '../entry/entry-sheet.js';
 import { heelsFigure } from '../../ui/heels.js';
 import * as sound from '../../ui/tick.js';
-import { imsgCard } from '../../imsg/imsg-card.js';
+import { imsgCard, aloudOf } from '../../imsg/imsg-card.js';
 import { loveCard } from '../../love/cards.js';
 import { waterCard } from '../../water/water-card.js';
 import { foldCard } from '../../ui/fold.js';
@@ -562,8 +562,9 @@ export function render(view, ctx) {
       pulseCard(ctx, plan),
       // «Отношения»: повтор навыков, «В поиске», «Разговор пары» (день 7), я-сообщение, вопрос на вечер, языки любви
       open.rel ? sectionBlock(ctx, 'rel', [
-        { id: 'imsg', build: () => imsgCard(ctx, plan) },
-        { id: 'evening', build: () => eveningCard(ctx, plan) },
+        // «Я-сообщение вслух» (вечерний вопрос дней 4–6) живёт внутри карточки «Я-сообщение» — одна карточка вместо двух
+        { id: 'imsg', build: () => imsgCard(ctx, plan, { aloud: sectionPicked('rel', 'evening', ctx.settings) }) },
+        { id: 'evening', build: () => (plan.imsg && sectionPicked('rel', 'imsg', ctx.settings) && aloudOf(ctx, plan) ? null : eveningCard(ctx, plan)) },
         { id: 'love', build: () => loveCard(ctx, plan) },
         { id: 'talk', build: () => talkCard(ctx, plan) },
         { id: 'repeat', build: () => repeatCard(plan) },
