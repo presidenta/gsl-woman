@@ -3,7 +3,7 @@ import { t } from '../../core/i18n.js';
 import { field } from '../../ui/controls.js';
 import { icons } from '../../ui/icons.js';
 import { brand } from '../../ui/brand.js';
-import { questBanner } from '../../quest/quest.js';
+import { questBanner, questLang } from '../../quest/quest.js';
 
 /* ВХОД: до него приложение ничего не показывает — программа приходит только вошедшей (program/source.js).
    Языка здесь нет — он в настройках (владелец 12.11.2026); до входа — язык телефона.
@@ -16,7 +16,7 @@ import { questBanner } from '../../quest/quest.js';
 
 let typedLogin = '';     // язык сменили посреди ввода — экран перерисуется, логин не пропадёт
 
-export function render(view, { mode = 'form', message = '', onLogin, onRetry }) {
+export function render(view, { mode = 'form', message = '', onLogin, onRetry, lang = '', onLang }) {
 
   // Название общее на две части — GSL (W+M)⁺: до входа ещё неизвестно, кто входит (владелец 13.11.2026)
   // Приветствие квеста «Я⁺ • Любовь» (js/quest/): картинка на языке приложения; слоган — только на ней (19.11.2026)
@@ -90,6 +90,11 @@ export function render(view, { mode = 'form', message = '', onLogin, onRetry }) 
     h('p', { class: 'onboarding__lead' }, t('login.lead')),
     form,
     submit,
-    h('p', { class: 'login__hint' }, t('login.hint')),
+    // Внизу одной строкой, без рамок: слева — кто выдаёт аккаунт, справа — язык (владелец 19.11.2026: «маленькую…
+    // без обводки, просто буквы и галочка вниз»). Список — родной, телефона.
+    h('div', { class: 'quest-foot' },
+      h('p', { class: 'login__hint quest-foot__hint' }, t('login.hint')),
+      onLang ? questLang(lang, onLang) : null,
+    ),
   ));
 }

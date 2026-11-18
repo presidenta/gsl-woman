@@ -1,6 +1,7 @@
 import { read, write } from '../core/store.js';
 import { DEFAULT_TIMES, LANGS, SLOTS } from '../config.js';
 import { isValidIso, isValidTime } from '../core/dates.js';
+import { detectLang } from '../core/i18n.js';
 
 /* НАСТРОЙКИ УЧАСТНИЦЫ: язык, имя для обращения, дата старта, время трёх напоминаний, показывать ли
    текст задания в уведомлении. Одна запись в хранилище; чтение всегда отдаёт полный набор полей —
@@ -34,7 +35,9 @@ export function get() {
   return {
     ...DEFAULTS,
     ...saved,
-    lang: LANGS.includes(saved.lang) ? saved.lang : DEFAULTS.lang,
+    // Язык ещё не выбран — язык телефона (uk → ua, ru, en; другой — украинский), владелец 19.11.2026: «телефон на
+    // одном языке — и картинка на нём»
+    lang: LANGS.includes(saved.lang) ? saved.lang : detectLang(),
     startDate: isValidIso(saved.startDate) ? saved.startDate : null,
     name: typeof saved.name === 'string' ? saved.name.slice(0, 40) : '',
     times,

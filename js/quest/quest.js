@@ -1,5 +1,6 @@
 import { h } from '../core/dom.js';
 import { t, getLang } from '../core/i18n.js';
+import { LANGS } from '../config.js';
 
 /* КВЕСТ «Я⁺ • ЛЮБОВЬ» (владелец 18.11.2026: «Квест № 1 в мире — Я⁺ • Любовь. Игра длиною в жизнь»).
    - questMark() — название игры золотой меткой: «Я» с плюсом в степени, точка, «Любовь»; на языке приложения
@@ -30,4 +31,15 @@ export function questBanner(cls = '') {
     h('img', { class: 'quest-hero__img', src, alt: t('quest.bannerAlt'), width: '1280', height: '720', fetchpriority: 'high' }),
     h('div', { class: 'quest-hero__deep', 'aria-hidden': 'true', style: { backgroundImage: `url("${src}")` } }),
   );
+}
+
+/* Язык на входе — без рамки: «RU Рус ▾» золотом; нажал — родной список телефона (владелец 19.11.2026). */
+const LANG_SHORT = { ua: 'UA Укр', ru: 'RU Рус', en: 'EN Eng' };
+const LANG_FULL = { ua: 'Українська', ru: 'Русский', en: 'English' };
+
+export function questLang(current, onPick) {
+  const select = h('select', { class: 'quest-lang__select', 'aria-label': t('settings.lang') },
+    ...LANGS.map((l) => h('option', { value: l, selected: l === current, title: LANG_FULL[l] }, LANG_SHORT[l])));
+  select.addEventListener('change', () => onPick(select.value));
+  return h('label', { class: 'quest-lang' }, select, h('span', { class: 'quest-lang__chevron', 'aria-hidden': 'true' }, '▾'));
 }

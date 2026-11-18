@@ -277,7 +277,11 @@ function drawGate() {
   const mode = !account.current()
     ? (gate.mode === 'loading' ? 'loading' : 'form')
     : gate.mode === 'failed' ? 'failed' : 'loading';
-  login.render(view, { mode, message: gate.message, onLogin, onRetry: loadProgram });
+  // Язык — прямо на входе: телефон мог быть на чужом языке (владелец 19.11.2026)
+  login.render(view, {
+    mode, message: gate.message, onLogin, onRetry: loadProgram,
+    lang: settings.get().lang, onLang: (value) => { settings.update({ lang: value }); draw(); },
+  });
 }
 
 function draw() {

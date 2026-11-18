@@ -83,10 +83,16 @@
   display: block;
   width: 100%;
   height: auto;
-  /* Чётко до самого низа: нижняя строка картинки («Новая концепция…») важна — тает только узкая кромка под ней
-     (владелец 19.11.2026: «текст должен быть читабельный») */
-  -webkit-mask-image: linear-gradient(180deg, #000 0%, #000 96%, transparent 100%);
-  mask-image: linear-gradient(180deg, #000 0%, #000 96%, transparent 100%);
+  /* Размытие — по нижним углам и по кромке под текстом; середина с нижней строкой («Новая концепция…») чёткая
+     (владелец 19.11.2026: «размытие по углам… чтобы не перекрывало текст — тогда монолитно») */
+  -webkit-mask-image:
+    linear-gradient(180deg, #000 0%, #000 95%, transparent 100%),
+    radial-gradient(120% 115% at 50% 22%, #000 62%, rgba(0, 0, 0, 0.35) 84%, transparent 100%);
+  -webkit-mask-composite: source-in;
+  mask-image:
+    linear-gradient(180deg, #000 0%, #000 95%, transparent 100%),
+    radial-gradient(120% 115% at 50% 22%, #000 62%, rgba(0, 0, 0, 0.35) 84%, transparent 100%);
+  mask-composite: intersect;
 }
 
 /* Продолжение картинки вниз: её нижний край зеркалом, размытый и тёмный, тает в фоне */
@@ -95,8 +101,8 @@
   z-index: -1;
   left: 0;
   right: 0;
-  top: 90%;
-  height: 55%;
+  top: 60%;
+  height: 80%;
   background-size: 100% auto;
   background-position: center bottom;
   background-repeat: no-repeat;
@@ -169,4 +175,61 @@
 
 .quest-scene .onboarding__lead {
   margin: var(--sp-3, 12px) auto var(--sp-4, 16px);
+}
+
+/* Низ входа одной строкой, без рамок: слева — кто выдаёт аккаунт, справа — язык */
+.quest-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-4, 16px);
+  max-width: 34rem;
+  margin: var(--sp-5, 20px) auto 0;
+}
+
+.quest-foot__hint {
+  flex: 1;
+  max-width: none;
+  margin: 0;
+  text-align: left;
+}
+
+.quest-lang {
+  position: relative;
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25em;
+  cursor: pointer;
+}
+
+.quest-lang__select {
+  appearance: none;
+  -webkit-appearance: none;
+  border: 0;
+  background: transparent;
+  padding: 4px 1.1em 4px 2px;
+  font: 700 var(--fs-sm, 14px) / 1.2 var(--f-body);
+  letter-spacing: 0.04em;
+  color: var(--c-gold);
+  cursor: pointer;
+}
+
+.quest-lang__select:focus-visible {
+  outline: 1px solid rgba(var(--rgb-gold), 0.6);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+.quest-lang__select option {
+  color: #111;
+  background: #f4efe4;
+}
+
+.quest-lang__chevron {
+  position: absolute;
+  right: 0;
+  pointer-events: none;
+  font-size: 0.8em;
+  color: var(--c-gold);
 }

@@ -1,5 +1,6 @@
 // Даты, хранилище, настройки и записи — то, на чём стоит всё приложение.
 import { test } from 'node:test';
+import { detectLang } from '../js/core/i18n.js';
 import assert from 'node:assert/strict';
 import * as dates from '../js/core/dates.js';
 import * as store from '../js/core/store.js';
@@ -79,7 +80,7 @@ test('настройки: кривые значения заменяются з�
   store._useBackend(fakeStorage());
   store.write('settings', { lang: 'de', startDate: '2026-13-01', times: { morning: '7:00', noon: '12:30' } });
   const s = settings.get();
-  assert.equal(s.lang, 'ua');
+  assert.equal(s.lang, detectLang(), 'неизвестный язык — язык телефона (19.11.2026)');
   assert.equal(s.startDate, null);
   assert.equal(s.times.morning, '08:00');
   assert.equal(s.times.noon, '12:30');
