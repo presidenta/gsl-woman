@@ -3,6 +3,7 @@ import { t } from '../../core/i18n.js';
 import { field } from '../../ui/controls.js';
 import { icons } from '../../ui/icons.js';
 import { brand } from '../../ui/brand.js';
+import { questBanner } from '../../quest/quest.js';
 
 /* ВХОД: до него приложение ничего не показывает — программа приходит только вошедшей (program/source.js).
    Языка здесь нет — он в настройках (владелец 12.11.2026); до входа — язык телефона.
@@ -18,16 +19,17 @@ let typedLogin = '';     // язык сменили посреди ввода �
 export function render(view, { mode = 'form', message = '', onLogin, onRetry }) {
 
   // Название общее на две части — GSL (W+M)⁺: до входа ещё неизвестно, кто входит (владелец 13.11.2026)
+  // Приветствие квеста «Я⁺ • Любовь» (js/quest/, владелец 18.11.2026): картинка на языке приложения и слоган
   const hero = [
-    h('div', { class: 'onboarding__mark' }, svg(icons.sparkle)),
-    h('p', { class: 'caps onboarding__eyebrow' }, t('login.eyebrow')),
+    questBanner(),
+    h('p', { class: 'quest-slogan' }, t('quest.slogan')),
     h('h1', { class: 'onboarding__brand gold-text' }, brand('', t('app.shared'))),
     h('p', { class: 'onboarding__tagline' }, t('app.sharedTagline')),
   ];
 
   if (mode !== 'form') {
     const failed = mode === 'failed';
-    add(view, h('div', { class: 'onboarding login' },
+    add(view, h('div', { class: 'onboarding login quest-scene' },
       ...hero,
       h('p', { class: `login__status${failed ? ' login__status--error' : ''}`, role: 'status' },
         failed ? t('login.programFail') : t('login.loading')),
@@ -84,7 +86,7 @@ export function render(view, { mode = 'form', message = '', onLogin, onRetry }) 
   submit.setAttribute('form', 'login-form');
   form.id = 'login-form';
 
-  add(view, h('div', { class: 'onboarding login' },
+  add(view, h('div', { class: 'onboarding login quest-scene' },
     ...hero,
     h('p', { class: 'onboarding__lead' }, t('login.lead')),
     form,

@@ -3,6 +3,7 @@ import { t } from '../../core/i18n.js';
 import { icons } from '../../ui/icons.js';
 import { brand } from '../../ui/brand.js';
 import * as side from '../../side/side.js';
+import { questBanner } from '../../quest/quest.js';
 
 /* «КТО ТЫ?» — выбор пола при первом входе (владелец 13.11.2026: «при входе обязательно указать пол: мужской или
    женский»). Пока пол пуст, приложение дальше этого экрана не идёт (main.js). Выбор — один раз: сервер запоминает
@@ -72,9 +73,10 @@ export function render(view, { onChoose }) {
     }
   });
 
-  add(view, h('div', { class: 'onboarding login gender' },
-    h('div', { class: 'onboarding__mark' }, svg(icons.sparkle)),
-    h('p', { class: 'caps onboarding__eyebrow' }, t('login.eyebrow')),
+  // Сцена квеста «Я⁺ • Любовь» — та же, что у входа: часть ещё не выбрана (js/quest/, 18.11.2026)
+  add(view, h('div', { class: 'onboarding login gender quest-scene' },
+    questBanner('quest-banner--small'),
+    h('p', { class: 'quest-slogan' }, t('quest.slogan')),
     h('h1', { class: 'onboarding__brand gold-text' }, brand('', t('app.shared'))),
     h('h2', { class: 'gender__ask' }, t('gender.title')),
     h('p', { class: 'onboarding__lead' }, t('gender.lead')),

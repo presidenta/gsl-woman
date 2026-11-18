@@ -52,13 +52,20 @@ test('последняя неделя — три повтора, практик�
 test('отзыв месяца — в конце каждой четвёртой недели', () => {
   const reviews = [];
   for (let w = 1; w <= WEEKS; w++) if (weekPlan(w, 'en').review) reviews.push(w * 7);
-  assert.deepEqual(reviews, [28, 56, 84, 112, 140, 168]);
+  assert.deepEqual(reviews, Array.from({ length: 12 }, (_, i) => (i + 1) * 28));
 });
 
-test('путь: 6 месяцев по 4 недели', () => {
+// Год по кругу (владелец 18.11.2026): 12 месяцев, месяц 7 — снова текст месяца 1, неделя 25 — снова неделя 1
+test('квест на год: 12 месяцев по 4 недели, после 24-й недели — снова с первой', () => {
   const o = outline('ru');
-  assert.equal(o.length, 6);
+  assert.equal(o.length, 12);
   assert.ok(o.every((m) => m.weeks.length === 4));
+  assert.equal(o[6].title, o[0].title);
+  assert.equal(o[6].weeks[0].week, 25);
+  assert.deepEqual(weekPlan(25, 'ru').tasks.map((x) => x.title), weekPlan(1, 'ru').tasks.map((x) => x.title));
+  assert.deepEqual(weekPlan(48, 'ru').tasks.map((x) => x.title), weekPlan(24, 'ru').tasks.map((x) => x.title));
+  assert.equal(weekPlan(24, 'ru').final, false);
+  assert.equal(weekPlan(48, 'ru').final, true);
 });
 
 test('утренняя минута: пятки каждый день, добавка по кругу', () => {

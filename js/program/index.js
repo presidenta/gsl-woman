@@ -11,18 +11,24 @@ import * as settings from '../settings/settings.js';
 
 const data = (lang) => langData(lang);
 
-/** Конец месяца — неделя 4, 8, … 24: в её седьмой день записывается отзыв (владелец, 05.11.2026). */
+/* ГОД ПО КРУГУ (владелец 18.11.2026): на сервере 24 недели и 6 месяцев, программа — 48 недель и 12 месяцев.
+   Неделя 25 — снова текст недели 1, месяц 7 — снова месяц 1; номера недель и месяцев идут дальше. */
+const cycled = (list, n) => (list?.length ? list[(n - 1) % list.length] : undefined);
+export const sourceWeek = (lang, week) => cycled(data(lang)?.weeks, week);
+const sourceMonth = (lang, month) => cycled(data(lang)?.months, month);
+
+/** Конец месяца — неделя 4, 8, … 48: в её седьмой день записывается отзыв (владелец, 05.11.2026). */
 export const isReviewWeek = (week) => week % MONTH_WEEKS === 0;
 
 /** Неделя целиком: заголовок, задания, свободный поток, созвон. */
 export function weekPlan(week, lang) {
-  const w = data(lang)?.weeks[week - 1];
+  const w = sourceWeek(lang, week);
   if (!w) return null;
   const month = monthOf(week);
   return {
     week,
     month,
-    monthInfo: data(lang).months[month - 1],
+    monthInfo: sourceMonth(lang, month),
     title: w.title,
     intro: w.intro || '',
     // Задания — в словах профиля отношений (profile/, владелец 14.11.2026): у каждого из четырёх свои слова
@@ -57,7 +63,7 @@ export function weekShape(tasksCount, callDay = settings.get().callDay) {
 
 /** Раскладка недели по её номеру — для подсчёта прогресса (progress.js) и экранов. */
 export function shapeOfWeek(week, lang) {
-  return weekShape(data(lang)?.weeks[week - 1]?.tasks.length || 0);
+  return weekShape(sourceWeek(lang, week)?.tasks.length || 0);
 }
 
 function kindOf(n, tasksCount) {
@@ -80,7 +86,7 @@ function talkOf(week, lang) {
 function imsgOf(week, n, imsgs, lang) {
   if (n >= 4 && n <= 6) return imsgs[n - 4] || null;
   if (n === WEEK_DAYS) return imsgs.length ? imsgs[(week - 1) % imsgs.length] : null;
-  const prev = week > 1 ? data(lang)?.weeks[week - 2]?.imsg || [] : [];
+  const prev = week > 1 ? sourceWeek(lang, week - 1)?.imsg || [] : [];
   const pool = prev.length ? prev : imsgs;
   return pool.length ? pool[(n - 1) % pool.length] : null;
 }
@@ -136,7 +142,7 @@ export function outline(lang) {
   for (let m = 1; m <= WEEKS / MONTH_WEEKS; m++) {
     const weeks = [];
     for (let i = 1; i <= MONTH_WEEKS; i++) weeks.push(weekPlan((m - 1) * MONTH_WEEKS + i, lang));
-    out.push({ month: m, ...data(lang).months[m - 1], weeks });
+    out.push({ month: m, ...sourceMonth(lang, m), weeks });
   }
   return out;
 }

@@ -15,6 +15,7 @@ import { familyDreamCard } from '../../kids/family-dream.js';
 import { familyApi } from '../../kids/family-api.js';
 import { kidAlerts } from '../../kids/alerts.js';
 import { photoOf } from '../../photos/photos.js';
+import { questMark } from '../../quest/quest.js';
 
 /* ЭКРАН «МЫ» (#/us) — «Пара» и «Семья» (владелец 13.11.2026; ТЗ — docs/TZ-para-semya.md). Вверху переключатель
    «Пара · Семья». Нет контура — что это и «Создать» / «У меня есть код». Создан, но второго ещё нет — код для
@@ -173,7 +174,8 @@ function familyView(view, ctx, circle) {
 
 export function render(view, ctx) {
   add(view,
-    h('h1', { class: 'screen-title' }, t('us.title')),
+    // «Совместные квесты «Я⁺ • Любовь»» (владелец 18.11.2026: «чтобы понимали — совместные квесты чего»)
+    h('h1', { class: 'screen-title quest-title' }, t('us.title'), questMark({ quoted: true })),
     segmented({
       label: t('us.title'),
       options: [{ value: 'pair', label: t('us.pair') }, { value: 'family', label: t('us.family') }],

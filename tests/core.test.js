@@ -40,8 +40,8 @@ test('неделя, день недели и месяц по номеру дня
   assert.equal(dates.monthOf(4), 1);
   assert.equal(dates.monthOf(5), 2);
   assert.equal(dates.monthOf(24), 6);
-  assert.equal(dates.inProgram(168), true);
-  assert.equal(dates.inProgram(169), false);
+  assert.equal(dates.inProgram(336), true);   // квест на год — 48 недель (18.11.2026)
+  assert.equal(dates.inProgram(337), false);
 });
 
 test('проверка дат и времени', () => {

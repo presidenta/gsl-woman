@@ -1,0 +1,109 @@
+/* КВЕСТ «Я⁺ • ЛЮБОВЬ»: золотая метка названия, баннер приветствия и изумрудно-золотая сцена нейтральных экранов
+   (вход, выбор части — до того, как известно, женщина входит или мужчина). Цвета — свои, только здесь. */
+
+:root {
+  --q-emerald: #1f9b6a;
+  --q-emerald-deep: #0b3b2a;
+  --q-emerald-night: #061a13;
+  --q-gold-1: #fff1b8;
+  --q-gold-2: #f4c255;
+  --q-gold-3: #b9812c;
+  --q-gold-text: linear-gradient(180deg, var(--q-gold-1) 0%, var(--q-gold-2) 48%, var(--q-gold-3) 100%);
+}
+
+/* Метка «Я⁺ • Любовь» — литое золото, плюс в степени */
+.quest-mark {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.08em;
+  white-space: nowrap;
+  font-family: var(--f-display, inherit);
+  font-weight: 700;
+  background: var(--q-gold-text);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 0 0.35em rgba(244, 194, 85, 0.35));
+}
+
+.quest-mark__plus {
+  font-size: 0.6em;
+  transform: translateY(-0.75em);
+}
+
+.quest-mark__dot {
+  margin: 0 0.22em 0 0.12em;
+  font-size: 0.7em;
+}
+
+.quest-mark__quoted {
+  white-space: nowrap;
+}
+
+/* Заголовок экрана с меткой: «Совместные квесты «Я⁺ • Любовь»», «Настройка «Я⁺ • Любовь»» */
+.quest-title {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  column-gap: 0.35em;
+}
+
+.quest-title .quest-mark__quoted {
+  font-size: 0.82em;
+  color: var(--q-gold-2);
+}
+
+/* Баннер приветствия */
+.quest-banner {
+  display: block;
+  width: 100%;
+  height: auto;
+  margin: 0 auto var(--sp-5, 20px);
+  border-radius: var(--r-lg, 18px);
+  border: 1px solid rgba(244, 194, 85, 0.45);
+  box-shadow: 0 0 0 1px rgba(31, 155, 106, 0.25), 0 12px 40px rgba(6, 26, 19, 0.7), 0 0 36px rgba(244, 194, 85, 0.18);
+}
+
+.quest-slogan {
+  margin: 0 auto var(--sp-5, 20px);
+  max-width: 36ch;
+  font-size: var(--fs-2xs, 0.72rem);
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  background: var(--q-gold-text);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* Изумрудно-золотая сцена: фон на весь экран за содержимым */
+.quest-scene {
+  position: relative;
+}
+
+.quest-scene::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background:
+    radial-gradient(120% 60% at 50% 0%, rgba(244, 194, 85, 0.16) 0%, transparent 55%),
+    radial-gradient(90% 70% at 15% 85%, rgba(31, 155, 106, 0.35) 0%, transparent 60%),
+    radial-gradient(90% 70% at 85% 80%, rgba(31, 155, 106, 0.25) 0%, transparent 60%),
+    linear-gradient(180deg, var(--q-emerald-deep) 0%, var(--q-emerald-night) 100%);
+}
+
+.quest-scene .card {
+  border-color: rgba(244, 194, 85, 0.35);
+  background: rgba(6, 26, 19, 0.55);
+}
+
+.quest-scene .onboarding__tagline,
+.quest-scene .login__hint {
+  color: rgba(236, 226, 196, 0.75);
+}
+
+.quest-banner--small {
+  max-width: 420px;
+}

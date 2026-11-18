@@ -398,8 +398,18 @@ export default {
       hint: 'Mark the glass with “I drank my glass”; the minute marks itself when it reaches the end.',
     },
   },
+  // The “I⁺ • Love” quest (js/quest/, owner 18.11.2026)
+  quest: {
+    me: 'I',
+    love: 'Love',
+    mark: 'I⁺ • Love',
+    qOpen: '“',
+    qClose: '”',
+    bannerAlt: 'GSL • Global Life Game. Quest № 1 in the world — I⁺ • Love. A lifetime game. Play. Develop. Love. Create. Earn. A new concept for personal development, relationships and income opportunities.',
+    slogan: 'Play. Develop. Love. Create. Earn.',
+  },
   settings: {
-    title: 'Settings',
+    title: 'Tuning',
     profile: 'About me',
     lang: 'Language',
     name: 'What should we call you',
@@ -519,7 +529,7 @@ export default {
   },
   // «Мы»: пара и семья (сборка 42, docs/TZ-para-semya.md)
   us: {
-    title: 'Us',
+    title: 'Shared quests',
     pair: 'Couple',
     family: 'Family',
     open: 'Couple and family',
@@ -538,7 +548,7 @@ export default {
     code: {
       pair: 'A code for him',
       family: 'A code for the second parent',
-      text: 'The code works for 24 hours, once: the other person opens “Us” → “I have a code”.',
+      text: 'The code works for 24 hours, once: the other person opens “Shared quests” → “I have a code”.',
       copy: 'Copy',
       copied: 'Code copied',
       fresh: 'New code',
@@ -692,7 +702,7 @@ export default {
       of: '{n} of {all}',
       normalized: 'The weights added up to {sum}% — the app evened them out to 100%.',
       empty: 'Create your first shared goal.',
-      needCircle: 'Link your cabinets in “Us” — shared goals will appear here.',
+      needCircle: 'Link your cabinets in “Shared quests” — shared goals will appear here.',
       reached: 'Goal reached!',
       create: 'Create the goal',
       remove: 'Delete the goal',
@@ -718,7 +728,7 @@ export default {
       },
     },
     card: {
-      title: 'Us',
+      title: 'Shared quests',
       unread: 'New messages: {n}',
       open: 'Open',
     },

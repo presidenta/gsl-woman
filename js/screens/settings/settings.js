@@ -20,6 +20,7 @@ import * as media from '../../media/photos.js';
 import { checkNow } from '../../core/updates.js';
 import { PROFILES } from '../../profile/profile.js';
 import { langData } from '../../program/source.js';
+import { questMark } from '../../quest/quest.js';
 
 /* ЭКРАН «НАСТРОЙКИ»: аккаунт «Кванта» (фото, имя, кабинет), значок на экран, мои отношения (профиль программы),
    «Пять языков любви», обо мне (имя, язык), дата старта, время трёх напоминаний, уведомления, данные.
@@ -182,7 +183,8 @@ export function render(view, ctx) {
   });
 
   add(view,
-    h('h1', { class: 'screen-title' }, t('settings.title')),
+    // «Настройка «Я⁺ • Любовь»» (владелец 18.11.2026)
+    h('h1', { class: 'screen-title quest-title' }, t('settings.title'), questMark({ quoted: true })),
 
     accountCard({ onLogout: ctx.logout, update: updateButton() }),
     partCard(ctx),
