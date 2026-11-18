@@ -1045,7 +1045,8 @@ export default {
     openDays: 'Access is open',
     pickTitle: 'Pick a date',
     pickLead: 'Tap a day — that will be the chosen date.',
-    access: { paid: 'Test mode: access is open until {date} inclusive — {n} days left. It may stop at any moment.', unlimited: 'Access is always open.', ended: 'The access period has ended.' },
+    helpLabel: 'How it works',
+    access: { paid: 'Test mode: access is open until {date} inclusive — {n} days left. It may stop at any moment.', ended: 'The access period has ended.' },
   },
   // Разделы дня — кнопки в шапке «Сегодня» (js/sections/, владелец 17.11.2026)
   sections: {

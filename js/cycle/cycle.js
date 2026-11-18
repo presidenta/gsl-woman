@@ -390,20 +390,27 @@ function eventForm(iso, done) {
   );
 }
 
-/** ‹ 27 дн. › и пояснение, что это за число. own — своё число или null (считается по отметкам). */
+/** Кружок «i»: открывает и закрывает пояснение рядом (свёрнуто по умолчанию — владелец 18.11.2026: «текст не нужен, пусть открывается»). */
+function infoButton(open, label, toggle) {
+  return h('button', { type: 'button', class: `cycle-info${open ? ' is-open' : ''}`, 'aria-label': label, 'aria-expanded': String(open), onclick: toggle }, 'i');
+}
+
+/** Одна строка: «Длина цикла  ‹ 27 дн. ›  (i)»; пояснение и «считать по отметкам» — под кружком. own — своё число или null. */
 function cycleStepper(s, ownCycle, redraw) {
   const value = ownCycle || s.cycle;
   const step = (d) => { setCycle(clamp(value + d, CYCLE_MIN, CYCLE_MAX)); redraw(); };
   return h('div', { class: 'cycle-len' },
     h('div', { class: 'cycle-len__row' },
       h('span', { class: 'cycle-len__label' }, t('cycle.len.title')),
-      h('button', { type: 'button', class: 'icon-btn cycle-len__btn', 'aria-label': t('cycle.len.less'), disabled: value <= CYCLE_MIN, onclick: () => step(-1) }, '‹'),
-      h('b', { class: 'cycle-len__value' }, t('cycle.len.days', { n: value })),
-      h('button', { type: 'button', class: 'icon-btn cycle-len__btn', 'aria-label': t('cycle.len.more'), disabled: value >= CYCLE_MAX, onclick: () => step(1) }, '›')),
-    h('p', { class: 'faint cycle-len__hint' }, t('cycle.len.hint'),
+      h('span', { class: 'cycle-len__step' },
+        h('button', { type: 'button', class: 'icon-btn cycle-len__btn', 'aria-label': t('cycle.len.less'), disabled: value <= CYCLE_MIN, onclick: () => step(-1) }, '‹'),
+        h('b', { class: 'cycle-len__value' }, t('cycle.len.days', { n: value })),
+        h('button', { type: 'button', class: 'icon-btn cycle-len__btn', 'aria-label': t('cycle.len.more'), disabled: value >= CYCLE_MAX, onclick: () => step(1) }, '›')),
+      infoButton(lenOpen, t('cycle.helpLabel'), () => { lenOpen = !lenOpen; redraw(); })),
+    lenOpen ? h('p', { class: 'faint cycle-len__hint' }, t('cycle.len.hint'),
       ownCycle
         ? h('button', { type: 'button', class: 'cycle-len__auto', onclick: () => { setCycle(null); redraw(); } }, t('cycle.len.auto', { n: s.auto }))
-        : h('span', {}, ` ${t('cycle.len.isAuto')}`)),
+        : h('span', {}, ` ${t('cycle.len.isAuto')}`)) : null,
   );
 }
 
@@ -411,6 +418,9 @@ let mode = 'period';
 let editing = null;
 // Выбор даты (поле «Дата старта»): { value, onPick } — тот же календарь, нажатие на число выбирает дату
 let pick = null;
+// Какие пояснения раскрыты: как отмечать дни (кружок у кнопок) и что такое длина цикла
+let helpOpen = false;
+let lenOpen = false;
 // Вид календаря: 'roll' — 90 дней вокруг сегодня (по умолчанию), 'year' — весь год, 'month' — месяц из года
 let view = 'roll';
 let shownYear = new Date().getFullYear();
@@ -448,26 +458,27 @@ function content() {
   const s = stats(days, sh.cycle);
   const next = s.last ? addDays(s.last.start, s.cycle * Math.max(1, Math.ceil((daysBetween(s.last.start, today) + 1) / s.cycle))) : null;
   add(box,
-    // Доступ: сколько оплаченных (или пробных) дней осталось — зелёным в календаре
-    accessNote(openDays),
-    // Выбор даты — одна подсказка; иначе — что отмечаем нажатием (месячные / праздник) и длина цикла
-    ...(pick ? [h('p', { class: 'card__text cycle__lead' }, t('cycle.pickLead'))] : [
-      h('p', { class: 'card__text cycle__lead' }, alone ? t('cycle.manAlone') : t(man ? 'cycle.manLead' : 'cycle.lead')),
-      h('div', { class: 'cycle-mode', role: 'group' },
+    // Одна строка кнопок: что отмечаем нажатием (месячные / праздник) · вид (90 дней / весь год) · кружок «i» с пояснением
+    h('div', { class: 'cycle-bar', role: 'group' },
+      ...(pick ? [] : [
         ...['period', 'event'].map((m) => h('button', {
-          type: 'button', class: `btn ${mode === m ? 'btn--gold' : 'btn--ghost'} cycle-mode__btn`, 'aria-pressed': String(mode === m),
+          type: 'button', class: `btn ${mode === m ? 'btn--gold' : 'btn--ghost'} cycle-bar__btn`, 'aria-pressed': String(mode === m),
           onclick: () => { mode = m; editing = null; redraw(); },
-        }, t(man && m === 'period' ? 'cycle.manMode' : `cycle.mode.${m}`)))),
-      // Длина цикла: ‹ 27 дн. › — своё число; «по отметкам» — вернуть расчёт
-      cycleStepper(s, man ? own().cycle : sh.cycle, redraw),
-      editing ? eventForm(editing, () => { editing = null; redraw(); }) : h('p', { class: 'faint cycle__hint' }, t(mode === 'event' ? 'cycle.eventHint' : man ? 'cycle.manPeriodHint' : 'cycle.periodHint')),
-    ]),
-    // Вид: 90 дней · весь год (владелец 17.11.2026: «стандартно 90 дней, и возможность открыть весь год»)
-    h('div', { class: 'cycle-mode cycle-view', role: 'group' },
+        }, t(man && m === 'period' ? 'cycle.manMode' : `cycle.mode.${m}`))),
+        h('span', { class: 'cycle-bar__gap' }),
+      ]),
       ...['roll', 'year'].map((v) => h('button', {
-        type: 'button', class: `btn ${view === v || (v === 'year' && view === 'month') ? 'btn--gold' : 'btn--ghost'} cycle-mode__btn`, 'aria-pressed': String(view === v),
+        type: 'button', class: `btn ${view === v || (v === 'year' && view === 'month') ? 'btn--gold' : 'btn--ghost'} cycle-bar__btn`, 'aria-pressed': String(view === v),
         onclick: () => { view = v; shownYear = now.getFullYear(); redraw(); },
-      }, t(`cycle.view.${v}`)))),
+      }, t(`cycle.view.${v}`))),
+      infoButton(helpOpen, t('cycle.helpLabel'), () => { helpOpen = !helpOpen; redraw(); })),
+    // Пояснение — только по кружку: как отмечать дни
+    helpOpen ? h('div', { class: 'cycle__help' },
+      h('p', { class: 'card__text' }, pick ? t('cycle.pickLead') : alone ? t('cycle.manAlone') : t(man ? 'cycle.manLead' : 'cycle.lead')),
+      pick ? null : h('p', { class: 'faint cycle__hint' }, t(mode === 'event' ? 'cycle.eventHint' : man ? 'cycle.manPeriodHint' : 'cycle.periodHint'))) : null,
+    // Длина цикла — одной строкой
+    ...(pick ? [] : [cycleStepper(s, man ? own().cycle : sh.cycle, redraw)]),
+    editing && !pick ? eventForm(editing, () => { editing = null; redraw(); }) : null,
     ...(view === 'roll' ? [rollingGrid(ctx)] : []),
     ...(view === 'year' ? [
       h('div', { class: 'cycle-yearnav' },
@@ -483,12 +494,14 @@ function content() {
     ] : []),
     h('ul', { class: 'cycle__legend' },
       h('li', {}, h('span', { class: 'cycle-dot is-start' }), t('cycle.start')),
-      h('li', {}, h('span', { class: 'cycle-dot is-open' }), t('cycle.openDays')),
+      openDays.kind === 'paid' ? h('li', {}, h('span', { class: 'cycle-dot is-open' }), t('cycle.openDays')) : null,
       h('li', {}, h('span', { class: 'cycle-dot is-period' }), t('cycle.period')),
       h('li', {}, h('span', { class: 'cycle-dot is-soon' }), t('cycle.soon')),
       h('li', {}, h('span', { class: 'cycle-dot is-event' }), t('cycle.event')),
       h('li', {}, h('span', { class: 'cycle-dot is-state' }), t('cycle.state')),
       h('li', {}, h('span', { class: 'cycle-dot is-weekend' }), t('cycle.weekend'))),
+    // Срок доступа: до какого числа и сколько дней осталось (тест-режим может остановиться в любой момент)
+    openDays.kind === 'paid' ? accessNote(openDays) : null,
     pick ? null : (s.count >= 1
       ? h('p', { class: 'faint cycle__stats' }, t('cycle.stats', { cycle: s.cycle, len: s.len, next: next ? dayMonth(next) : '—' }))
       : h('p', { class: 'faint cycle__stats' }, t(man ? 'cycle.manEmpty' : 'cycle.empty'))),
@@ -496,16 +509,17 @@ function content() {
   return box;
 }
 
-/** Строка про доступ: сколько дней осталось (тест-режим может остановиться в любой момент) или «без срока». */
+/** Строка про доступ под календарём: до какого числа открыто и сколько дней осталось. */
 function accessNote(open) {
-  if (open.kind !== 'paid') return h('p', { class: 'card__text cycle__access' }, t('cycle.access.unlimited'));
-  return h('p', { class: 'card__text cycle__access' }, t(open.left ? 'cycle.access.paid' : 'cycle.access.ended', { date: formatDate(open.to, { day: 'numeric', month: 'long' }), n: open.left }));
+  return h('p', { class: 'faint cycle__stats cycle__access' }, t(open.left ? 'cycle.access.paid' : 'cycle.access.ended', { date: formatDate(open.to, { day: 'numeric', month: 'long' }), n: open.left }));
 }
 
 /** Один календарь, два входа: кружок в шапке и поле «Дата старта». С pick — выбор даты: нажатие на число отдаёт её. */
 export function openCalendar(opts = {}) {
   share();
   editing = null;
+  helpOpen = false;
+  lenOpen = false;
   const mine = opts.pick ? { value: opts.pick.value, onPick: opts.pick.onPick } : null;
   pick = mine;
   view = 'roll';
