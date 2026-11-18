@@ -66,13 +66,21 @@
    тёмные — сделай светящуюся, как в Кванте»). Сами правила — общие, в styles/components/button.css; у женской части те же
    токены в розовом золоте (tokens.css). Кромка — перелив --pult-rim «Кванта». */
 :root[data-side="man"] {
-  --plate-img: var(--g-man-gold-img);
+  /* Золотая отливка «пульта» Кванта (--pult-face-gold-soft, planner/web/css/app.css): нарисованный металл, чистый и яркий */
+  --face-gold:
+    linear-gradient(118deg, rgba(255, 253, 238, 0.5) 0%, rgba(255, 253, 238, 0) 34%) padding-box,
+    radial-gradient(58% 130% at 97% 13%, rgba(255, 255, 255, 0.42) 0%, rgba(255, 255, 255, 0) 60%) padding-box,
+    linear-gradient(298deg, rgba(126, 92, 18, 0.3) 0%, rgba(126, 92, 18, 0) 32%) padding-box,
+    radial-gradient(135% 52% at 46% 79%, rgba(120, 88, 16, 0.46) 0%, rgba(120, 88, 16, 0) 100%) padding-box,
+    radial-gradient(150% 40% at 52% 112%, rgba(255, 248, 214, 0.55) 0%, rgba(255, 248, 214, 0) 64%) padding-box,
+    linear-gradient(180deg, #faebb8 0%, #efd892 7%, #e8c86e 30%, #e1bd5b 56%, #d2ab49 80%, #c7a043 91%, #efd492 100%) padding-box;
+  --on-dark: #f7de92;   /* буквы на тёмном «зеркале» — цвета кромки, яркие */
   --rim: linear-gradient(135deg, #fffbe8 0%, #f3d375 13%, #ffffff 25%, #d9a83f 38%, #fff4c0 52%, #c8902c 66%, #fff9dc 80%, #ae7d21 100%);
   --face-dark: linear-gradient(180deg, #2b2518 0%, #1f1b11 7%, #16130c 30%, #110f09 56%, #0d0b07 80%, #0b0905 91%, #2c2517 100%);
   --glow-rim: 0 0 0 1px rgba(10, 8, 4, 0.9), 0 0 16px rgba(232, 200, 110, 0.42), 0 3px 10px rgba(0, 0, 0, 0.55);
   --glow-gold: 0 0 0 1px rgba(10, 8, 4, 0.9), 0 0 22px rgba(255, 214, 120, 0.62), 0 4px 12px rgba(0, 0, 0, 0.6);
-  --on-plate: #231703;
-  --on-plate-shadow: rgba(255, 244, 200, 0.5);
+  --on-plate: #231703;   /* текст НА золоте — --pult-ink «Кванта» */
+  --on-plate-shadow: rgba(255, 250, 225, 0.4);
   /* золотые буквы (код приглашения, заголовки) — яркий перелив без тёмной плиты */
   --g-gold-text: linear-gradient(100deg, #ffe58f 0%, #f7c948 34%, #fff4c2 52%, #f2bf3a 76%, #ffe58f 100%);
 }

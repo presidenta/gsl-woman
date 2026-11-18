@@ -147,7 +147,13 @@
 :root .chat__act:not(.is-danger) {
   border: 1.5px solid transparent;
   background: var(--face-dark) padding-box, var(--rim) border-box;
+  color: var(--on-dark);
   box-shadow: var(--glow-rim);
+}
+
+/* Невыбранные вкладки выбора из вариантов — буквы тоже золотые (в «Кванте» — цвета кромки) */
+:root .segmented__option:not([aria-checked='true']) {
+  color: var(--on-dark);
 }
 
 /* ОДИН СТИЛЬ ВСЕХ ЗОЛОТЫХ КНОПОК (владелец 18.11.2026: «золото должно быть везде одинаковое, один стиль на все золотые
@@ -160,10 +166,7 @@
 :root .chat__voice-btn,
 :root .account__cam {
   border: 2px solid transparent;
-  background:
-    linear-gradient(180deg, rgba(255, 246, 200, 0.5) 0%, rgba(255, 226, 130, 0.14) 52%, rgba(255, 240, 170, 0.3) 100%) padding-box,
-    var(--plate-img) center / cover no-repeat padding-box,
-    var(--rim) border-box;
+  background: var(--face-gold), var(--rim) border-box;
   color: var(--on-plate);
   text-shadow: 0 1px 0 var(--on-plate-shadow);
   box-shadow: var(--glow-gold);
