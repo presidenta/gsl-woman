@@ -24,11 +24,17 @@ export function register({ onUpdated }) {
   }
 
   const hadController = !!navigator.serviceWorker.controller;
-  navigator.serviceWorker.register('./sw.js').then((reg) => {
+  // updateViaCache: 'none' — номер версии (version.js, его читает работник) проверяется мимо HTTP-кэша
+  navigator.serviceWorker.register('./sw.js', { updateViaCache: 'none' }).then((reg) => {
     document.addEventListener('visibilitychange', () => {
       if (document.visibilityState === 'visible') reg.update().catch(() => {});
     });
   }).catch((err) => console.warn('Работник не встал:', err));
+
+  // Работник окликает окна после обновления (sw.js, reviveDead): живая страница отвечает — и перезагрузится сама
+  navigator.serviceWorker.addEventListener('message', (e) => {
+    if (e.data?.type === 'gsl-ping') e.source?.postMessage({ type: 'gsl-alive' });
+  });
 
   // Первая установка тоже меняет controller — это не обновление, перезагружать незачем
   navigator.serviceWorker.addEventListener('controllerchange', () => {

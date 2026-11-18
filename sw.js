@@ -15,21 +15,50 @@ const CACHE = PREFIX + self.GSL_VERSION;
 
 /* Файлы кладём по одному, а не addAll: один недоехавший файл не отменяет всю установку — он докачается
    при первом запросе. cache: 'reload' — мимо HTTP-кэша браузера, иначе новая версия могла бы сложить
-   себе вчерашние файлы. */
+   себе вчерашние файлы.
+   Адрес качаем с ?v=НОМЕР_СБОРКИ, а в запас кладём под обычным: раздача сайта (CDN) после выкладки ещё минуты
+   отдаёт часть файлов прежними, и кэш новой версии выходил смесью старых и новых модулей — приложение не
+   запускалось (18.11.2026). Адрес с номером для раздачи новый, значит, берётся с самого сайта. */
+const bust = (url) => url + (url.includes('?') ? '&' : '?') + 'v=' + self.GSL_VERSION;
+
+async function stock(cache, url) {
+  const res = await fetch(new Request(bust(url), { cache: 'reload' }));
+  if (!res.ok) throw new Error(`${url}: ${res.status}`);
+  await cache.put(new Request(url), res);
+}
+
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE).then((cache) =>
-      Promise.allSettled(self.GSL_FILES.map((url) => cache.add(new Request(url, { cache: 'reload' })))),
+      Promise.allSettled(self.GSL_FILES.map((url) => stock(cache, url))),
     ),
   );
   self.skipWaiting();
 });
 
+/* Окно, в котором приложение «зависло» (модули не загрузились из испорченного кэша, кнопки не отвечают), само себя
+   не обновит: страница мертва, перезагружать некому. Поэтому новый работник после установки «окликает» все окна:
+   живая страница отвечает (js/core/updates.js) и перезагрузится сама, когда ей удобно; не ответила за 4 секунды —
+   перезагружаем окно принудительно, уже на чистом кэше. */
+const alive = new Set();
+self.addEventListener('message', (event) => {
+  if (event.data?.type === 'gsl-alive' && event.source?.id) alive.add(event.source.id);
+});
+
+async function reviveDead() {
+  const windows = await self.clients.matchAll({ type: 'window' });
+  windows.forEach((w) => w.postMessage({ type: 'gsl-ping' }));
+  await new Promise((r) => setTimeout(r, 4000));
+  for (const w of windows) if (!alive.has(w.id)) await w.navigate(w.url).catch(() => {});
+  alive.clear();
+}
+
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys()
       .then((keys) => Promise.all(keys.filter((k) => k.startsWith(PREFIX) && k !== CACHE).map((k) => caches.delete(k))))
-      .then(() => self.clients.claim()),
+      .then(() => self.clients.claim())
+      .then(reviveDead),
   );
 });
 
