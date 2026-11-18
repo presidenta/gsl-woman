@@ -1,10 +1,11 @@
-import { h, add } from '../core/dom.js';
+import { h, svg, add } from '../core/dom.js';
 import { t, locale, formatDate } from '../core/i18n.js';
 import { read, write } from '../core/store.js';
 import { isoDate, addDays, daysBetween, isValidIso } from '../core/dates.js';
 import * as circles from '../circles/circles.js';
 import * as side from '../side/side.js';
 import { openSheet, closeSheet } from '../ui/sheet.js';
+import { icons } from '../ui/icons.js';
 import * as settings from '../settings/settings.js';
 import * as access from '../access/access.js';
 
@@ -258,7 +259,7 @@ function dayCell(date, ctx) {
   const state = STATE[md];
   const weekend = date.getDay() === 0 || date.getDay() === 6;
   const cls = `cycle-day${weekend ? ' is-weekend' : ''}${state ? ' is-state' : ''}${own.length ? ' is-event' : ''}`
-    + `${inOpen(iso, ctx) ? ' is-open' : ''}${iso === ctx.start ? ' is-start' : ''}${iso === ctx.picked ? ' is-picked' : ''}`
+    + `${inOpen(iso, ctx) ? ' is-open' : ''}${iso === ctx.picked ? ' is-picked' : ''}`
     + `${marked ? ' is-period' : ''}${soon ? ' is-soon' : ''}${iso === ctx.today ? ' is-today' : ''}${iso === ctx.editing ? ' is-editing' : ''}`
     + `${ctx.pulse && (marked || soon) && iso >= ctx.today ? ' is-pulse' : ''}`;
   const names = [iso === ctx.start ? t('cycle.start') : '', state ? t(state) : '', ...own.map((e) => e.title)].filter(Boolean);
@@ -335,7 +336,7 @@ function yearGrid(year, ctx, openMonth) {
       const marked = ctx.days.includes(iso);
       const soon = !marked && ctx.soon.has(iso);
       const ev = ctx.events.some((e) => e.md === iso.slice(5));
-      dots.push(h('i', { class: `cycle-mini__d${marked ? ' is-period' : ''}${soon ? ' is-soon' : ''}${ev ? ' is-event' : ''}${iso === ctx.today ? ' is-today' : ''}${inOpen(iso, ctx) ? ' is-open' : ''}${iso === ctx.start ? ' is-start' : ''}${iso === ctx.picked ? ' is-picked' : ''}` }, String(d)));
+      dots.push(h('i', { class: `cycle-mini__d${marked ? ' is-period' : ''}${soon ? ' is-soon' : ''}${ev ? ' is-event' : ''}${iso === ctx.today ? ' is-today' : ''}${inOpen(iso, ctx) ? ' is-open' : ''}${iso === ctx.picked ? ' is-picked' : ''}` }, String(d)));
     }
     const name = new Intl.DateTimeFormat(locale(), { month: 'long' }).format(first);
     return h('button', { type: 'button', class: 'cycle-mini', 'aria-label': t('cycle.openMonth', { month: name }), onclick: () => openMonth(m) },
@@ -390,13 +391,15 @@ function eventForm(iso, done) {
   );
 }
 
-/** Кружок «i»: открывает и закрывает пояснение рядом (свёрнуто по умолчанию — владелец 18.11.2026: «текст не нужен, пусть открывается»). */
+/** Галочка ⌄: открывает и закрывает пояснение рядом; открыто — смотрит вверх (владелец 18.11.2026: «с какого перепуга
+    буква „и“ — нарисовал галочку»). Свёрнуто по умолчанию. */
 function infoButton(open, label, toggle) {
-  return h('button', { type: 'button', class: `cycle-info${open ? ' is-open' : ''}`, 'aria-label': label, 'aria-expanded': String(open), onclick: toggle }, 'i');
+  return h('button', { type: 'button', class: `cycle-info${open ? ' is-open' : ''}`, 'aria-label': label, 'aria-expanded': String(open), onclick: toggle }, svg(icons.chevronRight));
 }
 
-/** Одна строка: «Длина цикла  ‹ 27 дн. ›  (i)»; пояснение и «считать по отметкам» — под кружком. own — своё число или null. */
-function cycleStepper(s, ownCycle, redraw) {
+/** Одна строка: «Длина цикла  ‹ 27 дн. ›  ⌄»; под галочкой — пояснение, «считать по отметкам» и статистика года
+    (extra — её строит вызывающий: «Циклов за год…», «идёт сейчас…» убраны с экрана, владелец 18.11.2026). */
+function cycleStepper(s, ownCycle, redraw, extra) {
   const value = ownCycle || s.cycle;
   const step = (d) => { setCycle(clamp(value + d, CYCLE_MIN, CYCLE_MAX)); redraw(); };
   return h('div', { class: 'cycle-len' },
@@ -411,6 +414,7 @@ function cycleStepper(s, ownCycle, redraw) {
       ownCycle
         ? h('button', { type: 'button', class: 'cycle-len__auto', onclick: () => { setCycle(null); redraw(); } }, t('cycle.len.auto', { n: s.auto }))
         : h('span', {}, ` ${t('cycle.len.isAuto')}`)) : null,
+    lenOpen ? extra?.() : null,
   );
 }
 
@@ -458,26 +462,26 @@ function content() {
   const s = stats(days, sh.cycle);
   const next = s.last ? addDays(s.last.start, s.cycle * Math.max(1, Math.ceil((daysBetween(s.last.start, today) + 1) / s.cycle))) : null;
   add(box,
-    // Одна строка кнопок: что отмечаем нажатием (месячные / праздник) · вид (90 дней / весь год) · кружок «i» с пояснением
+    // Одна строка: вид (90 дней / весь год) слева; справа «Праздник» и «Месячные» с галочкой — она открывает, как отмечать дни
     h('div', { class: 'cycle-bar', role: 'group' },
-      ...(pick ? [] : [
-        ...['period', 'event'].map((m) => h('button', {
-          type: 'button', class: `btn ${mode === m ? 'btn--gold' : 'btn--ghost'} cycle-bar__btn`, 'aria-pressed': String(mode === m),
-          onclick: () => { mode = m; editing = null; redraw(); },
-        }, t(man && m === 'period' ? 'cycle.manMode' : `cycle.mode.${m}`))),
-        h('span', { class: 'cycle-bar__gap' }),
-      ]),
       ...['roll', 'year'].map((v) => h('button', {
         type: 'button', class: `btn ${view === v || (v === 'year' && view === 'month') ? 'btn--gold' : 'btn--ghost'} cycle-bar__btn`, 'aria-pressed': String(view === v),
         onclick: () => { view = v; shownYear = now.getFullYear(); redraw(); },
       }, t(`cycle.view.${v}`))),
-      infoButton(helpOpen, t('cycle.helpLabel'), () => { helpOpen = !helpOpen; redraw(); })),
-    // Пояснение — только по кружку: как отмечать дни
-    helpOpen ? h('div', { class: 'cycle__help' },
-      h('p', { class: 'card__text' }, pick ? t('cycle.pickLead') : alone ? t('cycle.manAlone') : t(man ? 'cycle.manLead' : 'cycle.lead')),
-      pick ? null : h('p', { class: 'faint cycle__hint' }, t(mode === 'event' ? 'cycle.eventHint' : man ? 'cycle.manPeriodHint' : 'cycle.periodHint'))) : null,
+      ...(pick ? [] : [
+        h('span', { class: 'cycle-bar__gap' }),
+        ...['event', 'period'].map((m) => h('button', {
+          type: 'button', class: `btn ${mode === m ? 'btn--gold' : 'btn--ghost'} cycle-bar__btn`, 'aria-pressed': String(mode === m),
+          onclick: () => { mode = m; editing = null; redraw(); },
+        }, t(man && m === 'period' ? 'cycle.manMode' : `cycle.mode.${m}`))),
+        infoButton(helpOpen, t('cycle.helpLabel'), () => { helpOpen = !helpOpen; redraw(); }),
+      ])),
+    // Пояснение к «Месячные» — только по галочке
+    helpOpen && !pick ? h('div', { class: 'cycle__help' },
+      h('p', { class: 'card__text' }, alone ? t('cycle.manAlone') : t(man ? 'cycle.manLead' : 'cycle.lead')),
+      h('p', { class: 'faint cycle__hint' }, t(man ? 'cycle.manPeriodHint' : 'cycle.periodHint'))) : null,
     // Длина цикла — одной строкой
-    ...(pick ? [] : [cycleStepper(s, man ? own().cycle : sh.cycle, redraw)]),
+    ...(pick ? [] : [cycleStepper(s, man ? own().cycle : sh.cycle, redraw, () => yearStatsView(days, now.getFullYear(), today))]),
     editing && !pick ? eventForm(editing, () => { editing = null; redraw(); }) : null,
     ...(view === 'roll' ? [rollingGrid(ctx)] : []),
     ...(view === 'year' ? [
@@ -486,14 +490,12 @@ function content() {
         h('b', { class: 'cycle-yearnav__year' }, String(shownYear)),
         h('button', { type: 'button', class: 'icon-btn', 'aria-label': t('cycle.nextYear'), onclick: () => { shownYear += 1; redraw(); } }, '›')),
       yearGrid(shownYear, ctx, (m) => { shownMonth = m; view = 'month'; redraw(); }),
-      ...(pick ? [] : [yearStatsView(days, shownYear, today)]),
     ] : []),
     ...(view === 'month' ? [
       h('button', { type: 'button', class: 'btn btn--ghost cycle-back', onclick: () => { view = 'year'; redraw(); } }, `‹ ${t('cycle.view.year')}`),
       monthGrid(shownYear, shownMonth, ctx),
     ] : []),
     h('ul', { class: 'cycle__legend' },
-      h('li', {}, h('span', { class: 'cycle-dot is-start' }), t('cycle.start')),
       openDays.kind === 'paid' ? h('li', {}, h('span', { class: 'cycle-dot is-open' }), t('cycle.openDays')) : null,
       h('li', {}, h('span', { class: 'cycle-dot is-period' }), t('cycle.period')),
       h('li', {}, h('span', { class: 'cycle-dot is-soon' }), t('cycle.soon')),
