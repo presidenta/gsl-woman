@@ -1,4 +1,5 @@
 import { read, write, remove } from '../core/store.js';
+import { isoDate, addDays, daysBetween, isValidIso } from '../core/dates.js';
 
 /* ДОСТУП К GSL WOMAN+ — как у «Кванта» (planner/web/js/core/access-controller.js; владелец 13.11.2026:
    «принцип как сделали в Кванте, точно так же»).
@@ -60,7 +61,31 @@ export function until() {
   return typeof u === 'number' ? u : null;
 }
 
+/* ДНИ ДОСТУПА В КАЛЕНДАРЕ (владелец 18.11.2026: «выдели цветом, сколько осталось проплаченных дней»).
+   Срок с сервера есть — красим дни от сегодня до последнего открытого. Срока нет (бессрочно или сервер ещё не
+   отвечал) — пробный режим: три недели от первого дня, когда календарь это увидел; он может остановиться в любой
+   момент. Закрывает приложение по-прежнему только срок с сервера (isOpen) — пробные три недели ничего не закрывают. */
+export const TRIAL_DAYS = 21;
+const TRIAL_KEY = 'access-trial';
+
+/** { kind: 'paid' | 'trial', from, to, left } — from/to включительно, left — сколько дней осталось (с сегодняшним). */
+export function openDays(todayIso = isoDate()) {
+  const u = until();
+  if (u !== null) {
+    const to = isoDate(new Date(u - 1)); // дата наступила — закрыто, значит последний открытый день — накануне
+    return { kind: 'paid', from: todayIso, to, left: Math.max(0, daysBetween(todayIso, to) + 1) };
+  }
+  let first = read(TRIAL_KEY, null)?.from;
+  if (!isValidIso(first)) {
+    first = todayIso;
+    write(TRIAL_KEY, { from: first });
+  }
+  const to = addDays(first, TRIAL_DAYS - 1);
+  return { kind: 'trial', from: todayIso > first ? todayIso : first, to, left: Math.max(0, daysBetween(todayIso, to) + 1) };
+}
+
 /** Другой человек на телефоне или выход — прежний срок здесь ни при чём. */
 export function forget() {
   remove(KEY);
+  remove(TRIAL_KEY);
 }

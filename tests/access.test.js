@@ -54,3 +54,24 @@ test('выход или другой человек — прежний срок 
   access.forget();
   assert.equal(access.isOpen(now), true);
 });
+
+// Дни доступа в календаре (владелец 18.11.2026): срок с сервера — красим до него; срока нет — пробные три недели.
+test('срок с сервера: дни от сегодня до последнего открытого, осталось считается с сегодняшним', () => {
+  access.remember('2026-11-25T00:00:00Z', now);
+  const d = access.openDays('2026-11-18');
+  assert.equal(d.kind, 'paid');
+  assert.equal(d.from, '2026-11-18');
+  assert.ok(d.to === '2026-11-24' || d.to === '2026-11-25', 'последний день — накануне даты срока (с поправкой на пояс)');
+  assert.ok(d.left >= 7 && d.left <= 8);
+});
+
+test('срока нет — пробный режим: три недели от первого показа, потом «0 дней»; запоминается и забывается с выходом', () => {
+  access.remember(null, now);
+  const first = access.openDays('2026-11-18');
+  assert.deepEqual([first.kind, first.from, first.to, first.left], ['trial', '2026-11-18', '2026-12-08', 21]);
+  const later = access.openDays('2026-11-28');
+  assert.deepEqual([later.from, later.to, later.left], ['2026-11-28', '2026-12-08', 11]);
+  assert.equal(access.openDays('2026-12-20').left, 0);
+  access.forget();
+  assert.equal(access.openDays('2027-01-05').to, '2027-01-25');
+});

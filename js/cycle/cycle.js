@@ -1,10 +1,12 @@
 import { h, add } from '../core/dom.js';
-import { t, locale } from '../core/i18n.js';
+import { t, locale, formatDate } from '../core/i18n.js';
 import { read, write } from '../core/store.js';
 import { isoDate, addDays, daysBetween, isValidIso } from '../core/dates.js';
 import * as circles from '../circles/circles.js';
 import * as side from '../side/side.js';
-import { openSheet } from '../ui/sheet.js';
+import { openSheet, closeSheet } from '../ui/sheet.js';
+import * as settings from '../settings/settings.js';
+import * as access from '../access/access.js';
 
 /* КАЛЕНДАРЬ ЦИКЛА — кружок с датой в шапке (владелец 17.11.2026).
 
@@ -19,6 +21,10 @@ import { openSheet } from '../ui/sheet.js';
      к ним добавляются её. Есть дни в календаре — расчёт и пульсация работают.
    - Календарь открывается у всех (владелец: «у мужчины тоже — просто без отметок»): выходные, государственные
      праздники и свои праздники пары — золотом.
+   - КАЛЕНДАРЬ ОДИН (владелец 18.11.2026: «один календарь, одни отметки; тот, что в кружке, — оставить как есть»).
+     Вид прежний: 90 дней, год, месяцы. Кроме цикла в нём: начало тренинга и дни, пока открыт доступ
+     (access.openDays) — зелёным. Поле «Дата старта» (controls.dateField) открывает его же в режиме
+     выбора даты: нажал на число — дата выбрана, лист закрылся.
 
    Хранение: у женщины — на телефоне (ключ cycle: { days: [iso…], cycle: своя длина | null }); в паре — копия записью
    cycle/days, мужчина читает её оттуда. Отметки мужчины — на его телефоне, ключ cycle-her (тот же вид); в пару они
@@ -130,7 +136,7 @@ let button = null;
 
 /** Кружок с числом и днём недели. Шапка строится один раз, число освежает paint() при каждой перерисовке. */
 export function headerButton() {
-  button = h('button', { type: 'button', class: 'icon-btn cycle-btn', 'aria-label': t('cycle.open'), onclick: openCalendar },
+  button = h('button', { type: 'button', class: 'icon-btn cycle-btn', 'aria-label': t('cycle.open'), onclick: () => openCalendar() },
     h('span', { class: 'cycle-btn__day' }), h('span', { class: 'cycle-btn__week' }));
   paint();
   return button;
@@ -240,6 +246,8 @@ const dayMonth = (iso) => new Intl.DateTimeFormat(locale(), { day: 'numeric', mo
 const weekHeads = () => [...Array(7)].map((_, i) => new Intl.DateTimeFormat(locale(), { weekday: 'short' }).format(new Date(2024, 0, 1 + i)).replace('.', ''))
   .map((n, i) => h('span', { class: `cycle-grid__head${i >= 5 ? ' is-weekend' : ''}` }, n));
 
+const inOpen = (iso, ctx) => !!ctx.open && iso >= ctx.open.from && iso <= ctx.open.to;
+
 /** Ячейка дня и строки праздников этого дня. */
 function dayCell(date, ctx) {
   const iso = isoDate(date);
@@ -250,9 +258,10 @@ function dayCell(date, ctx) {
   const state = STATE[md];
   const weekend = date.getDay() === 0 || date.getDay() === 6;
   const cls = `cycle-day${weekend ? ' is-weekend' : ''}${state ? ' is-state' : ''}${own.length ? ' is-event' : ''}`
+    + `${inOpen(iso, ctx) ? ' is-open' : ''}${iso === ctx.start ? ' is-start' : ''}${iso === ctx.picked ? ' is-picked' : ''}`
     + `${marked ? ' is-period' : ''}${soon ? ' is-soon' : ''}${iso === ctx.today ? ' is-today' : ''}${iso === ctx.editing ? ' is-editing' : ''}`
     + `${ctx.pulse && (marked || soon) && iso >= ctx.today ? ' is-pulse' : ''}`;
-  const names = [state ? t(state) : '', ...own.map((e) => e.title)].filter(Boolean);
+  const names = [iso === ctx.start ? t('cycle.start') : '', state ? t(state) : '', ...own.map((e) => e.title)].filter(Boolean);
   const cell = h('button', { type: 'button', class: cls, title: names.join(' · ') || null, 'aria-pressed': String(marked), 'aria-label': dayMonth(iso), onclick: () => ctx.tap(iso) }, String(date.getDate()));
   const notes = [
     ...(state ? [h('li', { class: 'is-state' }, `${dayMonth(iso)} — ${t(state)}`)] : []),
@@ -326,7 +335,7 @@ function yearGrid(year, ctx, openMonth) {
       const marked = ctx.days.includes(iso);
       const soon = !marked && ctx.soon.has(iso);
       const ev = ctx.events.some((e) => e.md === iso.slice(5));
-      dots.push(h('i', { class: `cycle-mini__d${marked ? ' is-period' : ''}${soon ? ' is-soon' : ''}${ev ? ' is-event' : ''}${iso === ctx.today ? ' is-today' : ''}` }, String(d)));
+      dots.push(h('i', { class: `cycle-mini__d${marked ? ' is-period' : ''}${soon ? ' is-soon' : ''}${ev ? ' is-event' : ''}${iso === ctx.today ? ' is-today' : ''}${inOpen(iso, ctx) ? ' is-open' : ''}${iso === ctx.start ? ' is-start' : ''}${iso === ctx.picked ? ' is-picked' : ''}` }, String(d)));
     }
     const name = new Intl.DateTimeFormat(locale(), { month: 'long' }).format(first);
     return h('button', { type: 'button', class: 'cycle-mini', 'aria-label': t('cycle.openMonth', { month: name }), onclick: () => openMonth(m) },
@@ -400,6 +409,8 @@ function cycleStepper(s, ownCycle, redraw) {
 
 let mode = 'period';
 let editing = null;
+// Выбор даты (поле «Дата старта»): { value, onPick } — тот же календарь, нажатие на число выбирает дату
+let pick = null;
 // Вид календаря: 'roll' — 90 дней вокруг сегодня (по умолчанию), 'year' — весь год, 'month' — месяц из года
 let view = 'roll';
 let shownYear = new Date().getFullYear();
@@ -415,6 +426,7 @@ function content() {
   const redraw = () => { box.replaceWith(content()); paint(); };
   const today = isoDate();
   const now = new Date();
+  const openDays = access.openDays(today);
   const ctx = {
     days,
     soon: predicted(days, sh.cycle, view === 'roll' ? 3 : 15),
@@ -422,7 +434,11 @@ function content() {
     today,
     editing,
     pulse: man, // у мужчины её дни — сегодняшние и будущие — пульсируют
+    start: settings.get().startDate,
+    open: openDays,
+    picked: pick?.value || null,
     tap: (iso) => {
+      if (pick) { const { onPick } = pick; closeSheet(); onPick(iso); return; }
       if (mode === 'event') { editing = iso; redraw(); return; }
       const own = ownDays();
       saveOwn(own.includes(iso) ? own.filter((d) => d !== iso) : [...own, iso]);
@@ -432,16 +448,20 @@ function content() {
   const s = stats(days, sh.cycle);
   const next = s.last ? addDays(s.last.start, s.cycle * Math.max(1, Math.ceil((daysBetween(s.last.start, today) + 1) / s.cycle))) : null;
   add(box,
-    h('p', { class: 'card__text cycle__lead' }, alone ? t('cycle.manAlone') : t(man ? 'cycle.manLead' : 'cycle.lead')),
-    // Что отмечаем нажатием: месячные (у мужчины — её дни) или праздник
-    h('div', { class: 'cycle-mode', role: 'group' },
-      ...['period', 'event'].map((m) => h('button', {
-        type: 'button', class: `btn ${mode === m ? 'btn--gold' : 'btn--ghost'} cycle-mode__btn`, 'aria-pressed': String(mode === m),
-        onclick: () => { mode = m; editing = null; redraw(); },
-      }, t(man && m === 'period' ? 'cycle.manMode' : `cycle.mode.${m}`)))),
-    // Длина цикла: ‹ 27 дн. › — своё число; «по отметкам» — вернуть расчёт
-    cycleStepper(s, man ? own().cycle : sh.cycle, redraw),
-    editing ? eventForm(editing, () => { editing = null; redraw(); }) : h('p', { class: 'faint cycle__hint' }, t(mode === 'event' ? 'cycle.eventHint' : man ? 'cycle.manPeriodHint' : 'cycle.periodHint')),
+    // Доступ: сколько оплаченных (или пробных) дней осталось — зелёным в календаре
+    accessNote(openDays),
+    // Выбор даты — одна подсказка; иначе — что отмечаем нажатием (месячные / праздник) и длина цикла
+    ...(pick ? [h('p', { class: 'card__text cycle__lead' }, t('cycle.pickLead'))] : [
+      h('p', { class: 'card__text cycle__lead' }, alone ? t('cycle.manAlone') : t(man ? 'cycle.manLead' : 'cycle.lead')),
+      h('div', { class: 'cycle-mode', role: 'group' },
+        ...['period', 'event'].map((m) => h('button', {
+          type: 'button', class: `btn ${mode === m ? 'btn--gold' : 'btn--ghost'} cycle-mode__btn`, 'aria-pressed': String(mode === m),
+          onclick: () => { mode = m; editing = null; redraw(); },
+        }, t(man && m === 'period' ? 'cycle.manMode' : `cycle.mode.${m}`)))),
+      // Длина цикла: ‹ 27 дн. › — своё число; «по отметкам» — вернуть расчёт
+      cycleStepper(s, man ? own().cycle : sh.cycle, redraw),
+      editing ? eventForm(editing, () => { editing = null; redraw(); }) : h('p', { class: 'faint cycle__hint' }, t(mode === 'event' ? 'cycle.eventHint' : man ? 'cycle.manPeriodHint' : 'cycle.periodHint')),
+    ]),
     // Вид: 90 дней · весь год (владелец 17.11.2026: «стандартно 90 дней, и возможность открыть весь год»)
     h('div', { class: 'cycle-mode cycle-view', role: 'group' },
       ...['roll', 'year'].map((v) => h('button', {
@@ -455,31 +475,54 @@ function content() {
         h('b', { class: 'cycle-yearnav__year' }, String(shownYear)),
         h('button', { type: 'button', class: 'icon-btn', 'aria-label': t('cycle.nextYear'), onclick: () => { shownYear += 1; redraw(); } }, '›')),
       yearGrid(shownYear, ctx, (m) => { shownMonth = m; view = 'month'; redraw(); }),
-      yearStatsView(days, shownYear, today),
+      ...(pick ? [] : [yearStatsView(days, shownYear, today)]),
     ] : []),
     ...(view === 'month' ? [
       h('button', { type: 'button', class: 'btn btn--ghost cycle-back', onclick: () => { view = 'year'; redraw(); } }, `‹ ${t('cycle.view.year')}`),
       monthGrid(shownYear, shownMonth, ctx),
     ] : []),
     h('ul', { class: 'cycle__legend' },
+      h('li', {}, h('span', { class: 'cycle-dot is-start' }), t('cycle.start')),
+      h('li', {}, h('span', { class: 'cycle-dot is-open' }), t('cycle.openDays')),
       h('li', {}, h('span', { class: 'cycle-dot is-period' }), t('cycle.period')),
       h('li', {}, h('span', { class: 'cycle-dot is-soon' }), t('cycle.soon')),
       h('li', {}, h('span', { class: 'cycle-dot is-event' }), t('cycle.event')),
       h('li', {}, h('span', { class: 'cycle-dot is-state' }), t('cycle.state')),
       h('li', {}, h('span', { class: 'cycle-dot is-weekend' }), t('cycle.weekend'))),
-    (s.count >= 1
+    pick ? null : (s.count >= 1
       ? h('p', { class: 'faint cycle__stats' }, t('cycle.stats', { cycle: s.cycle, len: s.len, next: next ? dayMonth(next) : '—' }))
       : h('p', { class: 'faint cycle__stats' }, t(man ? 'cycle.manEmpty' : 'cycle.empty'))),
   );
   return box;
 }
 
-export function openCalendar() {
+/** Строка про доступ: сколько дней осталось; пробный режим — с предупреждением, что он может остановиться. */
+function accessNote(open) {
+  const date = formatDate(open.to, { day: 'numeric', month: 'long' });
+  const key = open.kind === 'trial' ? (open.left ? 'cycle.access.trial' : 'cycle.access.trialDone') : 'cycle.access.paid';
+  return h('p', { class: `card__text cycle__access${open.kind === 'trial' ? ' is-trial' : ''}` }, t(key, { date, n: open.left }));
+}
+
+/** Один календарь, два входа: кружок в шапке и поле «Дата старта». С pick — выбор даты: нажатие на число отдаёт её. */
+export function openCalendar(opts = {}) {
   share();
   editing = null;
+  const mine = opts.pick ? { value: opts.pick.value, onPick: opts.pick.onPick } : null;
+  pick = mine;
   view = 'roll';
+  shownYear = new Date().getFullYear();
+  // Выбираемая дата за краем ленты «90 дней» — сразу её месяц
+  const v = mine?.value;
+  if (isValidIso(v)) {
+    const { from, to } = windowRange();
+    if (v < from || v > to) { view = 'month'; shownYear = Number(v.slice(0, 4)); shownMonth = Number(v.slice(5, 7)) - 1; }
+  }
   const box = content();
-  openSheet({ title: t('cycle.title'), content: box });
-  // Сегодня — посередине ленты
-  setTimeout(() => box.isConnected && box.querySelector('.cycle-roll .is-today')?.scrollIntoView({ block: 'center' }), 60);
+  openSheet({ title: t(mine ? 'cycle.pickTitle' : 'cycle.title'), content: box, onClose: () => { if (pick === mine) pick = null; } });
+  pick = mine;
+  // Выбранный день, а если его нет — сегодняшний, оказывается на виду
+  setTimeout(() => box.isConnected && (box.querySelector('.is-picked') || box.querySelector('.is-today'))?.scrollIntoView({ block: 'center' }), 60);
 }
+
+/** Выбор даты тем же календарём (поле «Дата старта»). */
+export const pickDate = (value, onPick) => openCalendar({ pick: { value, onPick } });

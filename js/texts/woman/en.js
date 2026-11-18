@@ -1041,6 +1041,11 @@ export default {
     stats: "Cycle about {cycle} days, period about {len} days. Next one around {next}.",
     empty: "Mark the days of your last period and the app will work out the next one.",
     manEmpty: 'Mark her last days yourself, and the app will work out the next ones.',
+    start: 'Start of the training',
+    openDays: 'Access is open',
+    pickTitle: 'Pick a date',
+    pickLead: 'Tap a day — that will be the chosen date.',
+    access: { paid: 'Access is open until {date} inclusive — {n} days left.', trial: 'Trial mode: three weeks, until {date} inclusive — {n} days left. Test mode may stop at any moment.', trialDone: 'The three trial weeks are over. Test mode may stop at any moment.' },
   },
   // Разделы дня — кнопки в шапке «Сегодня» (js/sections/, владелец 17.11.2026)
   sections: {
