@@ -8,7 +8,7 @@ export default {
     sharedTagline: 'Trainings for women and men',
   },
 
-  nav: { today: 'Today', week: 'Week', goals: 'Artifacts', journal: 'Journal', path: 'Path' },
+  nav: { today: 'Today', week: 'Week', goals: 'Artifacts', journal: 'Journal', path: 'Quest' },
   fold: { open: 'Open', close: 'Close' },
   score: {
     totalTitle: 'Total for the day',
@@ -59,7 +59,7 @@ export default {
     kpkHint: 'Formula: compliment — programme — compliment. Keep the compliment short; the programme is what you want, as if he already does it. Join the parts with “and” — it makes the phrase soft and whole.',
     sayTitle: 'What to say',
     weekProgress: 'Done this week: {done}',
-    taskLabel: 'Today’s task',
+    taskLabel: 'Quest of the day',
     flowLead: 'Practise this week’s exercises freely — choose what feels closest today and notice your reactions.',
     exercisesLabel: 'This week’s exercises',
     record: 'Record the result',
@@ -78,9 +78,9 @@ export default {
     catchText: 'You are {percent}% behind. Catch up {days} — you’ve got this.',
     catchDay: 'Day {day} · {date}',
     beforeTitle: 'Starting soon',
-    beforeText: 'Your path begins on {date}. {left} to go.',
-    afterTitle: 'The “New Me” stage is complete',
-    afterText: 'You are a “Woman Plus”. The path goes on: the next stage will open here.',
+    beforeText: 'Your quest begins on {date}. {left} to go.',
+    afterTitle: 'The “New Me” level is complete!',
+    afterText: 'You are a “Woman Plus”. The quest goes on: the next level will open here.',
   },
 
   morning: {
@@ -258,7 +258,7 @@ export default {
   },
 
   week: {
-    title: 'Week',
+    title: 'Quest of the week',
     done: 'done',
     lag: 'You are {percent}% behind',
     onTrack: 'You are in rhythm',
@@ -276,11 +276,11 @@ export default {
   },
 
   path: {
-    title: 'Path',
-    lead: '“New Me” is the beginning of your path. Step by step, month by month.',
+    title: 'A lifelong quest',
+    lead: '“New Me” is the first level of your quest. Step by step, month by month.',
     current: 'Now',
     ahead: 'Ahead',
-    goal: 'Goal of the month',
+    goal: 'Quest of the month',
   },
 
   login: {
@@ -450,10 +450,10 @@ export default {
   },
 
   onboarding: {
-    eyebrow: 'The “New Me” programme',
+    eyebrow: 'The “New Me” quest — a lifelong quest',
     title: 'Welcome',
     lead: 'A path of small steps: one task a day, three warm reminders and your own story in the journal.',
-    begin: 'Begin the path',
+    begin: 'Begin the quest',
     langLabel: 'Language',
     nameLabel: 'What should we call you',
     startLabel: 'When do we start',
