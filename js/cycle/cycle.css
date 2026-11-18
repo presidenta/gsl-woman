@@ -69,14 +69,10 @@ button.cycle-day { cursor: pointer; }
    Красный — её дни, розовый — ожидаемые. При «уменьшить движение» — неподвижное яркое кольцо. */
 .cycle-btn.is-pulse { --pulse: 217, 83, 106; border-color: rgb(var(--pulse)); animation: cycle-ring 1.6s ease-out infinite; }
 .cycle-btn.is-pulse.is-soon { --pulse: 233, 163, 177; }
-/* В календаре пульсирует сам кружок (не вся клетка — иначе билась бы и подсветка выходного): красный — месячные, розовый — ожидаемые */
-.cycle-day.is-pulse::before { --pulse: 217, 83, 106; animation: cycle-disc 1.6s ease-out infinite; }
-.cycle-day.is-soon.is-pulse::before { --pulse: 233, 163, 177; }
+/* Пульсирует ТОЛЬКО кружок в шапке (владелец 18.11.2026: «в календаре никакой пульсации, просто красные кружочки») */
 @keyframes cycle-ring { 0% { box-shadow: 0 0 0 0 rgba(var(--pulse), .75); } 70%, 100% { box-shadow: 0 0 0 9px rgba(var(--pulse), 0); } }
-@keyframes cycle-disc { 0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(var(--pulse), .85); } 70% { transform: scale(1.12); box-shadow: 0 0 0 7px rgba(var(--pulse), 0); } 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(var(--pulse), 0); } }
 @media (prefers-reduced-motion: reduce) {
   .cycle-btn.is-pulse { animation: none; box-shadow: 0 0 0 3px rgba(var(--pulse), .85); }
-  .cycle-day.is-pulse::before { animation: none; box-shadow: 0 0 0 2px rgba(var(--pulse), .85); }
 }
 
 /* Вид календаря (владелец 17.11.2026): «90 дней» — лента недель вокруг сегодня; «Весь год» — 12 маленьких месяцев и
@@ -119,10 +115,10 @@ button.cycle-day { cursor: pointer; }
 
 /* Один календарь (владелец 18.11.2026): оплаченные дни — сама цифра зелёная (месячные остаются белыми на красном);
    выбранная дата — золотом. Ни дорожек, ни точек. */
-.cycle { --open: 96, 192, 150; }
+.cycle { --open: 57, 255, 110; } /* неоновый зелёный: виден и на красном кружке (владелец 18.11.2026) */
 .cycle-day.is-open:not(.is-period):not(.is-picked) { color: rgb(var(--open)); font-weight: 700; }
 /* месячные и оплачено одновременно: просто зелёная цифра в красном кружке (владелец 18.11.2026: «убери обводку») */
-.cycle-day.is-period.is-open { color: rgb(var(--open)); }
+.cycle-day.is-period.is-open { color: rgb(var(--open)); font-weight: 800; text-shadow: 0 1px 2px rgba(60, 0, 20, .55); }
 .cycle-day.is-picked { background: var(--gold, #d9b56a); color: #1b1420; font-weight: 700; }
 .cycle-mini__d.is-open:not(.is-period):not(.is-picked) { color: rgb(var(--open)); font-weight: 700; opacity: 1; }
 .cycle-mini__d.is-period.is-open { color: rgb(var(--open)); }

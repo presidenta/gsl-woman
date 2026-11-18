@@ -263,8 +263,7 @@ function dayCell(date, ctx) {
   const weekend = date.getDay() === 0 || date.getDay() === 6;
   const cls = `cycle-day${weekend ? ' is-weekend' : ''}${state ? ' is-state' : ''}${own.length ? ' is-event' : ''}`
     + `${inOpen(iso, ctx) ? ' is-open' : ''}${iso === ctx.picked ? ' is-picked' : ''}`
-    + `${marked ? ' is-period' : ''}${soon ? ' is-soon' : ''}${iso === ctx.today ? ' is-today' : ''}${iso === ctx.editing ? ' is-editing' : ''}`
-    + `${ctx.pulse && (marked || soon) && iso >= ctx.today ? ' is-pulse' : ''}`;
+    + `${marked ? ' is-period' : ''}${soon ? ' is-soon' : ''}${iso === ctx.today ? ' is-today' : ''}${iso === ctx.editing ? ' is-editing' : ''}`;
   const names = [iso === ctx.start ? t('cycle.start') : '', state ? t(state) : '', ...own.map((e) => e.title)].filter(Boolean);
   const cell = h('button', { type: 'button', class: cls, title: names.join(' · ') || null, 'aria-pressed': String(marked), 'aria-label': dayMonth(iso), onclick: () => ctx.tap(iso) }, String(date.getDate()));
   const notes = [
@@ -451,7 +450,6 @@ function content() {
     events: events(),
     today,
     editing,
-    pulse: true, // сегодняшние и будущие дни месячных и ожидаемые пульсируют (у обеих частей)
     start: settings.get().startDate,
     open: openDays,
     picked: pick?.value || null,
