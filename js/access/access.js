@@ -1,4 +1,5 @@
 import { read, write, writeQuiet, remove } from '../core/store.js';
+import { isoDate, daysBetween } from '../core/dates.js';
 
 /* ДОСТУП К GSL WOMAN+ — как у «Кванта» (planner/web/js/core/access-controller.js; владелец 13.11.2026:
    «принцип как сделали в Кванте, точно так же»).
@@ -61,6 +62,19 @@ export function isOpen(now = Date.now()) {
 export function until() {
   const u = state().until;
   return typeof u === 'number' ? u : null;
+}
+
+/* ДНИ ДОСТУПА В КАЛЕНДАРЕ (владелец 18.11.2026: «выдели цветом, сколько осталось проплаченных дней»).
+   Срок с сервера есть — дни от сегодня до последнего открытого красятся зелёным. Срока нет — бессрочно (или сервер ещё
+   не отвечал): красить нечего. Тест-режим — это настоящий срок в админке (миграция 031: три недели), его продлевают
+   там же. */
+
+/** { kind: 'paid', from, to, left } — from/to включительно, left — сколько дней осталось (с сегодняшним); бессрочно — { kind: 'unlimited' }. */
+export function openDays(todayIso = isoDate()) {
+  const u = until();
+  if (u === null) return { kind: 'unlimited' };
+  const to = isoDate(new Date(u - 1)); // дата наступила — закрыто, значит последний открытый день — накануне
+  return { kind: 'paid', from: todayIso, to, left: Math.max(0, daysBetween(todayIso, to) + 1) };
 }
 
 /** Другой человек на телефоне или выход — прежний срок здесь ни при чём. */

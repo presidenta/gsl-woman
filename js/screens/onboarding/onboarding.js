@@ -4,7 +4,7 @@ import { isoDate, isValidIso } from '../../core/dates.js';
 import * as settings from '../../settings/settings.js';
 import { current as currentAccount } from '../../account/session.js';
 import * as permission from '../../reminders/permission.js';
-import { field } from '../../ui/controls.js';
+import { field, dateField } from '../../ui/controls.js';
 import { icons } from '../../ui/icons.js';
 import { brand } from '../../ui/brand.js';
 import { timeFields } from '../settings/settings.js';
@@ -20,7 +20,7 @@ export function render(view, { onDone }) {
   const draft = { lang: s.lang, name: s.name || accountName, startDate: s.startDate || isoDate(), times: { ...s.times } };
 
   const name = field({ label: t('onboarding.nameLabel'), placeholder: t('settings.namePh'), value: draft.name, maxlength: 40, autocomplete: 'given-name' });
-  const start = field({ label: t('onboarding.startLabel'), hint: t('settings.startHint'), type: 'date', value: draft.startDate });
+  const start = dateField({ label: t('onboarding.startLabel'), hint: t('settings.startHint'), value: draft.startDate });
 
   const begin = h('button', { type: 'button', class: 'btn btn--gold btn--block onboarding__begin' }, t('onboarding.begin'), svg(icons.chevronRight));
   begin.addEventListener('click', async () => {

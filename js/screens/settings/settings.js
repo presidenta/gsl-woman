@@ -7,7 +7,7 @@ import * as permission from '../../reminders/permission.js';
 import { clearAll } from '../../core/store.js';
 import * as sync from '../../sync/sync.js';
 import { nativeCard } from './native-card.js';
-import { field, switchRow, segmented } from '../../ui/controls.js';
+import { field, dateField, switchRow, segmented } from '../../ui/controls.js';
 import * as sections from '../../sections/sections.js';
 import * as push from '../../push/push.js';
 import * as side from '../../side/side.js';
@@ -166,7 +166,7 @@ export function render(view, ctx) {
   const name = field({ label: t('settings.name'), placeholder: t('settings.namePh'), value: s.name, maxlength: 40, autocomplete: 'given-name' });
   name.control.addEventListener('change', () => settings.update({ name: name.control.value.trim() }));
 
-  const start = field({ label: t('settings.start'), hint: t('settings.startHint'), type: 'date', value: s.startDate || '' });
+  const start = dateField({ label: t('settings.start'), hint: t('settings.startHint'), value: s.startDate || '' });
   start.control.addEventListener('change', () => {
     if (isValidIso(start.control.value)) settings.update({ startDate: start.control.value });
   });
