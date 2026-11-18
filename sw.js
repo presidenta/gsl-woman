@@ -15,11 +15,22 @@ const CACHE = PREFIX + self.GSL_VERSION;
 
 /* Файлы кладём по одному, а не addAll: один недоехавший файл не отменяет всю установку — он докачается
    при первом запросе. cache: 'reload' — мимо HTTP-кэша браузера, иначе новая версия могла бы сложить
-   себе вчерашние файлы. */
+   себе вчерашние файлы.
+   Адрес качаем с ?v=НОМЕР_СБОРКИ, а в запас кладём под обычным: раздача сайта (CDN) после выкладки ещё минуты
+   отдаёт часть файлов прежними, и кэш новой версии выходил смесью старых и новых модулей — приложение не
+   запускалось вообще (18.11.2026, сборка 124). Адрес с номером для раздачи новый, значит, берётся с самого сайта. */
+const bust = (url) => url + (url.includes('?') ? '&' : '?') + 'v=' + self.GSL_VERSION;
+
+async function stock(cache, url) {
+  const res = await fetch(new Request(bust(url), { cache: 'reload' }));
+  if (!res.ok) throw new Error(`${url}: ${res.status}`);
+  await cache.put(new Request(url), res);
+}
+
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE).then((cache) =>
-      Promise.allSettled(self.GSL_FILES.map((url) => cache.add(new Request(url, { cache: 'reload' })))),
+      Promise.allSettled(self.GSL_FILES.map((url) => stock(cache, url))),
     ),
   );
   self.skipWaiting();

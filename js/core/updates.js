@@ -24,7 +24,9 @@ export function register({ onUpdated }) {
   }
 
   const hadController = !!navigator.serviceWorker.controller;
-  navigator.serviceWorker.register('./sw.js').then((reg) => {
+  // updateViaCache: 'none' — номер версии (version.js, его читает работник) проверяется мимо HTTP-кэша: новая сборка
+  // приходит при первом открытии, а не через десять минут (кэш раздачи сайта)
+  navigator.serviceWorker.register('./sw.js', { updateViaCache: 'none' }).then((reg) => {
     document.addEventListener('visibilitychange', () => {
       if (document.visibilityState === 'visible') reg.update().catch(() => {});
     });
