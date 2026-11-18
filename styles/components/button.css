@@ -166,7 +166,8 @@
 :root .goals-box__plus,
 :root .chat__send,
 :root .chat__voice-btn,
-:root .account__cam {
+:root .account__cam,
+:root .chip--solid {
   border: 2px solid transparent;
   /* заливка — вырезка из фотографии золота, без дымки; буквы — цвета кромки, светятся, в тёмном контуре («прорезанное золото») */
   background: var(--plate-img) center / cover no-repeat padding-box, var(--rim) border-box;
@@ -181,4 +182,12 @@
 :root .chat__voice-btn svg,
 :root .account__cam svg {
   filter: var(--f-cut);
+}
+
+/* плашка «ДЕНЬ N» — та же золотая вырезка, но маленькая: кромка тоньше, свечение мягче */
+:root .chip--solid {
+  border-width: 1.5px;
+  box-shadow: var(--glow-rim);
+  /* на мелких буквах плотный контур рвёт их — здесь тонкий и мягкий */
+  text-shadow: 0 0 2px rgba(22, 12, 4, 0.95), 0 1px 1px rgba(22, 12, 4, 0.9);
 }
