@@ -454,7 +454,7 @@ function content() {
     open: openDays,
     picked: pick?.value || null,
     tap: (iso) => {
-      if (pick) { const { onPick } = pick; closeSheet(); onPick(iso); return; }
+      if (pick && mode === 'pick') { const { onPick } = pick; closeSheet(); onPick(iso); return; }
       if (mode === 'event') { editing = iso; redraw(); return; }
       const own = ownDays();
       saveOwn(own.includes(iso) ? own.filter((d) => d !== iso) : [...own, iso]);
@@ -470,21 +470,22 @@ function content() {
         type: 'button', class: `btn ${view === v || (v === 'year' && view === 'month') ? 'btn--gold' : 'btn--ghost'} cycle-bar__btn`, 'aria-pressed': String(view === v),
         onclick: () => { view = v; shownYear = now.getFullYear(); redraw(); },
       }, t(`cycle.view.${v}`))),
-      ...(pick ? [] : [
-        h('span', { class: 'cycle-bar__gap' }),
-        ...['event', 'period'].map((m) => h('button', {
-          type: 'button', class: `btn ${mode === m ? 'btn--gold' : 'btn--ghost'} cycle-bar__btn`, 'aria-pressed': String(mode === m),
-          onclick: () => { mode = m; editing = null; redraw(); },
-        }, t(man && m === 'period' ? 'cycle.manMode' : `cycle.mode.${m}`))),
-        infoButton(helpOpen, t('cycle.helpLabel'), () => { helpOpen = !helpOpen; redraw(); }),
-      ])),
+      h('span', { class: 'cycle-bar__gap' }),
+      ...['event', 'period'].map((m) => h('button', {
+        type: 'button', class: `btn ${mode === m ? 'btn--gold' : 'btn--ghost'} cycle-bar__btn`, 'aria-pressed': String(mode === m),
+        // При выборе даты (поле «Дата старта») обе кнопки не нажаты и число выбирает дату; нажал «Месячные» или «Праздник» —
+        // календарь отмечает дни, ещё раз на ту же — снова выбор даты (владелец 18.11.2026: «один календарь, все кнопки на месте»)
+        onclick: () => { mode = pick && mode === m ? 'pick' : m; editing = null; redraw(); },
+      }, t(man && m === 'period' ? 'cycle.manMode' : `cycle.mode.${m}`))),
+      infoButton(helpOpen, t('cycle.helpLabel'), () => { helpOpen = !helpOpen; redraw(); })),
+    pick && mode === 'pick' ? h('p', { class: 'faint cycle__hint' }, t('cycle.pickLead')) : null,
     // Пояснение к «Месячные» — только по галочке
-    helpOpen && !pick ? h('div', { class: 'cycle__help' },
+    helpOpen ? h('div', { class: 'cycle__help' },
       h('p', { class: 'card__text' }, alone ? t('cycle.manAlone') : t(man ? 'cycle.manLead' : 'cycle.lead')),
       h('p', { class: 'faint cycle__hint' }, t(man ? 'cycle.manPeriodHint' : 'cycle.periodHint'))) : null,
     // Длина цикла — одной строкой
-    ...(pick ? [] : [cycleStepper(s, man ? own().cycle : sh.cycle, redraw, () => yearStatsView(days, now.getFullYear(), today))]),
-    editing && !pick ? eventForm(editing, () => { editing = null; redraw(); }) : null,
+    cycleStepper(s, man ? own().cycle : sh.cycle, redraw, () => yearStatsView(days, now.getFullYear(), today)),
+    editing ? eventForm(editing, () => { editing = null; redraw(); }) : null,
     ...(view === 'roll' ? [rollingGrid(ctx)] : []),
     ...(view === 'year' ? [
       h('div', { class: 'cycle-yearnav' },
@@ -506,9 +507,9 @@ function content() {
       h('li', {}, h('span', { class: 'cycle-dot is-weekend' }), t('cycle.weekend'))),
     // Срок доступа: до какого числа и сколько дней осталось (тест-режим может остановиться в любой момент)
     openDays.kind === 'paid' ? accessNote(openDays) : null,
-    pick ? null : (s.count >= 1
+    s.count >= 1
       ? h('p', { class: 'faint cycle__stats' }, t('cycle.stats', { cycle: s.cycle, len: s.len, next: next ? dayMonth(next) : '—' }))
-      : h('p', { class: 'faint cycle__stats' }, t(man ? 'cycle.manEmpty' : 'cycle.empty'))),
+      : h('p', { class: 'faint cycle__stats' }, t(man ? 'cycle.manEmpty' : 'cycle.empty')),
   );
   return box;
 }
@@ -526,6 +527,7 @@ export function openCalendar(opts = {}) {
   lenOpen = false;
   const mine = opts.pick ? { value: opts.pick.value, onPick: opts.pick.onPick } : null;
   pick = mine;
+  mode = mine ? 'pick' : 'period';
   view = 'roll';
   shownYear = new Date().getFullYear();
   // Выбираемая дата за краем ленты «90 дней» — сразу её месяц
