@@ -148,12 +148,14 @@
   border: 1.5px solid transparent;
   background: var(--face-dark) padding-box, var(--rim) border-box;
   color: var(--on-dark);
+  text-shadow: var(--sh-cut), var(--text-glow);
   box-shadow: var(--glow-rim);
 }
 
 /* Невыбранные вкладки выбора из вариантов — буквы тоже золотые (в «Кванте» — цвета кромки) */
 :root .segmented__option:not([aria-checked='true']) {
   color: var(--on-dark);
+  text-shadow: var(--sh-cut), var(--text-glow);
 }
 
 /* ОДИН СТИЛЬ ВСЕХ ЗОЛОТЫХ КНОПОК (владелец 18.11.2026: «золото должно быть везде одинаковое, один стиль на все золотые
@@ -166,11 +168,17 @@
 :root .chat__voice-btn,
 :root .account__cam {
   border: 2px solid transparent;
-  background: var(--face-gold), var(--rim) border-box;
-  color: var(--on-plate);
-  text-shadow: 0 1px 0 var(--on-plate-shadow);
+  /* заливка — вырезка из фотографии золота, без дымки; буквы — цвета кромки, светятся, в тёмном контуре («прорезанное золото») */
+  background: var(--plate-img) center / cover no-repeat padding-box, var(--rim) border-box;
+  color: var(--c-on-metal);
+  text-shadow: var(--sh-cut), var(--text-glow);
   box-shadow: var(--glow-gold);
 }
-:root .btn--gold svg {
-  filter: none;
+:root .btn--gold svg,
+:root .goals__add svg,
+:root .goals-box__plus svg,
+:root .chat__send svg,
+:root .chat__voice-btn svg,
+:root .account__cam svg {
+  filter: var(--f-cut);
 }

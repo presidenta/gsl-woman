@@ -80,22 +80,14 @@
 
   /* Светящаяся кромка кнопок — как в «Кванте» (владелец 18.11.2026): перелив через белое, под ней тёмное «зеркало»,
      вокруг свечение. Здесь — розовое золото; у мужской части те же имена, золотые значения (side-man.css). */
-  /* Золотая отливка — не фотография, а нарисованный металл с зеркальным бликом (как --pult-face-gold-soft «Кванта»):
-     чистая, яркая, без «тумана» плиты. Здесь — розовое золото. */
-  --face-gold:
-    linear-gradient(118deg, rgba(255, 247, 241, 0.5) 0%, rgba(255, 247, 241, 0) 34%) padding-box,
-    radial-gradient(58% 130% at 97% 13%, rgba(255, 255, 255, 0.42) 0%, rgba(255, 255, 255, 0) 60%) padding-box,
-    linear-gradient(298deg, rgba(122, 58, 48, 0.3) 0%, rgba(122, 58, 48, 0) 32%) padding-box,
-    radial-gradient(135% 52% at 46% 79%, rgba(138, 66, 54, 0.42) 0%, rgba(138, 66, 54, 0) 100%) padding-box,
-    radial-gradient(150% 40% at 52% 112%, rgba(255, 241, 233, 0.58) 0%, rgba(255, 241, 233, 0) 64%) padding-box,
-    linear-gradient(180deg, #fde8da 0%, #f6d0bb 7%, #eeb7a0 30%, #e5a48c 56%, #d89580 80%, #c9826c 91%, #f4c9b4 100%) padding-box;
-  --on-dark: #f9d6c2;   /* буквы на тёмном «зеркале» — цвета кромки, яркие */
+  /* Заливка золотых кнопок — вырезка из фотографии розового золота (assets/textures/rose-gold.jpg), как плита «Кванта» */
+  --plate-img: var(--g-rose-img);
+  --on-dark: #fcdccb;   /* буквы на тёмных кнопках — цвета кромки, яркие; контур — --sh-cut */
+  --text-glow: 0 0 10px rgba(248, 186, 166, 0.45);
   --rim: linear-gradient(135deg, #fff1e6 0%, #f8cdb6 13%, #ffffff 25%, #e6a38b 38%, #ffeade 52%, #d48f78 66%, #fff3ea 80%, #c57f69 100%);
   --face-dark: linear-gradient(180deg, #2f2126 0%, #231a1e 7%, #1b1216 30%, #150e11 56%, #110a0d 80%, #0e080a 91%, #2e2227 100%);
   --glow-rim: 0 0 0 1px rgba(20, 6, 8, 0.9), 0 0 16px rgba(244, 170, 150, 0.42), 0 3px 10px rgba(0, 0, 0, 0.55);
   --glow-gold: 0 0 0 1px rgba(20, 6, 8, 0.9), 0 0 22px rgba(248, 186, 166, 0.62), 0 4px 12px rgba(0, 0, 0, 0.6);
-  --on-plate: #3b1710;
-  --on-plate-shadow: rgba(255, 240, 232, 0.42);
   --g-page:
     radial-gradient(110% 60% at 92% -8%, rgba(233, 165, 164, 0.17), transparent 62%),
     radial-gradient(90% 55% at -12% 12%, rgba(239, 196, 166, 0.11), transparent 58%),
