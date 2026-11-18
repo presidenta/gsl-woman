@@ -143,3 +143,8 @@ button.cycle-day { cursor: pointer; }
 .cycle__help p { margin: 0; }
 .cycle__access { margin-top: -6px; }
 .cycle-len .cycle-hist { margin-top: 6px; }
+
+/* «Весь год»: 13 месяцев, текущий — посередине (владелец 18.11.2026); текущий месяц выделен золотом */
+.cycle-mini.is-now { border-color: var(--c-gold, #d9b56a); }
+.cycle-mini.is-now .cycle-mini__title { color: var(--c-gold, #d9b56a); }
+.cycle-yearnav__year { min-width: 0; font-size: 15px; }

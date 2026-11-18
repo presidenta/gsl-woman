@@ -132,3 +132,32 @@
   text-decoration-color: rgba(var(--rgb-gold), 0.35);
   text-underline-offset: 4px;
 }
+
+/* СВЕТЯЩАЯСЯ КРОМКА (владелец 18.11.2026: «обводки тёмные, сделай светящиеся, как в Кванте; в женской — розовые»).
+   Цвета — токены части (tokens.css — розовое золото, side-man.css — золото). Префикс :root поднимает вес правил над
+   базовыми стилями кнопок и выбора из вариантов, которые подключены позже. */
+:root .btn:not(.btn--gold):not(.btn--danger),
+:root .icon-btn:not(.cycle-btn),
+:root .cycle-btn:not(.is-period):not(.is-soon):not(.is-pulse),
+:root .segmented,
+:root .cycle-info {
+  border: 1.5px solid transparent;
+  background: var(--face-dark) padding-box, var(--rim) border-box;
+  box-shadow: var(--glow-rim);
+}
+
+/* золотые кнопки и выбранная вкладка — яркая плита, тёмные буквы, свечение */
+:root .btn--gold,
+:root .segmented__option[aria-checked='true'] {
+  border: 2px solid transparent;
+  background:
+    linear-gradient(180deg, rgba(255, 246, 200, 0.5) 0%, rgba(255, 226, 130, 0.14) 52%, rgba(255, 240, 170, 0.3) 100%) padding-box,
+    var(--plate-img) center / cover no-repeat padding-box,
+    var(--rim) border-box;
+  color: var(--on-plate);
+  text-shadow: 0 1px 0 var(--on-plate-shadow);
+  box-shadow: var(--glow-gold);
+}
+:root .btn--gold svg {
+  filter: none;
+}

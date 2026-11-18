@@ -327,8 +327,14 @@ function rollingGrid(ctx) {
 }
 
 /** «Весь год»: 12 маленьких месяцев с цветными днями; нажатие на месяц — он целиком, с отметками. */
-function yearGrid(year, ctx, openMonth) {
-  const months = [...Array(12)].map((_, m) => {
+function yearGrid(center, ctx, openMonth) {
+  const nowY = new Date().getFullYear();
+  const nowM = new Date().getMonth();
+  // 13 месяцев: шесть до текущего, текущий — седьмой, посередине, шесть после (владелец 18.11.2026)
+  const months = [...Array(13)].map((_, k) => {
+    const idx = center - 6 + k;
+    const year = Math.floor(idx / 12);
+    const m = ((idx % 12) + 12) % 12;
     const first = new Date(year, m, 1);
     const lead = (first.getDay() + 6) % 7;
     const count = new Date(year, m + 1, 0).getDate();
@@ -342,11 +348,18 @@ function yearGrid(year, ctx, openMonth) {
       dots.push(h('i', { class: `cycle-mini__d${dow === 0 || dow === 6 ? ' is-weekend' : ''}${STATE[iso.slice(5)] ? ' is-state' : ''}${marked ? ' is-period' : ''}${soon ? ' is-soon' : ''}${ev ? ' is-event' : ''}${iso === ctx.today ? ' is-today' : ''}${inOpen(iso, ctx) ? ' is-open' : ''}${iso === ctx.picked ? ' is-picked' : ''}` }, String(d)));
     }
     const name = new Intl.DateTimeFormat(locale(), { month: 'long' }).format(first);
-    return h('button', { type: 'button', class: 'cycle-mini', 'aria-label': t('cycle.openMonth', { month: name }), onclick: () => openMonth(m) },
-      h('span', { class: 'cycle-mini__title caps' }, name),
+    const title = year === nowY ? name : `${name} ${year}`;
+    return h('button', { type: 'button', class: `cycle-mini${year === nowY && m === nowM ? ' is-now' : ''}`, 'aria-label': t('cycle.openMonth', { month: title }), onclick: () => openMonth(year, m) },
+      h('span', { class: 'cycle-mini__title caps' }, title),
       h('span', { class: 'cycle-mini__grid' }, ...dots));
   });
   return h('div', { class: 'cycle-year' }, ...months);
+}
+
+/** Подпись окна «Весь год»: «май 2026 — май 2027». */
+function yearRange(center) {
+  const f = (idx) => new Intl.DateTimeFormat(locale(), { month: 'short', year: 'numeric' }).format(new Date(Math.floor(idx / 12), ((idx % 12) + 12) % 12, 1)).replace(' г.', '');
+  return `${f(center - 6)} — ${f(center + 6)}`;
 }
 
 /** Статистика года: средние и история циклов полосками (цикл — полоса, месячные — красная часть). */
@@ -431,6 +444,9 @@ let lenOpen = false;
 // Вид календаря: 'roll' — 90 дней вокруг сегодня (по умолчанию), 'year' — весь год, 'month' — месяц из года
 let view = 'roll';
 let shownYear = new Date().getFullYear();
+// «Весь год» — окно из 13 месяцев вокруг месяца yearCenter (год*12 + месяц); по умолчанию — текущий в середине
+const nowIndex = () => new Date().getFullYear() * 12 + new Date().getMonth();
+let yearCenter = nowIndex();
 let shownMonth = 0;
 
 function content() {
@@ -468,7 +484,7 @@ function content() {
     h('div', { class: 'cycle-bar', role: 'group' },
       ...['roll', 'year'].map((v) => h('button', {
         type: 'button', class: `btn ${view === v || (v === 'year' && view === 'month') ? 'btn--gold' : 'btn--ghost'} cycle-bar__btn`, 'aria-pressed': String(view === v),
-        onclick: () => { view = v; shownYear = now.getFullYear(); redraw(); },
+        onclick: () => { view = v; shownYear = now.getFullYear(); yearCenter = nowIndex(); redraw(); },
       }, t(`cycle.view.${v}`))),
       h('span', { class: 'cycle-bar__gap' }),
       ...['event', 'period'].map((m) => h('button', {
@@ -489,10 +505,10 @@ function content() {
     ...(view === 'roll' ? [rollingGrid(ctx)] : []),
     ...(view === 'year' ? [
       h('div', { class: 'cycle-yearnav' },
-        h('button', { type: 'button', class: 'icon-btn', 'aria-label': t('cycle.prevYear'), onclick: () => { shownYear -= 1; redraw(); } }, '‹'),
-        h('b', { class: 'cycle-yearnav__year' }, String(shownYear)),
-        h('button', { type: 'button', class: 'icon-btn', 'aria-label': t('cycle.nextYear'), onclick: () => { shownYear += 1; redraw(); } }, '›')),
-      yearGrid(shownYear, ctx, (m) => { shownMonth = m; view = 'month'; redraw(); }),
+        h('button', { type: 'button', class: 'icon-btn', 'aria-label': t('cycle.prevYear'), onclick: () => { yearCenter -= 12; redraw(); } }, '‹'),
+        h('b', { class: 'cycle-yearnav__year' }, yearRange(yearCenter)),
+        h('button', { type: 'button', class: 'icon-btn', 'aria-label': t('cycle.nextYear'), onclick: () => { yearCenter += 12; redraw(); } }, '›')),
+      yearGrid(yearCenter, ctx, (y, m) => { shownYear = y; shownMonth = m; view = 'month'; redraw(); }),
     ] : []),
     ...(view === 'month' ? [
       h('button', { type: 'button', class: 'btn btn--ghost cycle-back', onclick: () => { view = 'year'; redraw(); } }, `‹ ${t('cycle.view.year')}`),
@@ -530,6 +546,7 @@ export function openCalendar(opts = {}) {
   mode = mine ? 'pick' : 'period';
   view = 'roll';
   shownYear = new Date().getFullYear();
+  yearCenter = nowIndex();
   // Выбираемая дата за краем ленты «90 дней» — сразу её месяц
   const v = mine?.value;
   if (isValidIso(v)) {

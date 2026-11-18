@@ -53,7 +53,8 @@ function joinForm(view, ctx) {
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
     try {
-      await circles.join(input.value);
+      // Код вставляют как придётся (с пробелом, строчными) — приводим к виду кода
+      await circles.join(input.value.replace(/\s+/g, '').toUpperCase());
       joining = false;
       toast({ title: t('us.join.done') });
       ctx.rerender();
@@ -93,7 +94,13 @@ function emptyState(view, ctx, which) {
 function codeCard(ctx, circle) {
   const c = code[circle.id];
   const label = circle.kind === 'pair' ? t('us.code.pair') : t('us.code.family');
-  const show = h('p', { class: 'us-code gold-text' }, c ? `${c.code.slice(0, 3)} ${c.code.slice(3)}` : '· · · · · ·');
+  // Копирование кода (владелец 18.11.2026: «код делится на две части — сделай, чтобы копировался нажатием»): цельный код,
+  // нажал на него или на «Скопировать» — он в буфере целиком, без пробела
+  const copy = async () => {
+    if (!c) return;
+    try { await navigator.clipboard.writeText(c.code); toast({ title: t('us.code.copied') }); } catch { /* копирование недоступно — код виден на экране */ }
+  };
+  const show = h('button', { type: 'button', class: 'us-code gold-text', 'aria-label': t('us.code.copy'), onclick: copy }, c ? c.code : '······');
   const fresh = async () => {
     try {
       code[circle.id] = await circles.invite(circle.id);
@@ -108,13 +115,7 @@ function codeCard(ctx, circle) {
     show,
     h('p', { class: 'card__text faint' }, t('us.code.text')),
     h('div', { class: 'card__actions us-empty__actions' },
-      h('button', {
-        type: 'button', class: 'btn btn--gold btn--block',
-        onclick: async () => {
-          if (!c) return;
-          try { await navigator.clipboard.writeText(c.code); toast({ title: t('us.code.copied') }); } catch { /* копирование недоступно — код виден на экране */ }
-        },
-      }, t('us.code.copy')),
+      h('button', { type: 'button', class: 'btn btn--gold btn--block', onclick: copy }, t('us.code.copy')),
       h('button', { type: 'button', class: 'btn btn--ghost btn--block', onclick: fresh }, t('us.code.fresh')),
     ),
     circle.kind === 'pair' ? h('p', { class: 'faint us-waiting' }, t('us.code.waiting')) : null,
@@ -139,7 +140,8 @@ function leaveButton(ctx, circle) {
 }
 
 function pairView(view, ctx, circle) {
-  if (!circles.isComplete(circle)) return [memberList(circle), codeCard(ctx, circle), leaveButton(ctx, circle)];
+  // Ждём второго человека: сверху — фото влюблённой пары (js/photos/: us.invite), как у «Семьи» (владелец 18.11.2026)
+  if (!circles.isComplete(circle)) return [h('section', { class: 'card us-head has-photo' }, photoOf('us.invite'), memberList(circle)), codeCard(ctx, circle), leaveButton(ctx, circle)];
   const tabs = ['chat', 'wishes'];
   return [
     // Фото пары (js/photos/: us.pair) — меняется по дням
@@ -181,7 +183,7 @@ export function render(view, ctx) {
   );
   const circle = kind === 'pair' ? circles.pair() : circles.family();
   if (!circle) {
-    add(view, emptyState(view, ctx, kind));
+    add(view, ...(kind === 'pair' ? [h('section', { class: 'card us-head has-photo' }, photoOf('us.invite'))] : []), emptyState(view, ctx, kind));
     return;
   }
   add(view, ...(kind === 'pair' ? pairView(view, ctx, circle) : familyView(view, ctx, circle)));
