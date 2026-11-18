@@ -18,7 +18,7 @@ import { waterCard } from '../../water/water-card.js';
 import { foldCard } from '../../ui/fold.js';
 import { kegelCard } from '../../habits/kegel-card.js';
 import { stepsCard } from '../../habits/steps-card.js';
-import { state as sectionsOpen, sectionButtons, sectionBlock, bizCard, womanPlusCard } from '../../sections/sections.js';
+import { state as sectionsOpen, picked as sectionPicked, sectionButtons, sectionBlock, bizCard, womanPlusCard } from '../../sections/sections.js';
 import * as sideOf from '../../side/side.js';
 import { pulseCard } from '../../pulse/pulse.js';
 import { voiceCheck } from '../../voice-check/voice-check.js';
@@ -41,6 +41,7 @@ import { dayScore, pointsOf, taskPoints, pointsLabel } from '../../score/score.j
    2. «Можно наверстать» — если в этой неделе есть пропуски.
    3. Стакан тёплой воды — сразу после пробуждения: человек сам кладёт в него составляющие (js/water/).
    3½. Утренняя минута: выбор 1, 2 или 3 минуты (Минимум / 100% / Максимум), счёт вверх со звуком каждую секунду.
+       Показывается, когда открыт раздел «Здоровье» и отмечен пункт «Утренняя минута»; стоит СРАЗУ за стаканом воды.
    4. Дело дня: задание с уровнями / свободный поток / седьмой день с созвоном и отзывом месяца.
    5. Что уже записано сегодня.
    6. Привычки дня — Кегель и шаги (js/habits/), в самом конце — стакан воды на ночь (js/water/). */
@@ -553,6 +554,9 @@ export function render(view, ctx) {
       catchUp(ctx, summary),
       // Стакан тёплой воды — сразу после пробуждения (js/water/README.md)
       waterCard(ctx),
+      // Утренняя минута — сразу за стаканом воды, как с самого начала (владелец 18.11.2026): она из раздела «Здоровье»
+      // (включается там же, по галочке), но стоит в утреннем порядке, а не внизу вместе с Кегелем и шагами
+      open.health && sectionPicked('health', 'minute', ctx.settings) ? morningCard(ctx, plan) : null,
       main,
       // Замер недели — в день итога: три оценки «что изменилось» (js/pulse/, владелец 17.11.2026)
       pulseCard(ctx, plan),
@@ -565,9 +569,8 @@ export function render(view, ctx) {
         { id: 'repeat', build: () => repeatCard(plan) },
         { id: 'search', build: () => meetLink(plan, ctx) },
       ]) : null,
-      // «Здоровье»: утренняя минута, Кегель, шаги — человек сам собирает, что показывать
+      // «Здоровье»: Кегель, шаги, стакан на ночь — человек сам собирает, что показывать (утренняя минута — выше, за стаканом воды)
       open.health ? sectionBlock(ctx, 'health', [
-        { id: 'minute', build: () => morningCard(ctx, plan) },
         { id: 'kegel', build: () => kegelCard(ctx) },
         { id: 'steps', build: () => stepsCard(ctx) },
         // Стакан на ночь — в «Здоровье», по выбору (владелец 17.11.2026: «утром — всегда, на ночь — если надо»)
