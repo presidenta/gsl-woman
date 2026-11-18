@@ -277,8 +277,8 @@ export default {
   },
 
   path: {
-    title: 'A lifelong quest',
-    lead: '“New Me” is the first level of your quest. Step by step, month by month.',
+    title: 'Quest',
+    lead: 'A lifetime game. “New Me” is the first level: step by step, month by month.',
     current: 'Now',
     ahead: 'Ahead',
     goal: 'Quest of the month',
@@ -547,7 +547,7 @@ export default {
       join: 'I have a code',
     },
     code: {
-      pair: 'A code for her',
+      pair: 'An invitation to the quest',
       family: 'A code for the second parent',
       text: 'The code works for 24 hours, once: the other person opens “Shared quests” → “I have a code”.',
       copy: 'Copy',
@@ -1085,7 +1085,7 @@ export default {
       rest: "Today is a day off: rest and time with your loved ones.",
       title: 'Good morning',
       titleNamed: 'Good morning, {name}',
-      task: 'Today’s task is waiting for you. Start with a glass of warm water, and in 10–15 minutes — a minute of energy.',
+      task: 'Your “I⁺ • Love” quest of the day is waiting for you. Start with a glass of warm water, and in 10–15 minutes — a minute of energy.',
       flow: 'Free flow: a glass of warm water, a minute of energy and one thing in the love language.',
       call: 'Today is the week review and your call with your mentor.',
       callReview: 'Today is the month review, your call with your mentor and a live testimonial.',

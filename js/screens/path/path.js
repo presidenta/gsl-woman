@@ -4,6 +4,7 @@ import { weekOf, monthOf } from '../../core/dates.js';
 import { outline, shapeOfWeek } from '../../program/index.js';
 import { weekSummary } from '../../progress/progress.js';
 import { pulseChart } from '../../pulse/pulse.js';
+import { questMark } from '../../quest/quest.js';
 
 /* ЭКРАН «ПУТЬ»: шесть месяцев по четыре недели. Текущий месяц раскрыт, в нём подсвечена текущая
    неделя; у пройденных недель — процент выполнения. Названия будущих недель видны: путь целиком
@@ -32,7 +33,8 @@ export function render(view, ctx) {
   const currentMonth = currentWeek ? monthOf(currentWeek) : 1;
 
   add(view,
-    h('h1', { class: 'screen-title' }, t('path.title')),
+    // «Квест «Я⁺ • Любовь»» и «Игра длиною в жизнь» (владелец 18.11.2026)
+    h('h1', { class: 'screen-title quest-title' }, t('path.title'), questMark({ quoted: true })),
     h('p', { class: 'screen-lead' }, t('path.lead')),
     // Замер недели: три линии «что изменилось» (js/pulse/)
     pulseChart(),

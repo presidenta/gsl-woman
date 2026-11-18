@@ -112,7 +112,8 @@ function codeCard(ctx, circle) {
   };
   if (!c) queueMicrotask(fresh);
   return h('section', { class: 'card card--hero us-invite' },
-    h('p', { class: 'caps' }, label),
+    // «Приглашение в квест «Я⁺ • Любовь»» (владелец 18.11.2026) — у пары; у семьи — код для второго родителя
+    h('p', { class: 'caps' }, label, circle.kind === 'pair' ? [' ', questMark({ quoted: true })] : null),
     show,
     h('p', { class: 'card__text faint' }, t('us.code.text')),
     h('div', { class: 'card__actions us-empty__actions' },

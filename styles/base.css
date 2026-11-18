@@ -201,13 +201,16 @@ img, svg {
   white-space: nowrap;
 }
 
+/* Плюс в степени — крупный и жирный, как буква (владелец 18.11.2026: «везде, где есть этот значок плюс, он должен
+   быть в степени и массивный, заметный… такой как буква») */
 .brand__plus {
   display: inline-block;
-  margin-left: 0.06em;
-  font-size: 0.74em;
+  margin-left: 0.04em;
+  font-family: var(--f-body);
+  font-size: 1.05em;
   font-style: normal;
-  font-weight: 600;
-  vertical-align: 0.5em;
+  font-weight: 800;
+  vertical-align: 0.62em;
   line-height: 0;
 }
 

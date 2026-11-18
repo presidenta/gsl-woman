@@ -49,6 +49,7 @@ import * as install from './install/install.js';
 import * as media from './media/photos.js';
 import * as preview from './preview/preview.js';
 import { usedPhotoIds } from './media/used.js';
+import { questMark } from './quest/quest.js';
 
 /* ВХОД В ПРИЛОЖЕНИЕ: каркас (шапка, область экрана, нижняя панель), маршруты, перерисовка при
    изменениях, напоминания и работник. Экраны ничего не знают друг о друге: каждый получает ctx —
@@ -140,7 +141,8 @@ function buildShell() {
   const gear = h('a', { class: 'icon-btn', href: '#/settings', 'aria-label': t('common.settings') }, svg(icons.gear));
   // «Мы» — пара и семья (circles/): красная точка — есть новое сообщение
   const us = h('a', { class: 'icon-btn us-btn', href: '#/us', 'aria-label': t('us.open') }, svg(icons.rings), h('span', { class: 'us-btn__dot', hidden: true }));
-  const brand = h('div', { class: 'app-header__brand gold-text' }, brandMark());
+  // Под названием — мелкая метка квеста «Я⁺ • Любовь» (владелец 18.11.2026)
+  const brand = h('div', { class: 'app-header__brand gold-text' }, brandMark(), h('span', { class: 'app-header__quest' }, questMark()));
   const who = identity();
   const view = h('main', { class: 'app-view', id: 'view', tabindex: '-1' });
   const nav = h('nav', { class: 'app-nav', 'aria-label': t('app.name') },
