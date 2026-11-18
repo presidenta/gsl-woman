@@ -17,11 +17,14 @@
 }
 
 .card--hero {
-  border: 1px solid transparent;
+  /* Главная рамка — та же светящаяся кромка, что у кнопок (владелец 18.11.2026: «одинаковая, как у всех кнопок, яркая»):
+     перелив --rim и свечение --glow-rim; цвет — токены части (золото у мужской, розовое золото у женской) */
+  border: 1.5px solid transparent;
   background:
     var(--g-rose-glow) padding-box,
     linear-gradient(var(--c-bg-raise), var(--c-bg-raise)) padding-box,
-    var(--g-gold) border-box;
+    var(--rim) border-box;
+  box-shadow: var(--glow-rim);
   overflow: hidden;
 }
 
