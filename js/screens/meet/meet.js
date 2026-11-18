@@ -2,7 +2,7 @@ import { h, svg, add } from '../../core/dom.js';
 import { t, formatDate } from '../../core/i18n.js';
 import { icons } from '../../ui/icons.js';
 import { toast } from '../../ui/toast.js';
-import { field, dateField } from '../../ui/controls.js';
+import { field } from '../../ui/controls.js';
 import * as meet from '../../meet/meet.js';
 import { flagRow, flagTotal, picked } from '../../ui/flags.js';
 import { platePanel } from '../../ui/plate.js';
@@ -73,7 +73,7 @@ function themesBlock(data) {
 
 function notesCard(ctx, data, signals) {
   const who = field({ label: t('meet.who'), placeholder: t('meet.whoPh'), maxlength: 60 });
-  const date = dateField({ label: t('meet.date'), value: ctx.todayIso });
+  const date = field({ label: t('meet.date'), type: 'date', value: ctx.todayIso });
   const answers = data.notes.prompts.map((p) => field({ label: p, multiline: true, rows: 2, maxlength: meet.MAX_TEXT }));
 
   const form = h('form', { class: 'meet__form' },

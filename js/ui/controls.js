@@ -1,6 +1,5 @@
 import { h, svg } from '../core/dom.js';
-import { t, formatDate } from '../core/i18n.js';
-import { pickDate } from '../cycle/cycle.js';
+import { t } from '../core/i18n.js';
 import { icons } from './icons.js';
 
 /* РЕГУЛИРОВКИ — готовые элементы с доступностью (роли, aria-checked, управление стрелками).
@@ -88,27 +87,6 @@ export function field({ label, hint, multiline = false, ...attrs }) {
   const node = h('div', { class: 'field' },
     h('label', { class: 'field__label', for: id }, label),
     attrs.type === 'password' ? passwordEye(control) : control,
-    hint ? h('p', { class: 'field__hint' }, hint) : null,
-  );
-  return { node, control };
-}
-
-/** Поле даты — без своего календаря: нажатие открывает общий (js/cycle/), владелец 18.11.2026 «один календарь».
-    Как у field: { node, control }; control.value — дата ГГГГ-ММ-ДД, при выборе у него приходит 'change'. */
-export function dateField({ label, hint, value = '' }) {
-  const id = 'f-' + Math.random().toString(36).slice(2, 8);
-  const control = h('input', { type: 'hidden', value });
-  const text = h('span', { class: 'date-field__text' });
-  const paint = () => { text.textContent = control.value ? formatDate(control.value, { day: 'numeric', month: 'long', year: 'numeric' }) : '—'; };
-  const button = h('button', { type: 'button', id, class: 'input date-field', onclick: () => pickDate(control.value, (iso) => {
-    control.value = iso;
-    paint();
-    control.dispatchEvent(new Event('change'));
-  }) }, text, svg(icons.calendar));
-  paint();
-  const node = h('div', { class: 'field' },
-    h('label', { class: 'field__label', for: id }, label),
-    button, control,
     hint ? h('p', { class: 'field__hint' }, hint) : null,
   );
   return { node, control };

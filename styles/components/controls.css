@@ -56,15 +56,12 @@
   background: rgba(var(--rgb-ink), 0.5);
 }
 
-/* Время: системный выбор оставляем, перекрашиваем значок под тему (дата — общий календарь, dateField) */
-.input[type='time'] {
+/* Время и дата: системный выбор оставляем, перекрашиваем значок под тему */
+.input[type='time'],
+.input[type='date'] {
   color-scheme: dark;
   font-variant-numeric: tabular-nums;
 }
-
-/* Поле даты без своего календаря: открывает общий (js/cycle/) */
-.date-field { display: flex; align-items: center; justify-content: space-between; gap: 8px; text-align: left; cursor: pointer; font-variant-numeric: tabular-nums; }
-.date-field svg { width: 20px; height: 20px; flex: none; opacity: .75; }
 
 /* — Выбор одного из нескольких: язык, уровень выполнения — */
 .segmented {
