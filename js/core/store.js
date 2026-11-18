@@ -49,6 +49,14 @@ export function read(key, fallback = null) {
 
 /** Записать значение и сообщить подписчикам, какой ключ изменился. */
 export function write(key, value) {
+  writeQuiet(key, value);
+  emit(key);
+}
+
+/** Записать, не будя подписчиков: служебное значение, которое экран не меняет (метка времени «видели часы»). Такая
+    запись внутри отрисовки, да ещё с «будящим» write, запускала перерисовку по кругу: экран мигал 140 раз в секунду, и
+    ни одно нажатие не доходило до кнопки (18.11.2026, срок доступа у владельца). */
+export function writeQuiet(key, value) {
   const full = STORAGE_PREFIX + key;
   const raw = JSON.stringify(value);
   memory.set(full, raw);
@@ -59,7 +67,6 @@ export function write(key, value) {
       // Переполнено или запрещено: значение остаётся в памяти, страница работает дальше
     }
   }
-  emit(key);
 }
 
 /** Удалить один ключ. */

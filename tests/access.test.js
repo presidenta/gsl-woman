@@ -54,3 +54,23 @@ test('выход или другой человек — прежний срок 
   access.forget();
   assert.equal(access.isOpen(now), true);
 });
+
+// Круг перерисовок (18.11.2026): isOpen зовут из каждой отрисовки — он не должен будить подписчиков хранилища,
+// иначе экран перерисовывается без остановки и кнопки не нажимаются.
+test('isOpen при конечном сроке не будит подписчиков и пишет метку часов не чаще раза в минуту', async () => {
+  const { subscribe } = await import('../js/core/store.js');
+  access.remember('2026-12-01T00:00:00Z', now);
+  let woken = 0;
+  const off = subscribe(() => { woken += 1; });
+  for (let i = 0; i < 50; i++) assert.equal(access.isOpen(now + i * 100), true);
+  assert.equal(woken, 0, 'ни одной записи с оповещением');
+  assert.equal(access.isOpen(now + 5 * 60 * 1000), true);
+  assert.equal(woken, 0, 'и через пять минут метка пишется тихо');
+  off?.();
+});
+
+test('метка часов всё же двигается (защита от перевода часов назад работает)', () => {
+  access.remember('2026-12-01T00:00:00Z', now);
+  access.isOpen(now + 5 * DAY / 24);
+  assert.equal(access.isOpen(now - 3 * DAY), false, 'часы ушли назад больше чем на 12 часов — закрыто');
+});

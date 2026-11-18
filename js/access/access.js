@@ -1,4 +1,4 @@
-import { read, write, remove } from '../core/store.js';
+import { read, write, writeQuiet, remove } from '../core/store.js';
 
 /* ДОСТУП К GSL WOMAN+ — как у «Кванта» (planner/web/js/core/access-controller.js; владелец 13.11.2026:
    «принцип как сделали в Кванте, точно так же»).
@@ -16,6 +16,7 @@ import { read, write, remove } from '../core/store.js';
 const KEY = 'access';
 const UNLIMITED = 'unlimited';
 const CLOCK_TOLERANCE_MS = 12 * 60 * 60 * 1000;
+const CLOCK_WRITE_EVERY_MS = 60 * 1000;
 
 function state() {
   const s = read(KEY, null);
@@ -50,7 +51,9 @@ export function isOpen(now = Date.now()) {
   // Сервер ещё ни разу не прислал срок (старый сервер, первый запуск) или бессрочно — открыто
   if (s.until === null || s.until === undefined || s.until === UNLIMITED) return true;
   if (s.clock && now < s.clock - CLOCK_TOLERANCE_MS) return false;
-  if (now > (s.clock || 0)) save({ ...s, clock: now });
+  // Метку «видели часы» обновляем не чаще раза в минуту и тихо: isOpen зовут из каждой отрисовки, а запись с
+  // оповещением запускала отрисовку заново — бесконечный круг, кнопки не нажимались (18.11.2026)
+  if (now > (s.clock || 0) + CLOCK_WRITE_EVERY_MS) writeQuiet(KEY, { ...s, clock: now });
   return now < s.until;
 }
 
