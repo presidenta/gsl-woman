@@ -155,10 +155,13 @@ export function paint() {
   button.classList.toggle('is-soon', care === 'soon' || care === 'near');
   // У мужчины кружок пульсирует в её дни и за два дня до ожидаемых (владелец 17.11.2026: «чтобы мужчина не мог просто
   // не обратить внимания»)
-  const pulse = side.get() === 'man' && care !== null;
+  // Пульсирует у обеих частей (владелец 18.11.2026: «куда пропала пульсация»): красным — идут месячные, розовым —
+  // ожидаются или начнутся через день-два. Подсказка «больше тепла и заботы» — только мужчине.
+  const pulse = care !== null;
+  const manNote = pulse && side.get() === 'man';
   button.classList.toggle('is-pulse', pulse);
-  button.setAttribute('aria-label', pulse ? `${t('cycle.open')}. ${t('cycle.manAlert')}` : t('cycle.open'));
-  button.title = pulse ? t('cycle.manAlert') : '';
+  button.setAttribute('aria-label', manNote ? `${t('cycle.open')}. ${t('cycle.manAlert')}` : t('cycle.open'));
+  button.title = manNote ? t('cycle.manAlert') : '';
 }
 
 /** Что сегодня: 'period' — отмеченный день, 'soon' — ожидаемый, 'near' — ожидаемые через день-два, null — обычный. */
@@ -448,7 +451,7 @@ function content() {
     events: events(),
     today,
     editing,
-    pulse: man, // у мужчины её дни — сегодняшние и будущие — пульсируют
+    pulse: true, // сегодняшние и будущие дни месячных и ожидаемые пульсируют (у обеих частей)
     start: settings.get().startDate,
     open: openDays,
     picked: pick?.value || null,
