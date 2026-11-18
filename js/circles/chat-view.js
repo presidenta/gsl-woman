@@ -132,17 +132,62 @@ function openPhoto(src) {
 const atOf = (x) => x.data?.at || x.updatedAt;
 let composing = false;
 
+// Какое своё сообщение правится сейчас (id) и набранная правка — вне отрисовки: экран перерисовывается, когда приходит новое
+let editingId = null;
+let editDraft = '';
+
+/** Поле правки своего сообщения: «Сохранить» кладёт новый текст в ту же запись (автор прежний), «Отмена» — как было. */
+function editBox(circle, m, api) {
+  const area = h('textarea', { class: 'textarea chat__edit', rows: '2', maxlength: String(MAX), 'aria-label': t('us.chat.editMsg') });
+  area.value = editDraft;
+  area.addEventListener('input', () => { editDraft = area.value; });
+  const close = (li) => { editingId = null; editDraft = ''; li.replaceWith(bubble(circle, m, api)); };
+  return h('div', { class: 'chat__editbox' }, area,
+    h('div', { class: 'chat__actions' },
+      h('button', {
+        type: 'button', class: 'btn btn--gold btn--small',
+        onclick: (e) => {
+          const text = area.value.trim().slice(0, MAX);
+          const li = e.currentTarget.closest('li');
+          if (!text) return;
+          editingId = null;
+          editDraft = '';
+          if (text === m.data?.text) { li.replaceWith(bubble(circle, m, api)); return; }
+          api.put('msg', m.id, { ...m.data, text, edited: true });
+        },
+      }, t('us.chat.saveMsg')),
+      h('button', { type: 'button', class: 'btn btn--ghost btn--small', onclick: (e) => close(e.currentTarget.closest('li')) }, t('us.chat.cancel'))),
+  );
+}
+
+/** Под своим сообщением — «Редактировать» (если есть текст) и «Удалить» (владелец 18.11.2026: «ошибочно нажал — и не
+    удалить; пусть будут кнопки»). Сервер даёт править и удалять запись только автору. */
+function msgActions(circle, m, api) {
+  const d = m.data || {};
+  return h('div', { class: 'chat__actions' },
+    d.text ? h('button', {
+      type: 'button', class: 'chat__act',
+      onclick: (e) => { editingId = m.id; editDraft = d.text; const li = e.currentTarget.closest('li'); li.replaceWith(bubble(circle, m, api)); },
+    }, t('us.chat.editMsg')) : null,
+    h('button', {
+      type: 'button', class: 'chat__act is-danger',
+      onclick: () => { if (confirm(t('us.chat.deleteAsk'))) api.drop('msg', m.id); },
+    }, t('us.chat.deleteMsg')));
+}
+
 function bubble(circle, m, api) {
   const mine = m.author === circle.me;
   const d = m.data || {};
+  const editing = mine && editingId === m.id;
   const time = new Date(d.at || m.updatedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   return h('li', { class: `chat__msg ${mine ? 'is-mine' : 'is-theirs'} ${sideClass(circle, m.author)}${d.signal ? ` is-signal is-${d.signal}` : ''}${d.photo ? ' has-photo' : ''}` },
     mine ? null : h('span', { class: 'chat__who' }, api.name(m.author)),
     d.signal ? h('span', { class: 'chat__signal' }, svg(SIGNAL_ICON[d.signal] || icons.sparkle, 'chat__signal-icon'), t(`us.chat.signals.${d.signal}`)) : null,
     d.photo && api.media ? photoNote(api, d.photo) : null,
     d.audio && api.media ? voiceNote(api, d.audio) : null,
-    d.text ? h('span', { class: 'chat__text' }, d.text) : null,
-    h('span', { class: 'chat__time' }, time),
+    editing ? editBox(circle, m, api) : d.text ? h('span', { class: 'chat__text' }, d.text) : null,
+    h('span', { class: 'chat__time' }, d.edited ? `${time} · ${t('us.chat.edited')}` : time),
+    mine && !editing && api.drop ? msgActions(circle, m, api) : null,
     // Сердечки и смайлики под сообщением (chat-extras.js)
     reactionsRow(api, m),
   );

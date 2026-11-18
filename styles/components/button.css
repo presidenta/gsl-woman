@@ -140,15 +140,25 @@
 :root .icon-btn:not(.cycle-btn),
 :root .cycle-btn:not(.is-period):not(.is-soon):not(.is-pulse),
 :root .segmented,
-:root .cycle-info {
+:root .cycle-info,
+:root .chat__quick:not(.is-urgent),
+:root .chat__reply,
+:root .chat__tool,
+:root .chat__act:not(.is-danger) {
   border: 1.5px solid transparent;
   background: var(--face-dark) padding-box, var(--rim) border-box;
   box-shadow: var(--glow-rim);
 }
 
-/* золотые кнопки и выбранная вкладка — яркая плита, тёмные буквы, свечение */
+/* ОДИН СТИЛЬ ВСЕХ ЗОЛОТЫХ КНОПОК (владелец 18.11.2026: «золото должно быть везде одинаковое, один стиль на все золотые
+   кнопки»): яркая плита, тёмные буквы, свечение. Новая золотая кнопка — просто добавить её класс в этот список. */
 :root .btn--gold,
-:root .segmented__option[aria-checked='true'] {
+:root .segmented__option[aria-checked='true'],
+:root .goals__add,
+:root .goals-box__plus,
+:root .chat__send,
+:root .chat__voice-btn,
+:root .account__cam {
   border: 2px solid transparent;
   background:
     linear-gradient(180deg, rgba(255, 246, 200, 0.5) 0%, rgba(255, 226, 130, 0.14) 52%, rgba(255, 240, 170, 0.3) 100%) padding-box,
