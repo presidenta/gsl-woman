@@ -19,10 +19,9 @@ let typedLogin = '';     // язык сменили посреди ввода �
 export function render(view, { mode = 'form', message = '', onLogin, onRetry }) {
 
   // Название общее на две части — GSL (W+M)⁺: до входа ещё неизвестно, кто входит (владелец 13.11.2026)
-  // Приветствие квеста «Я⁺ • Любовь» (js/quest/, владелец 18.11.2026): картинка на языке приложения и слоган
+  // Приветствие квеста «Я⁺ • Любовь» (js/quest/): картинка на языке приложения; слоган — только на ней (19.11.2026)
   const hero = [
     questBanner(),
-    h('p', { class: 'quest-slogan' }, t('quest.slogan')),
     h('h1', { class: 'onboarding__brand gold-text' }, brand('', t('app.shared'))),
     h('p', { class: 'onboarding__tagline' }, t('app.sharedTagline')),
   ];

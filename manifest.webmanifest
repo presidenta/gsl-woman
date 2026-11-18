@@ -1,8 +1,8 @@
 {
   "id": "./",
-  "name": "GSL (W+M)⁺ — тренінги для жінок і чоловіків",
+  "name": "GSL (W+M)⁺ — квест для чоловіків і жінок, а також їхніх батьків",
   "short_name": "GSL (W+M)⁺",
-  "description": "GSL Woman+ і GSL Man+: щоденні завдання тренінгу, нагадування і твоя історія змін.",
+  "description": "GSL Woman+ і GSL Man+: щоденні завдання квесту, нагадування і твоя історія змін.",
   "start_url": "./#/today",
   "scope": "./",
   "display": "standalone",

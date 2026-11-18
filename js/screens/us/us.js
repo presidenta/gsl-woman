@@ -176,7 +176,8 @@ function familyView(view, ctx, circle) {
 export function render(view, ctx) {
   add(view,
     // «Совместные квесты «Я⁺ • Любовь»» (владелец 18.11.2026: «чтобы понимали — совместные квесты чего»)
-    h('h1', { class: 'screen-title quest-title' }, t('us.title'), questMark({ quoted: true })),
+    // Пара — «Совместные квесты», семья — «Командные квесты» (владелец 19.11.2026: заголовок по выбранной вкладке)
+    h('h1', { class: 'screen-title quest-title' }, t(kind === 'family' ? 'us.titleFamily' : 'us.title'), questMark({ quoted: true })),
     segmented({
       label: t('us.title'),
       options: [{ value: 'pair', label: t('us.pair') }, { value: 'family', label: t('us.family') }],

@@ -21,12 +21,13 @@ export function questMark({ cls = '', quoted = false } = {}) {
   return h('span', { class: 'quest-mark__quoted' }, t('quest.qOpen'), mark, t('quest.qClose'));
 }
 
+/** Картинка приветствия на всю ширину: сверху «дышит», снизу её же край, отражённый и затемнённый, уходит в тёмный
+    изумрудный лес (владелец 19.11.2026: «из тёмного леса смотрим, как там сидит пара… снизу как продолжение»). */
 export function questBanner(cls = '') {
   const lang = BANNER_LANGS.includes(getLang()) ? getLang() : 'ru';
-  return h('img', {
-    class: `quest-banner ${cls}`.trim(),
-    src: `assets/quest/banner-${lang}.webp`,
-    alt: t('quest.bannerAlt'),
-    width: '1280', height: '720', fetchpriority: 'high',
-  });
+  const src = `assets/quest/banner-${lang}.webp`;
+  return h('div', { class: `quest-hero ${cls}`.trim() },
+    h('img', { class: 'quest-hero__img', src, alt: t('quest.bannerAlt'), width: '1280', height: '720', fetchpriority: 'high' }),
+    h('div', { class: 'quest-hero__deep', 'aria-hidden': 'true', style: { backgroundImage: `url("${src}")` } }),
+  );
 }

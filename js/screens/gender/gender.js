@@ -75,8 +75,7 @@ export function render(view, { onChoose }) {
 
   // Сцена квеста «Я⁺ • Любовь» — та же, что у входа: часть ещё не выбрана (js/quest/, 18.11.2026)
   add(view, h('div', { class: 'onboarding login gender quest-scene' },
-    questBanner('quest-banner--small'),
-    h('p', { class: 'quest-slogan' }, t('quest.slogan')),
+    questBanner(),
     h('h1', { class: 'onboarding__brand gold-text' }, brand('', t('app.shared'))),
     h('h2', { class: 'gender__ask' }, t('gender.title')),
     h('p', { class: 'onboarding__lead' }, t('gender.lead')),

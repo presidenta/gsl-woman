@@ -3,9 +3,9 @@
 export default {
   app: {
     name: 'GSL Woman+',
-    tagline: 'Trainings for women',
+    tagline: 'A quest for women',
     shared: 'GSL (W+M)+',
-    sharedTagline: 'Trainings for women and men',
+    sharedTagline: 'A quest for men and women — and their parents',
   },
 
   nav: { today: 'Today', week: 'Week', goals: 'Artifacts', journal: 'Journal', path: 'Quest' },
@@ -406,7 +406,6 @@ export default {
     qOpen: '“',
     qClose: '”',
     bannerAlt: 'GSL • Global Life Game. Quest № 1 in the world — I⁺ • Love. A lifetime game. Play. Evolve. Love. Create. Earn. A new concept for personal development, relationships and income opportunities.',
-    slogan: 'Play. Evolve. Love. Create. Earn.',
   },
   settings: {
     title: 'Tuning',
@@ -530,6 +529,7 @@ export default {
   // «Мы»: пара и семья (сборка 42, docs/TZ-para-semya.md)
   us: {
     title: 'Shared quests',
+    titleFamily: 'Team quests',
     pair: 'Couple',
     family: 'Family',
     open: 'Couple and family',
@@ -596,7 +596,7 @@ export default {
     chat: {
       react: "Reaction",
       repliesTitle: "Quick replies",
-      quickReplies: ["Love you ❤️", "Will do 👍", "Thank you 🙏", "Miss you 😘", "On my way 🏃"],
+      quickReplies: ["Love you ❤️", "Will do 👍", "Thank you 🙏", "Miss you 🥰", "On my way 🏃", "Smiling 😊", "Hugging you tight 🤗", "Intriguing 😏"],
       thanksWeek: "Thanks this week: {n} of {goal}. Tell someone close what you are grateful for.",
       thanksDone: "Thanks this week: {n}. Your warmth gets through.",
       council: { title: "Family council of the week", start: "Start the council", sets: [["What made you happy this week?", "What would you like next week?", "Who in the family shall we thank?"], ["What was the warmest moment of the week?", "What shall we do together at the weekend?", "Who helped whom this week?"], ["What did each of us learn this week?", "What do we dream about as a family?", "What shall we do for grandma and grandpa?"], ["What was hard, and how did we cope?", "What one house rule shall we add?", "What surprise shall we plan for mum or dad?"]] },
@@ -1056,7 +1056,7 @@ export default {
     stats: "Cycle about {cycle} days, period about {len} days. Next one around {next}.",
     empty: "Mark the days of your last period and the app will work out the next one.",
     manEmpty: 'Mark her last days yourself, and the app will work out the next ones.',
-    start: 'Start of the training',
+    start: 'Start of the quest',
     openDays: 'Access is open',
     pickTitle: 'Pick a date',
     pickLead: 'Tap a day — that will be the chosen date.',
