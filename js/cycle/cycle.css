@@ -27,7 +27,11 @@ button.cycle-day { cursor: pointer; }
 .cycle-day.is-period::before { background: #c94a62; }
 .cycle-day.is-soon { color: #f3c6cf; }
 .cycle-day.is-soon::before { background: rgba(233, 163, 177, .32); }
-.cycle-day.is-today::after { content: ""; position: absolute; inset: 12%; border-radius: 50%; border: 1px solid var(--gold, #d9b56a); pointer-events: none; }
+/* Сегодня — ярко-золотой светящийся кружок (владелец 18.11.2026); у месячных — золотое светящееся кольцо вокруг красного */
+.cycle { --today: 240, 194, 75; }
+.cycle-day.is-today::after { content: ""; position: absolute; inset: 19%; z-index: -1; border-radius: 50%; border: 2px solid rgb(var(--today)); box-shadow: 0 0 10px 2px rgba(var(--today), .75); pointer-events: none; }
+.cycle-day.is-today:not(.is-period):not(.is-soon):not(.is-picked)::after { background: radial-gradient(circle at 35% 30%, #ffe08a, rgb(var(--today)) 70%); }
+.cycle-day.is-today:not(.is-period):not(.is-soon):not(.is-picked) { color: #2a1a05; font-weight: 800; }
 .cycle-day.is-editing { outline: 2px dashed var(--gold, #d9b56a); outline-offset: 1px; }
 .cycle__legend { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px 16px; font-size: 13px; }
 .cycle__legend li { display: flex; align-items: center; gap: 6px; }
@@ -94,7 +98,8 @@ button.cycle-day { cursor: pointer; }
 .cycle-mini__d.is-period { background: #c94a62; color: #fff; opacity: 1; font-weight: 700; border-radius: 50%; }
 .cycle-mini__d.is-soon { background: rgba(233, 163, 177, .35); opacity: 1; border-radius: 50%; }
 .cycle-mini__d.is-event { box-shadow: inset 0 0 0 1px var(--gold, #d9b56a); opacity: 1; }
-.cycle-mini__d.is-today { outline: 1px solid var(--gold, #d9b56a); opacity: 1; }
+.cycle-mini__d.is-today { outline: 1.5px solid rgb(240, 194, 75); box-shadow: 0 0 5px 1px rgba(240, 194, 75, .8); opacity: 1; }
+.cycle-mini__d.is-today:not(.is-period):not(.is-soon):not(.is-picked) { background: rgb(240, 194, 75); color: #2a1a05; font-weight: 800; border-radius: 50%; outline: 0; }
 
 .cycle-hist { display: grid; gap: 4px; }
 .cycle-hist__list { list-style: none; margin: 6px 0 0; padding: 0; display: grid; gap: 8px; }
@@ -114,11 +119,11 @@ button.cycle-day { cursor: pointer; }
    выбранная дата — золотом. Ни дорожек, ни точек. */
 .cycle { --open: 96, 192, 150; }
 .cycle-day.is-open:not(.is-period):not(.is-picked) { color: rgb(var(--open)); font-weight: 700; }
-/* месячные и оплачено одновременно: зелёная цифра с белой каёмкой, чтобы читалась на красном */
-.cycle-day.is-period.is-open { color: rgb(var(--open)); -webkit-text-stroke: 2px #fff; paint-order: stroke fill; }
+/* месячные и оплачено одновременно: просто зелёная цифра в красном кружке (владелец 18.11.2026: «убери обводку») */
+.cycle-day.is-period.is-open { color: rgb(var(--open)); }
 .cycle-day.is-picked { background: var(--gold, #d9b56a); color: #1b1420; font-weight: 700; }
 .cycle-mini__d.is-open:not(.is-period):not(.is-picked) { color: rgb(var(--open)); font-weight: 700; opacity: 1; }
-.cycle-mini__d.is-period.is-open { color: rgb(var(--open)); -webkit-text-stroke: 1.5px #fff; paint-order: stroke fill; }
+.cycle-mini__d.is-period.is-open { color: rgb(var(--open)); }
 .cycle-mini__d.is-picked { background: var(--gold, #d9b56a); color: #1b1420; opacity: 1; }
 /* легенда: «Доступ открыт» — зелёное число, «Выходные» — тонированная клетка */
 .cycle-dot.is-open { width: auto; height: auto; border-radius: 0; background: none; color: rgb(var(--open)); font-weight: 700; font-size: 13px; line-height: 1; }
