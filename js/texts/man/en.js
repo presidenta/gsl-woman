@@ -330,8 +330,8 @@ export default {
       noMic: 'The microphone is busy or switched off',
       local: 'The voice is backed up and moves to your other phone',
     },
-    title: 'Артефакты',
-    lead: 'Всё ценное — под рукой: цели, вопросы, комплименты, знания.',
+    title: 'Artifacts',
+    lead: 'Everything valuable at hand: goals, questions, compliments, knowledge.',
     placeholder: 'New goal',
     add: 'Add goal',
     text: 'Goal',
@@ -581,7 +581,7 @@ export default {
       add: 'Add a child',
       ph: 'Child’s name',
       save: 'Add',
-      hint: 'Each child has their own cabinet: login, stars and confirmations are in the «Дети» tab below.',
+      hint: 'Each child has their own cabinet: login, stars and confirmations are in the “Children” tab below.',
       remove: 'Remove',
     },
     chat: {
@@ -850,19 +850,19 @@ export default {
   },
   // «Библиотека» и «Красный флаг» — свои экраны (владелец 15.11.2026)
   library: {
-    title: 'Библиотека',
-    lead: 'Читать и возвращаться: что ей нужно от тебя, авторы мужской стороны, темы, правила дома, идеи свиданий.',
+    title: 'Library',
+    lead: 'To read and come back to: what she needs from you, authors for the men’s side, topics, house rules, date ideas.',
   },
   // У «compliments» уже есть пул фраз (массив) — подпись плашки под своим именем
   complimentsPlate: {
-    lead: 'Готовые слова — открыть и сказать сегодня',
+    lead: 'Ready words — open them and say them today',
   },
   redflag: {
-    title: 'Красный флаг',
-    ban: 'Оценивать запрещено',
+    title: 'Red flag',
+    ban: 'Grading is forbidden',
   },
   help: {
-    intro: 'Короткие — если мало времени, глубокие — когда есть целый вечер. Под вопросами — как понимать ответ.',
+    intro: 'Short ones when time is tight, deep ones when you have a whole evening. Under the questions — how to read the answer.',
     flagsHint: 'Under each question, tick how the person answered — the result appears below.',
     total: 'Result',
     greenCount: 'Green flags',
@@ -877,8 +877,8 @@ export default {
     rulesRemove: 'Remove the rule',
     rulesEdit: 'Tap to edit',
     rulesSaved: 'Rule added',
-    title: 'Вопросы',
-    lead: 'Для разговора: коротко, если мало времени, и глубоко, когда есть вечер',
+    title: 'Questions',
+    lead: 'For a talk: brief when time is short, deep when you have an evening',
     meetTitle: 'First date',
     library: 'Library',
     draft: 'draft',
@@ -907,11 +907,11 @@ export default {
   // Вопрос на вечер — вдвоём (js/evening/, 15.11.2026)
   // Стержень недели — мужская сторона (js/stem/, 15.11.2026)
   stem: {
-    markHint: 'Сделал шаг — хоть маленький — уже +1 балл.',
-    mark: 'Сделал',
-    markDone: 'Сделал — +1 балл',
-    again: 'Сделаю позже',
-    againToast: 'Упражнение ждёт тебя всю неделю',
+    markHint: 'You took a step — even a small one — that’s +1 point.',
+    mark: 'Done',
+    markDone: 'Done — +1 point',
+    again: 'Later',
+    againToast: 'The exercise waits for you all week',
   },
   evening: {
     markHint: 'Even five minutes together is a talk — and +1 point.',

@@ -47,3 +47,9 @@ test('ящик взрослого и синхронизация: письма е
 test('тексты писем — положительными словами', () => {
   for (const s of strings(LT)) assert.doesNotMatch(s, NEGATIVE, s);
 });
+
+test('тексты писем — на трёх языках, ключи одинаковые, в английском русского нет (18.11.2026)', () => {
+  const keys = (o, w = '') => Object.entries(o).flatMap(([k, v]) => (typeof v === 'object' ? keys(v, `${w}${k}.`) : [`${w}${k}`]));
+  for (const l of ['ua', 'en']) assert.deepEqual(keys(LT[l]), keys(LT.ru), l);
+  for (const s of strings(LT.en)) assert.doesNotMatch(s, /[а-яёіїєґ]/i, s);
+});
