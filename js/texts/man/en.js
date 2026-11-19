@@ -406,6 +406,8 @@ export default {
     mark: 'I⁺ • Love',
     qOpen: '“',
     qClose: '”',
+    zoomOpen: 'Open the picture full screen',
+    zoomHint: 'Spread two fingers to zoom in. Double-tap for a closer look.',
     bannerAlt: 'GSL • Global Life Game. Quest № 1 in the world — I⁺ • Love. A lifetime game. Play. Evolve. Love. Create. Earn. A new concept for personal development, relationships and income opportunities.',
   },
   settings: {
