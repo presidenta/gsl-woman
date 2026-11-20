@@ -342,6 +342,13 @@ function flowCard(ctx, plan) {
     body: [
     h('p', { class: 'task__text' }, plan.flow || t('today.flowLead')),
     plan.flow ? h('p', { class: 'card__text' }, t('today.flowLead')) : null,
+    // Что сказать в дни практики — как в карточке задания (у недели 5: имя любимого и слова ему)
+    plan.flowSay?.length
+      ? h('div', { class: 'task__block' },
+        h('p', { class: 'caps task__block-title' }, t('today.sayTitle')),
+        h('ul', { class: 'task__say' }, ...plan.flowSay.map(sayItem)),
+      )
+      : null,
     plan.tasks.length
       ? h('div', {},
         h('p', { class: 'caps', style: { margin: 'var(--sp-5) 0 var(--sp-2)' } }, t('today.exercisesLabel')),

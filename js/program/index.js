@@ -34,6 +34,8 @@ export function weekPlan(week, lang) {
     // Задания — в словах профиля отношений (profile/, владелец 14.11.2026): у каждого из четырёх свои слова
     tasks: w.tasks.map((t) => applyTask(t, currentProfile())),
     flow: w.flow,
+    // Фразы дней практики (сервер, поле flowSay; сейчас у недели 5 — имя любимого и слова ему, владелец 21.11.2026)
+    flowSay: w.flowSay || [],
     // Весёлые фразы дней своей практики (сервер: woman/teasers/, владелец 15.11.2026); у задания — task.teaser
     teasers: w.teasers || [],
     biz: w.biz || null,
