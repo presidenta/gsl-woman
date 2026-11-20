@@ -49,7 +49,7 @@ test('сумма дня складывается из всех отметок', 
   deeds.toggle(ISO, 'evening'); // «Мы поговорили» — вопрос на вечер (evening/)
   deeds.toggle(ISO, 'stem'); // «Сделал» — стержень недели (stem/)
   const s = dayScore(ISO, 2, [{ day: 2, kind: 'task', level: 'min' }], { talk: true });
-  assert.deepEqual(s.parts, { water: 1, minute: 3, task: 1, imsg: 0, love: 1, evening: 1, stem: 1, talk: 1, kegel: 2, steps: 2, night: 1, search: 0 });
+  assert.deepEqual(s.parts, { water: 1, minute: 3, task: 1, imsg: 0, love: 1, evening: 1, stem: 1, talk: 1, thanks: 0, kegel: 2, steps: 2, night: 1, search: 0 });
   assert.equal(s.total, 14);
 });
 

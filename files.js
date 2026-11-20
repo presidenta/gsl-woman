@@ -351,6 +351,8 @@ self.GSL_FILES = [
   './js/texts/woman/en.js',
   './js/texts/woman/ru.js',
   './js/texts/woman/ua.js',
+  './js/thanks/thanks.css',
+  './js/thanks/thanks.js',
   './js/ui/ask.js',
   './js/ui/brand.js',
   './js/ui/controls.js',

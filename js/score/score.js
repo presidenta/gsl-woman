@@ -32,8 +32,8 @@ export function taskPoints(entries, day) {
   return best;
 }
 
-/** Все баллы дня по частям — для шапки и итога. talk — отметка «Мы поговорили» (знает circles/talk.js). */
-export function dayScore(iso, day, entries, { talk = false } = {}) {
+/** Все баллы дня по частям — для шапки и итога. talk — отметка «Мы поговорили» (знает circles/talk.js), thanks — своя «Благодарность недели» (thanks/). */
+export function dayScore(iso, day, entries, { talk = false, thanks = false } = {}) {
   const parts = {
     water: waterLog.isDone(iso) ? 1 : 0,
     minute: pointsOf(morningLog.levelOf(iso)),
@@ -43,6 +43,7 @@ export function dayScore(iso, day, entries, { talk = false } = {}) {
     evening: deeds.isDone(iso, 'evening') ? 1 : 0, // «Мы поговорили» — вопрос на вечер (evening/)
     stem: deeds.isDone(iso, 'stem') ? 1 : 0, // «Сделал» — стержень недели у мужчин (stem/)
     talk: talk ? 1 : 0,
+    thanks: thanks ? 1 : 0, // «Благодарность недели» — своя запись в паре (thanks/)
     kegel: pointsOf(kegelLevel(iso)),
     steps: pointsOf(stepsLevel(stepsOf(iso))),
     night: waterLog.night.isDone(iso) ? 1 : 0,

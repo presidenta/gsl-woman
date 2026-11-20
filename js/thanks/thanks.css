@@ -1,0 +1,14 @@
+/* «БЛАГОДАРНОСТЬ НЕДЕЛИ» (js/thanks/): своя запись и запись партнёра в 7-й день */
+.thanks__write { margin-top: var(--sp-3); }
+.thanks__input { width: 100%; }
+.thanks__entry {
+  margin-top: var(--sp-3);
+  padding: var(--sp-3);
+  border-radius: 14px;
+  border: 1px solid color-mix(in srgb, var(--c-gold) 35%, transparent);
+  background: color-mix(in srgb, var(--c-gold) 6%, transparent);
+}
+.thanks__entry.is-wait { border-style: dashed; background: none; }
+.thanks__who { margin: 0 0 var(--sp-1); color: var(--c-gold); }
+.thanks__text { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; }
+.thanks__edit { margin-top: var(--sp-2); }
