@@ -12,6 +12,7 @@ import { childrenBlock, dreamsView } from '../../circles/family-view.js';
 import { kidsView } from '../../kids/parent-view.js';
 import { kt } from '../../kids/texts.js';
 import { familyDreamCard } from '../../kids/family-dream.js';
+import { teamCard } from '../../team/team-view.js';
 import { familyApi } from '../../kids/family-api.js';
 import { kidAlerts } from '../../kids/alerts.js';
 import { photoOf } from '../../photos/photos.js';
@@ -162,6 +163,8 @@ function familyView(view, ctx, circle) {
   const tabLabel = (k) => (k === 'kids' ? `${kt('parent.tab')}${alerts ? ` · ${alerts} 🔴` : ''}` : t(`us.tabs.${k}`));
   return [
     h('section', { class: 'card us-head has-photo' }, photoOf('us.family'), memberList(circle)),
+    // Командная цель семьи — 10 звёзд за день, доля каждого ребёнка, неделя (team/, владелец 21.11.2026)
+    teamCard(familyApi(circle), { rerender: ctx.rerender }),
     // Мечта нашей семьи — общий котёл звёзд (kids/family-dream.js)
     familyDreamCard(familyApi(circle), { rerender: ctx.rerender }),
     childrenBlock(circle, fail),

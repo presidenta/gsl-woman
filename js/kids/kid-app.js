@@ -16,6 +16,8 @@ import { SKILL_SECTIONS, SKILLS, DREAM_CATEGORIES } from './catalog.js';
 import { gamesFor, gameById, gameForm, minusButton, hiddenBlock } from './games-list.js';
 import { levelOf, starsOf, skillCount, skillStep, okMap, familyScore, gamesOf } from './stars.js';
 import { familyDreamCard } from './family-dream.js';
+// Командная цель семьи — 10 звёзд за день, доля ребёнка, неделя (../team/, владелец 21.11.2026)
+import { teamCard } from '../team/team-view.js';
 import { careersView, stepTitle, doStep } from './careers.js';
 import { KID_LETTER_PROMPTS } from './dreams-catalog.js';
 import { lettersCard } from '../letters/letters-view.js';
@@ -228,7 +230,9 @@ function familyCard(api) {
 }
 
 function todayView(api) {
-  return [levelCard(api), powerCard(api), familyDreamCard(api, { rerender: draw }), planCard(api), helpCard(api), familyCard(api)];
+  // «Звёзды семьи за неделю» — внутри командной карточки (кто сколько внёс); отдельная карточка — только если команды нет
+  const team = teamCard(api, { rerender: draw });
+  return [levelCard(api), team, powerCard(api), familyDreamCard(api, { rerender: draw }), planCard(api), helpCard(api), team ? null : familyCard(api)];
 }
 
 /* ---------- Навыки ---------- */
