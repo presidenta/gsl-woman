@@ -274,6 +274,7 @@ function taskCard(ctx, plan) {
         h('ol', { class: 'task__how' }, ...task.how.map((step) => h('li', {}, step))),
       )
       : null,
+    quoteBlock(task.quote),
     // Задание на голос — микрофон: записать и прослушать себя (js/voice-check/, владелец 17.11.2026)
     task.voice ? voiceCheck(plan.day) : null,
     h('ul', { class: 'task__levels' },
@@ -299,6 +300,7 @@ function taskCard(ctx, plan) {
         h('ul', { class: 'task__say' }, ...task.say.map(sayItem)),
       )
       : null,
+    askBlock(task.ask),
     markLevels(ctx, plan, 'task'),
     h('div', { class: 'card__actions' },
       h('button', {
@@ -309,6 +311,25 @@ function taskCard(ctx, plan) {
     ),
     ],
   }).node;
+}
+
+/* Вопросы для записи (поле ask у задания, flowAsk у дней практики; владелец 21.11.2026: «писать, как она себя ощущает,
+   и как мужчины реагируют») — над кнопкой «Записать результат», ответы — в самой записи. */
+function askBlock(questions) {
+  if (!questions?.length) return null;
+  return h('div', { class: 'task__block' },
+    h('p', { class: 'caps task__block-title' }, t('today.askTitle')),
+    h('ol', { class: 'task__how' }, ...questions.map((q) => h('li', {}, q))));
+}
+
+/* Слова автора дословно — с подписью: автор и книга (правило проекта: авторское — дословно, имя — только в подписи). */
+function quoteBlock(quotes) {
+  if (!quotes?.length) return null;
+  return h('div', { class: 'task__block' },
+    h('p', { class: 'caps task__block-title' }, t('today.quoteTitle')),
+    ...quotes.map((q) => h('figure', { class: 'search-quote' },
+      h('blockquote', { class: 'search-quote__text' }, q.text),
+      q.source ? h('figcaption', { class: 'search-quote__source' }, `— ${q.source}`) : null)));
 }
 
 /* Фраза: просто слова — или по формуле «комплимент — программа — комплимент» (kpk): три части строками,
@@ -349,12 +370,14 @@ function flowCard(ctx, plan) {
         h('ul', { class: 'task__say' }, ...plan.flowSay.map(sayItem)),
       )
       : null,
+    quoteBlock(plan.flowQuote),
     plan.tasks.length
       ? h('div', {},
         h('p', { class: 'caps', style: { margin: 'var(--sp-5) 0 var(--sp-2)' } }, t('today.exercisesLabel')),
         h('ol', { class: 'flow__list' }, ...plan.tasks.map((ex) => h('li', {}, h('strong', {}, ex.title), h('span', { class: 'dim' }, ex.text)))),
       )
       : null,
+    askBlock(plan.flowAsk),
     markLevels(ctx, plan, 'flow'),
     h('div', { class: 'card__actions' },
       h('button', {

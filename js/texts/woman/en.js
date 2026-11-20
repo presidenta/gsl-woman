@@ -58,6 +58,8 @@ export default {
     kpkProgram: 'Programme',
     kpkHint: 'Formula: compliment — programme — compliment. Keep the compliment short; the programme is what you want, as if he already does it. Join the parts with “and” — it makes the phrase soft and whole.',
     sayTitle: 'What to say',
+    askTitle: 'Answer in your entry',
+    quoteTitle: 'The author’s words',
     weekProgress: 'Done this week: {done}',
     taskLabel: 'Quest of the day',
     flowLead: 'Practise this week’s exercises freely — choose what feels closest today and notice your reactions.',

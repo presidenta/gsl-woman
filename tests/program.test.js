@@ -90,9 +90,13 @@ test('весёлая фраза в шапке: у задания своя, в д
 
 test('фразы дней практики (flowSay) доходят до дня: у недели 5 — имя любимого и слова ему (владелец 21.11.2026)', () => {
   const say = [{ label: 'Ему', text: '(имя), ты мой мужчина.' }];
-  const weeks = fixture.langs.ru.weeks.map((w, i) => (i === 0 ? { ...w, flowSay: say } : w));
+  const ask = ['Как он отреагировал?'];
+  const quote = [{ text: 'Слова автора дословно', source: 'Автор, «Книга»' }];
+  const weeks = fixture.langs.ru.weeks.map((w, i) => (i === 0 ? { ...w, flowSay: say, flowAsk: ask, flowQuote: quote } : w));
   _use({ ...fixture, langs: { ...fixture.langs, ru: { ...fixture.langs.ru, weeks } } });
   assert.deepEqual(dayPlan(4, 'ru').flowSay, say);
+  assert.deepEqual(dayPlan(4, 'ru').flowAsk, ask, 'вопросы для записи');
+  assert.deepEqual(dayPlan(4, 'ru').flowQuote, quote, 'слова автора');
   assert.deepEqual(dayPlan(11, 'ru').flowSay, [], 'у недели без фраз — пусто');
   _use(fixture);
 });

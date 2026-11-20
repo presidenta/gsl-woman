@@ -36,6 +36,9 @@ export function weekPlan(week, lang) {
     flow: w.flow,
     // Фразы дней практики (сервер, поле flowSay; сейчас у недели 5 — имя любимого и слова ему, владелец 21.11.2026)
     flowSay: w.flowSay || [],
+    // Вопросы для записи и слова автора в дни практики (сервер: flowAsk, flowQuote; у недели 5 — голос, 21.11.2026)
+    flowAsk: w.flowAsk || [],
+    flowQuote: w.flowQuote || [],
     // Весёлые фразы дней своей практики (сервер: woman/teasers/, владелец 15.11.2026); у задания — task.teaser
     teasers: w.teasers || [],
     biz: w.biz || null,
