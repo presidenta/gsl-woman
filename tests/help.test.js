@@ -36,3 +36,32 @@ test('«Правила нашего дома»: начинаются с прав
   assert.deepEqual(rules.list(base), [], 'убрал все — правила с сервера сами не возвращаются');
   assert.ok(COLLECTIONS.some((c) => c.key === 'houserules'));
 });
+
+test('«Правила нашего дома» на языке интерфейса: правило с сервера переводится, своё и изменённое — как написано (21.11.2026)', () => {
+  clearAll();
+  const ru = ['Любим друг друга.', 'Держим слово.'];
+  const ua = ['Любимо одне одного.', 'Тримаємо слово.'];
+  const known = [ua, ru];
+  // Заполнено по-русски (правила помнят номер), потом — своё правило
+  rules.list(ru);
+  const mine = rules.add('Воскресенье — день семьи.', ru, known);
+  assert.deepEqual(rules.list(ua, known).map((r) => r.text), ['Любимо одне одного.', 'Тримаємо слово.', 'Воскресенье — день семьи.']);
+  const ids = rules.list(ru, known).map((r) => r.id);
+  // Нажал и ушёл, ничего не поменяв, — правило остаётся переводимым
+  rules.update(ids[0], 'Любимо одне одного.', ua, known);
+  assert.equal(rules.list(ru, known)[0].text, 'Любим друг друга.');
+  // Изменил — теперь его слова на всех языках
+  rules.update(ids[1], 'Тримаємо слово завжди.', ua, known);
+  assert.equal(rules.list(ru, known)[1].text, 'Тримаємо слово завжди.');
+  assert.equal(rules.list(ua, known)[2].text, 'Воскресенье — день семьи.');
+  assert.ok(mine);
+});
+
+test('«Правила нашего дома»: список, заполненный по-русски до сборки 157 (только текст), на украинском — по-украински', async () => {
+  clearAll();
+  const { write } = await import('../js/core/store.js');
+  write('houserules', { seeded: true, items: [{ id: 'a', text: 'Любим друг друга.' }, { id: 'b', text: 'Своё правило.' }] });
+  const ru = ['Любим друг друга.'];
+  const ua = ['Любимо одне одного.'];
+  assert.deepEqual(rules.list(ua, [ua, ru]).map((r) => r.text), ['Любимо одне одного.', 'Своё правило.']);
+});

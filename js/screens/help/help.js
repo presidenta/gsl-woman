@@ -8,6 +8,7 @@ import { flagRow, flagTotal, picked } from '../../ui/flags.js';
 import * as help from '../../help/help.js';
 import * as rules from '../../help/rules.js';
 import * as meet from '../../meet/meet.js';
+import { LANGS } from '../../config.js';
 
 /* ЭКРАН «ПОМОЩЬ» (#/help, владелец 14–15.11.2026) — быстрое: первое свидание и вопросы для разговора. С 15.11.2026
    остальные пункты — на экране «Библиотека» (screens/library/), «Красный флаг» — отдельный экран (screens/redflag/);
@@ -132,12 +133,15 @@ export function folder(g, { open = false, verdicts, photo = null } = {}) {
 
 /** «Правила нашего дома»: нажать — изменить; крестик — убрать (с подтверждением); «＋» — дописать. */
 function rulesBody(item, rerender) {
-  const defaults = item.groups.flatMap((g) => g.entries || []).map((e) => e.text);
-  const rows = rules.list(defaults).map((r) => {
+  const textsOf = (it) => (it?.groups || []).flatMap((g) => g.entries || []).map((e) => e.text);
+  const defaults = textsOf(item);
+  // Правила с сервера на всех языках — узнать их в списке, заполненном на другом языке (help/rules.js, 21.11.2026)
+  const known = LANGS.map((l) => textsOf(help.content(l)?.items.find((i) => i.key === item.key))).filter((l) => l.length);
+  const rows = rules.list(defaults, known).map((r) => {
     const text = h('button', { type: 'button', class: 'help__rule-text', title: t('help.rulesEdit') }, r.text);
     text.addEventListener('click', () => {
       const input = h('input', { class: 'input help__rule-input', value: r.text, maxlength: String(rules.MAX_TEXT) });
-      const done = () => { rules.update(r.id, input.value); rerender(); };
+      const done = () => { rules.update(r.id, input.value, defaults, known); rerender(); };
       input.addEventListener('keydown', (e) => { if (e.key === 'Enter') done(); });
       input.addEventListener('blur', done);
       text.replaceWith(input);
@@ -157,7 +161,7 @@ function rulesBody(item, rerender) {
     h('button', { type: 'submit', class: 'help__rule-btn help__rule-btn--add', 'aria-label': t('help.rulesAdd'), title: t('help.rulesAdd') }, svg(icons.plus)));
   form.addEventListener('submit', (e) => {
     e.preventDefault();
-    if (!rules.add(input.value, defaults)) { input.focus(); return; }
+    if (!rules.add(input.value, defaults, known)) { input.focus(); return; }
     toast({ title: t('help.rulesSaved') });
     rerender();
   });
