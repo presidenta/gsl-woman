@@ -27,6 +27,7 @@ const count = (n, unit) => (unit && n ? `${n} ${plural(n, `plural.${unit}`)}` : 
 // Значок каждого пункта — свой, вид один
 const ITEM_ICON = { redline: 'flag', questions: 'chat', her: 'heart', words: 'heart', kpk: 'crown', authors: 'journal', types: 'rings', topics: 'rings', rules: 'home', dates: 'calendar', compliments: 'sparkle', notfit: 'flag' };
 // Авторы — каждый своей плашкой (author-glover…, с 80) — значок книги
+const RED_FLAG = new Set(['redline', 'notfit']);
 const iconOf = (key) => icons[ITEM_ICON[key] || (key.startsWith('author-') ? 'journal' : '')] || icons.sparkle;
 
 function readBox(text) {
@@ -193,8 +194,9 @@ export function itemPlate(item, ctx, verdicts, { photo = null } = {}) {
   const n = rulesPart ? rulesPart.count : item.groups.filter((g) => g.unit === item.unit).reduce((s, g) => s + entriesOf(g).length, 0);
   return remember(platePanel({
     icon: iconOf(item.key),
-    // «Красный флаг» — единственная красная плашка: это запрет, а не совет (владелец 15.11.2026)
-    cls: `${item.key === 'redline' ? 'plate--red' : ''}${photo ? ' has-photo' : ''}`.trim(),
+    // Красный флаг в кружке — у запретов: «Красный флаг» (владелец 15.11.2026) и «Когда задание не подходит» — когда
+    // задание делать нельзя (владелец 21.11.2026: «это тоже один из красных флагов, закрась флажок красным»)
+    cls: `${RED_FLAG.has(item.key) ? 'plate--red' : ''}${photo ? ' has-photo' : ''}`.trim(),
     title: item.title,
     author: item.author, // авторы и «Павел Раков — Кто перед тобой?»: имя другим цветом
     // byline — кто автор, прямо на плашке («Кто перед тобой»: «По трактовке Павла Ракова — …», 15.11.2026)
