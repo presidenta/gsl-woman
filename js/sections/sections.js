@@ -31,7 +31,7 @@ const ICON = { rel: icons.heart, health: icons.pulse, biz: icons.crown };
 
 /** Что лежит в каждом разделе — в этом порядке и на «Сегодня», и в настройках. */
 export const ITEMS = {
-  rel: ['imsg', 'evening', 'love', 'talk', 'thanks', 'repeat'], // thanks — «Благодарность недели» в паре (thanks/, 19.11.2026) // «В поиске» — не пункт раздела, а своя карточка (today.js), как было до 17.11
+  rel: ['imsg', 'evening', 'love', 'talk', 'thanks', 'intim', 'repeat'], // intim — интим-квест выходного (intim/, 21.11.2026) // thanks — «Благодарность недели» в паре (thanks/, 19.11.2026) // «В поиске» — не пункт раздела, а своя карточка (today.js), как было до 17.11
   health: ['minute', 'kegel', 'steps', 'waterNight'],
   biz: ['tip', 'stem', 'soon'],
 };

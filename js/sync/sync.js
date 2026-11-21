@@ -57,6 +57,8 @@ export const COLLECTIONS = [
   { key: 'houserules', kind: 'houserules', type: 'single', empty: null },
   // Письма себе в будущее — «Цели» (letters/, 14.11.2026)
   { key: 'letters', kind: 'letter', type: 'list', empty: [] },
+  // Карта желаний «Интим 18⁺» (intim/map.js, 21.11.2026)
+  { key: 'intimmap', kind: 'intimmap', type: 'single', empty: null },
 ];
 const BY_KEY = Object.fromEntries(COLLECTIONS.map((c) => [c.key, c]));
 const BY_KIND = Object.fromEntries(COLLECTIONS.map((c) => [c.kind, c]));

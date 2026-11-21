@@ -1,0 +1,31 @@
+/* «ИНТИМ 18⁺» (js/intim/, screens/intim/): название с плюсом в степени, карта желаний, карточка выходного */
+.intim-name { white-space: nowrap; }
+.intim__adult { margin-top: calc(-1 * var(--sp-2)); }
+
+/* Карта желаний: те же строки, что «Желания на выходные» (circles.css: .wish, .wish__marks) */
+.intim-map { display: grid; gap: var(--sp-3); }
+.intim-map__matches { padding: var(--sp-3); border: 1px solid var(--c-line-strong); border-radius: var(--r-md, 14px); }
+.intim-map__caps { color: var(--c-gold); margin: 0 0 var(--sp-1); }
+.intim-map__x {
+  display: inline-grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  margin-left: auto;
+  border: 0;
+  background: none;
+  color: var(--c-text-dim);
+  cursor: pointer;
+}
+.intim-map__x svg { width: 14px; height: 14px; }
+
+/* Карточка выходного на «Сегодня» */
+.intim-weekend__caps { margin: var(--sp-3) 0 var(--sp-1); color: var(--c-gold); }
+.intim-weekend__how { margin: 0; padding-left: 1.3em; display: grid; gap: 4px; }
+.intim-weekend__levels { list-style: none; margin: var(--sp-3) 0; padding: 0; display: grid; gap: 6px; }
+.intim-weekend__levels b { color: var(--c-gold); }
+.intim-weekend__solo { margin-top: var(--sp-2); }
+.intim-weekend__other { color: var(--c-gold); font-weight: 700; }
+.intim-weekend__link { margin-top: var(--sp-2); }
+/* Плюс в кнопке — цветом букв кнопки (золото-вырезка в тексте кнопки его прячет) */
+.intim-weekend__link .brand__plus { color: currentColor; -webkit-text-fill-color: currentColor; background: none; }

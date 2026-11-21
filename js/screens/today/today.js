@@ -26,6 +26,7 @@ import * as settingsStore from '../../settings/settings.js';
 import { usCard } from '../../circles/today-card.js';
 import { talkCard, talkDone } from '../../circles/talk.js';
 import { thanksCard, thanksDone } from '../../thanks/thanks.js';
+import { weekendCard, intimDone } from '../../intim/weekend.js';
 import { eveningCard } from '../../evening/evening.js';
 import { stemCard } from '../../stem/stem.js';
 // «В поиске» — карточка дня: шаги недели (search/) тем же списком, что на экране «В поиске»
@@ -97,7 +98,7 @@ function stopMinute() {
 
 function header(ctx, plan, summary, buttons) {
   // Баллы дня (score/): личные, для себя — сколько баллов прожито сегодня
-  const score = dayScore(ctx.todayIso, plan.day, ctx.entries, { talk: talkDone(ctx, plan), thanks: thanksDone(ctx, plan) });
+  const score = dayScore(ctx.todayIso, plan.day, ctx.entries, { talk: talkDone(ctx, plan), thanks: thanksDone(ctx, plan), intim: intimDone(ctx, plan) });
   return h('section', { class: 'card card--hero today-hero' },
     h('div', { class: 'card__eyebrow today-hero__top' },
       h('span', { class: 'chip chip--solid' }, t('today.dayOf', { day: plan.day })),
@@ -530,7 +531,7 @@ function recordedToday(ctx, plan) {
 
 /* Итог дня внизу (владелец 14.11.2026): «итого набрано баллов за день — человек видит, сколько набрал». */
 function totalCard(ctx, plan) {
-  const score = dayScore(ctx.todayIso, plan.day, ctx.entries, { talk: talkDone(ctx, plan), thanks: thanksDone(ctx, plan) });
+  const score = dayScore(ctx.todayIso, plan.day, ctx.entries, { talk: talkDone(ctx, plan), thanks: thanksDone(ctx, plan), intim: intimDone(ctx, plan) });
   return h('section', { class: 'card card--soft day-total' },
     h('p', { class: 'caps day-total__title' }, t('score.totalTitle')),
     h('p', { class: 'day-total__value' }, pointsLabel(score.total)),
@@ -603,6 +604,8 @@ export function render(view, ctx) {
         { id: 'talk', build: () => talkCard(ctx, plan) },
         // «Благодарность недели» — в паре на 7-й день, за «Разговором пары» (js/thanks/, владелец 19.11.2026)
         { id: 'thanks', build: () => thanksCard(ctx, plan) },
+        // «Интим-квест выходного» — 6-й и 7-й день (js/intim/, владелец 21.11.2026)
+        { id: 'intim', build: () => weekendCard(ctx, plan) },
         { id: 'repeat', build: () => repeatCard(plan) },
       ]) : null,
       // «Здоровье»: Кегель, шаги, стакан на ночь — человек сам собирает, что показывать (утренняя минута — выше, за стаканом воды)
