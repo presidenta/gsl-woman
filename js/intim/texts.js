@@ -3,6 +3,7 @@ import { getLang } from '../core/i18n.js';
 /* Надписи модуля «Интим 18⁺» (кнопки, подписи); сами тексты раздела — с сервера (поле intim программы). */
 export const IT = {
   ru: {
+    name: 'Если постучишь в мою тайную дверь', // название раздела, пока программа не пришла (само — с сервера)
     yes: 'Да', maybe: 'Может быть',
     matchesTitle: 'Совпадения', matchesLead: 'То, что хочется вам обоим. Видно только совпадения — остальное каждый держит при себе.',
     matchesNone: 'Пока совпадений нет — отметь свою карту, и когда партнёр отметит свою, здесь появится общее.',
@@ -15,6 +16,7 @@ export const IT = {
     adult: 'Раздел для взрослых 18+. Всё — только по взаимному «да».',
   },
   ua: {
+    name: 'Якщо постукаєш у мої таємні двері',
     yes: 'Так', maybe: 'Може бути',
     matchesTitle: 'Збіги', matchesLead: 'Те, чого хочеться вам обом. Видно лише збіги — решту кожен тримає при собі.',
     matchesNone: 'Поки збігів немає — познач свою карту, і коли партнер позначить свою, тут зʼявиться спільне.',
@@ -27,6 +29,7 @@ export const IT = {
     adult: 'Розділ для дорослих 18+. Усе — лише за взаємним «так».',
   },
   en: {
+    name: 'If you knock on my secret door',
     yes: 'Yes', maybe: 'Maybe',
     matchesTitle: 'Matches', matchesLead: 'What you both want. Only matches are visible — the rest each of you keeps to yourself.',
     matchesNone: 'No matches yet — mark your map, and when your partner marks theirs, what you share will appear here.',

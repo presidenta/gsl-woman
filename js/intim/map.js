@@ -15,11 +15,26 @@ export const MARK_KIND = 'imark';
 export const WISH_KIND = 'iwish';
 const MAX_TEXT = 120;
 
+/* С 161 (владелец 22.11.2026: «пестощі и відчуття объединить в один раздел») раздел «Ощущения» (sense) влился в
+   «Ласки» (caress); ключи пунктов остались прежними. Отметки и свои желания, сделанные до этого, читаются по новому
+   разделу — ничего отмеченного не теряется. */
+const MOVED = { sense: 'caress' };
+export const sectionOf = (section) => MOVED[section] || section;
+/** Ключ отметки «раздел.пункт» с учётом перенесённых разделов. */
+export function keyOf(key) {
+  const s = String(key);
+  const dot = s.indexOf('.');
+  return dot < 0 ? s : sectionOf(s.slice(0, dot)) + s.slice(dot);
+}
+
 function local() {
   const v = read(KEY, null);
+  const marks = v?.marks && typeof v.marks === 'object' ? v.marks : {};
   return {
-    marks: v?.marks && typeof v.marks === 'object' ? v.marks : {},
-    own: Array.isArray(v?.own) ? v.own.filter((w) => w && typeof w.id === 'string' && typeof w.text === 'string') : [],
+    marks: Object.fromEntries(Object.entries(marks).map(([k, m]) => [keyOf(k), m])),
+    own: Array.isArray(v?.own)
+      ? v.own.filter((w) => w && typeof w.id === 'string' && typeof w.text === 'string').map((w) => ({ ...w, section: sectionOf(w.section) }))
+      : [],
   };
 }
 const saveLocal = (next) => write(KEY, next);
@@ -36,7 +51,8 @@ const markId = (p, key) => `${circles.short(p.me)}.${key}`.slice(0, 64);
 export const myMarks = () => local().marks;
 
 /** Поставить, сменить или снять (то же ещё раз) отметку. */
-export function setMark(key, mark) {
+export function setMark(rawKey, mark) {
+  const key = keyOf(rawKey);
   const s = local();
   const marks = { ...s.marks };
   const off = marks[key] === mark;
@@ -57,7 +73,7 @@ export function ownList(section) {
   if (!p) return mine;
   const seen = new Set(mine.map((w) => w.id));
   const shared = circles.items(p.id, WISH_KIND)
-    .filter((w) => w.data?.section === section && w.data?.text && !seen.has(w.id))
+    .filter((w) => sectionOf(w.data?.section) === section && w.data?.text && !seen.has(w.id))
     .map((w) => ({ id: w.id, section, text: w.data.text, mine: w.author === p.me }));
   return [...mine, ...shared];
 }
@@ -88,7 +104,7 @@ export function removeOwn(id) {
 /** Отметки партнёра (только для подсчёта совпадений — на экран идут лишь совпадения). */
 function partnerMarks(p) {
   const out = {};
-  for (const m of circles.items(p.id, MARK_KIND)) if (m.author !== p.me && m.data?.key && MARKS.includes(m.data.mark)) out[m.data.key] = m.data.mark;
+  for (const m of circles.items(p.id, MARK_KIND)) if (m.author !== p.me && m.data?.key && MARKS.includes(m.data.mark)) out[keyOf(m.data.key)] = m.data.mark;
   return out;
 }
 
@@ -113,6 +129,8 @@ export function matches(p = pairNow()) {
 export function mirrorToPair(p = pairNow()) {
   if (!p) return;
   const s = local();
+  // Свои отметки под старым ключом раздела (до 161: sense.*) — убрать из контура; ниже они пишутся под новым
+  for (const m of circles.items(p.id, MARK_KIND)) if (m.author === p.me && m.data?.key && keyOf(m.data.key) !== m.data.key) circles.drop(p.id, MARK_KIND, m.id);
   for (const [key, mark] of Object.entries(s.marks)) {
     if (circles.item(p.id, MARK_KIND, markId(p, key))?.data?.mark !== mark) circles.put(p.id, MARK_KIND, markId(p, key), { key, mark });
   }

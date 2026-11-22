@@ -38,7 +38,7 @@ function weekendFolders(w) {
 export function render(view, ctx) {
   const x = intimOf(ctx.lang);
   if (!x) {
-    add(view, h('h1', { class: 'screen-title' }, 'Интим 18', h('span', { class: 'brand__plus' }, '+')), h('p', { class: 'card__text' }, t('help.waiting')));
+    add(view, h('h1', { class: 'screen-title' }, it('name')), h('p', { class: 'card__text' }, t('help.waiting')));
     return;
   }
   add(view,
@@ -57,12 +57,13 @@ export function render(view, ctx) {
   );
 }
 
-/** Плашка-переход в «Библиотеке» — первой. */
+/** Плашка-переход в «Артефактах» — под «Библиотекой» (с 161, владелец 22.11.2026: «это не библиотека — вынеси в общий
+    раздел»; значок — кружок и «18+» красным). */
 export function intimLink(lang) {
   const x = intimOf(lang);
   if (!x) return null;
-  return h('a', { class: 'card plate plate--intim', href: '#/intim' },
-    h('span', { class: 'plate__icon', 'aria-hidden': 'true' }, svg(icons.heart)),
+  return h('a', { class: 'card plate plate--intim plate--adult', href: '#/intim' },
+    h('span', { class: 'plate__icon', 'aria-hidden': 'true' }, svg(icons.adult)),
     h('span', { class: 'plate__text' },
       h('span', { class: 'plate__title' }, withPlus(x.title)),
       h('span', { class: 'plate__lead' }, it('plateLead'))),

@@ -49,11 +49,25 @@ test('без пары совпадений нет; своё желание жи�
 });
 
 test('в паре — только совпадения: оба «да» — первыми, «да» и «может быть» — совпало', () => {
-  pairWith({ 'touch.kiss': 'yes', 'sense.ice': 'maybe', 'bond.gag': 'yes' });
-  map.setMark('sense.ice', 'yes');
+  pairWith({ 'touch.kiss': 'yes', 'caress.ice': 'maybe', 'bond.gag': 'yes' });
+  map.setMark('caress.ice', 'yes');
   map.setMark('touch.kiss', 'yes');
   map.setMark('toys.vibe', 'yes'); // у партнёра отметки нет — второму это не видно
-  assert.deepEqual(map.matches(), [{ key: 'touch.kiss', match: 'both' }, { key: 'sense.ice', match: 'soft' }]);
+  assert.deepEqual(map.matches(), [{ key: 'touch.kiss', match: 'both' }, { key: 'caress.ice', match: 'soft' }]);
+});
+
+test('с 161 «Ощущения» влились в «Ласки»: старые отметки sense.* и свои желания читаются как caress.*', async () => {
+  write('intimmap', { marks: { 'sense.ice': 'yes', 'touch.kiss': 'maybe' }, own: [{ id: 'iw1', section: 'sense', text: 'Шёлковая лента' }] });
+  assert.deepEqual(map.myMarks(), { 'caress.ice': 'yes', 'touch.kiss': 'maybe' });
+  assert.deepEqual(map.ownList('caress').map((w) => w.text), ['Шёлковая лента']);
+  assert.deepEqual(map.ownList('sense'), []);
+  pairWith({ 'sense.ice': 'yes' }); // партнёр отметил ещё по старому ключу
+  assert.deepEqual(map.matches(), [{ key: 'caress.ice', match: 'both' }]);
+  const circles = await import('../js/circles/circles.js');
+  circles.put('c1', 'imark', '11111111.sense.ice', { key: 'sense.ice', mark: 'yes' }); // моя старая отметка в контуре
+  map.mirrorToPair();
+  const mine = circles.items('c1', 'imark').filter((x) => x.author !== HE).map((x) => x.data.key).sort();
+  assert.deepEqual(mine, ['caress.ice', 'touch.kiss'], 'в контуре — только новые ключи');
 });
 
 test('в паре отметка уходит в контур пары; отмеченное до пары переносится один раз', async () => {

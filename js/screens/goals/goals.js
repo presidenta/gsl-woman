@@ -15,6 +15,7 @@ import { photoOf } from '../../photos/photos.js';
 import { plateLink, platePanel } from '../../ui/plate.js';
 import * as help from '../../help/help.js';
 import { itemPlate } from '../help/help.js';
+import { intimLink } from '../intim/intim.js';
 import { photoStrip } from '../../media/photo-field.js';
 import * as mediaStore from '../../media/photos.js';
 import { usedPhotoIds } from '../../media/used.js';
@@ -190,6 +191,8 @@ export function render(view, ctx) {
     helpPlate(),
     complimentsPlate(ctx),
     libraryPlate(),
+    // «Если постучишь в мою тайную дверь» — раздел 18+ (#/intim): с 161 здесь, под «Библиотекой» (владелец 22.11.2026)
+    intimLink(ctx.lang),
     lettersPlate(ctx),
   );
 }
