@@ -12,7 +12,7 @@ import { toast } from '../ui/toast.js';
    Баллы 3 · 2 · 1; процент — от максимума по отвеченным вопросам. Итог — как на сайте: все пять языков, форма профиля,
    советы; кнопка «Это язык …» сохраняет главный язык (onSave). Языки ответов k = 1…5 → KINDS по порядку.
    Анкета живёт только на экране #/love (screens/love/love.js), в хранилище — только итог через onSave.
-   Английского текста анкет нет — английский получает русский (правило PLAN.md: языки без своего текста — русский). */
+   Языки анкет — ru, ua, en (английский — с 22.11.2026, владелец: «переведи на английский тоже»). */
 
 export const KINDS = ['words', 'time', 'gifts', 'service', 'touch'];
 const kindOf = (k) => KINDS[k - 1];
@@ -24,8 +24,8 @@ const DANGER = 10;
 const ENOUGH = 2 / 3; // отвечено меньше — итог «предварительный»
 
 const PACKS = {
-  self: { ru: () => import('./self-ru.js'), ua: () => import('./self-ua.js') },
-  observe: { ru: () => import('./observe-ru.js'), ua: () => import('./observe-ua.js') },
+  self: { ru: () => import('./self-ru.js'), ua: () => import('./self-ua.js'), en: () => import('./self-en.js') },
+  observe: { ru: () => import('./observe-ru.js'), ua: () => import('./observe-ua.js'), en: () => import('./observe-en.js') },
 };
 
 let run = null; // идёт анкета: см. open()
@@ -83,7 +83,7 @@ export function close() {
     подросток); title — шапка; saveText — надпись кнопки сохранения; onSave(kind); lang — язык приложения;
     redraw() — перерисовать экран. Тексты грузятся при первом открытии. */
 export async function open(opts) {
-  const lang = opts.lang === 'ua' ? 'ua' : 'ru';
+  const lang = PACKS[opts.mode][opts.lang] ? opts.lang : 'ru';
   const pack = (await PACKS[opts.mode][lang]()).default;
   stopTimer();
   run = { ...opts, fixedGroup: Boolean(opts.group), pack, stage: 'intro', i: 0, picks: [], order: [], skipped: [], timedOut: [], deadline: 0, result: null };

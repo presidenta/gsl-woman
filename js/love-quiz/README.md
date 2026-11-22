@@ -19,13 +19,13 @@
 | Файл | Что |
 |---|---|
 | `quiz.js` | Механизм: вступление, вопрос, таймер, подсчёт `score`, форма профиля `shapeOf`, итог |
-| `self-ru.js`, `self-ua.js` | Тексты анкеты о себе — **копия с сайта**, создаёт `npm run love-quiz` |
-| `observe-ru.js`, `observe-ua.js` | Тексты анкеты по наблюдению — **копия с сайта**, создаёт `npm run love-quiz` |
+| `self-ru.js`, `self-ua.js`, `self-en.js` | Тексты анкеты о себе — **копия с сайта**, создаёт `npm run love-quiz` |
+| `observe-ru.js`, `observe-ua.js`, `observe-en.js` | Тексты анкеты по наблюдению — **копия с сайта**, создаёт `npm run love-quiz` |
 | `love-quiz.css` | Вид: отметки 1 · 2 · 3, таймер, шкалы |
 
 Тексты правятся **только на сайте** (`D:\genesis\otkrut put test\love\`, `…\love-observe\`), потом
 `npm run love-quiz` (путь — первый аргумент или `OTKRYTIE_PUTI`), `npm run files`, `npm test`.
-Английского текста анкет нет — английский получает русский (правило из `docs/PLAN.md`).
+Языки анкет — русский, украинский и английский (английский — с 22.11.2026, сборка 168).
 
 Стыковка: `screens/love/love.js` (кнопка «Анкета» у каждого человека, `quiz.open` / `quiz.node`), стиль — строка в
 `index.html`. Проверки — `tests/love-quiz.test.js`. Убрать — удалить папку и эти строки.

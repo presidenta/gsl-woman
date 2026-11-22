@@ -7,6 +7,8 @@ import selfRu from '../js/love-quiz/self-ru.js';
 import selfUa from '../js/love-quiz/self-ua.js';
 import observeRu from '../js/love-quiz/observe-ru.js';
 import observeUa from '../js/love-quiz/observe-ua.js';
+import selfEn from '../js/love-quiz/self-en.js';
+import observeEn from '../js/love-quiz/observe-en.js';
 
 const qs = (ks) => ks.map((row) => ({ q: 'q', o: row.map((k) => ({ t: 't', k })) }));
 
@@ -81,4 +83,30 @@ test('надписи интерфейса анкет — одни ключи н�
 test('без оценок («Красный флаг»): ни «молодец», ни «умница» в анкетах', () => {
   const all = JSON.stringify([selfRu, selfUa, observeRu, observeUa]);
   assert.ok(!/молодец|молодець|умниц|хорош(ий|ая) (мальчик|девочка)|на пятёрку/i.test(all));
+});
+
+test('английские анкеты устроены как русские: те же вопросы, языки ответов, советы, надписи', () => {
+  const keys = (o, pre = '') => Object.entries(o).flatMap(([k, v]) => (v && typeof v === 'object' && !Array.isArray(v) ? keys(v, `${pre}${k}.`) : [`${pre}${k}`])).sort();
+  assert.deepEqual(keys(selfEn.ui), keys(selfRu.ui));
+  assert.deepEqual(keys(observeEn.ui), keys(observeRu.ui));
+  assert.equal(selfEn.questions.length, selfRu.questions.length);
+  selfRu.questions.forEach((q, i) => assert.deepEqual(selfEn.questions[i].o.map((o) => o.k), q.o.map((o) => o.k), `вопрос ${i + 1}`));
+  for (const k of [1, 2, 3, 4, 5]) {
+    for (const f of ['name', 'tagline', 'desc', 'critical', 'phrase', 'hurts']) assert.ok(selfEn.langs[k][f], `en, язык ${k}: ${f}`);
+    for (const f of ['behave', 'never', 'self']) assert.equal(selfEn.langs[k][f].length, selfRu.langs[k][f].length, `en, язык ${k}: ${f}`);
+  }
+  for (const g of ['child', 'teen', 'adult']) {
+    const ru = observeRu.groups[g];
+    const en = observeEn.groups[g];
+    assert.equal(en.questions.length, ru.questions.length, g);
+    ru.questions.forEach((q, i) => assert.deepEqual(en.questions[i].o.map((o) => o.k), q.o.map((o) => o.k), `${g}, вопрос ${i + 1}`));
+    for (const k of [1, 2, 3, 4, 5]) assert.ok(en.tips[k].seen && en.tips[k].todo.length && en.tips[k].never.length, `${g}, язык ${k}`);
+    assert.equal(en.check.pairs.length, ru.check.pairs.length, `${g}: пары выбора`);
+  }
+});
+
+test('английские анкеты — без русских букв и без оценок', () => {
+  const all = JSON.stringify([selfEn.ui, selfEn.langs, selfEn.shapes, selfEn.questions, observeEn.ui, observeEn.langs, observeEn.shapes, observeEn.groups]);
+  assert.ok(!/[а-яёіїєґ]/i.test(all));
+  assert.ok(!/well done|good (boy|girl)/i.test(all));
 });

@@ -1,8 +1,8 @@
 /* АНКЕТЫ «ПЯТЬ ЯЗЫКОВ ЛЮБВИ» — копия текстов с сайта анкет (владелец 22.11.2026: «эти две новые вставляй»).
    Источник один — репозиторий otkrytie-puti (https://presidenta.github.io/otkrytie-puti/):
-     love/content-{ru,ua}.js          — анкета о себе, 22 вопроса;
-     love-observe/content-{ru,ua}.js  — анкета по наблюдению: ребёнок, подросток, взрослый.
-   Там тексты лежат в window.LOVE / window.LOVE_OBS; здесь они становятся модулями js/love-quiz/{self,observe}-{ru,ua}.js.
+     love/content-{ru,ua,en}.js          — анкета о себе, 22 вопроса;
+     love-observe/content-{ru,ua,en}.js  — анкета по наблюдению: ребёнок, подросток, взрослый.
+   Там тексты лежат в window.LOVE / window.LOVE_OBS; здесь они становятся модулями js/love-quiz/{self,observe}-{ru,ua,en}.js.
    Правка текстов — только на сайте, потом: npm run love-quiz (путь к сайту — первый аргумент или OTKRYTIE_PUTI). */
 
 import { readFileSync, writeFileSync } from 'node:fs';
@@ -18,7 +18,7 @@ const SOURCES = [
 ];
 
 for (const { from, global, to } of SOURCES) {
-  for (const lang of ['ru', 'ua']) {
+  for (const lang of ['ru', 'ua', 'en']) {
     const src = readFileSync(join(site, from, `content-${lang}.js`), 'utf8').replace(/\r\n/g, '\n');
     const open = `window.${global}.${lang} = {`;
     if (!src.includes(open)) throw new Error(`${from}/content-${lang}.js: нет строки «${open}»`);
