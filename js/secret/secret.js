@@ -1,6 +1,7 @@
 import { h } from '../core/dom.js';
 import { icons } from '../ui/icons.js';
 import { platePanel } from '../ui/plate.js';
+import { foldCard } from '../ui/fold.js';
 import { langData } from '../program/source.js';
 import { folderBody } from '../screens/help/help.js';
 import { st } from './texts.js';
@@ -46,7 +47,9 @@ const nextLine = (n, day, days, sec) => {
   return `${d <= 1 ? st('tomorrow') : st('next', { d })}: ${sec.chapters[n].teaser}`;
 };
 
-/** Карточка главы на «Сегодня»: только когда глава вышла (и день после неё). */
+/** Карточка главы на «Сегодня» — как остальные карточки дня (ui/fold.js, владелец 22.11.2026: «має бути похожа на
+    інші»): свёрнута — гриф, «Секретные материалы · Глава первая», название досье, стрелка в кружке справа; раскрыта —
+    чакра, текст главы, задания, следующая глава. Только в день главы и на следующий. */
 export function secretCard(ctx) {
   const sec = secretOf(ctx.lang);
   if (!sec) return null;
@@ -54,14 +57,21 @@ export function secretCard(ctx) {
   if (!cardOn(ctx.day, days)) return null;
   const n = openedOn(ctx.day, days);
   const ch = sec.chapters[n - 1];
-  const body = h('details', { class: 'secret__chapter' }, h('summary', { class: 'secret__more' }, st('read')), ...chapterBody(ch));
-  return h('section', { class: 'card secret' },
-    stamp(sec.stamp),
-    h('p', { class: 'caps secret__caps' }, `${sec.title} · ${st('chapter', { n })}`),
-    h('h2', { class: 'secret__title' }, ch.chakra),
-    body,
-    h('p', { class: 'secret__next' }, nextLine(n, ctx.day, days, sec)),
-    h('a', { class: 'secret__all', href: '#/library' }, st('openAll')));
+  return foldCard({
+    id: `secret-${n}`,
+    cls: 'secret-card',
+    icon: icons.journal,
+    above: stamp(sec.stamp),
+    title: `${sec.title} · ${st('chapter', { n })}`,
+    lead: sec.book,
+    keepLead: true,
+    body: [
+      h('h3', { class: 'secret__title' }, ch.chakra),
+      ...chapterBody(ch),
+      h('p', { class: 'secret__next' }, nextLine(n, ctx.day, days, sec)),
+      h('a', { class: 'secret__all', href: '#/library' }, st('openAll')),
+    ],
+  }).node;
 }
 
 /** Плашка «Секретные материалы» в «Тайном архиве»: все главы, закрытые — с днями до выхода. */

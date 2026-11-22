@@ -38,10 +38,10 @@ const quoteInner = (s) => s.replace(/«/g, '„').replace(/»/g, '“');
  * фраза после названия через тире (карточка дня); keepLead — название видно и в раскрытом виде, крупно (карточка
  * задания: «Магия рук» стоит под подписью, а не в теле под значком); lead — строка или узел; status — узел справа
  * (идущий счёт); points — баллы дня за этот раздел (score/): больше нуля — раздел сделан: стрелка светится золотом,
- * после названия зелёным «+N балл» (владелец 14.11.2026, сборка 57); body — содержимое раздела. Вернёт { node, thumb, isOpen() }: thumb — место
+ * после названия зелёным «+N балл» (владелец 14.11.2026, сборка 57); body — содержимое раздела; above — узел над подписью. Вернёт { node, thumb, isOpen() }: thumb — место
  * для рисунка в шапке; onToggle(open) зовётся при каждом раскрытии и сворачивании (и сразу при создании).
  */
-export function foldCard({ id, cls = '', icon, title, teaser = '', lead = '', keepLead = false, status = null, points = 0, body = [], onToggle = null }) {
+export function foldCard({ id, cls = '', icon, title, teaser = '', lead = '', keepLead = false, status = null, points = 0, body = [], onToggle = null, above = null }) {
   let open = isOpen(id);
   const thumb = h('span', { class: 'fold__thumb', 'aria-hidden': 'true' });
   const inner = h('div', { class: 'fold__inner' }, ...body);
@@ -51,6 +51,8 @@ export function foldCard({ id, cls = '', icon, title, teaser = '', lead = '', ke
   const head = h('button', { type: 'button', class: 'fold__head', 'aria-controls': `fold-${id}` },
     h('span', { class: 'fold__mark', 'aria-hidden': 'true' }, thumb, h('span', { class: 'fold__badge' }, svg(icon, 'fold__icon'))),
     h('span', { class: 'fold__text' },
+      // above — узел над подписью (гриф «Совершенно секретно» у главы «Секретных материалов», 22.11.2026)
+      above,
       // Баллы — сразу за последним словом названия, в той же строке (владелец 15.11.2026: «далеко от текста»)
       h('span', { class: 'caps fold__title' }, title,
         // «ЗАДАНИЕ ДНЯ — «Это шутка или магия?»» (владелец 15.11.2026): фраза за подписью через тире, в кавычках
