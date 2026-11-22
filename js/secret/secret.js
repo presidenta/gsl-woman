@@ -4,10 +4,13 @@ import { platePanel } from '../ui/plate.js';
 import { langData } from '../program/source.js';
 import { folderBody } from '../screens/help/help.js';
 import { st } from './texts.js';
-import { startOf, openedOn, daysTo, cardOn, COUNT } from './schedule.js';
+import { startOf, releaseDays, openedOn, daysTo, cardOn, COUNT } from './schedule.js';
+
+/** Дни выхода глав для экрана (по дню на экране и настоящему дню человека). */
+const daysOf = (ctx) => releaseDays(startOf(ctx.day, ctx.realDay ?? ctx.day), ctx.settings?.startDate);
 
 /* «СЕКРЕТНЫЕ МАТЕРИАЛЫ» (владелец 22.11.2026, решение консилиума): досье «Секс, деньги и чакры» главами — 7 глав, по
-   чакре, раз в 2 дня. На «Сегодня» — карточка главы под делом дня (secretCard); в «Тайном архиве» — первая плашка
+   чакре: первая на 2-й день, остальные по выходным (schedule.js). На «Сегодня» — карточка главы под делом дня (secretCard); в «Тайном архиве» — первая плашка
    со всеми главами: открытые читаются, закрытые — «откроется через N дн.» (secretPlate). Тексты — с сервера (поле
    secret программы, planner/server/src/gsl/secret/). Стыковка — строка в screens/today/today.js и в
    screens/library/library.js. */
@@ -37,9 +40,9 @@ export function chapterBody(ch) {
   ];
 }
 
-const nextLine = (n, day, start, sec) => {
+const nextLine = (n, day, days, sec) => {
   if (n >= COUNT) return st('last');
-  const d = daysTo(n + 1, day, start);
+  const d = daysTo(n + 1, day, days);
   return `${d <= 1 ? st('tomorrow') : st('next', { d })}: ${sec.chapters[n].teaser}`;
 };
 
@@ -47,9 +50,9 @@ const nextLine = (n, day, start, sec) => {
 export function secretCard(ctx) {
   const sec = secretOf(ctx.lang);
   if (!sec) return null;
-  const start = startOf(ctx.day);
-  if (!cardOn(ctx.day, start)) return null;
-  const n = openedOn(ctx.day, start);
+  const days = daysOf(ctx);
+  if (!cardOn(ctx.day, days)) return null;
+  const n = openedOn(ctx.day, days);
   const ch = sec.chapters[n - 1];
   const body = h('details', { class: 'secret__chapter' }, h('summary', { class: 'secret__more' }, st('read')), ...chapterBody(ch));
   return h('section', { class: 'card secret' },
@@ -57,7 +60,7 @@ export function secretCard(ctx) {
     h('p', { class: 'caps secret__caps' }, `${sec.title} · ${st('chapter', { n })}`),
     h('h2', { class: 'secret__title' }, ch.chakra),
     body,
-    h('p', { class: 'secret__next' }, nextLine(n, ctx.day, start, sec)),
+    h('p', { class: 'secret__next' }, nextLine(n, ctx.day, days, sec)),
     h('a', { class: 'secret__all', href: '#/library' }, st('openAll')));
 }
 
@@ -65,8 +68,8 @@ export function secretCard(ctx) {
 export function secretPlate(ctx) {
   const sec = secretOf(ctx.lang);
   if (!sec) return null;
-  const start = startOf(ctx.day);
-  const n = openedOn(ctx.day, start);
+  const days = daysOf(ctx);
+  const n = openedOn(ctx.day, days);
   const rows = sec.chapters.map((ch, i) => {
     if (i < n) {
       const node = h('details', { class: 'help__folder' },
@@ -75,7 +78,7 @@ export function secretPlate(ctx) {
       node.open = i === n - 1;
       return node;
     }
-    const d = daysTo(i + 1, ctx.day, start);
+    const d = daysTo(i + 1, ctx.day, days);
     return h('p', { class: 'secret__locked' }, stamp(sec.stamp), h('span', {}, `${st('chapter', { n: i + 1 })} · ${ch.chakra} — ${d == null ? st('notYet') : d <= 1 ? st('closedTomorrow') : st('closed', { d })}`));
   });
   return platePanel({
