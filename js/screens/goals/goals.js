@@ -16,6 +16,7 @@ import { plateLink, platePanel } from '../../ui/plate.js';
 import * as help from '../../help/help.js';
 import { itemPlate } from '../help/help.js';
 import { intimLink } from '../intim/intim.js';
+import { secretPlate } from '../../secret/secret.js';
 import { photoStrip } from '../../media/photo-field.js';
 import * as mediaStore from '../../media/photos.js';
 import { usedPhotoIds } from '../../media/used.js';
@@ -191,6 +192,9 @@ export function render(view, ctx) {
     helpPlate(),
     complimentsPlate(ctx),
     libraryPlate(),
+    // «Секретные материалы» — главы досье о чакрах (js/secret/): с 172 здесь, а не в «Тайном архиве» (владелец 22.11.2026:
+    // «две книжки одинаковых в одном разделе — нелогично»; целиком досье — в архиве)
+    secretPlate(ctx),
     // «Если постучишь в мою тайную дверь» — раздел 18+ (#/intim): с 161 здесь, под «Библиотекой» (владелец 22.11.2026)
     intimLink(ctx.lang),
     lettersPlate(ctx),

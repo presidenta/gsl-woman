@@ -11,10 +11,10 @@ import { startOf, releaseDays, openedOn, daysTo, cardOn, COUNT } from './schedul
 const daysOf = (ctx) => releaseDays(startOf(ctx.day, ctx.realDay ?? ctx.day), ctx.settings?.startDate);
 
 /* «СЕКРЕТНЫЕ МАТЕРИАЛЫ» (владелец 22.11.2026, решение консилиума): досье «Секс, деньги и чакры» главами — 7 глав, по
-   чакре: первая на 2-й день, остальные по выходным (schedule.js). На «Сегодня» — карточка главы под делом дня (secretCard); в «Тайном архиве» — первая плашка
+   чакре: первая на 2-й день, остальные по выходным (schedule.js). На «Сегодня» — карточка главы под делом дня (secretCard); в «Артефактах» — плашка
    со всеми главами: открытые читаются, закрытые — «откроется через N дн.» (secretPlate). Тексты — с сервера (поле
    secret программы, planner/server/src/gsl/secret/). Стыковка — строка в screens/today/today.js и в
-   screens/library/library.js. */
+   screens/goals/goals.js. */
 
 export const secretOf = (lang) => langData(lang)?.secret || null;
 
@@ -74,7 +74,7 @@ export function secretCard(ctx) {
   }).node;
 }
 
-/** Плашка «Секретные материалы» в «Тайном архиве»: все главы, закрытые — с днями до выхода. */
+/** Плашка «Секретные материалы» в «Артефактах»: все главы, закрытые — с днями до выхода. */
 export function secretPlate(ctx) {
   const sec = secretOf(ctx.lang);
   if (!sec) return null;
