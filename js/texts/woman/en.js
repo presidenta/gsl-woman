@@ -1140,6 +1140,7 @@ export default {
     questions: ['question', 'questions'],
     topics: ['topic', 'topics'],
     chakras: ['chakra', 'chakras'],
+    surveys: ['questionnaire', 'questionnaires'],
     rules: ['rule', 'rules'],
     tips: ['tip', 'tips'],
     compliments: ['compliment', 'compliments'],

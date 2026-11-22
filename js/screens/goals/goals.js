@@ -11,7 +11,7 @@ import { circleGoals } from '../../circles/goals-view.js';
 import { lettersBody } from '../../letters/letters-view.js';
 import { ownBox } from '../../letters/letters.js';
 import { lt } from '../../letters/texts.js';
-import { photoOf } from '../../photos/photos.js';
+import { photoOf, photo, fixed } from '../../photos/photos.js';
 import { plateLink, platePanel } from '../../ui/plate.js';
 import * as help from '../../help/help.js';
 import { itemPlate } from '../help/help.js';
@@ -190,6 +190,9 @@ export function render(view, ctx) {
     redFlagPlate(),
     meetPlate(ctx),
     helpPlate(),
+    // «Анкеты» — свой раздел рядом с «Вопросами» (с 176, владелец 22.11.2026: «вопросы отдельно, для обсуждения, а
+    // анкеты — отдельный пункт… и вынести в артефакты»); раскрывается прямо здесь
+    surveysPlate(ctx),
     complimentsPlate(ctx),
     libraryPlate(),
     // «Секретные материалы» — главы досье о чакрах (js/secret/): с 172 здесь, а не в «Тайном архиве» (владелец 22.11.2026:
@@ -258,6 +261,11 @@ function helpPlate() {
 function complimentsPlate(ctx) {
   const item = help.content(ctx.lang)?.items.find((i) => i.key === 'compliments');
   return item ? itemPlate({ ...item, lead: t('complimentsPlate.lead') }, ctx, null) : null;
+}
+
+function surveysPlate(ctx) {
+  const item = help.content(ctx.lang)?.items.find((i) => i.key === 'surveys');
+  return item ? itemPlate(item, ctx, null, { photo: photo(fixed('surveys', 0)) }) : null;
 }
 
 function libraryPlate() {

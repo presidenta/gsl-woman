@@ -27,7 +27,7 @@ const entriesOf = (g) => [...(g.entries || []), ...(g.sections || []).flatMap((s
 const count = (n, unit) => (unit && n ? `${n} ${plural(n, `plural.${unit}`)}` : null);
 
 // Значок каждого пункта — свой, вид один
-const ITEM_ICON = { redline: 'flag', questions: 'chat', her: 'heart', words: 'heart', kpk: 'crown', authors: 'journal', energy: 'journal', types: 'rings', topics: 'rings', rules: 'home', dates: 'calendar', compliments: 'sparkle', notfit: 'flag' };
+const ITEM_ICON = { redline: 'flag', questions: 'chat', surveys: 'check', her: 'heart', words: 'heart', kpk: 'crown', authors: 'journal', energy: 'journal', types: 'rings', topics: 'rings', rules: 'home', dates: 'calendar', compliments: 'sparkle', notfit: 'flag' };
 
 /* Книжечка «Библиотеки» (energy, сервер gsl/energy/, 22.11.2026) — текст как в книге: list — вид списка ('ul' — точки,
    'plain' — абзацы; иначе номера), sub — вложенный список под пунктом, after — абзац после списка. */
@@ -101,6 +101,8 @@ function section(s) {
 
 /** Содержимое папки: вступление, вопросы (с флагами — и итог), разделы, «как понимать», источники. */
 export function folderBody(g, verdicts) {
+  // анкета «Чек-лист: 7 чакр в паре» (js/chakra-check/) — в «Анкетах» и главой досье, везде одна и та же
+  if (g.check) return chakraCheck(g);
   let total = null;
   let list = null;
   const recount = () => {
@@ -135,7 +137,7 @@ export function folder(g, { open = false, verdicts, photo = null } = {}) {
     h('summary', { class: 'help__folder-summary' },
       svg(icons.chevronRight, 'help__chevron'),
       h('span', { class: 'help__folder-title' }, g.title),
-      count(entriesOf(g).length, g.unit) ? h('span', { class: 'help__count' }, count(entriesOf(g).length, g.unit)) : null),
+      ((n) => (n ? h('span', { class: 'help__count' }, n) : null))(g.check ? count(g.sections.length, 'chakras') : count(entriesOf(g).length, g.unit))),
     h('div', { class: `help__folder-body${hp}` }, ...body),
   );
   node.open = open;
@@ -199,15 +201,15 @@ function questionPlates(item, verdicts) {
       lead: g.by, // кто автор подборки — прямо на плашке (владелец 15.11.2026)
       chip: g.themes ? count(g.sections.length, g.themeUnit || 'topics') : count(entriesOf(g).length, g.unit),
       // Постоянное фото плашки (js/photos/catalog.js → FIXED.questions): пирамиды, «JSL», игры — по порядку
-      // check — тест «Чек-лист: 7 чакр» с итогом «у кого перекос» (js/chakra-check/, 22.11.2026)
-      body: [photoNode(fixed('questions', i)), ...(g.check ? chakraCheck(g) : folderBody(g, verdicts))],
+      body: [photoNode(fixed('questions', i)), ...folderBody(g, verdicts)],
     }), `q${i}`)),
   ];
 }
 
 export function itemPlate(item, ctx, verdicts, { photo = null } = {}) {
   const rulesPart = item.editable ? rulesBody(item, () => { opened.add(item.key); ctx.rerender(); }) : null;
-  const n = rulesPart ? rulesPart.count : item.groups.filter((g) => g.unit === item.unit).reduce((s, g) => s + entriesOf(g).length, 0);
+  // «Анкеты» — счёт по анкетам; остальное — по записям
+  const n = rulesPart ? rulesPart.count : item.groups.every((g) => g.check) ? item.groups.length : item.groups.filter((g) => g.unit === item.unit).reduce((s, g) => s + entriesOf(g).length, 0);
   return remember(platePanel({
     icon: iconOf(item.key),
     // Красный флаг в кружке — у запретов: «Красный флаг» (владелец 15.11.2026) и «Когда задание не подходит» — когда
