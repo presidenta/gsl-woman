@@ -27,6 +27,7 @@ import { usCard } from '../../circles/today-card.js';
 import { talkCard, talkDone } from '../../circles/talk.js';
 import { thanksCard, thanksDone } from '../../thanks/thanks.js';
 import { weekendCard, intimDone } from '../../intim/weekend.js';
+import { secretCard } from '../../secret/secret.js';
 import { eveningCard } from '../../evening/evening.js';
 import { stemCard } from '../../stem/stem.js';
 // «В поиске» — карточка дня: шаги недели (search/) тем же списком, что на экране «В поиске»
@@ -590,6 +591,8 @@ export function render(view, ctx) {
       // (включается там же, по галочке), но стоит в утреннем порядке, а не внизу вместе с Кегелем и шагами
       open.health && sectionPicked('health', 'minute', ctx.settings) ? morningCard(ctx, plan) : null,
       main,
+      // «Секретные материалы» — глава досье о чакрах раз в 2 дня, под делом дня (js/secret/, владелец 22.11.2026)
+      secretCard(ctx),
       // Замер недели — в день итога: три оценки «что изменилось» (js/pulse/, владелец 17.11.2026)
       pulseCard(ctx, plan),
       // «В поиске» — своя карточка у профиля «В поиске», не пункт раздела и не переключатель (владелец 18.11.2026: «верни

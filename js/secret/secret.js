@@ -1,0 +1,88 @@
+import { h } from '../core/dom.js';
+import { icons } from '../ui/icons.js';
+import { platePanel } from '../ui/plate.js';
+import { langData } from '../program/source.js';
+import { folderBody } from '../screens/help/help.js';
+import { st } from './texts.js';
+import { startOf, openedOn, daysTo, cardOn, COUNT } from './schedule.js';
+
+/* «СЕКРЕТНЫЕ МАТЕРИАЛЫ» (владелец 22.11.2026, решение консилиума): досье «Секс, деньги и чакры» главами — 7 глав, по
+   чакре, раз в 2 дня. На «Сегодня» — карточка главы под делом дня (secretCard); в «Тайном архиве» — первая плашка
+   со всеми главами: открытые читаются, закрытые — «откроется через N дн.» (secretPlate). Тексты — с сервера (поле
+   secret программы, planner/server/src/gsl/secret/). Стыковка — строка в screens/today/today.js и в
+   screens/library/library.js. */
+
+export const secretOf = (lang) => langData(lang)?.secret || null;
+
+const stamp = (text) => h('span', { class: 'secret__stamp', 'aria-hidden': 'true' }, text);
+
+/** Кусок книжечки: заголовок и текст тем же видом, что папки «Тайного архива». */
+const piece = (b) => h('section', { class: 'secret__piece' }, h('h4', { class: 'help__section-title' }, b.title), ...folderBody(b));
+
+function task(t) {
+  return h('li', { class: 'secret__task' },
+    h('p', { class: 'secret__task-title' }, t.title),
+    h('p', { class: 'card__text' }, t.text),
+    t.quote ? h('blockquote', { class: 'secret__quote' }, `${st('qo')}${t.quote.text}${st('qc')}`, h('span', { class: 'secret__src' }, `${st('quote')}: ${t.quote.src}`)) : null);
+}
+
+/** Содержимое главы: на виду, «Читать глубже», задания (ей / ему), паре — в последней. */
+export function chapterBody(ch) {
+  const deeper = h('details', { class: 'secret__deeper' }, h('summary', { class: 'secret__more' }, st('deeper')), ...ch.deeper.map(piece));
+  return [
+    ...ch.open.map(piece),
+    deeper,
+    ch.tasks.length ? h('div', { class: 'secret__tasks' }, h('p', { class: 'caps secret__caps' }, st('tasks')), h('ul', { class: 'secret__task-list' }, ...ch.tasks.map(task))) : null,
+    ch.pair?.length ? h('div', { class: 'secret__tasks' }, h('p', { class: 'caps secret__caps' }, st('pair')), h('ul', { class: 'secret__task-list' }, ...ch.pair.map(task))) : null,
+  ];
+}
+
+const nextLine = (n, day, start, sec) => {
+  if (n >= COUNT) return st('last');
+  const d = daysTo(n + 1, day, start);
+  return `${d <= 1 ? st('tomorrow') : st('next', { d })}: ${sec.chapters[n].teaser}`;
+};
+
+/** Карточка главы на «Сегодня»: только когда глава вышла (и день после неё). */
+export function secretCard(ctx) {
+  const sec = secretOf(ctx.lang);
+  if (!sec) return null;
+  const start = startOf(ctx.day);
+  if (!cardOn(ctx.day, start)) return null;
+  const n = openedOn(ctx.day, start);
+  const ch = sec.chapters[n - 1];
+  const body = h('details', { class: 'secret__chapter' }, h('summary', { class: 'secret__more' }, st('read')), ...chapterBody(ch));
+  return h('section', { class: 'card secret' },
+    stamp(sec.stamp),
+    h('p', { class: 'caps secret__caps' }, `${sec.title} · ${st('chapter', { n })}`),
+    h('h2', { class: 'secret__title' }, ch.chakra),
+    body,
+    h('p', { class: 'secret__next' }, nextLine(n, ctx.day, start, sec)),
+    h('a', { class: 'secret__all', href: '#/library' }, st('openAll')));
+}
+
+/** Плашка «Секретные материалы» в «Тайном архиве»: все главы, закрытые — с днями до выхода. */
+export function secretPlate(ctx) {
+  const sec = secretOf(ctx.lang);
+  if (!sec) return null;
+  const start = startOf(ctx.day);
+  const n = openedOn(ctx.day, start);
+  const rows = sec.chapters.map((ch, i) => {
+    if (i < n) {
+      const node = h('details', { class: 'help__folder' },
+        h('summary', { class: 'help__folder-summary' }, h('span', { class: 'help__folder-title' }, `${st('chapter', { n: i + 1 })} · ${ch.chakra}`)),
+        h('div', { class: 'help__folder-body' }, ...chapterBody(ch)));
+      node.open = i === n - 1;
+      return node;
+    }
+    const d = daysTo(i + 1, ctx.day, start);
+    return h('p', { class: 'secret__locked' }, stamp(sec.stamp), h('span', {}, `${st('chapter', { n: i + 1 })} · ${ch.chakra} — ${d == null ? st('notYet') : d <= 1 ? st('closedTomorrow') : st('closed', { d })}`));
+  });
+  return platePanel({
+    icon: icons.journal,
+    stamp: sec.stamp,
+    title: sec.title,
+    lead: n ? st('of', { n }) : st('notYet'),
+    body: [h('p', { class: 'card__text help__lead' }, st('lead', { book: sec.book })), ...rows],
+  });
+}
