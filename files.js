@@ -215,6 +215,7 @@ self.GSL_FILES = [
   './js/boot.js',
   './js/chakra-check/chakra-check.css',
   './js/chakra-check/check.js',
+  './js/chakra-check/score.js',
   './js/chakra-check/texts.js',
   './js/circles/catalog/en.js',
   './js/circles/catalog/ru.js',

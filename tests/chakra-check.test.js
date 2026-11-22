@@ -1,24 +1,44 @@
-// Тест «Чек-лист: 7 чакр в паре» (js/chakra-check/, владелец 22.11.2026): итог — у кого больше перекосов и чей
-// перекос в каждой чакре; надписи на трёх языках с одним набором ключей.
+// Анкета «Чек-лист: 7 чакр в паре» (js/chakra-check/, владелец 22.11.2026): два опросника («У вас дома» / «У родителей»)
+// считаются раздельно; перекос — с двух баллов; «Что повторяется» — сравнение строк; надписи — одни ключи на трёх языках.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { summary } from '../js/chakra-check/check.js';
+import { points, leanOf, compare } from '../js/chakra-check/score.js';
 import { CT } from '../js/chakra-check/texts.js';
 
-test('итог: больше у мужчины / у женщины / поровну; по чакре — чей перекос', () => {
-  const r = summary([{ man: 2, woman: 1, pair: 1 }, { woman: 2 }, {}]);
-  assert.deepEqual(r.sum, { man: 2, woman: 3, pair: 1, both: 0 });
-  assert.equal(r.top, 'woman');
-  assert.deepEqual(r.leans, ['man', 'woman', null]);
-  assert.equal(summary([{ man: 1, woman: 1 }]).top, 'equal');
-  assert.equal(summary([{ man: 1, woman: 1 }]).leans[0], 'equal');
-  assert.equal(summary([{ pair: 2 }]).top, null, 'только «в паре» — без мужчины и женщины');
+const ROLE = { M: 'ok', W: 'w', B: null };
+const SIGN = { M: 'm', W: 'w', B: 'mw', N: 'ok' };
+const chakra = {
+  p1: [{ score: { home: true, place: { his: 'ok', hers: 'w', together: 'ok', rent: null }, ...ROLE } }, { score: ROLE }, { score: SIGN }],
+  p2: { who: 'w' },
+};
+
+test('баллы: роль, признак, жильё в два шага, «Да» части 2', () => {
+  assert.deepEqual(points(chakra, {}), { man: 0, woman: 0, pair: 0, answered: 0 });
+  const p = points(chakra, { place: ['hers'], p1: ['W', 'M', 'B'], p2: [true, false] });
+  assert.deepEqual(p, { man: 1, woman: 4, pair: 0, answered: 6 });
+  assert.equal(points(chakra, { p1: [null, null, 'N'] }).answered, 1, '«Никто» — ответ, в балансе');
+  assert.equal(points(chakra, { p1: [null, 'N'] }).answered, 0, 'варианта нет у вопроса — не считается');
+});
+
+test('перекос — с двух баллов; пусто — в балансе; ничего не отвечено — null', () => {
+  assert.equal(leanOf({ man: 0, woman: 0, pair: 0, answered: 0 }), null);
+  assert.deepEqual(leanOf({ man: 1, woman: 1, pair: 0, answered: 4 }), []);
+  assert.deepEqual(leanOf({ man: 2, woman: 3, pair: 0, answered: 6 }), ['man', 'woman']);
+  assert.deepEqual(leanOf({ man: 0, woman: 0, pair: 2, answered: 3 }), ['pair']);
+});
+
+test('«Что повторяется»: тот же перекос, роли поменялись, по-своему, оба в балансе', () => {
+  assert.deepEqual(compare(['woman'], ['woman', 'man']), { kind: 'repeat', who: ['woman'] });
+  assert.deepEqual(compare(['woman'], ['man']), { kind: 'swap', par: ['man'], now: ['woman'] });
+  assert.deepEqual(compare([], ['man']), { kind: 'own' });
+  assert.deepEqual(compare([], []), { kind: 'nothing' });
+  assert.equal(compare(null, ['man']), null);
+  assert.equal(compare(['man'], []), null);
 });
 
 test('надписи — одни ключи на ru, ua, en; без оценок', () => {
   const keys = (o) => Object.keys(o).sort().join();
   assert.equal(keys(CT.ua), keys(CT.ru));
   assert.equal(keys(CT.en), keys(CT.ru));
-  const all = JSON.stringify(CT);
-  assert.ok(!/молодец|умниц|молодець|well done|good (boy|girl)/i.test(all));
+  assert.ok(!/молодец|умниц|молодець|well done|good (boy|girl)/i.test(JSON.stringify(CT)));
 });

@@ -1,8 +1,43 @@
-/* Тест «Чек-лист: 7 чакр в паре» (js/chakra-check/): признаки — флажками, как в «Вопросах»; итог — тем же блоком */
-.chakra-check__who + .chakra-check__who { margin-top: var(--sp-3); }
-.chakra-check__label { margin: 0 0 var(--sp-1); font-weight: 600; }
+/* Анкета «Чек-лист: 7 чакр в паре» (js/chakra-check/): два опросника — два цвета. Золото — «У вас дома» (про пару сейчас),
+   голубой — «У родителей» (про семью, где человек вырос); итог — теми же цветами. */
+.chakra-test { --ct-now: var(--c-gold); --ct-par: #9fb6ea; --ct-repeat: var(--c-rose); }
+.ct-mode { margin: var(--sp-3) 0 var(--sp-4); }
+.ct-mode__label { margin: 0 0 var(--sp-2); font-weight: 700; }
+.ct-part { margin: var(--sp-4) 0 var(--sp-2); color: var(--c-gold); }
+.ct-q + .ct-q { margin-top: var(--sp-4); }
+.ct-q__title { margin: 0 0 var(--sp-2); font-weight: 700; color: var(--c-text); }
+
+.ct-row,
+.ct-block {
+    --row: var(--ct-now);
+    padding: var(--sp-3);
+    border: 1px solid color-mix(in srgb, var(--row) 40%, transparent);
+    border-left: 4px solid var(--row);
+    border-radius: var(--r-md);
+    background: color-mix(in srgb, var(--row) 9%, transparent);
+}
+.ct-row--par, .ct-block--par { --row: var(--ct-par); }
+.ct-block--repeat, .ct-block--should { --row: var(--ct-repeat); }
+.ct-row + .ct-row { margin-top: var(--sp-2); }
+.ct-row__label,
+.ct-block__title {
+    display: block;
+    margin: 0 0 var(--sp-1);
+    color: var(--row);
+    font-size: var(--fs-xs);
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+.ct-row__text { margin: 0 0 var(--sp-2); }
+.ct-follow:not(:empty) { margin-top: var(--sp-3); }
+.ct-row .segmented__option { padding: 4px 6px; white-space: normal; line-height: 1.15; letter-spacing: 0; }
+/* «Встречаемся или пока одна» — золотые блоки «У вас дома» прячутся */
+.chakra-test.is-apart .ct-row--now { display: none; }
+
 .chakra-total { margin-top: var(--sp-4); }
-.chakra-total__head { margin-bottom: var(--sp-2); }
-.chakra-total__list { margin: 0 0 var(--sp-3); padding-left: var(--sp-5); display: grid; gap: var(--sp-1); font-size: var(--fs-sm); }
+.ct-block + .ct-block { margin-top: var(--sp-3); }
+.ct-block__head { margin: 0 0 var(--sp-1); }
+.chakra-total__list { margin: var(--sp-2) 0 0; padding-left: var(--sp-5); display: grid; gap: var(--sp-1); font-size: var(--fs-sm); }
 .chakra-total__lean { color: var(--c-red-flag); font-weight: 700; }
 .chakra-total__open { display: inline-block; margin: var(--sp-1) 0 var(--sp-2); color: var(--c-gold); font-weight: 700; }
