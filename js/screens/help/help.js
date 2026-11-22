@@ -101,7 +101,7 @@ function section(s) {
 
 /** Содержимое папки: вступление, вопросы (с флагами — и итог), разделы, «как понимать», источники. */
 export function folderBody(g, verdicts) {
-  // анкета «Чек-лист: 7 чакр в паре» (js/chakra-check/) — в «Анкетах» и главой досье, везде одна и та же
+  // анкета «Чек-лист: 7 чакр в паре» (js/chakra-check/) — в «Анкетах» и главой книги, везде одна и та же
   if (g.check) return chakraCheck(g);
   let total = null;
   let list = null;
