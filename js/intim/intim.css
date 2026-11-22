@@ -2,10 +2,10 @@
 .intim-name { white-space: nowrap; }
 .intim__adult { margin-top: calc(-1 * var(--sp-2)); }
 
-/* Плашка раздела в «Артефактах» (с 161, владелец 22.11.2026): кружок и «18+» — красные, тем же красным, что флаг */
+/* Плашка раздела в «Артефактах» (с 161, владелец 22.11.2026): кружок — золотой, как у «Красного флага»,
+   «18⁺» внутри — красное (162: «оболочка жёлтая, цифры красные») */
 .plate--adult .plate__icon {
   color: var(--c-red-flag);
-  border-color: var(--c-red-flag);
 }
 .plate--adult .plate__icon svg { width: 28px; height: 28px; }
 
