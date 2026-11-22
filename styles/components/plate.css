@@ -130,3 +130,25 @@ a.plate,
 .plate__author {
   color: var(--c-gold);
 }
+
+/* Гриф «Совершенно секретно» над названием (книжечка о чакрах, владелец 22.11.2026): как штамп на секретных бумагах —
+   красная двойная рамка, наклон, едва заметно; нажатию не мешает */
+.plate__text { position: relative; }
+.plate__stamp {
+  display: inline-block;
+  justify-self: start;
+  margin: 0 0 var(--sp-1);
+  padding: 2px 10px;
+  border: 3px double var(--c-red-flag);
+  border-radius: 4px;
+  color: var(--c-red-flag);
+  font-family: var(--f-body, inherit);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  transform: rotate(-7deg);
+  transform-origin: left center;
+  opacity: 0.45;
+  pointer-events: none;
+}

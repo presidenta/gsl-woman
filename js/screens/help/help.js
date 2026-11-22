@@ -9,6 +9,7 @@ import * as help from '../../help/help.js';
 import * as rules from '../../help/rules.js';
 import * as meet from '../../meet/meet.js';
 import { LANGS } from '../../config.js';
+import { chakraCheck } from '../../chakra-check/check.js';
 
 /* ЭКРАН «ПОМОЩЬ» (#/help, владелец 14–15.11.2026) — быстрое: первое свидание и вопросы для разговора. С 15.11.2026
    остальные пункты — на экране «Библиотека» (screens/library/), «Красный флаг» — отдельный экран (screens/redflag/);
@@ -117,7 +118,8 @@ export function folderBody(g, verdicts) {
     after(g),
     total?.node,
     // themes — каждая тема своей папкой с числом вопросов (Готтманы, 13 тем; владелец 15.11.2026)
-    ...(g.sections || []).map((s) => (g.themes ? folder({ ...s, unit: 'questions' }) : section(s))),
+    // unit: null у раздела — папка без счётчика (чек-лист чакр, 22.11.2026)
+    ...(g.sections || []).map((s) => (g.themes ? folder({ ...s, unit: s.unit === null ? null : 'questions' }) : section(s))),
     g.read ? readBox(g.read) : null,
     sources(g.sources),
   ];
@@ -195,9 +197,10 @@ function questionPlates(item, verdicts) {
       title: g.title,
       author: g.author, // «Павел Раков — Темы-„опознаватели“…»
       lead: g.by, // кто автор подборки — прямо на плашке (владелец 15.11.2026)
-      chip: g.themes ? count(g.sections.length, 'topics') : count(entriesOf(g).length, g.unit),
+      chip: g.themes ? count(g.sections.length, g.themeUnit || 'topics') : count(entriesOf(g).length, g.unit),
       // Постоянное фото плашки (js/photos/catalog.js → FIXED.questions): пирамиды, «JSL», игры — по порядку
-      body: [photoNode(fixed('questions', i)), ...folderBody(g, verdicts)],
+      // check — тест «Чек-лист: 7 чакр» с итогом «у кого перекос» (js/chakra-check/, 22.11.2026)
+      body: [photoNode(fixed('questions', i)), ...(g.check ? chakraCheck(g) : folderBody(g, verdicts))],
     }), `q${i}`)),
   ];
 }
@@ -211,6 +214,7 @@ export function itemPlate(item, ctx, verdicts, { photo = null } = {}) {
     // задание делать нельзя (владелец 21.11.2026: «это тоже один из красных флагов, закрась флажок красным»)
     cls: `${RED_FLAG.has(item.key) ? 'plate--red' : ''}${photo ? ' has-photo' : ''}`.trim(),
     title: item.title,
+    stamp: item.stamp, // гриф «Совершенно секретно» (книжечка о чакрах)
     author: item.author, // авторы и «Павел Раков — Кто перед тобой?»: имя другим цветом
     // byline — кто автор, прямо на плашке («Кто перед тобой»: «По трактовке Павла Ракова — …», 15.11.2026)
     lead: item.byline || null,

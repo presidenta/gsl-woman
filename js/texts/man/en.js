@@ -885,7 +885,7 @@ export default {
   },
   // «Библиотека» и «Красный флаг» — свои экраны (владелец 15.11.2026)
   library: {
-    title: 'Library',
+    title: 'Secret archive', // было «Library» — владелец 22.11.2026: «выбивается из контекста»
     lead: 'To read and come back to: what she needs from you, authors for the men’s side, topics, house rules, date ideas.',
   },
   // У «compliments» уже есть пул фраз (массив) — подпись плашки под своим именем
@@ -915,7 +915,7 @@ export default {
     title: 'Questions',
     lead: 'For a talk: brief when time is short, deep when you have an evening',
     meetTitle: 'First date',
-    library: 'Library',
+    library: 'Secret archive',
     draft: 'draft',
     waiting: 'This section arrives together with the programme — open the app online.',
   },
@@ -1140,6 +1140,7 @@ export default {
     phrases: ['phrase', 'phrases'],
     questions: ['question', 'questions'],
     topics: ['topic', 'topics'],
+    chakras: ['chakra', 'chakras'],
     rules: ['rule', 'rules'],
     tips: ['tip', 'tips'],
     compliments: ['compliment', 'compliments'],

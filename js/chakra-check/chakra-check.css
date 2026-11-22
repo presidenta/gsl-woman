@@ -1,0 +1,8 @@
+/* Тест «Чек-лист: 7 чакр в паре» (js/chakra-check/): признаки — флажками, как в «Вопросах»; итог — тем же блоком */
+.chakra-check__who + .chakra-check__who { margin-top: var(--sp-3); }
+.chakra-check__label { margin: 0 0 var(--sp-1); font-weight: 600; }
+.chakra-total { margin-top: var(--sp-4); }
+.chakra-total__head { margin-bottom: var(--sp-2); }
+.chakra-total__list { margin: 0 0 var(--sp-3); padding-left: var(--sp-5); display: grid; gap: var(--sp-1); font-size: var(--fs-sm); }
+.chakra-total__lean { color: var(--c-red-flag); font-weight: 700; }
+.chakra-total__open { display: inline-block; margin: var(--sp-1) 0 var(--sp-2); color: var(--c-gold); font-weight: 700; }

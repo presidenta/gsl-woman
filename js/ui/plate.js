@@ -8,10 +8,12 @@ import { icons } from './icons.js';
      platePanel — раскрывается на месте (пункты «Помощи», «Письмо себе в будущее»): стрелка поворачивается вниз.
    Вид — styles/components/plate.css. */
 
-function head({ icon, title, author, lead, chip }) {
+function head({ icon, title, author, lead, chip, stamp }) {
   return [
     h('span', { class: 'plate__icon', 'aria-hidden': 'true' }, svg(icon || icons.sparkle)),
     h('span', { class: 'plate__text' },
+      // stamp — гриф над названием, как штамп на секретных бумагах: красный, бледный, с наклоном (владелец 22.11.2026)
+      stamp ? h('span', { class: 'plate__stamp', 'aria-hidden': 'true' }, stamp) : null,
       // author — имя автора другим цветом перед названием: «Павел Раков — Кто перед тобой?» (15.11.2026)
       h('span', { class: 'plate__title' }, author ? h('span', { class: 'plate__author' }, author) : null, author ? ' — ' : null, title),
       lead ? h('span', { class: 'plate__lead' }, lead) : null,
