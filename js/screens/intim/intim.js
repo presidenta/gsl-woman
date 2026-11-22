@@ -7,8 +7,9 @@ import { intimOf, withPlus } from '../../intim/content.js';
 import { mapView } from '../../intim/map-view.js';
 import { it } from '../../intim/texts.js';
 
-/* ЭКРАН «ИНТИМ 18⁺» (#/intim, владелец 21.11.2026): красный флаг (договор, стоп-слово), почему это важно (Готтманы,
-   Перель), карта желаний, массажи, игры, задания на выходные. Видят все — в паре и каждый для себя. Данные — поле
+/* ЭКРАН «ИНТИМ 18⁺» (#/intim, владелец 21.11.2026): красный флаг (договор, стоп-слово), своя плашка части
+   («Женщине / Мужчине: верность и близость», 22.11), почему это важно (Готтманы, Перель), карта желаний, массажи, игры,
+   задания на выходные. Видят все — в паре и каждый для себя. Данные — поле
    intim программы (planner: gsl/intim/), модуль — js/intim/. Раскрытые плашки и папки переживают перерисовку. */
 
 const opened = new Set(['safety']);
@@ -46,6 +47,8 @@ export function render(view, ctx) {
     h('p', { class: 'faint intim__adult' }, it('adult')),
     // Красный флаг — первым и раскрытым: договор и стоп-слово читают до всего остального
     plate('safety', icons.flag, x.safety.title, [h('p', { class: 'card__text' }, x.safety.lead), ...folders(x.safety.groups, 'safety')], 'plate--red'),
+    // Своя плашка части (22.11.2026): «Женщине / Мужчине: верность и близость» — слова авторов дословно
+    x.side ? plate('side', icons.rings, x.side.title, [h('p', { class: 'card__text' }, x.side.lead), ...folders(x.side.folders, 'side')]) : null,
     plate('why', icons.journal, x.sections.why, folders(x.why, 'why')),
     plate('map', icons.heart, x.sections.map, [mapView(x.map)]),
     plate('massage', icons.sparkle, x.sections.massage, folders(x.massage, 'massage')),
