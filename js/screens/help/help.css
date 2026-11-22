@@ -338,3 +338,8 @@
 .help__list:is(.help__list--dots, .help__list--num) > .help__entry > .help__sub { margin-top: var(--sp-1); }
 /* Номер и точка — в строку с текстом пункта (обтекание фото ставило текст блоком под номер) */
 .help__list.help__list:is(.help__list--dots, .help__list--num) > .help__entry.help__entry > .help__text { display: inline; }
+
+/* «Анкеты» в «Артефактах»: ссылка на «Пять языков любви» — строкой как папка, стрелка справа (с 177) */
+.surveys__link { display: block; color: inherit; text-decoration: none; }
+.surveys__link .help__folder-title { flex: 1; }
+.surveys__arrow { width: 18px; height: 18px; flex: none; color: var(--c-gold); }

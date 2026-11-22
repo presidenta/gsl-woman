@@ -189,7 +189,9 @@ export function render(view, ctx) {
     goalsBox({ list, open, done, form, input }),
     redFlagPlate(),
     meetPlate(ctx),
-    helpPlate(),
+    // «Вопросы» — двумя разделами (с 177, владелец 23.11.2026): первое свидание и для пары
+    helpPlate('date'),
+    helpPlate('pair'),
     // «Анкеты» — свой раздел рядом с «Вопросами» (с 176, владелец 22.11.2026: «вопросы отдельно, для обсуждения, а
     // анкеты — отдельный пункт… и вынести в артефакты»); раскрывается прямо здесь
     surveysPlate(ctx),
@@ -253,8 +255,8 @@ function meetPlate(ctx) {
   return plateLink({ href: '#/meet', icon: icons.rings, title: t('help.meetTitle'), lead: help.content(ctx.lang)?.meetLead });
 }
 
-function helpPlate() {
-  return plateLink({ href: '#/help', icon: icons.chat, title: t('help.title'), lead: t('help.lead') });
+function helpPlate(scene) {
+  return plateLink({ href: `#/help?${scene}`, icon: icons.chat, title: t(`help.${scene}Title`), lead: t(`help.${scene}Lead`) });
 }
 
 // Комплименты — те же, что были в «Помощи»; плашка раскрывается прямо здесь (itemPlate из screens/help/)
@@ -265,7 +267,10 @@ function complimentsPlate(ctx) {
 
 function surveysPlate(ctx) {
   const item = help.content(ctx.lang)?.items.find((i) => i.key === 'surveys');
-  return item ? itemPlate(item, ctx, null, { photo: photo(fixed('surveys', 0)) }) : null;
+  // «Пять языков любви» — ссылкой (владелец 23.11.2026): анкеты живут на своём экране, там же сохраняется итог у каждого
+  const love = h('a', { class: 'help__folder surveys__link', href: '#/love' },
+    h('span', { class: 'help__folder-summary' }, svg(icons.heart, 'help__chevron'), h('span', { class: 'help__folder-title' }, t('help.loveLink')), svg(icons.chevronRight, 'surveys__arrow')));
+  return item ? itemPlate(item, ctx, null, { photo: photo(fixed('surveys', 0)), extra: [love], extraCount: 2 }) : null;
 }
 
 function libraryPlate() {

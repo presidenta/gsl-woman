@@ -189,11 +189,12 @@ function remember(node, id) {
   return node;
 }
 
-/** Вопросы для разговора — сразу отдельными плашками, по числу вопросов (короткие первыми). */
-function questionPlates(item, verdicts) {
+/** Вопросы для разговора — сразу отдельными плашками, по числу вопросов (короткие первыми). scene — только папки своего
+    раздела ('date' — первое свидание, 'pair' — для пары; сервер gsl/help/scenes.js); фото — по месту папки в общем ряду. */
+function questionPlates(item, verdicts, scene = null) {
   return [
     h('h2', { class: 'caps plates__heading' }, item.title),
-    ...item.groups.map((g, i) => remember(platePanel({
+    ...item.groups.map((g, i) => (scene && g.scene && g.scene !== scene ? null : remember(platePanel({
       cls: 'has-photo',
       icon: icons.chat,
       title: g.title,
@@ -202,14 +203,17 @@ function questionPlates(item, verdicts) {
       chip: g.themes ? count(g.sections.length, g.themeUnit || 'topics') : count(entriesOf(g).length, g.unit),
       // Постоянное фото плашки (js/photos/catalog.js → FIXED.questions): пирамиды, «JSL», игры — по порядку
       body: [photoNode(fixed('questions', i)), ...folderBody(g, verdicts)],
-    }), `q${i}`)),
+    }), `q${i}`))).filter(Boolean),
   ];
 }
 
-export function itemPlate(item, ctx, verdicts, { photo = null } = {}) {
+/** Раздел «Вопросов» из адреса: #/help?date или #/help?pair (плашки «Артефактов»); без него — оба раздела. */
+const sceneOf = () => ({ date: 'date', pair: 'pair' })[location.hash.split('?')[1]] || null;
+
+export function itemPlate(item, ctx, verdicts, { photo = null, extra = [], extraCount = 0 } = {}) {
   const rulesPart = item.editable ? rulesBody(item, () => { opened.add(item.key); ctx.rerender(); }) : null;
   // «Анкеты» — счёт по анкетам; остальное — по записям
-  const n = rulesPart ? rulesPart.count : item.groups.every((g) => g.check) ? item.groups.length : item.groups.filter((g) => g.unit === item.unit).reduce((s, g) => s + entriesOf(g).length, 0);
+  const n = extraCount + (rulesPart ? rulesPart.count : item.groups.every((g) => g.check) ? item.groups.length : item.groups.filter((g) => g.unit === item.unit).reduce((s, g) => s + entriesOf(g).length, 0));
   return remember(platePanel({
     icon: iconOf(item.key),
     // Красный флаг в кружке — у запретов: «Красный флаг» (владелец 15.11.2026) и «Когда задание не подходит» — когда
@@ -226,6 +230,7 @@ export function itemPlate(item, ctx, verdicts, { photo = null } = {}) {
       h('p', { class: 'card__text help__lead' }, item.lead),
       // Главы книжечки — со своим фото (photos/catalog.js → CHAPTERS, у него и у неё — разные); у прочих — без фото
       ...(rulesPart ? rulesPart.nodes : item.groups.map((g, i) => folder(g, { open: !!item.openFolders, verdicts, photo: photoNode(chapter(item.key, i)) }))),
+      ...extra, // «Анкеты»: ссылка на «Пять языков любви» (screens/goals/)
     ],
   }), item.key);
 }
@@ -242,9 +247,13 @@ export function render(view, ctx) {
   // «Помощь» — только быстрое: первое свидание и вопросы для разговора. Остальное — в «Библиотеке» (library/),
   // «Красный флаг» — отдельным разделом (redflag/) (владелец 15.11.2026: «библиотека — это уже другое, это не помощь»)
   // С 76 — «Вопросы» (бывшая «Помощь»): только вопросы; «Первое свидание» и «Комплименты» — свои плашки в «Артефактах»
+  // С 177 — два раздела (владелец 23.11.2026): «Вопросы: первое свидание» и «Вопросы для пары»; адрес без раздела
+  // (старые ссылки) — оба, каждый под своим заголовком
+  const scene = sceneOf();
+  const part = (s) => (questions ? questionPlates(questions, verdicts, s).slice(1) : []);
   add(view,
-    h('h1', { class: 'screen-title' }, t('help.title')),
-    h('p', { class: 'help__intro' }, t('help.intro')),
-    ...(questions ? questionPlates(questions, verdicts).slice(1) : []),
+    h('h1', { class: 'screen-title' }, scene ? t(`help.${scene}Title`) : t('help.title')),
+    h('p', { class: 'help__intro' }, scene ? t(`help.${scene}Lead`) : t('help.intro')),
+    ...(scene ? part(scene) : ['date', 'pair'].flatMap((s) => [h('h2', { class: 'caps plates__heading' }, t(`help.${s}Title`)), ...part(s)])),
   );
 }
