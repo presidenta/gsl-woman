@@ -3,14 +3,16 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { existsSync } from 'node:fs';
-import { POOLS, FIXED } from '../js/photos/catalog.js';
+import { POOLS, FIXED, CHAPTERS } from '../js/photos/catalog.js';
 import { SIZES } from '../js/photos/sizes.js';
-import { pick, fixed, useDay } from '../js/photos/photos.js';
+import { pick, fixed, useDay, chapter } from '../js/photos/photos.js';
 
 // Красные на листах разбора (владелец 15.11.2026) и 22, 24 — номер Gemini на волосах
 const RED = [4, 22, 24, 39, 56, 57, 58, 72, 74, 75, 78, 79, 80, 81, 128, 129, 148, 150];
 const id = (n) => String(n).padStart(3, '0');
-const all = [...Object.values(POOLS), ...Object.values(FIXED)].flat();
+// Главы книжечки — { глава: кадр } (CHAPTERS); в общий список — их кадры
+const rows = { ...Object.fromEntries(Object.entries(CHAPTERS).map(([k, v]) => [k, Object.values(v)])) };
+const all = [...Object.values(POOLS), ...Object.values(FIXED), ...Object.values(rows)].flat();
 
 test('каждое фото из каталога лежит в assets/photos и знает свой размер', () => {
   for (const n of all) {
@@ -28,7 +30,7 @@ test('брак не стоит нигде и не лежит в assets', () => {
 
 // Владелец 15.11.2026: «мужчинам поставь одну фотографию, женщинам — другую… где логика?»
 test('у мужской и женской части в одном месте — ни одного общего кадра', () => {
-  for (const table of [POOLS, FIXED]) {
+  for (const table of [POOLS, FIXED, rows]) {
     // Стакан — исключение владельца (16.11.2026): кадры, где пьют вдвоём, «можно ставить и мужчине, и женщине»
     for (const key of Object.keys(table).filter((k) => k.endsWith('.woman') && !k.startsWith('water.'))) {
       const man = table[key.replace(/\.woman$/, '.man')];
@@ -83,4 +85,16 @@ test('фото идут по дню программы на экране: ден
     }
   }
   useDay(null);
+});
+
+// Книжечка «Энергия пары» (22.11.2026): у главы — своё фото по части; глава без фото и чужой пункт — без фото
+test('главы книжечки: фото по номеру главы, у него и у неё — своё; без записи — нет фото', () => {
+  assert.equal(chapter('energy', 2, 'woman'), 162, 'у неё восьмёрка — лист «Шесть этапов»');
+  assert.equal(chapter('energy', 2, 'man'), 167);
+  assert.equal(chapter('energy', 1, 'woman'), null, 'таблица — без фото');
+  assert.equal(chapter('types', 0, 'woman'), null, 'у пунктов без глав в каталоге — без фото');
+  assert.equal(fixed('library', 3, 'woman'), 166, 'плашка книжечки у неё');
+  assert.equal(fixed('library', 4, 'woman'), 1, '«Кто перед тобой» — с прежним фото');
+  assert.equal(fixed('library', 5, 'man'), 164, 'плашка книжечки у него');
+  assert.equal(fixed('library', 6, 'man'), 7, '«Кто перед тобой» у него — с прежним фото');
 });

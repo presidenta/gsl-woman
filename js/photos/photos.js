@@ -1,5 +1,5 @@
 import { h } from '../core/dom.js';
-import { POOLS, FIXED } from './catalog.js';
+import { POOLS, FIXED, CHAPTERS } from './catalog.js';
 import { SIZES } from './sizes.js';
 import * as side from '../side/side.js';
 
@@ -51,6 +51,12 @@ export function pick(key, date, part) {
 export function fixed(kind, i, part) {
   const list = listOf(FIXED, kind, part);
   return list?.length ? list[i % list.length] : null;
+}
+
+/** Фото главы книжечки «Библиотеки»: номер кадра главы i (с 0) пункта key или null — у главы без фото и у пунктов
+    без глав в каталоге (CHAPTERS). */
+export function chapter(key, i, part) {
+  return listOf(CHAPTERS, key, part)?.[i] ?? null;
 }
 
 /** Узел фото по номеру: портретное — слева с обтеканием, широкое — во всю ширину. Нет файла — null. */

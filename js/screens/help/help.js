@@ -2,7 +2,7 @@ import { h, svg, add } from '../../core/dom.js';
 import { t, plural } from '../../core/i18n.js';
 import { icons } from '../../ui/icons.js';
 import { toast } from '../../ui/toast.js';
-import { photo as photoNode, fixed } from '../../photos/photos.js';
+import { photo as photoNode, fixed, chapter } from '../../photos/photos.js';
 import { plateLink, platePanel } from '../../ui/plate.js';
 import { flagRow, flagTotal, picked } from '../../ui/flags.js';
 import * as help from '../../help/help.js';
@@ -26,7 +26,13 @@ const entriesOf = (g) => [...(g.entries || []), ...(g.sections || []).flatMap((s
 const count = (n, unit) => (unit && n ? `${n} ${plural(n, `plural.${unit}`)}` : null);
 
 // Значок каждого пункта — свой, вид один
-const ITEM_ICON = { redline: 'flag', questions: 'chat', her: 'heart', words: 'heart', kpk: 'crown', authors: 'journal', types: 'rings', topics: 'rings', rules: 'home', dates: 'calendar', compliments: 'sparkle', notfit: 'flag' };
+const ITEM_ICON = { redline: 'flag', questions: 'chat', her: 'heart', words: 'heart', kpk: 'crown', authors: 'journal', energy: 'journal', types: 'rings', topics: 'rings', rules: 'home', dates: 'calendar', compliments: 'sparkle', notfit: 'flag' };
+
+/* Книжечка «Библиотеки» (energy, сервер gsl/energy/, 22.11.2026) — текст как в книге: list — вид списка ('ul' — точки,
+   'plain' — абзацы; иначе номера), sub — вложенный список под пунктом, after — абзац после списка. */
+const LIST_CLS = { ul: 'help__list help__list--dots', ol: 'help__list help__list--num', plain: 'help__list help__list--plain' };
+const listOf = (g, nodes) => h(g.list === 'ul' || g.list === 'plain' ? 'ul' : 'ol', { class: LIST_CLS[g.list] || 'help__list' }, ...nodes);
+const after = (g) => (g.after ? h('p', { class: 'help__section-lead help__after' }, g.after) : null);
 // Авторы — каждый своей плашкой (author-glover…, с 80) — значок книги
 const RED_FLAG = new Set(['redline', 'notfit']);
 const iconOf = (key) => icons[ITEM_ICON[key] || (key.startsWith('author-') ? 'journal' : '')] || icons.sparkle;
@@ -65,6 +71,7 @@ function entry(e, onFlag) {
   const body = [
     h('span', { class: 'help__text' }, highlight(e.text, e.keys)),
     e.note ? h('span', { class: 'help__note' }, highlight(e.note, e.keys)) : null,
+    e.sub?.length ? h('ul', { class: 'help__sub' }, ...e.sub.map((s) => h('li', {}, s))) : null,
     e.read ? readBox(e.read) : null,
     onFlag && (e.green?.length || e.red?.length) ? flagChecks(e, onFlag) : null,
   ];
@@ -82,9 +89,10 @@ function sources(list) {
 
 function section(s) {
   return h('section', { class: 'help__section' },
-    h('h4', { class: 'help__section-title' }, s.title, s.entries?.length ? h('span', { class: 'help__count' }, count(s.entries.length, 'questions')) : null),
+    // unit: null — раздел без счётчика (главы книжечки); не указан — «N вопросов», как было
+    h('h4', { class: 'help__section-title' }, s.title, s.entries?.length && s.unit !== null ? h('span', { class: 'help__count' }, count(s.entries.length, s.unit || 'questions')) : null),
     s.lead ? h('p', { class: 'help__section-lead' }, s.lead) : null,
-    s.entries?.length ? h('ol', { class: 'help__list' }, ...s.entries.map((e) => entry(e))) : null,
+    s.entries?.length ? listOf(s, s.entries.map((e) => entry(e))) : null,
     s.read ? readBox(s.read) : null,
     sources(s.sources),
   );
@@ -99,13 +107,14 @@ export function folderBody(g, verdicts) {
     total.paint(green.length, red.length);
   };
   if (g.flags) total = flagTotal(verdicts);
-  list = g.entries?.length ? h('ol', { class: 'help__list' }, ...g.entries.map((e) => entry(e, g.flags ? recount : null))) : null;
+  list = g.entries?.length ? listOf(g, g.entries.map((e) => entry(e, g.flags ? recount : null))) : null;
   return [
     // by — кто автор, одной строкой («По трактовке Павла Ракова — …»), как у психологов
     g.by && g.by.length > 40 ? h('p', { class: 'help__by' }, g.by) : null,
     g.lead ? h('p', { class: 'help__section-lead' }, g.lead) : null,
     g.flags ? h('p', { class: 'faint help__flags-hint' }, t('help.flagsHint')) : null,
     list,
+    after(g),
     total?.node,
     // themes — каждая тема своей папкой с числом вопросов (Готтманы, 13 тем; владелец 15.11.2026)
     ...(g.sections || []).map((s) => (g.themes ? folder({ ...s, unit: 'questions' }) : section(s))),
@@ -209,7 +218,8 @@ export function itemPlate(item, ctx, verdicts, { photo = null } = {}) {
     body: [
       photo,
       h('p', { class: 'card__text help__lead' }, item.lead),
-      ...(rulesPart ? rulesPart.nodes : item.groups.map((g) => folder(g, { open: !!item.openFolders, verdicts }))),
+      // Главы книжечки — со своим фото (photos/catalog.js → CHAPTERS, у него и у неё — разные); у прочих — без фото
+      ...(rulesPart ? rulesPart.nodes : item.groups.map((g, i) => folder(g, { open: !!item.openFolders, verdicts, photo: photoNode(chapter(item.key, i)) }))),
     ],
   }), item.key);
 }

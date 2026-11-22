@@ -312,3 +312,29 @@
   font-weight: 600;
   font-style: normal;
 }
+
+/* Книжечка «Библиотеки» (пункт energy, 22.11.2026) — текст как в книге: точки вместо номеров, абзацы без значков,
+   вложенный список под пунктом, абзац после списка; во вступлении главы может быть два абзаца (перенос строки) */
+.help__section-lead { white-space: pre-line; }
+.help__list--dots { list-style: disc; }
+.help__list--plain { list-style: none; padding-left: 0; }
+.help__sub {
+  margin: var(--sp-1) 0 0;
+  padding-left: var(--sp-4);
+  display: grid;
+  gap: var(--sp-1);
+  list-style: circle;
+  color: var(--c-text);
+  font-size: var(--fs-sm);
+}
+.help__after { margin: var(--sp-3) 0 0; }
+/* Пункт — сетка (.help__entry), а у сетки нет значка списка: в книжечке точки и номера вернуть, как в тексте */
+/* Сильнее правил обтекания фото (photos.css: .has-photo … display: block — там значки пропадают): та же сила + класс */
+.help__list.help__list.help__list:is(.help__list--dots, .help__list--num) {
+  padding-left: var(--sp-5);
+  list-style-position: outside;
+}
+.help__list:is(.help__list--dots, .help__list--num) > .help__entry.help__entry:not(.help__entry--figure) { display: list-item; }
+.help__list:is(.help__list--dots, .help__list--num) > .help__entry > .help__sub { margin-top: var(--sp-1); }
+/* Номер и точка — в строку с текстом пункта (обтекание фото ставило текст блоком под номер) */
+.help__list.help__list:is(.help__list--dots, .help__list--num) > .help__entry.help__entry > .help__text { display: inline; }
