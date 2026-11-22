@@ -131,24 +131,33 @@ a.plate,
   color: var(--c-gold);
 }
 
-/* Гриф «Совершенно секретно» над названием (книжечка о чакрах, владелец 22.11.2026): как штамп на секретных бумагах —
-   красная двойная рамка, наклон, едва заметно; нажатию не мешает */
-.plate__text { position: relative; }
+/* Гриф «Совершенно секретно» (книжечка о чакрах, владелец 22.11.2026; вид — дизайнер): в правом верхнем углу карточки,
+   как на секретных документах, — тонкая красная рамка, лёгкий наклон, «потёртая» краска; нажатию не мешает */
+.plate--stamped { padding-top: 40px; }
 .plate__stamp {
-  display: inline-block;
-  justify-self: start;
-  margin: 0 0 var(--sp-1);
-  padding: 2px 10px;
-  border: 3px double var(--c-red-flag);
-  border-radius: 4px;
-  color: var(--c-red-flag);
-  font-family: var(--f-body, inherit);
-  font-size: 11px;
-  font-weight: 800;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  transform: rotate(-7deg);
-  transform-origin: left center;
-  opacity: 0.45;
-  pointer-events: none;
+    position: absolute;
+    top: 13px;
+    right: 18px;
+    transform-origin: 100% 50%;
+    padding: 3px 8px 2px;
+    border: 1.5px solid currentColor;
+    border-radius: 3px;
+    color: var(--c-red-flag);
+    font-family: var(--f-body);
+    font-size: 9.5px;
+    font-weight: 800;
+    line-height: 1.3;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    transform: rotate(-4deg);
+    opacity: 0.5;
+    mix-blend-mode: screen;
+    pointer-events: none;
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-mask-image: var(--stamp-ink);
+    mask-image: var(--stamp-ink);
+    -webkit-mask-size: 120px 48px;
+    mask-size: 120px 48px;
 }

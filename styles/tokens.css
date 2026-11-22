@@ -29,6 +29,8 @@
   /* Флаги «Помощи» и «Знакомства» (14.11.2026): зелёный и красный с золотым оттенком */
   --c-flag-green: #b9c879;
   --c-flag-red: #e88a6c;
+  /* «Потёртая» краска грифа «Совершенно секретно» (маска SVG-шум; plate.css, js/secret/secret.css) */
+  --stamp-ink: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='48'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' seed='9' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -3.4 2.55'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   --c-red-flag: #e5483d; /* «Красный флаг» в «Помощи» — единственная красная плашка: запрет (владелец 15.11.2026) */
   --c-gold-deep: #c98a70;
   --c-rose: #e9a5a4;

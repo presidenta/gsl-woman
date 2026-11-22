@@ -12,7 +12,7 @@ function head({ icon, title, author, lead, chip, stamp }) {
   return [
     h('span', { class: 'plate__icon', 'aria-hidden': 'true' }, svg(icon || icons.sparkle)),
     h('span', { class: 'plate__text' },
-      // stamp — гриф над названием, как штамп на секретных бумагах: красный, бледный, с наклоном (владелец 22.11.2026)
+      // stamp — гриф в правом верхнем углу карточки, как штамп на секретных бумагах (владелец 22.11.2026; вид — plate.css)
       stamp ? h('span', { class: 'plate__stamp', 'aria-hidden': 'true' }, stamp) : null,
       // author — имя автора другим цветом перед названием: «Павел Раков — Кто перед тобой?» (15.11.2026)
       h('span', { class: 'plate__title' }, author ? h('span', { class: 'plate__author' }, author) : null, author ? ' — ' : null, title),
@@ -26,12 +26,12 @@ function head({ icon, title, author, lead, chip, stamp }) {
 
 /** Плашка-переход: { icon, title, lead?, chip?, href, cls? }. */
 export function plateLink({ href, cls = '', ...rest }) {
-  return h('a', { class: `card plate ${cls}`.trim(), href }, ...head(rest));
+  return h('a', { class: `card plate ${rest.stamp ? 'plate--stamped ' : ''}${cls}`.trim(), href }, ...head(rest));
 }
 
 /** Плашка, которая раскрывается на месте: { icon, title, author?, lead?, chip?, open?, body: [узлы], cls? }. */
 export function platePanel({ open = false, body = [], cls = '', ...rest }) {
-  const node = h('details', { class: `card plate plate--panel ${cls}`.trim() },
+  const node = h('details', { class: `card plate plate--panel ${rest.stamp ? 'plate--stamped ' : ''}${cls}`.trim() },
     h('summary', { class: 'plate__head' }, ...head(rest)),
     h('div', { class: 'plate__body' }, ...body),
   );

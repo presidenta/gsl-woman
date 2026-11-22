@@ -9,14 +9,19 @@ const KEY = 'secret:start';
 export const COUNT = 7;
 export const STEP = 2;
 
-/** День старта; нет — запомнить сегодняшний (первый день программы → второй). */
+export const FIRST = 2; // по программе: главы на 2, 4, 6 … 14-й день
+
+/** День старта; нет — запомнить сегодняшний (первый день программы → второй). День на экране раньше запомненного
+    (администратор листает стрелками назад, 22.11.2026: «пролистал первые 7 дней — ни одного секретного материала») —
+    главы идут по дням программы: 2, 4, 6 … 14. */
 export function startOf(day) {
   let start = read(KEY, null);
   if (!Number.isInteger(start) && Number.isInteger(day) && day >= 1) {
-    start = Math.max(day, 2);
+    start = Math.max(day, FIRST);
     write(KEY, start);
   }
-  return Number.isInteger(start) ? start : null;
+  if (!Number.isInteger(start)) return null;
+  return Number.isInteger(day) && day < start ? FIRST : start;
 }
 
 /** Сколько глав открыто на день day (0…7). */
