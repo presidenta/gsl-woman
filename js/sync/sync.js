@@ -253,10 +253,22 @@ async function adopt(s, userId) {
   }
 }
 
-// Другая женщина вошла на этом устройстве: данные прежней — у неё на сервере, здесь их убираем
-function wipeForOther() {
-  for (const c of COLLECTIONS) writeLocal(c, c.empty);
+/* Другой человек вошёл на этом устройстве: данные прежнего — у него на сервере, здесь их убираем. Тот же человек
+   сменил часть (администратор, настройки → «Часть приложения»): записи прежней части тоже уходят, а настройки
+   остаются — иначе без отметки onboarded до прихода данных новой части на экране стартовая страница знакомства
+   (владелец 22.11.2026: «переключаться мгновенно, без всяких других страничек»). Свои настройки новой части на
+   сервере есть — adopt() их возьмёт (одиночное — с сервера); нет — уйдут туда эти. */
+const SAME_PERSON_KEEPS = new Set(['settings']);
+
+function wipeForOther(samePerson) {
+  for (const c of COLLECTIONS) {
+    if (samePerson && SAME_PERSON_KEEPS.has(c.key)) continue;
+    writeLocal(c, c.empty);
+  }
 }
+
+// Ключ владельца — «кабинет» или «кабинет:man» (side.ownerKey): тот же кабинет, другая часть
+const personOf = (ownerKey) => String(ownerKey).split(':')[0];
 
 /* Чьи данные на этом телефоне: кабинет и часть GSL (W+M)⁺ (side/side.js → ownerKey). У женской части — просто
    кабинет, как было всегда; у мужской — «кабинет:man». Администратор переключил часть — для телефона это как
@@ -276,7 +288,7 @@ async function run() {
   try {
     s.status = 'syncing';
     if (s.userId && s.userId !== me) {
-      wipeForOther();
+      wipeForOther(personOf(s.userId) === personOf(me));
       // И фото прежней: снимки, её фото профиля и что согласовано по фото
       await media.clear();
       write('avatar', null);

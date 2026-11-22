@@ -249,6 +249,10 @@ async function onLogin(loginName, password) {
    программа своей части и сверка данных. Отказ (нет сети, пол уже выбран) — исключение: экран покажет почему. */
 async function chooseGender(gender) {
   await sync.now().catch(() => {});
+  // Программа другой части — до переключения, пока на экране прежняя часть: переход мгновенный, без экрана входа
+  // (владелец 22.11.2026). Уже на телефоне — сразу; не скачалась — как раньше, загрузится после переключения.
+  const next = side.sideOfGender(gender);
+  if (next && !program.loaded(next)) await program.refresh(next).catch(() => {});
   await account.chooseGender(gender);
   side.follow(account.current());
   gate = { mode: 'form', message: '' };

@@ -57,6 +57,35 @@ test('программа другой части за свою не считае
   assert.equal(program.loaded(), true);
 });
 
+test('у каждой части своя копия программы — переключение мгновенное, без экрана входа (владелец 22.11.2026)', () => {
+  program._use(null);
+  program._use({ version: 'w1', langs: { ru: { months: [], weeks: [], tag: 'женская' } } });
+  program._use({ version: 'm1', side: 'man', langs: { ru: { months: [], weeks: [], tag: 'мужская' } } });
+  side._use('man');
+  assert.equal(program.loaded(), true);
+  assert.equal(program.langData('ru').tag, 'мужская');
+  side._use('woman');
+  assert.equal(program.loaded(), true, 'вернулась — женская копия на месте, качать заново не нужно');
+  assert.equal(program.langData('ru').tag, 'женская');
+  assert.equal(program.loaded('man'), true);
+  assert.equal(side.apiOf('man'), '/api/men');
+  assert.equal(side.apiOf('woman'), '/api/woman');
+});
+
+test('прежняя единственная копия мужской части переезжает на свой ключ, женская остаётся на месте', () => {
+  write('program', { version: 'm0', side: 'man', langs: { ru: { months: [], weeks: [] } } });
+  program._reload();
+  assert.equal(program.loaded('man'), true);
+  assert.equal(program.loaded('woman'), false);
+  write('program', { version: 'w0', langs: { ru: { months: [], weeks: [] } } });
+  program._reload();
+  assert.equal(program.loaded('woman'), true, 'копия без отметки — женская');
+  assert.equal(program.loaded('man'), true, 'мужская — со своего ключа');
+  program.forget();
+  program._reload();
+  assert.equal(program.loaded('woman') || program.loaded('man'), false, 'выход стирает обе');
+});
+
 test('синхронизация мужской части — на /api/men, данные женской части того же кабинета на телефоне стираются', async () => {
   const calls = [];
   sync._useRequest(async (path, { body } = {}) => {
@@ -78,6 +107,28 @@ test('синхронизация мужской части — на /api/men, д
   assert.ok(!calls.includes('/api/woman/sync'));
   const { read } = await import('../js/core/store.js');
   assert.deepEqual(read('goals', []), [], 'женская цель на телефоне мужской части стёрта (она на сервере женской)');
+});
+
+test('смена части тем же человеком: записи уходят, настройки остаются — без стартовой страницы знакомства (22.11.2026)', async () => {
+  sync._useRequest(async (path, { body } = {}) => (path.endsWith('/photos') ? [] : { cursor: body.cursor, changes: [], more: false, rejected: [] }));
+  const { read } = await import('../js/core/store.js');
+  write('account', { token: 't', userId: 'u5', gender: 'female' });
+  side.follow({ userId: 'u5', gender: 'female' });
+  settings.update({ onboarded: true, name: 'Вера', lang: 'ru' });
+  write('goals', [{ id: 'g1', text: 'цель', createdAt: '2026-11-01T10:00:00.000Z' }]);
+  await sync.now();
+
+  write('account', { token: 't', userId: 'u5', gender: 'male' });
+  side.follow({ userId: 'u5', gender: 'male' });
+  await sync.now();
+  assert.deepEqual(read('goals', []), [], 'записи прежней части стёрты');
+  assert.equal(settings.get().onboarded, true, 'знакомство пройдено — стартовая страница не показывается');
+  assert.equal(settings.get().name, 'Вера');
+
+  write('account', { token: 't2', userId: 'u6', gender: 'male' });
+  side.follow({ userId: 'u6', gender: 'male' });
+  await sync.now();
+  assert.equal(settings.get().onboarded, false, 'другой человек — настройки прежнего стёрты, как раньше');
 });
 
 test('пол ещё не выбран — синхронизация ждёт', async () => {

@@ -40,6 +40,9 @@ export const get = () => current;
 /** Адрес своей части на сервере: /api/woman или /api/men. Неизвестна — женская (так было всегда). */
 export const api = () => SIDES[current || 'woman'].api;
 
+/** Адрес любой части: woman → /api/woman, man → /api/men (программу другой части качают заранее, program/source.js). */
+export const apiOf = (key) => (SIDES[key] || SIDES.woman).api;
+
 /** Ключ для «чьи данные на этом телефоне» (sync/): у женской — как раньше, просто кабинет. */
 export const ownerKey = (userId) => (current === 'man' ? `${userId}:man` : userId);
 
