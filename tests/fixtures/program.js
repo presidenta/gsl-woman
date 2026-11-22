@@ -14,7 +14,6 @@ function lang(tag) {
         family: [0, 1, 2, 3, 4].map((i) => `${k} родным ${i}`),
         thanks: [0, 1, 2].map((i) => `${k} спасибо ${i}`),
       }])),
-      quiz: { him: [], me: [], child: [] },
     },
     months: Array.from({ length: 6 }, (_, i) => ({ title: `${tag} месяц ${i + 1}`, subtitle: '', goal: '' })),
     weeks: Array.from({ length: 24 }, (_, i) => {

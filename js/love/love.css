@@ -79,75 +79,7 @@
   font-weight: 600;
 }
 
-/* — Тест — */
-.love-quiz__step {
-  margin-top: var(--sp-2);
-  font-size: var(--fs-xs);
-}
-
-.love-quiz .bar {
-  margin-top: var(--sp-2);
-}
-
-.love-quiz__q {
-  margin-top: var(--sp-4);
-}
-
-.love-quiz__answers {
-  display: grid;
-  gap: var(--sp-2);
-  margin-top: var(--sp-4);
-}
-
-.love-quiz__answer {
-  padding: var(--sp-3) var(--sp-4);
-  border: 1px solid var(--c-line-strong);
-  border-radius: var(--r-md);
-  background: var(--g-gold-soft);
-  color: var(--c-text);
-  font: inherit;
-  font-size: var(--fs-md);
-  text-align: left;
-  transition: border-color var(--t-fast), transform var(--t-fast);
-}
-
-.love-quiz__answer:active {
-  transform: scale(0.99);
-  border-color: var(--c-gold);
-}
-
-.love-quiz__cancel {
-  justify-self: start;
-  margin-top: var(--sp-4);
-  padding: 0;
-  border: 0;
-  background: none;
-  color: var(--c-text-faint);
-  font-size: var(--fs-xs);
-  text-decoration: underline;
-  text-underline-offset: 3px;
-}
-
-/* — Итог теста — */
-.love-result__label {
-  margin-top: var(--sp-3);
-  color: var(--c-gold);
-}
-
-.love-result__name {
-  margin-top: var(--sp-1);
-  color: var(--c-champagne);
-  font-family: var(--f-display);
-  font-size: var(--fs-3xl);
-  line-height: 1.05;
-}
-
-.love-result__actions {
-  display: grid;
-  gap: var(--sp-2);
-}
-
-/* Кнопка-ссылка «Пройти тест» — без подчёркивания, как обычная кнопка */
+/* Кнопка-ссылка «Пройти анкету» — без подчёркивания, как обычная кнопка */
 a.btn {
   text-decoration: none;
 }

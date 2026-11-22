@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 import fixture from './fixtures/program.js';
 import { _use } from '../js/program/source.js';
 import { dayPlan } from '../js/program/index.js';
-import { choose, choices, score, ideaFor, myLanguage, pickFor, setCount, setPerson, groupIdeas } from '../js/love/love.js';
+import { choose, choices, ideaFor, myLanguage, pickFor, setCount, setPerson, groupIdeas } from '../js/love/love.js';
 import { write } from '../js/core/store.js';
 import * as settings from '../js/settings/settings.js';
 import { clearAll } from '../js/core/store.js';
@@ -12,12 +12,6 @@ import { clearAll } from '../js/core/store.js';
 beforeEach(() => {
   clearAll();
   _use(fixture);
-});
-
-test('тест: побеждает язык с большим числом ответов, при равенстве — по порядку', () => {
-  assert.equal(score(['time', 'touch', 'time', 'words'])[0].kind, 'time');
-  assert.equal(score(['touch', 'words'])[0].kind, 'words');
-  assert.equal(score([])[0].count, 0);
 });
 
 test('выбор хранится, чужие значения отбрасываются', () => {

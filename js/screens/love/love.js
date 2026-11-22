@@ -2,40 +2,51 @@ import { h, svg, add } from '../../core/dom.js';
 import { t, list } from '../../core/i18n.js';
 import { icons } from '../../ui/icons.js';
 import { toast } from '../../ui/toast.js';
-import { KINDS, GROUPS, MAX_PEOPLE, choices, choose, setCount, setPerson, content, score } from '../../love/love.js';
+import { KINDS, GROUPS, MAX_PEOPLE, choices, choose, setCount, setPerson, content } from '../../love/love.js';
+import * as quiz from '../../love-quiz/quiz.js';
 import { GROUP_TEXT, personLabel } from '../../love/cards.js';
 import { KIND_ICON } from '../../love/kind-icons.js';
 
 /* ЭКРАН «ПЯТЬ ЯЗЫКОВ ЛЮБВИ» (#/love). Отдельные разделы, по порядку (владелец 13.11.2026: «отдельно мужчина,
    потом дети, потом родители и другие родственники — три разных раздела, отделены»):
-     1. «Мой мужчина» — его язык: выбрать или тест;
-     2. «Мои дети» — «Сколько детей», у каждого имя, язык, тест;
-     3. «Родители и родные» — так же: «Папа», «Брат Вася», «Сестра Клава»…;
+     1. «Мой мужчина» — его язык: выбрать или анкета;
+     2. «Мои дети» — «Сколько детей», у каждого имя, язык, анкета;
+     3. «Родные» — так же: «Папа», «Брат Вася», «Сестра Клава»…;
      4. «Мой язык» — для я-сообщений;
    ниже — что это такое и все пять языков.
-   Тест — по вопросу за раз, пять ответов (по одному на каждый язык, порядок сдвинут); в конце — главный язык,
-   второй по силе и кнопка «Это язык …». Тест живёт только на этом экране, в хранилище — итог. */
+   Анкеты (владелец 22.11.2026, вместо прежнего короткого теста) — js/love-quiz/: «Мой язык» — анкета о себе
+   (22 вопроса); мужчина, дети и родные — анкета по наблюдению (взрослый; у детей — ребёнок или подросток).
+   Анкета живёт только на этом экране, в хранилище — итог («Это язык …»). */
 
-let quiz = null; // { who: 'him'|'me'|'children'|'family', index?, i, picks } — идёт тест
-let result = null; // { who, index?, ranking } — тест пройден, итог на экране
-
-const QUIZ_OF = { him: 'him', me: 'me', children: GROUPS.children.quiz, family: GROUPS.family.quiz };
-
-function shuffled(i) {
-  const k = (i * 2 + 1) % KINDS.length;
-  return [...KINDS.slice(k), ...KINDS.slice(0, k)];
-}
+const SELF_URL = 'https://presidenta.github.io/otkrytie-puti/love/'; // анкета о себе на сайте — её можно переслать
 
 function rerender(view, ctx) {
   view.replaceChildren();
   render(view, ctx);
-  scrollTo({ top: 0 });
 }
 
-function startQuiz(view, ctx, who, index) {
-  quiz = { who, index, i: 0, picks: [] };
-  result = null;
-  rerender(view, ctx);
+/** Открыть анкету для «Мой мужчина» / «Мой язык» (who) или для человека группы (who = 'children' | 'family', index). */
+function openQuiz(view, ctx, c, who, index) {
+  const group = GROUPS[who];
+  const save = (kind) => {
+    if (group) setPerson(who, index, { kind });
+    else choose(who, kind);
+    toast({ title: t('love.saved') });
+    rerender(view, ctx);
+    scrollTo({ top: 0 });
+  };
+  const named = group ? { name: whoName(who, index) } : {};
+  quiz.open({
+    mode: who === 'me' ? 'self' : 'observe',
+    group: { him: 'adult', family: 'adult', children: null }[who] ?? null, // детям — спросить: ребёнок или подросток
+    title: group ? t('love.quiz.title.named', named) : t(`love.quiz.title.${who}`),
+    saveText: group ? t('love.save.named', named) : t(`love.save.${who}`),
+    selfLink: who === 'me' ? null : { text: t(`love.quiz.selfLink.${who === 'him' ? 'him' : 'other'}`), url: SELF_URL },
+    names: Object.fromEntries(KINDS.map((k) => [k, c.kinds[k].name])), // названия языков — как везде в приложении
+    lang: ctx.lang,
+    onSave: save,
+    redraw: () => rerender(view, ctx),
+  });
 }
 
 function kindSelect(id, c, current, onPick, label) {
@@ -49,9 +60,9 @@ function kindSelect(id, c, current, onPick, label) {
   return h('div', { class: 'select' }, select, svg(icons.chevronRight, 'select__chevron'));
 }
 
-const testButton = (onClick) => h('button', { type: 'button', class: 'btn btn--ghost love-who__test', onclick: onClick }, t('love.test'));
+const quizButton = (onClick) => h('button', { type: 'button', class: 'btn btn--ghost love-who__test', onclick: onClick }, t('love.quiz.open'));
 
-// «Мой мужчина» и «Мой язык» — по отдельной карточке: заголовок, подсказка, язык и тест
+// «Мой мужчина» и «Мой язык» — по отдельной карточке: заголовок, подсказка, язык и анкета
 function oneSection(view, ctx, c, who, current) {
   const id = `love-${who}`;
   return h('section', { class: 'card settings__section love-section' },
@@ -66,12 +77,12 @@ function oneSection(view, ctx, c, who, current) {
       : null,
     h('div', { class: 'love-who__row' },
       kindSelect(id, c, current, (k) => choose(who, k), t(`love.who.${who}`)),
-      testButton(() => startQuiz(view, ctx, who)),
+      quizButton(() => openQuiz(view, ctx, c, who)),
     ),
   );
 }
 
-// Дети и родные: «Сколько», и по строке на каждого — имя, язык, тест
+// Дети и родные: «Сколько», и по строке на каждого — имя, язык, анкета
 function groupSection(view, ctx, c, group, people) {
   const tx = GROUP_TEXT[group];
   const count = h('select', { id: `love-${group}-count`, class: 'input select__control' },
@@ -94,7 +105,7 @@ function groupSection(view, ctx, c, group, people) {
         name,
         h('div', { class: 'love-who__row' },
           kindSelect(`love-${group}-${i}`, c, person.kind, (k) => setPerson(group, i, { kind: k }), t(tx.lang)),
-          testButton(() => startQuiz(view, ctx, group, i)),
+          quizButton(() => openQuiz(view, ctx, c, group, i)),
         ),
       );
     }),
@@ -105,85 +116,19 @@ function whoName(who, index) {
   return personLabel(who, choices()[who][index] || { name: '' }, index);
 }
 
-function quizTitle(who, index) {
-  return GROUPS[who] ? t('love.whoTest.named', { name: whoName(who, index) }) : t(`love.whoTest.${who}`);
-}
-
-function quizView(view, ctx, c) {
-  const list = c.quiz[QUIZ_OF[quiz.who]];
-  const q = list[quiz.i];
-  return h('section', { class: 'card love-quiz' },
-    h('div', { class: 'card__eyebrow' },
-      h('span', { class: 'card__icon' }, svg(icons.heart)),
-      h('span', { class: 'caps' }, quizTitle(quiz.who, quiz.index)),
-    ),
-    h('p', { class: 'love-quiz__step faint' }, t('love.question', { n: quiz.i + 1, count: list.length })),
-    h('div', { class: 'bar' }, h('div', { class: 'bar__fill', style: { width: `${(quiz.i / list.length) * 100}%` } })),
-    h('h2', { class: 'card__title love-quiz__q' }, q.q),
-    h('div', { class: 'love-quiz__answers' },
-      ...shuffled(quiz.i).map((k) => h('button', {
-        type: 'button',
-        class: 'love-quiz__answer',
-        onclick: () => {
-          quiz.picks.push(k);
-          quiz.i += 1;
-          if (quiz.i >= list.length) {
-            result = { who: quiz.who, index: quiz.index, ranking: score(quiz.picks) };
-            quiz = null;
-          }
-          rerender(view, ctx);
-        },
-      }, q.a[k])),
-    ),
-    h('button', { type: 'button', class: 'love-quiz__cancel', onclick: () => { quiz = null; rerender(view, ctx); } }, t('love.cancel')),
-  );
-}
-
-function resultView(view, ctx, c) {
-  const [first, second] = result.ranking;
-  const main = c.kinds[first.kind];
-  const { who, index } = result;
-  const saveText = GROUPS[who] ? t('love.save.named', { name: whoName(who, index) }) : t(`love.save.${who}`);
-  return h('section', { class: 'card card--hero love-result' },
-    h('div', { class: 'card__eyebrow' },
-      h('span', { class: 'card__icon' }, svg(icons.heart)),
-      h('span', { class: 'caps' }, quizTitle(who, index)),
-    ),
-    h('p', { class: 'caps love-result__label' }, t('love.resultTitle')),
-    h('h2', { class: 'love-result__name' }, main.name),
-    h('p', { class: 'card__text' }, main.about),
-    second.count ? h('p', { class: 'card__text faint' }, t('love.resultSecond', { name: c.kinds[second.kind].name })) : null,
-    h('div', { class: 'card__actions love-result__actions' },
-      h('button', {
-        type: 'button',
-        class: 'btn btn--gold btn--block',
-        onclick: () => {
-          if (GROUPS[who]) setPerson(who, index, { kind: first.kind });
-          else choose(who, first.kind);
-          result = null;
-          toast({ title: t('love.saved') });
-          rerender(view, ctx);
-        },
-      }, saveText),
-      h('button', { type: 'button', class: 'btn btn--ghost btn--block', onclick: () => startQuiz(view, ctx, who, index) }, t('love.again')),
-    ),
-  );
-}
-
 export function render(view, ctx) {
   const c = content(ctx.lang);
   if (!c) {
     add(view, h('h1', { class: 'screen-title' }, t('love.title')), h('p', { class: 'card__text' }, t('love.empty')));
     return;
   }
-  if (quiz) {
-    add(view, h('h1', { class: 'screen-title' }, c.title), quizView(view, ctx, c));
+  if (quiz.isOpen()) {
+    add(view, h('h1', { class: 'screen-title' }, c.title), quiz.node());
     return;
   }
   const mine = choices();
   add(view,
     h('h1', { class: 'screen-title' }, c.title),
-    result ? resultView(view, ctx, c) : null,
     oneSection(view, ctx, c, 'him', mine.him),
     groupSection(view, ctx, c, 'children', mine.children),
     groupSection(view, ctx, c, 'family', mine.family),
@@ -199,8 +144,7 @@ export function render(view, ctx) {
   );
 }
 
-/* Ушла с экрана посреди теста — при возвращении начнёт обычный вид */
+/* Ушла с экрана посреди анкеты — при возвращении начнёт обычный вид */
 export function onEnter() {
-  quiz = null;
-  result = null;
+  quiz.close();
 }

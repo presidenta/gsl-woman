@@ -1,0 +1,282 @@
+/* АНКЕТЫ «ПЯТЬ ЯЗЫКОВ ЛЮБВИ» (js/love-quiz/quiz.js): вопрос с отметками 1 · 2 · 3, таймер анкеты о себе, итог.
+   Только общие цвета и отступы приложения — у женской и мужской части свои значения тех же переменных. */
+
+.lq + .lq {
+  margin-top: var(--sp-3);
+}
+
+.lq-p + .lq-p {
+  margin-top: var(--sp-2);
+}
+
+.lq-sub {
+  margin-top: var(--sp-4);
+  color: var(--c-gold);
+}
+
+.lq-list {
+  display: grid;
+  gap: var(--sp-2);
+  margin: var(--sp-2) 0 0;
+  padding-left: 1.2em;
+  color: var(--c-text);
+}
+
+.lq-author {
+  margin-top: var(--sp-4);
+  font-size: var(--fs-xs);
+}
+
+.lq-close {
+  display: block;
+  margin: var(--sp-4) auto 0;
+  padding: var(--sp-2) var(--sp-3);
+  border: 0;
+  background: none;
+  color: var(--c-text-faint);
+  font: inherit;
+  font-size: var(--fs-sm);
+  text-decoration: underline;
+}
+
+/* — Ребёнок или подросток — */
+.lq-ages {
+  display: grid;
+  gap: var(--sp-2);
+}
+
+.lq-age {
+  display: grid;
+  gap: 2px;
+  padding: var(--sp-3) var(--sp-4);
+  border: 1px solid var(--c-line-strong);
+  border-radius: var(--r-md);
+  background: var(--g-gold-soft);
+  color: var(--c-text);
+  font: inherit;
+  text-align: left;
+}
+
+.lq-age strong {
+  color: var(--c-champagne);
+  font-family: var(--f-display);
+  font-size: var(--fs-lg);
+  font-weight: 600;
+}
+
+/* — Вопрос — */
+.lq-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-3);
+  margin-top: var(--sp-3);
+}
+
+.lq-top__count {
+  color: var(--c-text-dim);
+}
+
+.lq-timer {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  min-width: 120px;
+}
+
+.lq-timer__digits {
+  min-width: 2ch;
+  color: var(--c-champagne);
+  font-family: var(--f-display);
+  font-size: var(--fs-xl);
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+.lq-timer__track {
+  flex: 1;
+  height: 4px;
+  overflow: hidden;
+  border-radius: var(--r-pill);
+  background: var(--c-line);
+}
+
+.lq-timer__fill {
+  display: block;
+  height: 100%;
+  background: var(--g-gold-smooth);
+  transition: width 0.25s linear;
+}
+
+.lq-timer.is-warn .lq-timer__digits { color: #e9c46a; }
+.lq-timer.is-warn .lq-timer__fill { background: #e9c46a; }
+.lq-timer.is-danger .lq-timer__digits { color: var(--c-flag-red); }
+.lq-timer.is-danger .lq-timer__fill { background: var(--c-flag-red); }
+
+.lq .bar {
+  margin-top: var(--sp-2);
+}
+
+.lq-q {
+  margin-top: var(--sp-4);
+}
+
+.lq-answers {
+  display: grid;
+  gap: var(--sp-2);
+  margin-top: var(--sp-4);
+}
+
+.lq-answer {
+  display: grid;
+  grid-template-columns: 36px minmax(0, 1fr);
+  gap: var(--sp-3);
+  align-items: center;
+  padding: var(--sp-3);
+  border: 1px solid var(--c-line);
+  border-radius: var(--r-md);
+  background: var(--c-surface);
+  color: var(--c-text);
+  font: inherit;
+  font-size: var(--fs-md);
+  text-align: left;
+  transition: border-color var(--t-fast), background var(--t-fast);
+}
+
+.lq-answer__slot {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border: 1px dashed var(--c-line-strong);
+  border-radius: var(--r-md);
+  color: var(--c-on-gold);
+  font-family: var(--f-display);
+  font-size: var(--fs-lg);
+  font-weight: 700;
+}
+
+.lq-answer.is-rank-1 { border-color: var(--c-gold); background: var(--g-gold-soft); }
+.lq-answer.is-rank-1 .lq-answer__slot { border: 0; background: var(--g-gold-smooth); }
+.lq-answer.is-rank-2 { border-color: var(--c-line-strong); background: var(--c-surface-strong); }
+.lq-answer.is-rank-2 .lq-answer__slot { border: 0; background: var(--c-champagne); }
+.lq-answer.is-rank-3 { border-color: var(--c-line-strong); }
+.lq-answer.is-rank-3 .lq-answer__slot { border: 0; background: var(--c-gold-deep); }
+
+.lq-actions .btn[disabled] {
+  opacity: 0.45;
+}
+
+/* — Итог — */
+.lq-main {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--sp-3);
+  flex-wrap: wrap;
+  margin-top: var(--sp-1);
+}
+
+.lq-main__name {
+  color: var(--c-champagne);
+  font-family: var(--f-display);
+  font-size: var(--fs-2xl);
+  font-weight: 600;
+  line-height: 1.1;
+}
+
+.lq-main__name.is-second {
+  font-size: var(--fs-xl);
+}
+
+.lq-main__pct {
+  color: var(--c-gold);
+  font-family: var(--f-display);
+  font-size: var(--fs-2xl);
+  font-variant-numeric: tabular-nums;
+}
+
+.lq-main__pct.is-second {
+  font-size: var(--fs-xl);
+  color: var(--c-text-dim);
+}
+
+.lq-tagline {
+  margin: var(--sp-1) 0 var(--sp-3);
+  font-size: var(--fs-sm);
+}
+
+.lq-pill {
+  margin-top: var(--sp-3);
+  padding: var(--sp-3) var(--sp-4);
+  border: 1px solid var(--c-line);
+  border-radius: var(--r-md);
+  background: var(--c-surface);
+}
+
+.lq-pill .caps {
+  color: var(--c-gold);
+}
+
+.lq-pill.is-warn {
+  border-color: var(--c-flag-red);
+}
+
+.lq-phrase {
+  margin: var(--sp-2) 0 0;
+  padding: var(--sp-3) var(--sp-4);
+  border-left: 3px solid var(--c-gold);
+  border-radius: 0 var(--r-md) var(--r-md) 0;
+  background: var(--g-gold-soft);
+  color: var(--c-text);
+  font-style: italic;
+}
+
+.lq-bars {
+  display: grid;
+  gap: var(--sp-3);
+  margin-top: var(--sp-2);
+}
+
+.lq-bars__row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 4px var(--sp-2);
+}
+
+.lq-bars__name {
+  color: var(--c-text);
+  font-weight: 600;
+}
+
+.lq-bars__val {
+  color: var(--c-text-faint);
+  font-size: var(--fs-xs);
+  font-variant-numeric: tabular-nums;
+}
+
+.lq-bars__track {
+  grid-column: 1 / -1;
+  height: 6px;
+  overflow: hidden;
+  border-radius: var(--r-pill);
+  background: var(--c-line);
+}
+
+.lq-bars__fill {
+  display: block;
+  height: 100%;
+  background: var(--c-text-faint);
+}
+
+.lq-bars__row.is-top .lq-bars__fill { background: var(--g-gold-smooth); }
+.lq-bars__row.is-second .lq-bars__fill { background: var(--c-champagne); }
+
+.lq-pairs {
+  padding-left: 1.6em;
+}
+
+.lq-link {
+  color: var(--c-gold);
+  word-break: break-all;
+}
