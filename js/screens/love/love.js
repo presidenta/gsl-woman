@@ -2,7 +2,7 @@ import { h, svg, add } from '../../core/dom.js';
 import { t, list } from '../../core/i18n.js';
 import { icons } from '../../ui/icons.js';
 import { toast } from '../../ui/toast.js';
-import { KINDS, GROUPS, MAX_PEOPLE, choices, choose, setCount, setPerson, content, resultOf, setResult } from '../../love/love.js';
+import { KINDS, GROUPS, MAX_PEOPLE, choices, choose, chooseBoth, setCount, setPerson, content, resultOf, setResult } from '../../love/love.js';
 import * as quiz from '../../love-quiz/quiz.js';
 import { GROUP_TEXT, personLabel } from '../../love/cards.js';
 import { KIND_ICON } from '../../love/kind-icons.js';
@@ -35,9 +35,10 @@ const redrawCurrent = () => { if (onScreen) rerender(onScreen.view, onScreen.ctx
 /** Открыть анкету для «Мой мужчина» / «Мой язык» (who) или для человека группы (who = 'children' | 'family', index). */
 function openQuiz(view, ctx, c, who, index) {
   const group = GROUPS[who];
-  const save = (kind) => {
-    if (group) setPerson(who, index, { kind });
-    else choose(who, kind);
+  // Анкета сохраняет главный язык и второй (или null — тогда второй снимается: итог анкеты — новый)
+  const save = (kind, kind2 = null) => {
+    if (group) setPerson(who, index, { kind, kind2 });
+    else chooseBoth(who, kind, kind2);
     toast({ title: t('love.saved') });
     redrawCurrent();
     scrollTo({ top: 0 });
@@ -69,6 +70,22 @@ function kindSelect(id, c, current, onPick, label) {
   return h('div', { class: 'select' }, select, svg(icons.chevronRight, 'select__chevron'));
 }
 
+/* Второй язык — по желанию (владелец 25.11.2026: «можно выбрать два языка… у всех одинаково по одному шаблону»):
+   под главным, из четырёх остальных; «Один язык» — второго нет. Дела дня идут по двум языкам по очереди. */
+function secondSelect(id, c, main, current, onPick) {
+  if (!main) return null;
+  const select = h('select', { id, class: 'input select__control', 'aria-label': t('love.second') },
+    h('option', { value: '', selected: !current }, t('love.secondOne')),
+    ...KINDS.filter((k) => k !== main).map((k) => h('option', { value: k, selected: k === current }, c.kinds[k].name)));
+  select.addEventListener('change', () => {
+    onPick(select.value);
+    toast({ title: t('love.saved') });
+  });
+  return h('div', { class: 'field love-second' },
+    h('label', { class: 'field__label', for: id }, t('love.second')),
+    h('div', { class: 'select' }, select, svg(icons.chevronRight, 'select__chevron')));
+}
+
 const quizButton = (onClick, done) => h('button', { type: 'button', class: 'btn btn--ghost love-who__test', onclick: onClick },
   t(done ? 'love.quiz.result' : 'love.quiz.open'));
 
@@ -82,7 +99,7 @@ function resultLine(c, r) {
 }
 
 // «Мой мужчина» и «Мой язык» — по отдельной карточке: заголовок, подсказка, язык и анкета
-function oneSection(view, ctx, c, who, current) {
+function oneSection(view, ctx, c, who, current, second) {
   const id = `love-${who}`;
   return h('section', { class: 'card settings__section love-section' },
     h('h2', { class: 'love-section__title' }, t(`love.${who}Section`)),
@@ -98,6 +115,7 @@ function oneSection(view, ctx, c, who, current) {
       kindSelect(id, c, current, (k) => choose(who, k), t(`love.who.${who}`)),
       quizButton(() => openQuiz(view, ctx, c, who), resultOf(who)),
     ),
+    secondSelect(`${id}-2`, c, current, second, (k) => choose(who, k, true)),
     resultLine(c, resultOf(who)),
   );
 }
@@ -127,6 +145,7 @@ function groupSection(view, ctx, c, group, people) {
           kindSelect(`love-${group}-${i}`, c, person.kind, (k) => setPerson(group, i, { kind: k }), t(tx.lang)),
           quizButton(() => openQuiz(view, ctx, c, group, i), person.result),
         ),
+        secondSelect(`love-${group}-${i}-2`, c, person.kind, person.kind2, (k) => setPerson(group, i, { kind2: k })),
         resultLine(c, person.result),
       );
     }),
@@ -151,10 +170,10 @@ export function render(view, ctx) {
   const mine = choices();
   add(view,
     h('h1', { class: 'screen-title' }, c.title),
-    oneSection(view, ctx, c, 'him', mine.him),
+    oneSection(view, ctx, c, 'him', mine.him, mine.him2),
     groupSection(view, ctx, c, 'children', mine.children),
     groupSection(view, ctx, c, 'family', mine.family),
-    oneSection(view, ctx, c, 'me', mine.me),
+    oneSection(view, ctx, c, 'me', mine.me, mine.me2),
     h('section', { class: 'card love-intro' }, h('p', { class: 'card__text' }, c.intro)),
     h('section', { class: 'card' },
       h('h2', { class: 'caps settings__heading' }, t('love.kinds')),

@@ -1,6 +1,7 @@
 import { read, write } from '../core/store.js';
 import { langData } from '../program/source.js';
 import * as settings from '../settings/settings.js';
+import { touchDeed } from '../tender/tender.js';
 
 /* ПЯТЬ ЯЗЫКОВ ЛЮБВИ (Гэри Чепмен) — данные и выбор. Тексты (языки, дела, я-сообщения) — на сервере
    вместе с программой: langs.<язык>.love. Здесь только то, что выбрала сама женщина (ключ love в хранилище):
@@ -26,6 +27,13 @@ export const GROUPS = {
 const KEY = 'love';
 
 const kindOrNull = (k) => (KINDS.includes(k) ? k : null);
+/* ДВА ЯЗЫКА (владелец 25.11.2026: «язык может быть неярко выраженный и меняться — если два, вероятность попадания
+   гораздо больше»): у каждого — главный язык и второй по желанию. Анкета сама ставит два, когда первые два языка
+   разделяет 10% и меньше (как «два ведущих» в итоге анкеты, love-quiz/quiz.js → shapeOf); при большем разрыве
+   второй человек ставит сам. Второй — только при главном и отличный от него. */
+const secondOrNull = (main, k) => (kindOrNull(main) && kindOrNull(k) && k !== main ? k : null);
+/** Язык дела на этот день: при двух — по очереди (нечётный день — главный, чётный — второй). */
+export const dayKind = (main, second, day) => (second && day % 2 === 0 ? second : main);
 const cleanName = (n) => (typeof n === 'string' ? n.trim().slice(0, 40) : '');
 
 /* ИТОГ АНКЕТЫ — хранится у каждого, кто её прошёл (владелец 24.11.2026: «результат должен сохраняться открытым…
@@ -48,18 +56,20 @@ export function cleanResult(r) {
   };
 }
 const cleanList = (list) => (Array.isArray(list)
-  ? list.slice(0, MAX_PEOPLE).map((p) => ({ name: cleanName(p?.name), kind: kindOrNull(p?.kind), result: cleanResult(p?.result) }))
+  ? list.slice(0, MAX_PEOPLE).map((p) => ({ name: cleanName(p?.name), kind: kindOrNull(p?.kind), kind2: secondOrNull(p?.kind, p?.kind2), result: cleanResult(p?.result) }))
   : []);
 
-/** Выбор: { him, me, children: [{ name, kind }], family: [{ name, kind }] } — kind из KINDS или null. */
+/** Выбор: { him, him2, me, me2, children: [{ name, kind, kind2 }], family: [{ name, kind, kind2 }] } — kind из KINDS или null; *2 — второй язык. */
 export function choices() {
   const saved = read(KEY, {}) || {};
   let children = cleanList(saved.children);
   // До 13.11.2026 ребёнок был один (поле child) — он становится первым
-  if (!Array.isArray(saved.children) && kindOrNull(saved.child)) children = [{ name: '', kind: saved.child }];
+  if (!Array.isArray(saved.children) && kindOrNull(saved.child)) children = [{ name: '', kind: saved.child, kind2: null }];
   return {
     him: kindOrNull(saved.him),
+    him2: secondOrNull(saved.him, saved.him2),
     me: kindOrNull(saved.me),
+    me2: secondOrNull(saved.me, saved.me2),
     children,
     family: cleanList(saved.family),
     results: { him: cleanResult(saved.results?.him), me: cleanResult(saved.results?.me) },
@@ -67,7 +77,7 @@ export function choices() {
 }
 
 function save(next) {
-  write(KEY, { him: next.him, me: next.me, children: next.children, family: next.family, results: next.results });
+  write(KEY, { him: next.him, him2: secondOrNull(next.him, next.him2), me: next.me, me2: secondOrNull(next.me, next.me2), children: next.children, family: next.family, results: next.results });
 }
 
 /** Итог анкеты: who — 'him' | 'me' или группа ('children' | 'family') с номером человека; null — не проходили. */
@@ -90,9 +100,16 @@ export function setResult(who, index, result) {
   save(c);
 }
 
-export function choose(who, kind) {
+/** Главный язык (second = false) или второй (second = true). Новый главный, совпавший со вторым, убирает второй. */
+export function choose(who, kind, second = false) {
   if (!WHO.includes(who)) return;
-  save({ ...choices(), [who]: kindOrNull(kind) });
+  save({ ...choices(), [second ? `${who}2` : who]: kindOrNull(kind) });
+}
+
+/** Оба языка сразу — из анкеты: второй или null. */
+export function chooseBoth(who, kind, kind2) {
+  if (!WHO.includes(who)) return;
+  save({ ...choices(), [who]: kindOrNull(kind), [`${who}2`]: kindOrNull(kind2) });
 }
 
 /** Сколько человек в группе: лишние строки убираются с конца, новые — пустые. */
@@ -101,11 +118,11 @@ export function setCount(group, n) {
   const count = Math.max(0, Math.min(MAX_PEOPLE, Math.floor(Number(n) || 0)));
   const c = choices();
   const list = c[group].slice(0, count);
-  while (list.length < count) list.push({ name: '', kind: null, result: null });
+  while (list.length < count) list.push({ name: '', kind: null, kind2: null, result: null });
   save({ ...c, [group]: list });
 }
 
-/** Имя или язык одного человека группы (patch: { name } и/или { kind }). */
+/** Имя или язык одного человека группы (patch: { name }, { kind }, { kind2 }). */
 export function setPerson(group, index, patch) {
   if (!GROUPS[group]) return;
   const c = choices();
@@ -113,6 +130,8 @@ export function setPerson(group, index, patch) {
   const person = { ...c[group][index] };
   if ('name' in patch) person.name = cleanName(patch.name);
   if ('kind' in patch) person.kind = kindOrNull(patch.kind);
+  if ('kind2' in patch) person.kind2 = kindOrNull(patch.kind2);
+  person.kind2 = secondOrNull(person.kind, person.kind2);
   c[group][index] = person;
   save(c);
 }
@@ -129,11 +148,22 @@ export function pickFor(list, day, salt = 0) {
   return list[(((day + salt) % n) + n) % n];
 }
 
-/** Дело дня на языке мужчины: { kind, name, text } или null. */
+/** У партнёра язык «Прикосновения» — главный или второй. */
+export function partnerTouch() {
+  const c = choices();
+  return c.him === 'touch' || c.him2 === 'touch';
+}
+
+/** Дело дня на языке партнёра: { kind, name, text } или null. При двух языках — по очереди. Язык «Прикосновения» —
+    раз в неделю, на 4-й день, дело — ритуал прикосновений (tender/, владелец 25.11.2026: «обязательная программа,
+    хотя бы раз в неделю; гладить — это минимум»). */
 export function ideaFor(who, day, lang) {
   const c = content(lang);
-  const kind = choices()[who];
-  if (!c || !kind || who !== 'him') return null;
+  const mine = choices();
+  if (!c || !mine[who] || who !== 'him') return null;
+  const ritual = partnerTouch() ? touchDeed(day, lang) : null;
+  if (ritual) return { kind: 'touch', name: ritual.title, text: ritual.text };
+  const kind = dayKind(mine.him, mine.him2, day);
   const k = c.kinds[kind];
   return { kind, name: k.name, text: pickFor(k.him, day) };
 }
@@ -148,16 +178,18 @@ export function groupIdeas(group, day, lang) {
     .map((person, index) => ({ person, index }))
     .filter(({ person }) => person.kind)
     .map(({ person, index }) => {
-      const k = c.kinds[person.kind];
-      return { index, person, kind: person.kind, name: k.name, text: pickFor(k[g.ideas], day, index) };
+      const kind = dayKind(person.kind, person.kind2, day);
+      const k = c.kinds[kind];
+      return { index, person, kind, name: k.name, text: pickFor(k[g.ideas], day, index) };
     });
 }
 
 /** Свой язык: как сказать о нём и чем поблагодарить сегодня — или null. */
 export function myLanguage(day, lang) {
   const c = content(lang);
-  const kind = choices().me;
-  if (!c || !kind) return null;
+  const mine = choices();
+  if (!c || !mine.me) return null;
+  const kind = dayKind(mine.me, mine.me2, day);
   const k = c.kinds[kind];
   // «Встречаемся» и «в поиске» — свои фразы (сервер: gsl/imsg/love-*.js, поле by; владелец 17.11.2026): на свидании
   // и в переписке; в поиске — с мамой, папой, подругой, другом. «Замужем» и «живём вместе» — основные.

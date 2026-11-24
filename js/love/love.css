@@ -323,3 +323,6 @@ a.btn {
   color: var(--c-gold);
   font-weight: 700;
 }
+
+/* Второй язык — под главным (владелец 25.11.2026) */
+.love-second { margin-top: var(--sp-2); }

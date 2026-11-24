@@ -43,7 +43,7 @@
             android:theme="@android:style/Theme.DeviceDefault.NoActionBar" />
 
         <!-- Виджет на экран телефона -->
-        <receiver android:name=".GslWidget" android:exported="true" android:label="GSL (W+M)⁺">
+        <receiver android:name=".GslWidget" android:exported="true" android:label="GSL Я⁺ • Любовь (M+W)⁺">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>

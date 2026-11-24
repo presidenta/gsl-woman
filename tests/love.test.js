@@ -17,7 +17,7 @@ beforeEach(() => {
 test('выбор хранится, чужие значения отбрасываются', () => {
   choose('him', 'gifts');
   choose('me', 'нечто');
-  assert.deepEqual(choices(), { him: 'gifts', me: null, children: [], family: [], results: { him: null, me: null } });
+  assert.deepEqual(choices(), { him: 'gifts', him2: null, me: null, me2: null, children: [], family: [], results: { him: null, me: null } });
 });
 
 test('дело дня: язык выбран — каждый день своё, по кругу; не выбран — null', () => {
@@ -69,7 +69,7 @@ test('дети: сколько детей — столько строк; у ка
   setPerson('children', 0, { name: '  Маша  ', kind: 'touch' });
   setPerson('children', 1, { kind: 'time' });
   setPerson('children', 2, { name: 'Петя', kind: 'нечто' });
-  assert.deepEqual(choices().children, [{ name: 'Маша', kind: 'touch', result: null }, { name: '', kind: 'time', result: null }, { name: 'Петя', kind: null, result: null }]);
+  assert.deepEqual(choices().children, [{ name: 'Маша', kind: 'touch', kind2: null, result: null }, { name: '', kind: 'time', kind2: null, result: null }, { name: 'Петя', kind: null, kind2: null, result: null }]);
   setCount('children', 2);
   assert.deepEqual(choices().children.map((c) => c.name), ['Маша', '']);
   setCount('children', 99);
@@ -88,7 +88,7 @@ test('дети: дело дня у каждого ребёнка с языком
 
 test('дети: прежний один ребёнок (поле child) становится первым', () => {
   write('love', { him: 'time', me: null, child: 'gifts' });
-  assert.deepEqual(choices().children, [{ name: '', kind: 'gifts' }]);
+  assert.deepEqual(choices().children, [{ name: '', kind: 'gifts', kind2: null }]);
 });
 
 test('родные — отдельный раздел, как дети: свои строки, свои дела для взрослых', () => {
@@ -97,7 +97,7 @@ test('родные — отдельный раздел, как дети: сво�
   setCount('family', 2);
   setPerson('family', 0, { name: 'Папа', kind: 'service' });
   setPerson('family', 1, { name: 'Сестра Клава', kind: 'words' });
-  assert.deepEqual(choices().family, [{ name: 'Папа', kind: 'service', result: null }, { name: 'Сестра Клава', kind: 'words', result: null }]);
+  assert.deepEqual(choices().family, [{ name: 'Папа', kind: 'service', kind2: null, result: null }, { name: 'Сестра Клава', kind: 'words', kind2: null, result: null }]);
   assert.equal(choices().children.length, 1, 'родные не трогают детей');
   const ideas = groupIdeas('family', 3, 'ru');
   assert.deepEqual(ideas.map((i) => i.person.name), ['Папа', 'Сестра Клава']);

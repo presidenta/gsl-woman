@@ -297,3 +297,6 @@
   color: var(--c-gold);
   word-break: break-all;
 }
+
+/* Анкета сохраняет два языка — пояснение над «Сохранить» (владелец 25.11.2026) */
+.lq-two { color: var(--c-gold); margin-bottom: var(--sp-2); }

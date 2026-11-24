@@ -324,7 +324,7 @@ function resultView() {
       h('div', { class: 'lq-pill' }, h('p', { class: 'caps' }, `${u.shapeTitle} · ${shape.title}`), h('p', { class: 'card__text' }, shape.text)),
       few ? h('div', { class: 'lq-pill is-warn' }, h('p', { class: 'card__text' }, fill(u.fewNote, { n: r.answered, m: r.total }))) : null,
       self ? h('div', { class: 'lq-pill' }, h('p', { class: 'card__text' }, u.mirrorNote)) : null,
-      saveActions(main.kind),
+      saveActions(r),
     ),
     self
       ? h('section', { class: 'card lq' },
@@ -347,21 +347,28 @@ function resultView() {
       // на сайте в этом абзаце есть <b>; приложение вставляет только текст (core/dom.js) — теги снимаются
       self ? block(u.differsTitle, ...u.differsText.map((p) => h('p', { class: 'card__text lq-p' }, p.replace(/<[^>]+>/g, '')))) : null,
     ),
-    h('section', { class: 'card lq' }, saveActions(main.kind), closeButton()),
+    h('section', { class: 'card lq' }, saveActions(r), closeButton()),
   );
 }
 
-function saveActions(kind) {
+/* ДВА ЯЗЫКА (владелец 25.11.2026): первые два разделяет TWO_GAP% и меньше — «Сохранить» ставит оба (это и есть
+   «два ведущих», shapeOf); разрыв больше — главный, а второй — отдельной кнопкой, по желанию. */
+export const TWO_GAP = 10;
+export const autoTwo = (r) => r.ranking[0].pct - r.ranking[1].pct <= TWO_GAP;
+
+function saveActions(r) {
+  const [a, b] = r.ranking;
+  const two = autoTwo(r);
+  const nm = (x) => run.names?.[x.kind] || run.pack.langs[x.k].name;
+  const save = (second) => () => {
+    const done = run.onSave;
+    close();
+    done(a.kind, second);
+  };
   return h('div', { class: 'card__actions lq-actions' },
-    h('button', {
-      type: 'button',
-      class: 'btn btn--gold btn--block',
-      onclick: () => {
-        const done = run.onSave;
-        close();
-        done(kind);
-      },
-    }, run.saveText),
+    two ? h('p', { class: 'card__text lq-two' }, t('love.quiz.twoAuto', { gap: a.pct - b.pct, a: nm(a), b: nm(b) })) : null,
+    h('button', { type: 'button', class: 'btn btn--gold btn--block', onclick: save(two ? b.kind : null) }, run.saveText),
+    two ? null : h('button', { type: 'button', class: 'btn btn--ghost btn--block', onclick: save(b.kind) }, t('love.quiz.addSecond', { a: nm(a), b: nm(b) })),
     h('button', { type: 'button', class: 'btn btn--ghost btn--block', onclick: retry }, t('love.quiz.retry')),
   );
 }

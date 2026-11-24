@@ -7,7 +7,7 @@
 
 | Что | Где |
 |---|---|
-| Название, адрес сайта, страница первого запуска без сети | `capacitor.config.json`, `www/index.html` |
+| Название, адрес сайта, страница первого запуска без сети | `capacitor.config.json`, `www/index.html`. С 25.11.2026 (владелец): полное «GSL Я⁺ • Любовь (M+W)⁺» — в уведомлениях (`appName`), под значком — короткое «GSL Я⁺ • Любовь» (сборка ставит его в `title_activity_main`: длинное там обрезается) |
 | Значок (лотос, подложка #150c11) | `launcher-icon/mipmap-*` (из `assets/icons/icon-512.png` и `maskable-512.png`) |
 | Сборка в облаке | закрытый `planner/.github/workflows/gsl-woman-android.yml` — Actions → «Сборка GSL Woman+ для Android» |
 | Где взять готовое приложение | https://presidenta.github.io/quantum-diary/app/gsl-woman.apk (рядом с APK «Кванта») |

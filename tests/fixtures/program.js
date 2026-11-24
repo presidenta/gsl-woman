@@ -5,7 +5,9 @@
 const tasks = (week, n) => Array.from({ length: n }, (_, i) => ({ title: `Задание ${week}.${i + 1}`, text: '…' }));
 
 function lang(tag) {
+  const ritual = (name) => ({ title: name, text: '…', how: ['1', '2', '3', '4'], levels: { min: `${name} минимум`, full: '…', max: '…' }, say: [{ label: 'Ему', text: '…' }], deed: `${name} дело` });
   return {
+    tender: { title: `${tag} нежность`, lead: '…', touchTitle: `${tag} ритуал прикосновений`, rituals: [1, 2, 3, 4, 5, 6].map((i) => ritual(`Ритуал ${i}`)), dating: ritual('Встреча'), single: ritual('Близкие') },
     love: {
       title: 'Языки', intro: '…',
       kinds: Object.fromEntries(['words', 'time', 'gifts', 'service', 'touch'].map((k) => [k, {
