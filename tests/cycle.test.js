@@ -49,3 +49,25 @@ test('окно «90 дней»: 45 дней до и 45 после сегодня
   assert.equal(y.len, 5);
   assert.equal(yearStats(days, 2025).count, 0);
 });
+
+// Потенциальная овуляция (владелец 24.11.2026): за 14 дней до следующих месячных, три дня — ожидаемый и по дню рядом.
+test('овуляция: у прошедшего цикла — за 14 дней до настоящих следующих, у текущего и будущих — по длине цикла', async () => {
+  const { ovulation, nextOvulation } = await import('../js/cycle/cycle.js');
+  const ov = ovulation(days);
+  // 29.09 − 14 = 15.09 (прошедший); 29.09 + 28 − 14 = 13.10 (текущий); дальше каждые 28 дней
+  for (const d of ['2026-09-15', '2026-10-13', '2026-11-10', '2026-12-08']) assert.ok(ov.peak.has(d), d);
+  for (const d of ['2026-10-12', '2026-10-14']) assert.ok(ov.around.has(d), d);
+  assert.ok(!ov.peak.has('2026-10-12') && !ov.around.has('2026-10-11'));
+  // Ближайшая: пока окно 12–14.10 не прошло — 13.10, потом — 10.11
+  assert.equal(nextOvulation(days, null, '2026-10-14'), '2026-10-13');
+  assert.equal(nextOvulation(days, null, '2026-10-15'), '2026-11-10');
+});
+
+test('овуляция пересчитывается со своей длиной цикла; без отметок — пусто', async () => {
+  const { ovulation, nextOvulation } = await import('../js/cycle/cycle.js');
+  // Цикл 32: 29.09 + 32 − 14 = 17.10; прошедшая (по настоящим отметкам) остаётся 15.09
+  const ov = ovulation(days, 32);
+  assert.ok(ov.peak.has('2026-10-17') && ov.peak.has('2026-09-15') && !ov.peak.has('2026-10-13'));
+  assert.equal(ovulation([]).peak.size, 0);
+  assert.equal(nextOvulation([], null, '2026-10-01'), null);
+});

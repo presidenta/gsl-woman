@@ -148,3 +148,15 @@ button.cycle-day { cursor: pointer; }
 .cycle-mini.is-now { border-color: var(--c-gold, #d9b56a); }
 .cycle-mini.is-now .cycle-mini__title { color: var(--c-gold, #d9b56a); }
 .cycle-yearnav__year { min-width: 0; font-size: 15px; }
+
+/* Потенциальная овуляция (владелец 24.11.2026): маленькая оранжевая точка под цифрой — три дня, ожидаемый день крупнее.
+   Под цифрой, а не кружком: кружки заняты месячными и «сегодня», цвет цифры — доступом, клетка — выходными. */
+.cycle { --ovul: 255, 146, 43; }
+.cycle-day__ov, .cycle-mini__ov { position: absolute; left: 50%; border-radius: 50%; background: rgb(var(--ovul)); pointer-events: none; transform: translateX(-50%); }
+.cycle-day__ov { bottom: 5%; width: 5px; height: 5px; box-shadow: 0 0 4px 1px rgba(var(--ovul), .7); }
+.cycle-day.is-ovul-peak .cycle-day__ov { width: 8px; height: 8px; bottom: 3%; box-shadow: 0 0 6px 2px rgba(var(--ovul), .8); }
+.cycle-mini__d { position: relative; }
+.cycle-mini__d.is-ovul { opacity: 1; }
+.cycle-mini__ov { bottom: -1px; width: 3px; height: 3px; }
+.cycle-mini__d.is-ovul-peak .cycle-mini__ov { width: 4.5px; height: 4.5px; bottom: -2px; box-shadow: 0 0 3px rgba(var(--ovul), .9); }
+.cycle-dot.is-ovul { width: 8px; height: 8px; margin: 0 2px; background: rgb(var(--ovul)); box-shadow: 0 0 5px 1px rgba(var(--ovul), .8); }

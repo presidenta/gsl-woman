@@ -131,6 +131,36 @@ export function predicted(days, own = null, cycles = 3) {
   return out;
 }
 
+/* ПОТЕНЦИАЛЬНАЯ ОВУЛЯЦИЯ (владелец 24.11.2026: «высчитывать овуляцию в среднем, отмечать маркерами и подписать —
+   потенциальная овуляция; меняется вместе с циклом»). Расчёт, как у календарей цикла: овуляция — примерно за 14 дней
+   до следующих месячных (вторая половина цикла у большинства женщин 12–16 дней, первая гуляет). Отмечаем три дня:
+   ожидаемый (peak — точка крупнее) и по дню до и после (around). У прошедших циклов — от настоящего начала следующих
+   месячных, у текущего и будущих — от длины цикла (своей или по отметкам), поэтому при смене длины всё пересчитывается.
+   Видят все, кто видит календарь: она, он по своим отметкам, в паре — оба по общим. */
+export const LUTEAL = 14;
+
+export function ovulation(days, own = null, cycles = 3) {
+  const peak = new Set();
+  const around = new Set();
+  const s = stats(days, own);
+  if (!s.last) return { peak, around };
+  const eps = episodes(days);
+  for (let i = 1; i < eps.length; i++) {
+    const gap = daysBetween(eps[i - 1].start, eps[i].start);
+    // Пропущенный месяц (промежуток длиннее цикла) — эту овуляцию не угадать, пропускаем
+    if (gap >= CYCLE_MIN && gap <= CYCLE_MAX) peak.add(addDays(eps[i].start, -LUTEAL));
+  }
+  // Текущий цикл (k = 0) и ожидаемые вперёд
+  for (let k = 0; k <= cycles; k++) peak.add(addDays(s.last.start, s.cycle * (k + 1) - LUTEAL));
+  for (const p of peak) for (const d of [addDays(p, -1), addDays(p, 1)]) if (!peak.has(d)) around.add(d);
+  return { peak, around };
+}
+
+/** Ближайшая потенциальная овуляция: ожидаемый день, у которого окно (± 1 день) ещё не прошло; нет отметок — null. */
+export function nextOvulation(days, own = null, today = isoDate()) {
+  return [...ovulation(days, own).peak].sort().find((p) => addDays(p, 1) >= today) || null;
+}
+
 /* ---------- Кружок в шапке ---------- */
 
 let button = null;
@@ -251,6 +281,8 @@ const weekHeads = () => [...Array(7)].map((_, i) => new Intl.DateTimeFormat(loca
   .map((n, i) => h('span', { class: `cycle-grid__head${i >= 5 ? ' is-weekend' : ''}` }, n));
 
 const inOpen = (iso, ctx) => ctx.open?.kind === 'paid' && iso >= ctx.open.from && iso <= ctx.open.to;
+/** Потенциальная овуляция в этот день: 'peak' — ожидаемый день, 'around' — день до или после, null — нет. */
+const ovulOf = (iso, ctx) => (ctx.ovul.peak.has(iso) ? 'peak' : ctx.ovul.around.has(iso) ? 'around' : null);
 
 /** Ячейка дня и строки праздников этого дня. */
 function dayCell(date, ctx) {
@@ -261,11 +293,14 @@ function dayCell(date, ctx) {
   const own = ctx.events.filter((e) => e.md === md);
   const state = STATE[md];
   const weekend = date.getDay() === 0 || date.getDay() === 6;
+  const ov = ovulOf(iso, ctx);
   const cls = `cycle-day${weekend ? ' is-weekend' : ''}${state ? ' is-state' : ''}${own.length ? ' is-event' : ''}`
     + `${inOpen(iso, ctx) ? ' is-open' : ''}${iso === ctx.picked ? ' is-picked' : ''}`
-    + `${marked ? ' is-period' : ''}${soon ? ' is-soon' : ''}${iso === ctx.today ? ' is-today' : ''}${iso === ctx.editing ? ' is-editing' : ''}`;
-  const names = [iso === ctx.start ? t('cycle.start') : '', state ? t(state) : '', ...own.map((e) => e.title)].filter(Boolean);
-  const cell = h('button', { type: 'button', class: cls, title: names.join(' · ') || null, 'aria-pressed': String(marked), 'aria-label': dayMonth(iso), onclick: () => ctx.tap(iso) }, String(date.getDate()));
+    + `${marked ? ' is-period' : ''}${soon ? ' is-soon' : ''}${iso === ctx.today ? ' is-today' : ''}${iso === ctx.editing ? ' is-editing' : ''}`
+    + `${ov ? ` is-ovul${ov === 'peak' ? ' is-ovul-peak' : ''}` : ''}`;
+  const names = [iso === ctx.start ? t('cycle.start') : '', state ? t(state) : '', ...own.map((e) => e.title), ov ? t('cycle.ovul') : ''].filter(Boolean);
+  const cell = h('button', { type: 'button', class: cls, title: names.join(' · ') || null, 'aria-pressed': String(marked), 'aria-label': ov ? `${dayMonth(iso)}, ${t('cycle.ovul')}` : dayMonth(iso), onclick: () => ctx.tap(iso) },
+    String(date.getDate()), ov ? h('i', { class: 'cycle-day__ov', 'aria-hidden': 'true' }) : null);
   const notes = [
     ...(state ? [h('li', { class: 'is-state' }, `${dayMonth(iso)} — ${t(state)}`)] : []),
     ...own.map((e) => h('li', { class: 'is-event' }, `${dayMonth(iso)} — ${e.title}`)),
@@ -345,7 +380,9 @@ function yearGrid(center, ctx, openMonth) {
       const soon = !marked && ctx.soon.has(iso);
       const ev = ctx.events.some((e) => e.md === iso.slice(5));
       const dow = new Date(year, m, d).getDay();
-      dots.push(h('i', { class: `cycle-mini__d${dow === 0 || dow === 6 ? ' is-weekend' : ''}${STATE[iso.slice(5)] ? ' is-state' : ''}${marked ? ' is-period' : ''}${soon ? ' is-soon' : ''}${ev ? ' is-event' : ''}${iso === ctx.today ? ' is-today' : ''}${inOpen(iso, ctx) ? ' is-open' : ''}${iso === ctx.picked ? ' is-picked' : ''}` }, String(d)));
+      const ov = ovulOf(iso, ctx);
+      dots.push(h('i', { class: `cycle-mini__d${dow === 0 || dow === 6 ? ' is-weekend' : ''}${STATE[iso.slice(5)] ? ' is-state' : ''}${marked ? ' is-period' : ''}${soon ? ' is-soon' : ''}${ev ? ' is-event' : ''}${iso === ctx.today ? ' is-today' : ''}${inOpen(iso, ctx) ? ' is-open' : ''}${iso === ctx.picked ? ' is-picked' : ''}${ov ? ` is-ovul${ov === 'peak' ? ' is-ovul-peak' : ''}` : ''}` },
+        String(d), ov ? h('i', { class: 'cycle-mini__ov' }) : null));
     }
     const name = new Intl.DateTimeFormat(locale(), { month: 'long' }).format(first);
     const title = year === nowY ? name : `${name} ${year}`;
@@ -463,6 +500,7 @@ function content() {
   const ctx = {
     days,
     soon: predicted(days, sh.cycle, view === 'roll' ? 3 : 15),
+    ovul: ovulation(days, sh.cycle, view === 'roll' ? 3 : 15),
     events: events(),
     today,
     editing,
@@ -478,6 +516,7 @@ function content() {
     },
   };
   const s = stats(days, sh.cycle);
+  const ovNext = nextOvulation(days, sh.cycle, today);
   const next = s.last ? addDays(s.last.start, s.cycle * Math.max(1, Math.ceil((daysBetween(s.last.start, today) + 1) / s.cycle))) : null;
   add(box,
     // Одна строка: вид (90 дней / весь год) слева; справа «Праздник» и «Месячные» с галочкой — она открывает, как отмечать дни
@@ -498,7 +537,8 @@ function content() {
     // Пояснение к «Месячные» — только по галочке
     helpOpen ? h('div', { class: 'cycle__help' },
       h('p', { class: 'card__text' }, alone ? t('cycle.manAlone') : t(man ? 'cycle.manLead' : 'cycle.lead')),
-      h('p', { class: 'faint cycle__hint' }, t(man ? 'cycle.manPeriodHint' : 'cycle.periodHint'))) : null,
+      h('p', { class: 'faint cycle__hint' }, t(man ? 'cycle.manPeriodHint' : 'cycle.periodHint')),
+      h('p', { class: 'faint cycle__hint' }, t('cycle.ovulHint'))) : null,
     // Длина цикла — одной строкой
     cycleStepper(s, man ? own().cycle : sh.cycle, redraw, () => yearStatsView(days, now.getFullYear(), today)),
     editing ? eventForm(editing, () => { editing = null; redraw(); }) : null,
@@ -518,6 +558,7 @@ function content() {
       openDays.kind === 'paid' ? h('li', {}, h('span', { class: 'cycle-dot is-open' }), t('cycle.openDays')) : null,
       h('li', {}, h('span', { class: 'cycle-dot is-period' }), t('cycle.period')),
       h('li', {}, h('span', { class: 'cycle-dot is-soon' }), t('cycle.soon')),
+      h('li', {}, h('span', { class: 'cycle-dot is-ovul' }), t('cycle.ovul')),
       h('li', {}, h('span', { class: 'cycle-dot is-event' }), t('cycle.event')),
       h('li', {}, h('span', { class: 'cycle-dot is-state' }), t('cycle.state')),
       h('li', {}, h('span', { class: 'cycle-dot is-weekend' }), t('cycle.weekend'))),
@@ -526,6 +567,8 @@ function content() {
     s.count >= 1
       ? h('p', { class: 'faint cycle__stats' }, t('cycle.stats', { cycle: s.cycle, len: s.len, next: next ? dayMonth(next) : '—' }))
       : h('p', { class: 'faint cycle__stats' }, t(man ? 'cycle.manEmpty' : 'cycle.empty')),
+    // Ближайшая потенциальная овуляция — строкой под календарём
+    ovNext ? h('p', { class: 'faint cycle__stats' }, t('cycle.ovulNext', { date: dayMonth(ovNext) })) : null,
   );
   return box;
 }
