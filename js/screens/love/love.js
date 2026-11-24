@@ -25,6 +25,13 @@ function rerender(view, ctx) {
   render(view, ctx);
 }
 
+/* Экран, который сейчас на месте. Приложение пересобирает экран заново при каждом изменении данных (main.js → draw:
+   синхронизация, вход, отметки), и элемент, запомненный при открытии анкеты, к нажатию «Начать» уже снят со
+   страницы: анкета рисовала следующий шаг в него — и на экране ничего не происходило (владелец 24.11.2026: «тест
+   не нажимается кнопка»). Анкета перерисовывает всегда текущий. */
+let onScreen = null;
+const redrawCurrent = () => { if (onScreen) rerender(onScreen.view, onScreen.ctx); };
+
 /** Открыть анкету для «Мой мужчина» / «Мой язык» (who) или для человека группы (who = 'children' | 'family', index). */
 function openQuiz(view, ctx, c, who, index) {
   const group = GROUPS[who];
@@ -32,7 +39,7 @@ function openQuiz(view, ctx, c, who, index) {
     if (group) setPerson(who, index, { kind });
     else choose(who, kind);
     toast({ title: t('love.saved') });
-    rerender(view, ctx);
+    redrawCurrent();
     scrollTo({ top: 0 });
   };
   const named = group ? { name: whoName(who, index) } : {};
@@ -45,7 +52,7 @@ function openQuiz(view, ctx, c, who, index) {
     names: Object.fromEntries(KINDS.map((k) => [k, c.kinds[k].name])), // названия языков — как везде в приложении
     lang: ctx.lang,
     onSave: save,
-    redraw: () => rerender(view, ctx),
+    redraw: redrawCurrent,
   });
 }
 
@@ -117,6 +124,7 @@ function whoName(who, index) {
 }
 
 export function render(view, ctx) {
+  onScreen = { view, ctx };
   const c = content(ctx.lang);
   if (!c) {
     add(view, h('h1', { class: 'screen-title' }, t('love.title')), h('p', { class: 'card__text' }, t('love.empty')));
