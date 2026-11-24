@@ -50,24 +50,29 @@ test('окно «90 дней»: 45 дней до и 45 после сегодня
   assert.equal(yearStats(days, 2025).count, 0);
 });
 
-// Потенциальная овуляция (владелец 24.11.2026): за 14 дней до следующих месячных, три дня — ожидаемый и по дню рядом.
-test('овуляция: у прошедшего цикла — за 14 дней до настоящих следующих, у текущего и будущих — по длине цикла', async () => {
+// Потенциальная овуляция (владелец 25.11.2026): формула Огино — Кнауса — с (короткий цикл − 18)-го по
+// (длинный цикл − 11)-й день цикла; вероятный день — (цикл − 14)-й.
+test('овуляция: при цикле 28 — окно с 10-го по 17-й день (8 дней), вероятный — 14-й; прошедший цикл по факту', async () => {
   const { ovulation, nextOvulation } = await import('../js/cycle/cycle.js');
   const ov = ovulation(days);
-  // 29.09 − 14 = 15.09 (прошедший); 29.09 + 28 − 14 = 13.10 (текущий); дальше каждые 28 дней
-  for (const d of ['2026-09-15', '2026-10-13', '2026-11-10', '2026-12-08']) assert.ok(ov.peak.has(d), d);
-  for (const d of ['2026-10-12', '2026-10-14']) assert.ok(ov.around.has(d), d);
-  assert.ok(!ov.peak.has('2026-10-12') && !ov.around.has('2026-10-11'));
-  // Ближайшая: пока окно 12–14.10 не прошло — 13.10, потом — 10.11
-  assert.equal(nextOvulation(days, null, '2026-10-14'), '2026-10-13');
-  assert.equal(nextOvulation(days, null, '2026-10-15'), '2026-11-10');
+  const win = (from, n) => [...Array(n)].map((_, i) => { const d = new Date(`${from}T12:00:00Z`); d.setUTCDate(d.getUTCDate() + i); return d.toISOString().slice(0, 10); });
+  // Прошедший (1.09): 10–17.09, вероятный 14.09; текущий (29.09): 8–15.10, вероятный 12.10; следующий (27.10): 5–12.11
+  for (const d of win('2026-09-10', 8)) assert.ok(ov.around.has(d) || ov.peak.has(d), d);
+  for (const d of ['2026-09-14', '2026-10-12', '2026-11-09']) assert.ok(ov.peak.has(d), d);
+  for (const d of win('2026-10-08', 8)) assert.ok(ov.around.has(d) || ov.peak.has(d), d);
+  for (const d of ['2026-09-09', '2026-09-18', '2026-10-07', '2026-10-16']) assert.ok(!ov.around.has(d) && !ov.peak.has(d), d);
+  assert.ok(!ov.around.has('2026-10-12'), 'вероятный день — только сердечком-контуром');
+  assert.deepEqual(nextOvulation(days, null, '2026-10-15'), { from: '2026-10-08', to: '2026-10-15', peak: '2026-10-12' });
+  assert.equal(nextOvulation(days, null, '2026-10-16').peak, '2026-11-09');
 });
 
 test('овуляция пересчитывается со своей длиной цикла; без отметок — пусто', async () => {
   const { ovulation, nextOvulation } = await import('../js/cycle/cycle.js');
-  // Цикл 32: 29.09 + 32 − 14 = 17.10; прошедшая (по настоящим отметкам) остаётся 15.09
-  const ov = ovulation(days, 32);
-  assert.ok(ov.peak.has('2026-10-17') && ov.peak.has('2026-09-15') && !ov.peak.has('2026-10-13'));
+  // Своя длина 32, по отметкам 28: окно — с (28 − 18) по (32 − 11) день = 8–19.10, вероятный — 18-й день = 16.10;
+  // прошедший цикл остаётся по факту (14.09)
+  const w = nextOvulation(days, 32, '2026-10-01');
+  assert.deepEqual(w, { from: '2026-10-08', to: '2026-10-19', peak: '2026-10-16' });
+  assert.ok(ovulation(days, 32).peak.has('2026-09-14'));
   assert.equal(ovulation([]).peak.size, 0);
   assert.equal(nextOvulation([], null, '2026-10-01'), null);
 });

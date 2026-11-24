@@ -131,34 +131,56 @@ export function predicted(days, own = null, cycles = 3) {
   return out;
 }
 
-/* ПОТЕНЦИАЛЬНАЯ ОВУЛЯЦИЯ (владелец 24.11.2026: «высчитывать овуляцию в среднем, отмечать маркерами и подписать —
-   потенциальная овуляция; меняется вместе с циклом»). Расчёт, как у календарей цикла: овуляция — примерно за 14 дней
-   до следующих месячных (вторая половина цикла у большинства женщин 12–16 дней, первая гуляет). Отмечаем три дня:
-   ожидаемый (peak — точка крупнее) и по дню до и после (around). У прошедших циклов — от настоящего начала следующих
-   месячных, у текущего и будущих — от длины цикла (своей или по отметкам), поэтому при смене длины всё пересчитывается.
+/* ПОТЕНЦИАЛЬНАЯ ОВУЛЯЦИЯ (владелец 24–25.11.2026: «высчитывать в среднем, подписать — потенциальная овуляция;
+   обычно неделя, сделай точный медицинский расчёт; меняется вместе с циклом»).
+   Медицина: яйцеклетка живёт 12–24 часа, сперматозоиды — до 5 дней, поэтому зачатие возможно 6 дней подряд, последний
+   — день овуляции (Wilcox, NEJM 1995). День овуляции по календарю не угадать точно (Wilcox, BMJ 2000: окно ложится
+   на дни 10–17 лишь у 30 % женщин), поэтому календарный метод Огино — Кнауса берёт запас по её же циклам:
+     первый день окна = самый короткий цикл − 18, последний = самый длинный цикл − 11 (дни цикла, 1-й — начало месячных).
+   При ровном цикле 28 — дни 10–17 (8 дней); чем сильнее гуляет цикл, тем окно шире. Самый вероятный день овуляции —
+   за 14 дней до следующих месячных: день (цикл − 14), вторая половина цикла почти у всех 12–16 дней.
+   Прошедшие циклы — по их настоящей длине; текущий и будущие — короткий и длинный из последних 12 циклов вместе с
+   длиной цикла (своей или по отметкам), поэтому при смене длины окно переезжает. Окно не выходит за свой цикл.
    Видят все, кто видит календарь: она, он по своим отметкам, в паре — оба по общим. */
 export const LUTEAL = 14;
+export const FIRST_FERTILE = 18;
+export const LAST_FERTILE = 11;
 
+/** Окна по циклам: [{ from, to, peak }] по порядку + наборы дней: peak — вероятный день, around — остальные дни окна. */
 export function ovulation(days, own = null, cycles = 3) {
   const peak = new Set();
   const around = new Set();
+  const list = [];
   const s = stats(days, own);
-  if (!s.last) return { peak, around };
+  if (!s.last) return { peak, around, list };
   const eps = episodes(days);
+  const dayOf = (start, n) => addDays(start, n - 1); // n-й день цикла
+  const mark = (start, short, long, len) => {
+    const first = Math.max(1, short - FIRST_FERTILE);
+    const last = Math.min(len - 1, long - LAST_FERTILE);
+    const p = dayOf(start, len - LUTEAL);
+    for (let n = first; n <= last; n++) around.add(dayOf(start, n));
+    peak.add(p);
+    list.push({ from: dayOf(start, first), to: dayOf(start, last), peak: p });
+  };
+  const gaps = [];
   for (let i = 1; i < eps.length; i++) {
     const gap = daysBetween(eps[i - 1].start, eps[i].start);
-    // Пропущенный месяц (промежуток длиннее цикла) — эту овуляцию не угадать, пропускаем
-    if (gap >= CYCLE_MIN && gap <= CYCLE_MAX) peak.add(addDays(eps[i].start, -LUTEAL));
+    // Пропущенный месяц (промежуток длиннее цикла) — это окно не угадать, пропускаем
+    if (gap >= CYCLE_MIN && gap <= CYCLE_MAX) { gaps.push(gap); mark(eps[i - 1].start, gap, gap, gap); }
   }
+  const recent = [...gaps.slice(-12), s.cycle];
+  const short = Math.min(...recent);
+  const long = Math.max(...recent);
   // Текущий цикл (k = 0) и ожидаемые вперёд
-  for (let k = 0; k <= cycles; k++) peak.add(addDays(s.last.start, s.cycle * (k + 1) - LUTEAL));
-  for (const p of peak) for (const d of [addDays(p, -1), addDays(p, 1)]) if (!peak.has(d)) around.add(d);
-  return { peak, around };
+  for (let k = 0; k <= cycles; k++) mark(addDays(s.last.start, s.cycle * k), short, long, s.cycle);
+  for (const p of peak) around.delete(p);
+  return { peak, around, list };
 }
 
-/** Ближайшая потенциальная овуляция: ожидаемый день, у которого окно (± 1 день) ещё не прошло; нет отметок — null. */
+/** Ближайшее окно: идёт сейчас или следующее ({ from, to, peak }); нет отметок — null. */
 export function nextOvulation(days, own = null, today = isoDate()) {
-  return [...ovulation(days, own).peak].sort().find((p) => addDays(p, 1) >= today) || null;
+  return ovulation(days, own).list.find((w) => w.to >= today) || null;
 }
 
 /* ---------- Кружок в шапке ---------- */
@@ -281,8 +303,14 @@ const weekHeads = () => [...Array(7)].map((_, i) => new Intl.DateTimeFormat(loca
   .map((n, i) => h('span', { class: `cycle-grid__head${i >= 5 ? ' is-weekend' : ''}` }, n));
 
 const inOpen = (iso, ctx) => ctx.open?.kind === 'paid' && iso >= ctx.open.from && iso <= ctx.open.to;
-/** Потенциальная овуляция в этот день: 'peak' — ожидаемый день, 'around' — день до или после, null — нет. */
+/** Потенциальная овуляция в этот день: 'peak' — самый вероятный день, 'around' — другой день окна, null — нет. */
 const ovulOf = (iso, ctx) => (ctx.ovul.peak.has(iso) ? 'peak' : ctx.ovul.around.has(iso) ? 'around' : null);
+/* Сердечко (владелец 25.11.2026: «зарождение жизни — красное сердечко»): у вероятного дня — красный контур вокруг
+   цифры, без заливки и свечения; у остальных дней окна — маленькое красное сердечко в степени, как плюс в «GSL⁺». */
+const HEART = 'M12 21.3C6.6 17.7 2.6 13.9 2.6 9.2 2.6 6.1 5 3.8 7.9 3.8c1.8 0 3.3.9 4.1 2.3.8-1.4 2.3-2.3 4.1-2.3 2.9 0 5.3 2.3 5.3 5.4 0 4.7-4 8.5-9.4 12.1z';
+const heartLine = (cls) => svg(`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><path d="${HEART}"/></svg>`, cls);
+const heartFill = (cls) => svg(`<svg viewBox="0 0 24 24" fill="currentColor"><path d="${HEART}"/></svg>`, cls);
+const heartOf = (ov, base) => (ov === 'peak' ? heartLine(`${base}heart`) : ov ? heartFill(`${base}sup`) : null);
 
 /** Ячейка дня и строки праздников этого дня. */
 function dayCell(date, ctx) {
@@ -298,9 +326,9 @@ function dayCell(date, ctx) {
     + `${inOpen(iso, ctx) ? ' is-open' : ''}${iso === ctx.picked ? ' is-picked' : ''}`
     + `${marked ? ' is-period' : ''}${soon ? ' is-soon' : ''}${iso === ctx.today ? ' is-today' : ''}${iso === ctx.editing ? ' is-editing' : ''}`
     + `${ov ? ` is-ovul${ov === 'peak' ? ' is-ovul-peak' : ''}` : ''}`;
-  const names = [iso === ctx.start ? t('cycle.start') : '', state ? t(state) : '', ...own.map((e) => e.title), ov ? t('cycle.ovul') : ''].filter(Boolean);
-  const cell = h('button', { type: 'button', class: cls, title: names.join(' · ') || null, 'aria-pressed': String(marked), 'aria-label': ov ? `${dayMonth(iso)}, ${t('cycle.ovul')}` : dayMonth(iso), onclick: () => ctx.tap(iso) },
-    String(date.getDate()), ov ? h('i', { class: 'cycle-day__ov', 'aria-hidden': 'true' }) : null);
+  const names = [iso === ctx.start ? t('cycle.start') : '', state ? t(state) : '', ...own.map((e) => e.title), ov ? t(ov === 'peak' ? 'cycle.ovulPeak' : 'cycle.ovul') : ''].filter(Boolean);
+  const cell = h('button', { type: 'button', class: cls, title: names.join(' · ') || null, 'aria-pressed': String(marked), 'aria-label': ov ? `${dayMonth(iso)}, ${t(ov === 'peak' ? 'cycle.ovulPeak' : 'cycle.ovul')}` : dayMonth(iso), onclick: () => ctx.tap(iso) },
+    String(date.getDate()), heartOf(ov, 'cycle-day__'));
   const notes = [
     ...(state ? [h('li', { class: 'is-state' }, `${dayMonth(iso)} — ${t(state)}`)] : []),
     ...own.map((e) => h('li', { class: 'is-event' }, `${dayMonth(iso)} — ${e.title}`)),
@@ -382,7 +410,7 @@ function yearGrid(center, ctx, openMonth) {
       const dow = new Date(year, m, d).getDay();
       const ov = ovulOf(iso, ctx);
       dots.push(h('i', { class: `cycle-mini__d${dow === 0 || dow === 6 ? ' is-weekend' : ''}${STATE[iso.slice(5)] ? ' is-state' : ''}${marked ? ' is-period' : ''}${soon ? ' is-soon' : ''}${ev ? ' is-event' : ''}${iso === ctx.today ? ' is-today' : ''}${inOpen(iso, ctx) ? ' is-open' : ''}${iso === ctx.picked ? ' is-picked' : ''}${ov ? ` is-ovul${ov === 'peak' ? ' is-ovul-peak' : ''}` : ''}` },
-        String(d), ov ? h('i', { class: 'cycle-mini__ov' }) : null));
+        String(d), heartOf(ov, 'cycle-mini__')));
     }
     const name = new Intl.DateTimeFormat(locale(), { month: 'long' }).format(first);
     const title = year === nowY ? name : `${name} ${year}`;
@@ -558,7 +586,8 @@ function content() {
       openDays.kind === 'paid' ? h('li', {}, h('span', { class: 'cycle-dot is-open' }), t('cycle.openDays')) : null,
       h('li', {}, h('span', { class: 'cycle-dot is-period' }), t('cycle.period')),
       h('li', {}, h('span', { class: 'cycle-dot is-soon' }), t('cycle.soon')),
-      h('li', {}, h('span', { class: 'cycle-dot is-ovul' }), t('cycle.ovul')),
+      h('li', {}, heartFill('cycle-dot is-ovul'), t('cycle.ovul')),
+      h('li', {}, heartLine('cycle-dot is-ovul-peak'), t('cycle.ovulPeak')),
       h('li', {}, h('span', { class: 'cycle-dot is-event' }), t('cycle.event')),
       h('li', {}, h('span', { class: 'cycle-dot is-state' }), t('cycle.state')),
       h('li', {}, h('span', { class: 'cycle-dot is-weekend' }), t('cycle.weekend'))),
@@ -568,7 +597,7 @@ function content() {
       ? h('p', { class: 'faint cycle__stats' }, t('cycle.stats', { cycle: s.cycle, len: s.len, next: next ? dayMonth(next) : '—' }))
       : h('p', { class: 'faint cycle__stats' }, t(man ? 'cycle.manEmpty' : 'cycle.empty')),
     // Ближайшая потенциальная овуляция — строкой под календарём
-    ovNext ? h('p', { class: 'faint cycle__stats' }, t('cycle.ovulNext', { date: dayMonth(ovNext) })) : null,
+    ovNext ? h('p', { class: 'faint cycle__stats' }, t('cycle.ovulNext', { from: dayMonth(ovNext.from), to: dayMonth(ovNext.to), peak: dayMonth(ovNext.peak) })) : null,
   );
   return box;
 }
