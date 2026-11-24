@@ -1,6 +1,0 @@
-/* «Ритуал нежности» — как карточка интим-квеста выходного (intim/intim.css) */
-.tender__caps { margin: var(--sp-3) 0 var(--sp-1); color: var(--c-gold); }
-.tender__how { margin: 0; padding-left: 1.3em; display: grid; gap: 4px; }
-.tender__levels { list-style: none; margin: var(--sp-3) 0; padding: 0; display: grid; gap: 6px; }
-.tender__levels b { color: var(--c-gold); }
-.tender .task__say { margin-bottom: var(--sp-3); }
