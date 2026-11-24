@@ -106,8 +106,8 @@ function context() {
   cycle.paint();
   const s = settings.get();
   const todayIso = isoDate();
-  // Листаемый стрелками день (js/preview/): у администратора — любой, у человека — 7 дней назад
-  const day = preview.dayFor(s.startDate ? programDay(s.startDate, todayIso) : 0);
+  // Листаемый стрелками день (js/preview/): у администратора — любой, у человека — 7 дней назад, на «Сегодня»
+  const day = preview.dayFor(s.startDate ? programDay(s.startDate, todayIso) : 0, router.currentRoute() || router.routeName());
   photos.useDay(day); // фото мест идут по этому дню: листаешь дни — меняются и фото (js/photos/)
   return {
     settings: s,

@@ -5,6 +5,7 @@ import { dateOfDay, daysBetween, weekOf } from '../../core/dates.js';
 import { dayPlan, shapeOfWeek } from '../../program/index.js';
 import { morningFor } from '../../program/morning.js';
 import { weekSummary } from '../../progress/progress.js';
+import { pastBar } from '../../preview/preview.js';
 import * as morningLog from '../../journal/morning-log.js';
 import { icons } from '../../ui/icons.js';
 import { levelDots } from '../../ui/ring.js';
@@ -118,7 +119,10 @@ function header(ctx, plan, summary, buttons) {
 }
 
 function catchUp(ctx, summary) {
-  if (!summary.catchUp.length) return null;
+  /* Полоска человека «Прошедшие 7 дней» — первой в карточке (js/preview/, владелец 24.11.2026). Пока человек смотрит
+     прошедший день, карточка остаётся и без пропусков — чтобы листать дальше и вернуться к сегодняшнему. */
+  const strip = pastBar(ctx.realDay);
+  if (!summary.catchUp.length && !(strip && ctx.day !== ctx.realDay)) return null;
   /* Свёрнуто в одну строку (владелец 17.11.2026: «огромное, каждый день видно… нажал — открылось, догнал, если хочет»):
      на виду только «Отстаёшь на N%», дни — по стрелке. */
   return foldCard({
@@ -126,12 +130,12 @@ function catchUp(ctx, summary) {
     cls: 'catchup',
     icon: icons.heart,
     title: t('today.catchTitle'),
-    lead: t('today.catchText', {
+    lead: summary.catchUp.length ? t('today.catchText', {
       percent: summary.lagPercent,
       days: `${summary.lagDays} ${plural(summary.lagDays, 'plural.days')}`,
-    }),
+    }) : '',
     keepLead: true,
-    body: [h('div', { class: 'catch-list' },
+    body: [strip, h('div', { class: 'catch-list' },
       ...summary.catchUp.map((day) => {
         const p = dayPlan(day, ctx.lang);
         return h('button', {

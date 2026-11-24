@@ -1,4 +1,4 @@
-// Листание дней: администратор — вся программа; человек — 7 прошедших дней на «Сегодня».
+// Листание дней: администратор — вся программа; человек — 7 прошедших дней, полоска в «Можно наверстать».
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { write, remove } from '../js/core/store.js';
@@ -40,5 +40,16 @@ test('администратор: вся программа', () => {
   write('account', { token: 't', displayName: 'Владимир', role: 'admin' });
   assert.equal(bounds(12)[0], 1);
   assert.ok(bounds(12)[1] > 100);
+  remove('account');
+});
+
+test('полоска: у администратора — наверху, у человека — своя, для карточки «Можно наверстать»', async () => {
+  const { bar, pastBar } = await import('../js/preview/preview.js');
+  write('account', { token: 't', displayName: 'Анна', role: 'member' });
+  assert.equal(bar(10), null);
+  assert.equal(pastBar(1), null);
+  remove('account');
+  write('account', { token: 't', displayName: 'Владимир', role: 'admin' });
+  assert.equal(pastBar(10), null);
   remove('account');
 });
