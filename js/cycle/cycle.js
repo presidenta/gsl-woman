@@ -393,8 +393,9 @@ function rollingGrid(ctx) {
 function yearGrid(center, ctx, openMonth) {
   const nowY = new Date().getFullYear();
   const nowM = new Date().getMonth();
-  // 13 месяцев: шесть до текущего, текущий — седьмой, посередине, шесть после (владелец 18.11.2026)
-  const months = [...Array(13)].map((_, k) => {
+  // 12 месяцев: шесть до текущего, текущий — седьмой, пять после (владелец 25.11.2026: «13-й забери — ровно 12, без
+  // пустоты»; было 13, текущий посередине, 18.11.2026). Год листается стрелками ‹ ›.
+  const months = [...Array(12)].map((_, k) => {
     const idx = center - 6 + k;
     const year = Math.floor(idx / 12);
     const m = ((idx % 12) + 12) % 12;
@@ -421,10 +422,10 @@ function yearGrid(center, ctx, openMonth) {
   return h('div', { class: 'cycle-year' }, ...months);
 }
 
-/** Подпись окна «Весь год»: «май 2026 — май 2027». */
+/** Подпись окна «Весь год»: «май 2026 — апрель 2027». */
 function yearRange(center) {
   const f = (idx) => new Intl.DateTimeFormat(locale(), { month: 'short', year: 'numeric' }).format(new Date(Math.floor(idx / 12), ((idx % 12) + 12) % 12, 1)).replace(' г.', '');
-  return `${f(center - 6)} — ${f(center + 6)}`;
+  return `${f(center - 6)} — ${f(center + 5)}`;
 }
 
 /** Статистика года: средние и история циклов полосками (цикл — полоса, месячные — красная часть). */
@@ -509,7 +510,7 @@ let lenOpen = false;
 // Вид календаря: 'roll' — 90 дней вокруг сегодня (по умолчанию), 'year' — весь год, 'month' — месяц из года
 let view = 'roll';
 let shownYear = new Date().getFullYear();
-// «Весь год» — окно из 13 месяцев вокруг месяца yearCenter (год*12 + месяц); по умолчанию — текущий в середине
+// «Весь год» — окно из 12 месяцев вокруг месяца yearCenter (год*12 + месяц); по умолчанию — текущий в середине
 const nowIndex = () => new Date().getFullYear() * 12 + new Date().getMonth();
 let yearCenter = nowIndex();
 let shownMonth = 0;
