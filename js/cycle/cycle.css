@@ -163,3 +163,10 @@ button.cycle-day { cursor: pointer; }
 .cycle-mini__sup { width: 5px; height: 5px; top: -2px; right: -1px; }
 .cycle-dot.is-ovul, .cycle-dot.is-ovul-peak { width: 14px; height: 14px; border-radius: 0; color: var(--ovul); }
 .cycle-dot.is-ovul svg, .cycle-dot.is-ovul-peak svg { width: 100%; height: 100%; display: block; }
+
+/* Подписи двумя группами (владелец 25.11.2026): «Женские дни» (у мужчины — «Её дни») и «Календарь», между ними —
+   тонкая полоска цвета части, гаснущая к краям. Под каждой группой — её строки. */
+.cycle-key { display: grid; gap: 8px; }
+.cycle-key__title { margin: 0; font-size: 11px; color: var(--c-gold, #d9b56a); }
+.cycle-key .cycle__access { margin-top: 0; }
+.cycle-key__line { width: 100%; height: 1px; margin: 2px 0; border: 0; background: linear-gradient(90deg, transparent, var(--c-gold, #d9b56a) 20%, var(--c-gold, #d9b56a) 80%, transparent); opacity: .55; }

@@ -582,22 +582,32 @@ function content() {
       h('button', { type: 'button', class: 'btn btn--ghost cycle-back', onclick: () => { view = 'year'; redraw(); } }, `‹ ${t('cycle.view.year')}`),
       monthGrid(shownYear, shownMonth, ctx),
     ] : []),
-    h('ul', { class: 'cycle__legend' },
-      openDays.kind === 'paid' ? h('li', {}, h('span', { class: 'cycle-dot is-open' }), t('cycle.openDays')) : null,
-      h('li', {}, h('span', { class: 'cycle-dot is-period' }), t('cycle.period')),
-      h('li', {}, h('span', { class: 'cycle-dot is-soon' }), t('cycle.soon')),
-      h('li', {}, heartFill('cycle-dot is-ovul'), t('cycle.ovul')),
-      h('li', {}, heartLine('cycle-dot is-ovul-peak'), t('cycle.ovulPeak')),
-      h('li', {}, h('span', { class: 'cycle-dot is-event' }), t('cycle.event')),
-      h('li', {}, h('span', { class: 'cycle-dot is-state' }), t('cycle.state')),
-      h('li', {}, h('span', { class: 'cycle-dot is-weekend' }), t('cycle.weekend'))),
-    // Срок доступа: до какого числа и сколько дней осталось (тест-режим может остановиться в любой момент)
-    openDays.kind === 'paid' ? accessNote(openDays) : null,
-    s.count >= 1
-      ? h('p', { class: 'faint cycle__stats' }, t('cycle.stats', { cycle: s.cycle, len: s.len, next: next ? dayMonth(next) : '—' }))
-      : h('p', { class: 'faint cycle__stats' }, t(man ? 'cycle.manEmpty' : 'cycle.empty')),
-    // Ближайшая потенциальная овуляция — строкой под календарём
-    ovNext ? h('p', { class: 'faint cycle__stats' }, t('cycle.ovulNext', { from: dayMonth(ovNext.from), to: dayMonth(ovNext.to), peak: dayMonth(ovNext.peak) })) : null,
+    // Подписи — двумя группами (владелец 25.11.2026: «отделить всё, что связано с женскими днями»). Первая — женские
+    // дни: календарь цикла, красное и сердечки ищут глазами в первую очередь; под ней — её числа (цикл, овуляция).
+    // Тонкая полоска — и вторая группа, календарь: доступ, государственные праздники, выходные, наши праздники; под
+    // ней — срок доступа.
+    h('section', { class: 'cycle-key' },
+      h('p', { class: 'cycle-key__title caps' }, t(man ? 'cycle.key.her' : 'cycle.key.cycle')),
+      h('ul', { class: 'cycle__legend' },
+        h('li', {}, h('span', { class: 'cycle-dot is-period' }), t('cycle.period')),
+        h('li', {}, h('span', { class: 'cycle-dot is-soon' }), t('cycle.soon')),
+        h('li', {}, heartFill('cycle-dot is-ovul'), t('cycle.ovul')),
+        h('li', {}, heartLine('cycle-dot is-ovul-peak'), t('cycle.ovulPeak'))),
+      s.count >= 1
+        ? h('p', { class: 'faint cycle__stats' }, t('cycle.stats', { cycle: s.cycle, len: s.len, next: next ? dayMonth(next) : '—' }))
+        : h('p', { class: 'faint cycle__stats' }, t(man ? 'cycle.manEmpty' : 'cycle.empty')),
+      // Ближайшая потенциальная овуляция
+      ovNext ? h('p', { class: 'faint cycle__stats' }, t('cycle.ovulNext', { from: dayMonth(ovNext.from), to: dayMonth(ovNext.to), peak: dayMonth(ovNext.peak) })) : null),
+    h('hr', { class: 'cycle-key__line' }),
+    h('section', { class: 'cycle-key' },
+      h('p', { class: 'cycle-key__title caps' }, t('cycle.key.calendar')),
+      h('ul', { class: 'cycle__legend' },
+        openDays.kind === 'paid' ? h('li', {}, h('span', { class: 'cycle-dot is-open' }), t('cycle.openDays')) : null,
+        h('li', {}, h('span', { class: 'cycle-dot is-state' }), t('cycle.state')),
+        h('li', {}, h('span', { class: 'cycle-dot is-weekend' }), t('cycle.weekend')),
+        h('li', {}, h('span', { class: 'cycle-dot is-event' }), t('cycle.event'))),
+      // Срок доступа: до какого числа и сколько дней осталось (тест-режим может остановиться в любой момент)
+      openDays.kind === 'paid' ? accessNote(openDays) : null),
   );
   return box;
 }
