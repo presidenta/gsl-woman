@@ -2,7 +2,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { write, remove } from '../js/core/store.js';
-import { dayFor, isAdmin, bounds, canOpen } from '../js/preview/preview.js';
+import { dayFor, isAdmin, bounds, canOpen, pastBounds } from '../js/preview/preview.js';
 
 test('участница: нет полоски, день — настоящий', () => {
   write('account', { token: 't', displayName: 'Анна', role: 'member' });
@@ -49,7 +49,13 @@ test('полоска: у администратора — наверху, у ч�
   assert.equal(bar(10), null);
   assert.equal(pastBar(1), null);
   remove('account');
+});
+
+// Владелец 24.11.2026: «зашёл в кабинет мужчины — а там нету полоски» — у администратора она тоже есть, те же 7 дней
+test('«Прошедшие 7 дней» у администратора — то же окно, что у человека', () => {
   write('account', { token: 't', displayName: 'Владимир', role: 'admin' });
-  assert.equal(pastBar(10), null);
+  assert.deepEqual(pastBounds(12), [5, 12]);
+  assert.deepEqual(pastBounds(3), [1, 3]);
+  assert.ok(bounds(12)[1] > 100); // его полоса наверху — по-прежнему вся программа
   remove('account');
 });

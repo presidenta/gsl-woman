@@ -30,6 +30,11 @@ export function bounds(realDay) {
   return isAdmin() ? [1, PROGRAM_DAYS] : [Math.max(1, realDay - PAST_DAYS), realDay];
 }
 
+/** Окно полоски «Прошедшие 7 дней» — одно для всех, и у администратора тоже. */
+export function pastBounds(realDay) {
+  return [Math.max(1, realDay - PAST_DAYS), realDay];
+}
+
 /** Прошедший день из окна человека (7 дней до сегодняшнего). */
 export function canOpen(day, realDay) {
   return day >= Math.max(1, realDay - PAST_DAYS) && day < realDay;
@@ -49,10 +54,9 @@ export function onChange(fn) {
   listeners.add(fn);
 }
 
-function go(day) {
-  const [lo, hi] = bounds(realNow);
+function go(day, [lo, hi] = bounds(realNow)) {
   const to = Math.max(lo, Math.min(hi, day));
-  shown = !isAdmin() && to === realNow ? null : to;
+  shown = to === realNow ? null : to;
   listeners.forEach((fn) => fn());
 }
 
@@ -66,30 +70,35 @@ export function bar(realDay) {
   return isAdmin() ? strip(realDay) : null;
 }
 
-/** Полоска человека — та же, ограничение 7 дней; стоит внутри карточки «Можно наверстать» на «Сегодня» (владелец
-    24.11.2026: «перенеси её так, как она есть, в тот раздел… разворачивается — и видно, где можно полистать»). */
+/** Полоска «Прошедшие 7 дней» — та же, ограничение 7 дней; стоит внутри карточки «Можно наверстать» на «Сегодня»
+    (владелец 24.11.2026: «перенеси её так, как она есть, в тот раздел… разворачивается — и видно, где можно
+    полистать»). У администратора она тоже есть — ровно та, что у человека, с теми же 7 днями (владелец 24.11.2026:
+    «зашёл в кабинет мужчины — а там нету полоски»); его полоса на всю программу — наверху, как была. */
 export function pastBar(realDay) {
-  return !isAdmin() && realDay >= 2 ? strip(realDay) : null;
+  return realDay >= 2 ? strip(realDay, true) : null;
 }
 
-/** Сама полоска: ‹‹ неделя назад, ‹ день назад, «День N», день вперёд ›, неделя вперёд ››. */
-function strip(realDay) {
-  const admin = isAdmin();
-  const [lo, hi] = bounds(realDay);
-  const day = shown ?? Math.max(1, Math.min(PROGRAM_DAYS, realDay || 1));
+/** Сама полоска: ‹‹ неделя назад, ‹ день назад, «День N», день вперёд ›, неделя вперёд ››.
+    past — полоска «Прошедшие 7 дней»: окно 7 дней и у администратора. */
+function strip(realDay, past = false) {
+  const whole = isAdmin() && !past;
+  const [lo, hi] = past ? pastBounds(realDay) : bounds(realDay);
+  const today = Math.max(1, Math.min(PROGRAM_DAYS, realDay || 1));
+  // администратор ушёл наверху за пределы 7 дней — в карточке стоит сегодняшний день
+  const day = shown !== null && shown >= lo && shown <= hi ? shown : (past ? today : shown ?? today);
   const btn = (label, icon, to, double = false) => h('button', {
     type: 'button',
     class: `preview__btn${double ? ' preview__btn--double' : ''}`,
     'aria-label': label,
     disabled: to < lo || to > hi,
-    onclick: () => go(to),
+    onclick: () => go(to, [lo, hi]),
   }, svg(icon), double ? svg(icon) : null);
 
-  const label = admin ? t('preview.label') : t('preview.pastLabel', { n: PAST_DAYS });
+  const label = whole ? t('preview.label') : t('preview.pastLabel', { n: PAST_DAYS });
   return h('div', { class: 'preview', role: 'group', 'aria-label': label },
     h('div', { class: 'preview__head' },
       h('span', { class: 'caps preview__label' }, label),
-      shown !== null && shown !== realDay
+      day !== realDay
         ? h('button', { type: 'button', class: 'preview__back', onclick: reset }, t('preview.back'))
         : null,
     ),
