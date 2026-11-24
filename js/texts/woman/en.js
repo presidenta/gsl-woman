@@ -526,7 +526,7 @@ export default {
     inviteTitle: 'Discover your man’s love language',
     inviteText: 'A questionnaire by observation: how he shows love, what he asks for, what hurts him — and every day you’ll find one thing to do in his language here.',
     inviteBtn: 'Fill in the questionnaire',
-    more: 'The five love languages',
+    more: 'Find out the love languages — yours and your family’s', // link on the Today card (owner, 24.11.2026)
     empty: 'This section opens once the programme has loaded.',
     notice: 'Today for him: {idea}',
     noticeChild: '{name}: {idea}',
