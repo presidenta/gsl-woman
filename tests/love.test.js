@@ -17,7 +17,7 @@ beforeEach(() => {
 test('выбор хранится, чужие значения отбрасываются', () => {
   choose('him', 'gifts');
   choose('me', 'нечто');
-  assert.deepEqual(choices(), { him: 'gifts', me: null, children: [], family: [] });
+  assert.deepEqual(choices(), { him: 'gifts', me: null, children: [], family: [], results: { him: null, me: null } });
 });
 
 test('дело дня: язык выбран — каждый день своё, по кругу; не выбран — null', () => {
@@ -69,7 +69,7 @@ test('дети: сколько детей — столько строк; у ка
   setPerson('children', 0, { name: '  Маша  ', kind: 'touch' });
   setPerson('children', 1, { kind: 'time' });
   setPerson('children', 2, { name: 'Петя', kind: 'нечто' });
-  assert.deepEqual(choices().children, [{ name: 'Маша', kind: 'touch' }, { name: '', kind: 'time' }, { name: 'Петя', kind: null }]);
+  assert.deepEqual(choices().children, [{ name: 'Маша', kind: 'touch', result: null }, { name: '', kind: 'time', result: null }, { name: 'Петя', kind: null, result: null }]);
   setCount('children', 2);
   assert.deepEqual(choices().children.map((c) => c.name), ['Маша', '']);
   setCount('children', 99);
@@ -97,9 +97,31 @@ test('родные — отдельный раздел, как дети: сво�
   setCount('family', 2);
   setPerson('family', 0, { name: 'Папа', kind: 'service' });
   setPerson('family', 1, { name: 'Сестра Клава', kind: 'words' });
-  assert.deepEqual(choices().family, [{ name: 'Папа', kind: 'service' }, { name: 'Сестра Клава', kind: 'words' }]);
+  assert.deepEqual(choices().family, [{ name: 'Папа', kind: 'service', result: null }, { name: 'Сестра Клава', kind: 'words', result: null }]);
   assert.equal(choices().children.length, 1, 'родные не трогают детей');
   const ideas = groupIdeas('family', 3, 'ru');
   assert.deepEqual(ideas.map((i) => i.person.name), ['Папа', 'Сестра Клава']);
   assert.match(ideas[0].text, /^service родным/);
+});
+
+// Владелец 24.11.2026: «результат должен сохраняться открытым… свой результат, детей, родителей — в процентах»
+test('итог анкеты хранится у каждого: свой, мужчины, ребёнка, родных; новый заменяет прошлый; мусор не принимается', async () => {
+  const { resultOf, setResult } = await import('../js/love/love.js');
+  const ranking = [
+    { k: 1, kind: 'words', n: 32, pct: 48 }, { k: 2, kind: 'time', n: 20, pct: 30 }, { k: 4, kind: 'service', n: 8, pct: 12 },
+    { k: 3, kind: 'gifts', n: 4, pct: 6 }, { k: 5, kind: 'touch', n: 2, pct: 3 },
+  ];
+  const r = { mode: 'self', group: null, ranking, answered: 22, total: 22, max: 66, shape: 'dual', at: '2026-11-24T10:00:00.000Z' };
+  setResult('me', undefined, r);
+  assert.deepEqual(resultOf('me').ranking.map((x) => x.pct), [48, 30, 12, 6, 3]);
+  setCount('children', 2);
+  setResult('children', 1, { ...r, mode: 'observe', group: 'teen' });
+  assert.equal(resultOf('children', 1).group, 'teen');
+  assert.equal(resultOf('children', 0), null);
+  setPerson('children', 1, { name: 'Ваня' });
+  assert.equal(resultOf('children', 1).shape, 'dual', 'имя меняется — итог остаётся');
+  setResult('me', undefined, { ...r, ranking: [...ranking].reverse() });
+  assert.equal(resultOf('me').ranking[0].kind, 'touch', 'новый итог заменяет прошлый');
+  setResult('him', undefined, { ranking: [{ k: 9 }] });
+  assert.equal(resultOf('him'), null, 'испорченный итог не сохраняется');
 });

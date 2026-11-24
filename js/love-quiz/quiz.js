@@ -11,7 +11,10 @@ import { toast } from '../ui/toast.js';
        12–18 (16), взрослый (17); без таймера, от одного до трёх ответов или «Не замечал(а)».
    Баллы 3 · 2 · 1; процент — от максимума по отвеченным вопросам. Итог — как на сайте: все пять языков, форма профиля,
    советы; кнопка «Это язык …» сохраняет главный язык (onSave). Языки ответов k = 1…5 → KINDS по порядку.
-   Анкета живёт только на экране #/love (screens/love/love.js), в хранилище — только итог через onSave.
+   Анкета живёт только на экране #/love (screens/love/love.js). Итог сохраняется сам, как только анкета пройдена
+   (onResult → love/love.js, владелец 24.11.2026: «результат должен сохраняться открытым»), и при следующем открытии
+   анкеты показывается он — с кнопкой «Пройти ещё раз». Кнопка «Это язык …» по-прежнему ставит главный язык (onSave).
+   Отмечать можно от одного до трёх ответов по важности (владелец 24.11.2026: «можно выбрать один или два»).
    Языки анкет — ru, ua, en (английский — с 22.11.2026, владелец: «переведи на английский тоже»). */
 
 export const KINDS = ['words', 'time', 'gifts', 'service', 'touch'];
@@ -80,13 +83,20 @@ export function close() {
 }
 
 /** Открыть анкету. opts: mode 'self' | 'observe'; group — 'child' | 'teen' | 'adult' (null — спросить ребёнок или
-    подросток); title — шапка; saveText — надпись кнопки сохранения; onSave(kind); lang — язык приложения;
-    redraw() — перерисовать экран. Тексты грузятся при первом открытии. */
+    подросток); title — шапка; saveText — надпись кнопки сохранения; onSave(kind); onResult(result, group) — итог
+    пройденной анкеты (сохранить); saved — сохранённый итог прошлого раза: тогда открывается сразу он; lang — язык
+    приложения; redraw() — перерисовать экран. Тексты грузятся при первом открытии. */
 export async function open(opts) {
   const lang = PACKS[opts.mode][opts.lang] ? opts.lang : 'ru';
   const pack = (await PACKS[opts.mode][lang]()).default;
   stopTimer();
   run = { ...opts, fixedGroup: Boolean(opts.group), pack, stage: 'intro', i: 0, picks: [], order: [], skipped: [], timedOut: [], deadline: 0, result: null };
+  const saved = opts.saved;
+  if (saved?.ranking?.length === 5 && (saved.mode || opts.mode) === opts.mode && (opts.mode === 'self' || pack.groups[saved.group || opts.group])) {
+    run.result = saved;
+    if (opts.mode === 'observe') run.group = saved.group || opts.group;
+    run.stage = 'result';
+  }
   opts.redraw();
 }
 
@@ -120,8 +130,9 @@ function next() {
     armTimer();
   } else {
     stopTimer();
-    run.result = score(questions(), run.picks, run.skipped);
+    run.result = { ...score(questions(), run.picks, run.skipped), mode: run.mode, group: run.group, at: new Date().toISOString() };
     run.stage = 'result';
+    run.onResult?.(run.result);
   }
   show();
 }
@@ -192,7 +203,7 @@ const timerLevel = (left) => {
 
 function nextLabel(u, ready, last, got) {
   if (ready) return last ? u.quiz.finish : u.quiz.next;
-  return run.mode === 'self' ? fill(u.quiz.pickMore, { n: PICKS - got }) : u.quiz.pickOne;
+  return t('love.quiz.pickAny');
 }
 
 function answerButton(q, opt, slots) {
@@ -219,7 +230,7 @@ function questionView() {
   const got = slots.filter((v) => v !== null).length;
   const last = run.i === qs.length - 1;
   const self = run.mode === 'self';
-  const ready = self ? got === PICKS || (run.timedOut[run.i] && got > 0) : got > 0;
+  const ready = got > 0; // от одного до трёх: третий — не обязательно (владелец 24.11.2026)
   const left = self ? secondsLeft() : 0;
 
   return h('section', { class: 'card lq' },
@@ -234,6 +245,7 @@ function questionView() {
     ),
     h('div', { class: 'bar' }, h('div', { class: 'bar__fill', style: { width: `${((run.i + 1) / qs.length) * 100}%` } })),
     h('h2', { class: 'card__title lq-q' }, q.q),
+    h('p', { class: 'faint lq-hint' }, t('love.quiz.rankHint')),
     h('div', { class: 'lq-answers' },
       ...run.order[run.i].map((opt) => answerButton(q, opt, slots))),
     h('div', { class: 'card__actions lq-actions' },
@@ -254,7 +266,7 @@ function introView() {
   return h('section', { class: 'card lq' },
     head(),
     self
-      ? h('p', { class: 'card__text' }, u.intro.note)
+      ? h('p', { class: 'card__text' }, t('love.quiz.howSelf')) // как отмечать — правило приложения: 1, 2 или 3 ответа
       : h('div', {},
         ...u.intro.why.map((p) => h('p', { class: 'card__text lq-p' }, p)),
         h('p', { class: 'caps lq-sub' }, u.intro.howTitle),
@@ -304,6 +316,7 @@ function resultView() {
   return h('div', { class: 'lq-result' },
     h('section', { class: 'card card--hero lq' },
       head(),
+      r.at ? h('p', { class: 'faint lq-when' }, t('love.quiz.takenOn', { date: new Date(r.at).toLocaleDateString(dateLocale()) })) : null,
       h('p', { class: 'caps lq-sub' }, u.mainLabel),
       h('div', { class: 'lq-main' }, h('h2', { class: 'lq-main__name' }, name(main.k)), h('span', { class: 'lq-main__pct' }, `${main.pct}%`)),
       h('p', { class: 'faint lq-tagline' }, `${L[main.k].tagline} · ${fill(u.ofPicks, { n: main.n, m: r.max })}`),
@@ -352,6 +365,8 @@ function saveActions(kind) {
     h('button', { type: 'button', class: 'btn btn--ghost btn--block', onclick: retry }, t('love.quiz.retry')),
   );
 }
+
+const dateLocale = () => ({ ua: 'uk-UA', en: 'en-GB' })[run.lang] || 'ru-RU';
 
 function retry() {
   run.stage = 'intro';

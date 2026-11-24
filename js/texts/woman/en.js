@@ -488,6 +488,11 @@ export default {
     save: { him: 'This is my man’s language', me: 'This is my language', named: 'This is {name}’s language' },
     quiz: {
       open: 'Questionnaire',
+      pickAny: 'Choose at least one answer',
+      rankHint: 'Tap in order: first — 1 (most important), second — 2, third — 3. One or two is fine too.',
+      howSelf: '22 questions, five answers in each. Choose one to three, by importance: 1 — what matters most to you, 2 — the next, 3 — one more. You can choose just one or two. Answer fast, on your first impulse — it is more honest that way.',
+      result: 'Questionnaire result',
+      takenOn: 'Taken on {date}',
       start: 'Start',
       close: 'Close the questionnaire',
       retry: 'Take it again',

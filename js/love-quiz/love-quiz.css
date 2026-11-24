@@ -146,14 +146,19 @@
 .lq-answer__slot {
   display: grid;
   place-items: center;
-  width: 36px;
-  height: 36px;
+  flex: 0 0 auto;
+  width: 40px;
+  height: 40px;
   border: 1px dashed var(--c-line-strong);
-  border-radius: var(--r-md);
+  border-radius: 50%;
   color: var(--c-on-gold);
-  font-family: var(--f-display);
-  font-size: var(--fs-lg);
-  font-weight: 700;
+  /* Цифра на весь кружок, крупная и жирная (владелец 24.11.2026: «их не видно вообще, шрифт непонятный»):
+     у заголовочного шрифта цифры старого начертания — «1» в нём ниже строчных букв. Здесь — рубленый, прямые цифры. */
+  font-family: var(--f-body);
+  font-size: 24px;
+  font-weight: 800;
+  line-height: 1;
+  font-variant-numeric: lining-nums tabular-nums;
 }
 
 .lq-answer.is-rank-1 { border-color: var(--c-gold); background: var(--g-gold-soft); }
@@ -161,7 +166,19 @@
 .lq-answer.is-rank-2 { border-color: var(--c-line-strong); background: var(--c-surface-strong); }
 .lq-answer.is-rank-2 .lq-answer__slot { border: 0; background: var(--c-champagne); }
 .lq-answer.is-rank-3 { border-color: var(--c-line-strong); }
-.lq-answer.is-rank-3 .lq-answer__slot { border: 0; background: var(--c-gold-deep); }
+.lq-answer.is-rank-3 .lq-answer__slot { border: 0; background: var(--c-gold-deep); color: var(--c-text); }
+
+/* Как отмечать — под каждым вопросом (владелец 24.11.2026: «нигде не написано, что выбирать надо от 1 до 3») */
+.lq-hint {
+  margin: var(--sp-2) 0 var(--sp-3);
+  font-size: var(--fs-sm);
+  line-height: 1.45;
+}
+
+/* Когда пройдена — над итогом */
+.lq-when {
+  margin: 0 0 var(--sp-2);
+}
 
 .lq-actions .btn[disabled] {
   opacity: 0.45;

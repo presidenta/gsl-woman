@@ -27,8 +27,28 @@ const KEY = 'love';
 
 const kindOrNull = (k) => (KINDS.includes(k) ? k : null);
 const cleanName = (n) => (typeof n === 'string' ? n.trim().slice(0, 40) : '');
+
+/* ИТОГ АНКЕТЫ — хранится у каждого, кто её прошёл (владелец 24.11.2026: «результат должен сохраняться открытым…
+   чтобы можно было вернуться и посмотреть свой результат, детей, родителей — какие языки в приоритете в процентах»).
+   { mode, group, ranking: [{ k, kind, n, pct }] × 5, answered, total, max, shape, at } — как отдаёт love-quiz/score. */
+const num = (v) => (Number.isFinite(Number(v)) ? Math.max(0, Math.round(Number(v))) : 0);
+export function cleanResult(r) {
+  if (!r || !Array.isArray(r.ranking) || r.ranking.length !== 5) return null;
+  const ranking = r.ranking.map((x) => ({ k: num(x?.k), kind: kindOrNull(x?.kind), n: num(x?.n), pct: Math.min(100, num(x?.pct)) }));
+  if (ranking.some((x) => x.k < 1 || x.k > 5 || !x.kind)) return null;
+  return {
+    mode: r.mode === 'self' ? 'self' : 'observe',
+    group: ['child', 'teen', 'adult'].includes(r.group) ? r.group : null,
+    ranking,
+    answered: num(r.answered),
+    total: num(r.total),
+    max: num(r.max),
+    shape: ['flat', 'dual', 'dominant'].includes(r.shape) ? r.shape : 'flat',
+    at: typeof r.at === 'string' ? r.at.slice(0, 30) : null,
+  };
+}
 const cleanList = (list) => (Array.isArray(list)
-  ? list.slice(0, MAX_PEOPLE).map((p) => ({ name: cleanName(p?.name), kind: kindOrNull(p?.kind) }))
+  ? list.slice(0, MAX_PEOPLE).map((p) => ({ name: cleanName(p?.name), kind: kindOrNull(p?.kind), result: cleanResult(p?.result) }))
   : []);
 
 /** Выбор: { him, me, children: [{ name, kind }], family: [{ name, kind }] } — kind из KINDS или null. */
@@ -37,11 +57,37 @@ export function choices() {
   let children = cleanList(saved.children);
   // До 13.11.2026 ребёнок был один (поле child) — он становится первым
   if (!Array.isArray(saved.children) && kindOrNull(saved.child)) children = [{ name: '', kind: saved.child }];
-  return { him: kindOrNull(saved.him), me: kindOrNull(saved.me), children, family: cleanList(saved.family) };
+  return {
+    him: kindOrNull(saved.him),
+    me: kindOrNull(saved.me),
+    children,
+    family: cleanList(saved.family),
+    results: { him: cleanResult(saved.results?.him), me: cleanResult(saved.results?.me) },
+  };
 }
 
 function save(next) {
-  write(KEY, { him: next.him, me: next.me, children: next.children, family: next.family });
+  write(KEY, { him: next.him, me: next.me, children: next.children, family: next.family, results: next.results });
+}
+
+/** Итог анкеты: who — 'him' | 'me' или группа ('children' | 'family') с номером человека; null — не проходили. */
+export function resultOf(who, index) {
+  const c = choices();
+  return GROUPS[who] ? c[who][index]?.result || null : c.results[who] || null;
+}
+
+/** Сохранить итог пройденной анкеты — сразу, как только она пройдена; прошлый итог заменяется новым. */
+export function setResult(who, index, result) {
+  const r = cleanResult(result);
+  if (!r) return;
+  const c = choices();
+  if (GROUPS[who]) {
+    if (!c[who][index]) return;
+    c[who][index] = { ...c[who][index], result: r };
+  } else if (WHO.includes(who)) {
+    c.results = { ...c.results, [who]: r };
+  } else return;
+  save(c);
 }
 
 export function choose(who, kind) {
@@ -55,7 +101,7 @@ export function setCount(group, n) {
   const count = Math.max(0, Math.min(MAX_PEOPLE, Math.floor(Number(n) || 0)));
   const c = choices();
   const list = c[group].slice(0, count);
-  while (list.length < count) list.push({ name: '', kind: null });
+  while (list.length < count) list.push({ name: '', kind: null, result: null });
   save({ ...c, [group]: list });
 }
 

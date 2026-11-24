@@ -2,7 +2,7 @@ import { h, svg, add } from '../../core/dom.js';
 import { t, list } from '../../core/i18n.js';
 import { icons } from '../../ui/icons.js';
 import { toast } from '../../ui/toast.js';
-import { KINDS, GROUPS, MAX_PEOPLE, choices, choose, setCount, setPerson, content } from '../../love/love.js';
+import { KINDS, GROUPS, MAX_PEOPLE, choices, choose, setCount, setPerson, content, resultOf, setResult } from '../../love/love.js';
 import * as quiz from '../../love-quiz/quiz.js';
 import { GROUP_TEXT, personLabel } from '../../love/cards.js';
 import { KIND_ICON } from '../../love/kind-icons.js';
@@ -51,6 +51,8 @@ function openQuiz(view, ctx, c, who, index) {
     selfLink: who === 'me' ? null : { text: t(`love.quiz.selfLink.${who === 'him' ? 'him' : 'other'}`), url: SELF_URL },
     names: Object.fromEntries(KINDS.map((k) => [k, c.kinds[k].name])), // названия языков — как везде в приложении
     lang: ctx.lang,
+    saved: resultOf(who, index), // пройдена — открывается её итог (владелец 24.11.2026)
+    onResult: (r) => setResult(who, index, r),
     onSave: save,
     redraw: redrawCurrent,
   });
@@ -67,7 +69,17 @@ function kindSelect(id, c, current, onPick, label) {
   return h('div', { class: 'select' }, select, svg(icons.chevronRight, 'select__chevron'));
 }
 
-const quizButton = (onClick) => h('button', { type: 'button', class: 'btn btn--ghost love-who__test', onclick: onClick }, t('love.quiz.open'));
+const quizButton = (onClick, done) => h('button', { type: 'button', class: 'btn btn--ghost love-who__test', onclick: onClick },
+  t(done ? 'love.quiz.result' : 'love.quiz.open'));
+
+/* Итог пройденной анкеты — строкой под человеком: все пять языков в процентах, по убыванию (владелец 24.11.2026:
+   «чтобы было видно, какие языки любви в приоритете в процентном соотношении»). */
+function resultLine(c, r) {
+  if (!r) return null;
+  return h('p', { class: 'faint love-result' },
+    ...r.ranking.map((x, i) => h('span', { class: i === 0 ? 'love-result__top' : null }, `${c.kinds[x.kind].name} ${x.pct}%`))
+      .flatMap((el, i) => (i ? [' · ', el] : [el])));
+}
 
 // «Мой мужчина» и «Мой язык» — по отдельной карточке: заголовок, подсказка, язык и анкета
 function oneSection(view, ctx, c, who, current) {
@@ -84,8 +96,9 @@ function oneSection(view, ctx, c, who, current) {
       : null,
     h('div', { class: 'love-who__row' },
       kindSelect(id, c, current, (k) => choose(who, k), t(`love.who.${who}`)),
-      quizButton(() => openQuiz(view, ctx, c, who)),
+      quizButton(() => openQuiz(view, ctx, c, who), resultOf(who)),
     ),
+    resultLine(c, resultOf(who)),
   );
 }
 
@@ -112,8 +125,9 @@ function groupSection(view, ctx, c, group, people) {
         name,
         h('div', { class: 'love-who__row' },
           kindSelect(`love-${group}-${i}`, c, person.kind, (k) => setPerson(group, i, { kind: k }), t(tx.lang)),
-          quizButton(() => openQuiz(view, ctx, c, group, i)),
+          quizButton(() => openQuiz(view, ctx, c, group, i), person.result),
         ),
+        resultLine(c, person.result),
       );
     }),
   );

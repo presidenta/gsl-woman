@@ -312,3 +312,14 @@ a.btn {
   display: grid;
   gap: 2px;
 }
+
+/* Итог пройденной анкеты под человеком: пять языков в процентах (владелец 24.11.2026) */
+.love-result {
+  margin: var(--sp-2) 0 0;
+  font-size: var(--fs-sm);
+  line-height: 1.5;
+}
+.love-result__top {
+  color: var(--c-gold);
+  font-weight: 700;
+}
