@@ -170,3 +170,7 @@ button.cycle-day { cursor: pointer; }
 .cycle-key__title { margin: 0; font-size: 11px; color: var(--c-gold, #d9b56a); }
 .cycle-key .cycle__access { margin-top: 0; }
 .cycle-key__line { width: 100%; height: 1px; margin: 2px 0; border: 0; background: linear-gradient(90deg, transparent, var(--c-gold, #d9b56a) 20%, var(--c-gold, #d9b56a) 80%, transparent); opacity: .55; }
+
+/* Срок доступа — зелёным, тем же неоном, что «Доступ открыт» (владелец 25.11.2026: «должно бросаться в глаза: время
+   ограничено, нужна следующая оплата»). Перебивает приглушённый .faint. */
+.cycle-key .cycle__access { color: rgb(var(--open)); opacity: 1; font-weight: 600; }
