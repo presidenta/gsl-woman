@@ -1,8 +1,8 @@
-// Просмотр дней: участница всегда видит настоящий день, полоска со стрелками — только у администратора.
+// Листание дней: администратор — вся программа; человек — 7 прошедших дней на «Сегодня».
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { write, remove } from '../js/core/store.js';
-import { dayFor, isAdmin } from '../js/preview/preview.js';
+import { dayFor, isAdmin, bounds, canOpen } from '../js/preview/preview.js';
 
 test('участница: нет полоски, день — настоящий', () => {
   write('account', { token: 't', displayName: 'Анна', role: 'member' });
@@ -21,5 +21,24 @@ test('администратор: пока не листал — тоже нас
 test('старая сессия без роли — участница', () => {
   write('account', { token: 't', displayName: 'Анна' });
   assert.equal(isAdmin(), false);
+  remove('account');
+});
+
+// Человек листает 7 прошедших дней (владелец 24.11.2026)
+test('человек: окно — 7 прошедших дней, сдвигается каждый день', () => {
+  write('account', { token: 't', displayName: 'Анна', role: 'member' });
+  assert.deepEqual(bounds(12), [5, 12]);
+  assert.deepEqual(bounds(3), [1, 3]);
+  assert.equal(canOpen(5, 12), true);
+  assert.equal(canOpen(4, 12), false);
+  assert.equal(canOpen(12, 12), false);
+  assert.equal(canOpen(13, 12), false);
+  remove('account');
+});
+
+test('администратор: вся программа', () => {
+  write('account', { token: 't', displayName: 'Владимир', role: 'admin' });
+  assert.equal(bounds(12)[0], 1);
+  assert.ok(bounds(12)[1] > 100);
   remove('account');
 });

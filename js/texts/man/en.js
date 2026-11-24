@@ -368,6 +368,7 @@ export default {
   },
   preview: {
     label: 'Day preview · admin only',
+    pastLabel: 'The past {n} days',
     back: 'Back to today',
     prevDay: 'Previous day',
     nextDay: 'Next day',
