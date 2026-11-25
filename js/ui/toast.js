@@ -12,8 +12,9 @@ function ensureHost() {
   return host;
 }
 
-export function toast({ title, text, onClick, ms = 3200 }) {
-  const node = h('div', { class: 'toast' },
+/** tone: 'alert' — красная плашка (напоминание, reminders/reminders.css). */
+export function toast({ title, text, onClick, ms = 3200, tone }) {
+  const node = h('div', { class: tone === 'alert' ? 'toast toast--alert' : 'toast' },
     title ? h('div', { class: 'toast__title' }, title) : null,
     text ? h('div', { class: 'toast__text' }, text) : null,
   );

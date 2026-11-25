@@ -86,7 +86,8 @@ self.addEventListener('fetch', (event) => {
   })());
 });
 
-/* ПУШ С СЕРВЕРА — новое сообщение пары или семьи (js/push/, сервер circles/notify.js, 17.11.2026). Показываем каждый
+/* ПУШ С СЕРВЕРА — новое сообщение пары или семьи (js/push/, сервер circles/notify.js, 17.11.2026) и напоминание дня
+   (js/reminders/server.js, сервер push.js — 25.11.2026). Показываем каждый
    пуш обязательно: браузер, получивший пуш без уведомления, отзывает подписку. Нажатие — «Мы» (ниже, notificationclick). */
 self.addEventListener('push', (event) => {
   let data = {};
@@ -95,13 +96,18 @@ self.addEventListener('push', (event) => {
   } catch {
     data = { body: event.data ? event.data.text() : '' };
   }
+  // Напоминание по расписанию (kind: 'remind', js/reminders/server.js, 25.11.2026) — как будильник: со звуком и вибрацией
+  // и на экране до нажатия. Звук задаёт телефон (на iPhone — звук уведомлений, если он включён для GSL в настройках).
+  const remind = data.kind === 'remind';
   event.waitUntil(self.registration.showNotification(data.title || 'GSL', {
     body: data.body || '',
     tag: data.key || 'gsl-msg',
     renotify: true,
+    silent: false,
+    ...(remind ? { requireInteraction: true, vibrate: [500, 200, 500, 200, 900] } : {}),
     icon: './assets/icons/icon-192.png',
     badge: './assets/icons/badge-96.png',
-    data: { target: data.target || '#/us' },
+    data: { target: data.target || (remind ? '#/today' : '#/us') },
   }));
 });
 

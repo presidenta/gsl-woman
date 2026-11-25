@@ -4,7 +4,10 @@
 
    tick()        — мягкий короткий звон на каждую секунду;
    tick(true)    — каждая десятая секунда, чуть выше и ярче: слышно, сколько прошло;
-   finish()      — два звона в конце: время вышло. */
+   finish()      — два звона в конце: время вышло;
+   alert()       — напоминание на открытом приложении (reminders/local.js → main.js): три звона дважды, громко
+                   (владелец 25.11.2026: «чтобы звук был обязательно»). Телефон пускает звук только после первого
+                   касания приложения — main.js зовёт unlock() на первом нажатии. */
 
 let audio = null;
 
@@ -35,6 +38,19 @@ export function tick(strong = false) {
   try {
     bell(strong ? 880 : 620, audio.currentTime, strong ? 0.32 : 0.2, strong ? 0.35 : 0.16);
   } catch { /* звук — украшение: сбой не мешает счёту */ }
+}
+
+export function alert() {
+  if (!audio) return;
+  try {
+    audio.resume?.();
+    const now = audio.currentTime;
+    for (const [i, start] of [0, 1.1].entries()) {
+      bell(880, now + start, 0.5, 0.5);
+      bell(1175, now + start + 0.22, 0.45, 0.5);
+      bell(1320, now + start + 0.44, 0.5, i ? 1.2 : 0.6);
+    }
+  } catch { /* звук — дополнение к плашке: сбой её не отменяет */ }
 }
 
 export function finish() {

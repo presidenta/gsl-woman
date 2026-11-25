@@ -19,6 +19,8 @@ import * as sync from './sync/sync.js';
 import * as native from './native/native.js';
 import * as program from './program/source.js';
 import * as reminders from './reminders/local.js';
+import * as remindServer from './reminders/server.js';
+import * as sound from './ui/tick.js';
 import { isOpen as sheetOpen } from './ui/sheet.js';
 import { toast } from './ui/toast.js';
 import { icons } from './ui/icons.js';
@@ -436,10 +438,13 @@ router.start((name, screen) => {
   scrollTo({ top: 0 });
 });
 
+// Звук напоминания на открытом приложении: телефон разрешает его только после касания (ui/tick.js)
+addEventListener('pointerdown', () => sound.unlock(), { once: true, capture: true });
 reminders.start({
   // Закрытое приложение не напоминает о себе (как «Квант»: закрытое приложение не будит человека)
   context: () => ({ settings: access.isOpen() ? settings.get() : null, entries: journal.all() }),
-  inApp: (item) => toast({ title: item.title, text: item.body, ms: 8000, onClick: () => router.go('today') }),
+  // Напоминание на открытом приложении — красной плашкой и со звуком (владелец 25.11.2026: «чтобы бросалось в глаза»)
+  inApp: (item) => { sound.alert(); toast({ title: item.title, text: item.body, ms: 15000, tone: 'alert', onClick: () => router.go('today') }); },
 });
 
 if (account.current()) {
@@ -476,5 +481,7 @@ native.start(() => ({ settings: settings.get(), entries: journal.all() }));
 registerWorker({ onUpdated: () => toast({ title: t('update.ready') }) });
 // Уведомления о новых сообщениях пары и семьи: разрешение уже есть — подписаться на пуши сервера (js/push/)
 push.ensure();
+// Напоминания с сервера: расписание на неделю уходит серверу, в час напоминания он присылает пуш — и на iPhone (reminders/server.js)
+remindServer.start(() => ({ settings: access.isOpen() ? settings.get() : null, entries: journal.all() }));
 // Записи «Проверь свой голос» живут до конца дня: вчерашние стираются при открытии (js/voice-check/)
 import('./voice-check/voice-check.js').then((m) => m.sweep()).catch(() => {});

@@ -1,0 +1,21 @@
+/* Красная плашка «Напоминания со звуком» на «Сегодня» (nudge.js) — тёплый красный «Срочно» (--rgb-urgent), как у
+   срочного сообщения пары и семьи */
+.remind-nudge {
+  border: 2px solid rgb(var(--rgb-urgent));
+  background: rgba(var(--rgb-urgent), 0.16);
+  box-shadow: 0 0 18px rgba(var(--rgb-urgent), 0.35);
+}
+.remind-nudge__title {
+  display: flex; align-items: center; gap: var(--sp-2);
+  margin: 0 0 var(--sp-2);
+  font-family: var(--f-display); font-size: var(--fs-lg); font-weight: 600;
+  color: rgb(var(--rgb-urgent));
+}
+.remind-nudge__icon { width: 22px; height: 22px; flex: none; }
+.remind-nudge__text { margin: 0 0 var(--sp-3); color: var(--c-text); }
+.remind-nudge .btn.btn--danger.remind-nudge__btn { background: rgb(var(--rgb-urgent)); border-color: rgb(var(--rgb-urgent)); color: #fff; }
+
+/* Напоминание на открытом приложении (toast с tone: 'alert') — тоже красным */
+.toast--alert { border: 2px solid rgb(var(--rgb-urgent)); background: rgba(var(--rgb-urgent), 0.94); }
+.toast--alert .toast__title,
+.toast--alert .toast__text { color: #fff; }

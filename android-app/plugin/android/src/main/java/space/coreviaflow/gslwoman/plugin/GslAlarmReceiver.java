@@ -19,8 +19,16 @@ import org.json.JSONObject;
  * звук будильника, вибрация). Иначе — обычное уведомление. Нажатие на уведомление открывает приложение.
  */
 public class GslAlarmReceiver extends BroadcastReceiver {
-    static final String CH_REMIND = "gsl_remind";
+    /* Владелец 25.11.2026: «чтобы напоминания работали как будильники — со звуком обязательно, и выделялись красным».
+       Канал gsl_remind был с обычной важностью — уведомление тихо ложилось в шторку. Важность канала Android после
+       создания поменять не даёт, поэтому новый канал gsl_remind_sound: всплывает поверх экрана, звук уведомлений
+       телефона, вибрация; старый удаляется. Что видно на экране блокировки — решают настройки телефона. */
+    static final String CH_REMIND = "gsl_remind_sound";
+    static final String CH_REMIND_OLD = "gsl_remind";
     static final String CH_ALARM = "gsl_alarm";
+    /** Красный «Срочно» (--rgb-urgent в styles/tokens.css): значок и название в уведомлении. */
+    static final int RED = 0xFFE86056;
+    static final long[] BUZZ = { 0, 500, 200, 500, 200, 900 };
 
     @Override
     public void onReceive(Context c, Intent intent) {
@@ -35,8 +43,16 @@ public class GslAlarmReceiver extends BroadcastReceiver {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return;
         NotificationManager nm = (NotificationManager) c.getSystemService(Context.NOTIFICATION_SERVICE);
         if (nm == null) return;
+        nm.deleteNotificationChannel(CH_REMIND_OLD);
         NotificationChannel remind = new NotificationChannel(CH_REMIND,
-            GslStore.label(c, "channelRemind", "Напоминания"), NotificationManager.IMPORTANCE_DEFAULT);
+            GslStore.label(c, "channelRemind", "Напоминания"), NotificationManager.IMPORTANCE_HIGH);
+        remind.setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION), new AudioAttributes.Builder()
+            .setUsage(AudioAttributes.USAGE_NOTIFICATION_EVENT)
+            .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION).build());
+        remind.enableVibration(true);
+        remind.setVibrationPattern(BUZZ);
+        remind.enableLights(true);
+        remind.setLightColor(RED);
         nm.createNotificationChannel(remind);
         NotificationChannel alarm = new NotificationChannel(CH_ALARM,
             GslStore.label(c, "channelAlarm", "Будильник"), NotificationManager.IMPORTANCE_HIGH);
@@ -68,7 +84,13 @@ public class GslAlarmReceiver extends BroadcastReceiver {
             .setContentText(body)
             .setStyle(new Notification.BigTextStyle().bigText(body))
             .setAutoCancel(true)
+            .setColor(RED)
+            .setCategory(Notification.CATEGORY_REMINDER)
             .setContentIntent(openApp(c, id));
+        // До Android 8 каналов нет: звук, вибрация и всплывание — у самого уведомления
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+            b.setDefaults(Notification.DEFAULT_SOUND).setVibrate(BUZZ).setPriority(Notification.PRIORITY_HIGH);
+        }
         if (loud) {
             Intent full = new Intent(c, GslAlarmActivity.class)
                 .putExtra("key", key).putExtra("title", title).putExtra("body", body)

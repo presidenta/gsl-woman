@@ -28,7 +28,7 @@ addEventListener('appinstalled', () => {
 export const standalone = () =>
   matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
 
-const isIOS = () => /iPhone|iPad|iPod/i.test(navigator.userAgent)
+export const isIOS = () => /iPhone|iPad|iPod/i.test(navigator.userAgent)
   || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
 
 /** Перерисовать, когда браузер разрешил установку. */

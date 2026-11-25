@@ -10,6 +10,9 @@ import { nativeCard } from './native-card.js';
 import { field, dateField, switchRow, segmented } from '../../ui/controls.js';
 import * as sections from '../../sections/sections.js';
 import * as push from '../../push/push.js';
+import { kick as sendReminders } from '../../reminders/server.js';
+import { rt } from '../../reminders/texts.js';
+import { isIOS, standalone } from '../../install/install.js';
 import * as side from '../../side/side.js';
 import { icons } from '../../ui/icons.js';
 import { toast } from '../../ui/toast.js';
@@ -84,9 +87,12 @@ function notificationsBlock(ctx) {
   let body;
   if (state === 'granted') body = h('div', {},
     h('p', { class: 'settings__ok' }, svg(icons.check, 'settings__ok-icon'), t('settings.notifOn')),
+    // Напоминания с сервера — и при закрытом приложении, и на iPhone (reminders/server.js); в APK их ставит телефон
+    push.supported() ? h('p', { class: 'field__hint' }, rt('on')) : null,
     h('p', { class: 'field__hint' }, push.supported() ? t('settings.notifMessages') : t('settings.notifMessagesApp')));
   else if (state === 'denied') body = h('p', { class: 'field__hint' }, t('settings.notifDenied'));
-  else if (state === 'unsupported') body = h('p', { class: 'field__hint' }, t('settings.notifUnsupported'));
+  // iPhone в Safari: уведомления есть только у GSL со значка на экране «Домой»
+  else if (state === 'unsupported') body = h('p', { class: 'field__hint' }, isIOS() && !standalone() ? rt('ios') : t('settings.notifUnsupported'));
   else {
     body = h('button', {
       type: 'button',
@@ -95,6 +101,8 @@ function notificationsBlock(ctx) {
         await permission.request();
         // Разрешила — сразу подписка на сообщения пары и семьи (js/push/)
         await push.ensure();
+        // И напоминания дня — расписание сразу на сервер (js/reminders/server.js)
+        await sendReminders();
         ctx.rerender();
       },
     }, svg(icons.bell), t('settings.notifAsk'));

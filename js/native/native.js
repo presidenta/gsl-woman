@@ -2,7 +2,7 @@ import { t } from '../core/i18n.js';
 import * as side from '../side/side.js';
 import { subscribe } from '../core/store.js';
 import { isoDate, addDays, programDay, weekOf } from '../core/dates.js';
-import { buildPlan } from '../reminders/plan.js';
+import { buildPlan, noticeTitle } from '../reminders/plan.js';
 import { dayPlan } from '../program/index.js';
 import { morningFor } from '../program/morning.js';
 import { chosen as chosenWater, label as waterLabel } from '../water/water.js';
@@ -53,7 +53,7 @@ export function nativeItems({ settings, entries }, now = new Date()) {
   const alarms = settings.alarms || {};
   return buildPlan({ settings, entries, now, since: now, days: DAYS }).map((it) => {
     const slot = it.key.split(':').pop();
-    return { key: it.key, at: new Date(it.at).getTime(), title: it.title, body: it.body, loud: !!alarms[slot] };
+    return { key: it.key, at: new Date(it.at).getTime(), title: noticeTitle(it.title), body: it.body, loud: !!alarms[slot] };
   });
 }
 

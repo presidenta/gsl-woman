@@ -1,6 +1,8 @@
 import { read, write } from '../core/store.js';
 import { buildPlan } from './plan.js';
 import { isApp } from '../native/native.js';
+import { noticeTitle } from './plan.js';
+import { active as serverActive } from './server.js';
 
 /* ПОКАЗ НАПОМИНАНИЙ НА ТЕЛЕФОНЕ — пока приложение открыто или свёрнуто, но живо.
 
@@ -33,9 +35,13 @@ async function systemNotice(item) {
   if (!('Notification' in globalThis) || Notification.permission !== 'granted') return false;
   const reg = await navigator.serviceWorker?.getRegistration();
   if (!reg) return false;
-  await reg.showNotification(item.title, {
+  // Как пуш с сервера (sw.js): красная метка, звук, вибрация, на экране до нажатия; тот же tag — двойного не будет
+  await reg.showNotification(noticeTitle(item.title), {
     body: item.body,
     tag: item.key,
+    renotify: true,
+    requireInteraction: true,
+    vibrate: [500, 200, 500, 200, 900],
     icon: 'assets/icons/icon-192.png',
     badge: 'assets/icons/badge-96.png',
     data: { target: item.target },
@@ -59,7 +65,8 @@ export function start({ context, inApp }) {
       if (new Date(item.at) > now || sent.has(item.key)) continue;
       markSent(item.key);
       if (document.visibilityState === 'visible') inApp(item);
-      else await systemNotice(item).catch(() => inApp(item));
+      // Сервер уже пришлёт это напоминание пушем (server.js) — второе уведомление ни к чему
+      else if (!serverActive()) await systemNotice(item).catch(() => inApp(item));
     }
   };
   timer = setInterval(tick, TICK_MS);

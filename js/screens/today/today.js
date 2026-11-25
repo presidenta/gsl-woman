@@ -23,6 +23,7 @@ import { state as sectionsOpen, picked as sectionPicked, sectionButtons, section
 import * as sideOf from '../../side/side.js';
 import { pulseCard } from '../../pulse/pulse.js';
 import { voiceCheck } from '../../voice-check/voice-check.js';
+import { remindNudge } from '../../reminders/nudge.js';
 import * as settingsStore from '../../settings/settings.js';
 import { usCard } from '../../circles/today-card.js';
 import { talkCard, talkDone } from '../../circles/talk.js';
@@ -587,6 +588,8 @@ export function render(view, ctx) {
   add(view,
     h('div', { class: 'stack' },
       header(ctx, plan, summary, buttons),
+      // Напоминания выключены, а включить их можно — красная плашка сразу под шапкой (js/reminders/nudge.js, 25.11.2026)
+      remindNudge(ctx),
       // Новое от близкого (пара, семья) — сразу на виду; «Срочно» — красным
       usCard(),
       catchUp(ctx, summary),
