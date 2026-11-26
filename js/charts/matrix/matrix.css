@@ -1,0 +1,11 @@
+/* Матрица судьбы (js/charts/matrix/) */
+.mx__svg { display: block; width: 100%; max-width: 340px; margin: var(--sp-3) auto; }
+.mx__line { fill: none; stroke: var(--c-line-strong, var(--c-line)); stroke-width: 1.2; }
+.mx__dot { fill: rgba(0, 0, 0, .55); stroke: var(--c-gold); stroke-width: 1; }
+.mx__dot--big { stroke-width: 2; }
+.mx__num { fill: var(--c-text); font: 700 11px var(--f-body, sans-serif); text-anchor: middle; }
+.mx__cap { margin: var(--sp-4) 0 var(--sp-2); color: var(--c-gold); }
+.mx__table { width: 100%; border-collapse: collapse; font-size: var(--fs-sm); }
+.mx__table th, .mx__table td { padding: 4px 6px; border-bottom: 1px solid var(--c-line); text-align: center; }
+.mx__table th:first-child, .mx__table td:first-child { text-align: left; }
+.mx__sum td { font-weight: 700; color: var(--c-gold); }
