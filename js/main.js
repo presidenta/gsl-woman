@@ -73,7 +73,8 @@ const VERSION = globalThis.GSL_VERSION || 'dev';
 
 const NAV = [
   { route: 'today', icon: icons.today },
-  { route: 'week', icon: icons.week },
+  // Вместо «Недели» — «В разработке» (владелец 26.11.2026: «Неделя» есть в «Записях»; что поставить — решим позже)
+  { placeholder: true },
   { route: 'goals', icon: icons.goals },
   { route: 'journal', icon: icons.journal },
   { route: 'path', icon: icons.path },
@@ -152,7 +153,9 @@ function buildShell() {
   const who = identity();
   const view = h('main', { class: 'app-view', id: 'view', tabindex: '-1' });
   const nav = h('nav', { class: 'app-nav', 'aria-label': t('app.name') },
-    ...NAV.map((item) => h('a', { class: 'app-nav__item', href: `#/${item.route}`, dataset: { route: item.route } },
+    ...NAV.map((item) => item.placeholder
+      ? h('span', { class: 'app-nav__item app-nav__item--empty', 'aria-hidden': 'true' }, h('span', { class: 'app-nav__blank' }), h('span', {}, t('nav.soon')))
+      : h('a', { class: 'app-nav__item', href: `#/${item.route}`, dataset: { route: item.route } },
       svg(item.icon),
       h('span', {}, t(`nav.${item.route}`)),
     )),

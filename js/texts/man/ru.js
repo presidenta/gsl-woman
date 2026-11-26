@@ -13,7 +13,7 @@ export default {
     sharedTagline: 'Квест для мужчин и женщин, а также их родителей',
   },
 
-  nav: { today: 'Сегодня', week: 'Неделя', goals: 'Артефакты', journal: 'Записи', path: 'Квест' },
+  nav: { today: 'Сегодня', week: 'Неделя', goals: 'Артефакты', journal: 'Достижения', soon: 'В разработке', path: 'Квест' },
   fold: { open: 'Развернуть', close: 'Свернуть' },
   score: {
     totalTitle: 'Итого за день',

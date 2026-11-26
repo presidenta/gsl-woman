@@ -8,7 +8,7 @@ export default {
     sharedTagline: 'A quest for men and women — and their parents',
   },
 
-  nav: { today: 'Today', week: 'Week', goals: 'Artifacts', journal: 'Journal', path: 'Quest' },
+  nav: { today: 'Today', week: 'Week', goals: 'Artifacts', journal: 'Achievements', soon: 'Coming soon', path: 'Quest' },
   fold: { open: 'Open', close: 'Close' },
   score: {
     totalTitle: 'Total for the day',

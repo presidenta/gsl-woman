@@ -34,6 +34,10 @@
   transition: color var(--t-fast);
 }
 
+/* «В разработке» вместо «Недели» (26.11.2026): без значка и без нажатия; высота — как у соседей */
+.app-nav__item--empty { pointer-events: none; opacity: 0.6; text-align: center; }
+.app-nav__blank { width: 26px; height: 26px; }
+
 .app-nav__item svg {
   width: 26px;
   height: 26px;
