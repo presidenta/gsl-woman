@@ -48,7 +48,10 @@ function dayRow(ctx, d, summary) {
   return h('li', { class: `week-day is-${d.status}` }, box);
 }
 
-export function render(view, ctx) {
+/** То, что есть только у «Недели»: стрелки с названием недели программы, кольцо с процентом и статусом, семь дней.
+    С 199 это же стоит в «Достижениях» на сроке «Неделя» (владелец 26.11.2026: «то, чего нету, добавь»).
+    heading — тег названия недели: на своём экране h1, внутри «Достижений» — h2. range — дни показанной недели. */
+export function weekParts(ctx, { heading = 'h1' } = {}) {
   const current = Math.min(Math.max(weekOf(Math.max(ctx.day, 1)), 1), WEEKS);
   if (shown === null || shown > current) shown = current;
 
@@ -65,12 +68,12 @@ export function render(view, ctx) {
   else if (summary.lagDays) status = t('week.lag', { percent: summary.lagPercent });
   else status = t('week.onTrack');
 
-  add(view,
+  const nodes = [
     h('div', { class: 'week-nav' },
       prev,
       h('div', { class: 'week-nav__title' },
         h('p', { class: 'caps' }, t('today.week', { n: shown })),
-        h('h1', { class: 'screen-title' }, plan.title),
+        h(heading, { class: 'screen-title' }, plan.title),
       ),
       next,
     ),
@@ -79,12 +82,20 @@ export function render(view, ctx) {
       h('p', { class: 'week-ring__status' }, status),
     ),
     h('ul', { class: 'week-days' }, ...summary.days.map((d) => dayRow(ctx, d, summary))),
+  ];
+  return { nodes, range: { from: (shown - 1) * 7 + 1, to: shown * 7 } };
+}
+
+export function render(view, ctx) {
+  const parts = weekParts(ctx);
+  add(view,
+    ...parts.nodes,
     // Утро недели: стакан тёплой воды и утренняя минута — кружок на каждый день (владелец 13.11.2026)
     ...(() => {
-      const s = habits({ from: (shown - 1) * 7 + 1, to: shown * 7 }, ctx.day, ctx.settings.startDate);
+      const s = habits(parts.range, ctx.day, ctx.settings.startDate);
       return [habitsCard(s), habitsCard(s, { title: t('insights.habits.dayTitle'), list: DAY })];
     })(),
     // Итоги недели: реакции мужчин по дням и что получилось
-    summaryCard(summarize(ctx.entries, { from: (shown - 1) * 7 + 1, to: shown * 7 }, ctx.lang), { title: t('insights.title.week') }),
+    summaryCard(summarize(ctx.entries, parts.range, ctx.lang), { title: t('insights.title.week') }),
   );
 }
