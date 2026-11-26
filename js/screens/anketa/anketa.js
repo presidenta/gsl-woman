@@ -6,6 +6,7 @@ import { request } from '../../account/session.js';
 import { formView } from '../../anketa/form.js';
 import { resultView } from '../../anketa/result.js';
 import { at } from '../../anketa/texts.js';
+import { pythagorasCard } from '../../charts/pythagoras/view.js'; // квадрат Пифагора по дате рождения (js/charts/, 26.11.2026)
 import { myMarks, setMark, keyOf } from '../../intim/map.js';
 
 /* ЭКРАН «ЕДИНАЯ АНКЕТА ПАРТНЁРА» (#/anketa; #/anketa?result — сразу к «Нашему итогу»). Владелец 26.11.2026: анкета — в
@@ -113,6 +114,7 @@ export function render(view, ctx) {
         h('button', { type: 'button', class: 'btn btn--gold', onclick: share }, at('sendBtn')),
         h('button', { type: 'button', class: 'btn btn--ghost', onclick: copy }, at('copyBtn')))),
     resultsCard(ctx),
+    pythagorasCard(data.get('birth.date')),
     formView(form, {
       get: data.get,
       set: data.set,

@@ -1,0 +1,9 @@
+/* Квадрат Пифагора (js/charts/pythagoras/) */
+.pyth__grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; margin: var(--sp-3) 0; }
+.pyth__cell { display: grid; gap: 2px; place-items: center; min-height: 72px; padding: 6px; border: 1px solid var(--c-line); border-radius: var(--r-md); text-align: center; }
+.pyth__cell.is-empty { opacity: .55; }
+.pyth__digits { color: var(--c-gold); font-size: var(--fs-lg, 1.25rem); font-weight: 700; letter-spacing: .04em; word-break: break-all; }
+.pyth__name { color: var(--c-text-dim); font-size: var(--fs-xs); line-height: 1.2; }
+.pyth__lines { margin: 0; padding: 0; list-style: none; display: grid; gap: 4px; }
+.pyth__lines li { display: flex; justify-content: space-between; gap: var(--sp-2); font-size: var(--fs-sm); }
+.pyth__lines b { color: var(--c-gold); }
