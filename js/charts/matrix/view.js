@@ -1,5 +1,14 @@
 import { h } from '../../core/dom.js';
-import { matrix } from './calc.js';
+import { matrix, pairMatrix } from './calc.js';
+import { ARCANA_DB } from './arcana.js'; // трактовки арканов (тексты Gemini, правит владелец)
+const fold = (title, ...body) => h('details', { class: 'help__folder' }, h('summary', { class: 'help__folder-summary' }, h('span', { class: 'help__folder-title' }, title)), h('div', { class: 'help__folder-body' }, ...body));
+const para = (b, t) => (t ? h('p', {}, h('b', {}, b), ' ', t) : null);
+function arcanaBlock(label, n) {
+  const x = ARCANA_DB[n];
+  return h('div', { class: 'chart__item' }, h('p', { class: 'caps' }, `${label}: ${n} — ${x.name}`), para('В плюсе:', x.plus), para('В минусе:', x.minus),
+    para('Отношения и семья:', x.inRelationshipsAndFamily), para('Деньги и реализация:', x.inFinanceAndRealization), para('Здоровье и тело:', x.inHealthAndBody));
+}
+
 
 /* Карточка «Матрица судьбы (Ладини)»: схема точек (SVG), предназначения, карта здоровья. Трактовки арканов — следующим
    шагом. Стыковка — одна строка в screens/anketa/anketa.js. */
@@ -53,5 +62,20 @@ export function matrixCard(iso, caption = null) {
     h('table', { class: 'mx__table' },
       h('tr', {}, h('th', {}, 'Чакра'), h('th', {}, 'Физика'), h('th', {}, 'Энергия'), h('th', {}, 'Итог')),
       ...r.health.rows.map((x) => h('tr', {}, h('td', {}, x.name), h('td', {}, String(x.body)), h('td', {}, String(x.energy)), h('td', {}, String(x.total)))),
-      h('tr', { class: 'mx__sum' }, h('td', {}, 'Итого'), h('td', {}, String(t.body)), h('td', {}, String(t.energy)), h('td', {}, String(t.total)))));
+      h('tr', { class: 'mx__sum' }, h('td', {}, 'Итого'), h('td', {}, String(t.body)), h('td', {}, String(t.energy)), h('td', {}, String(t.total)))),
+    fold('Расшифровка арканов', ...[['А — день (личные качества)', r.points.A], ['Б — месяц (таланты)', r.points.B], ['В — год (кармическая задача)', r.points.C], ['Г — нижняя точка', r.points.D], ['Д — центр (характер, зона комфорта)', r.points.E],
+      ['Личное предназначение', P.personal], ['Социальное предназначение', P.social], ['Духовное предназначение', P.spiritual], ['Отцовский род', P.male], ['Материнский род', P.female]].map(([l, n]) => arcanaBlock(l, n))));
+}
+
+/** Карточка «Матрица пары»: центр пары и предназначения союза с расшифровкой. */
+export function pairCard(isoA, isoB, caption) {
+  const r = pairMatrix(isoA, isoB);
+  if (!r) return null;
+  const P = r.purposes;
+  return h('section', { class: 'card mx' },
+    h('h2', { class: 'card__title' }, 'Матрица пары (совместимость)'),
+    h('p', { class: 'chart__src' }, caption),
+    h('ul', { class: 'pyth__lines' }, ...[['Центр пары', r.points.E], ['Небо пары', P.sky], ['Земля пары', P.earth], ['Личное предназначение союза', P.personal],
+      ['Социальное', P.social], ['Духовное', P.spiritual]].map(([n, v]) => h('li', {}, h('span', {}, n), h('b', {}, String(v))))),
+    fold('Расшифровка', arcanaBlock('Центр пары', r.points.E), arcanaBlock('Предназначение союза', P.personal), arcanaBlock('Социальное предназначение пары', P.social)));
 }

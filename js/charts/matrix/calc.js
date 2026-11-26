@@ -39,3 +39,14 @@ export function matrix(iso) {
     health: { rows, total: { body: sumBody, energy: sumEnergy, total: r22(sumBody + sumEnergy) } },
   };
 }
+
+/** Матрица пары (совместимость): точки двух матриц складываются и сводятся; от них — предназначения пары. */
+export function pairMatrix(isoA, isoB) {
+  const a = matrix(isoA);
+  const b = matrix(isoB);
+  if (!a || !b) return null;
+  const P = Object.fromEntries(Object.keys(a.points).map((k) => [k, r22(a.points[k] + b.points[k])]));
+  const sky = r22(P.B + P.D), earth = r22(P.A + P.C), personal = r22(sky + earth);
+  const social = r22(r22(P.F + P.Y) + r22(P.G + P.K));
+  return { points: P, purposes: { sky, earth, personal, social, spiritual: r22(personal + social) } };
+}

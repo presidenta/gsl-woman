@@ -2,7 +2,7 @@ import { h, add } from '../../core/dom.js';
 import * as people from '../../charts/people.js';
 import * as anketa from '../../anketa/data.js';
 import { pythagorasCard } from '../../charts/pythagoras/view.js';
-import { matrixCard } from '../../charts/matrix/view.js';
+import { matrixCard, pairCard } from '../../charts/matrix/view.js';
 import { hdCard } from '../../charts/hd/view.js';
 
 /* ЭКРАН «КАРТЫ РОЖДЕНИЯ» (#/charts) — отдельный раздел, не анкета (владелец 26.11.2026). Наверху — люди: «Я» (данные
@@ -57,6 +57,8 @@ export function render(view, ctx) {
       pythagorasCard(cur.date, cap),
       matrixCard(cur.date, cap),
       hdCard({ date: cur.date, time: cur.time, city: cur.city, caption: cap }),
+      // совместимость «я + выбранный» — только по датам, считается на телефоне
+      cur.id !== 'me' && me().date ? pairCard(me().date, cur.date, `${people.caption(me())} + ${people.caption(cur).replace('Считаем по данным: ', '')}`) : null,
     ] : []),
   );
 }

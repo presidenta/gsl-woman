@@ -1,7 +1,7 @@
 // Матрица судьбы (js/charts/matrix/): точки по Ладини, карта здоровья без повторов, Небо/Земля, род.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { matrix, r22 } from '../js/charts/matrix/calc.js';
+import { matrix, r22, pairMatrix } from '../js/charts/matrix/calc.js';
 
 test('26.10: день 26 → 8 (сложение цифр, не минус 22)', () => {
   assert.equal(matrix('1990-10-26').points.A, 8);
@@ -25,4 +25,10 @@ test('карта здоровья: Сахасрара — А|Б, Муладха�
   assert.equal(l.father[0], 22); assert.equal(l.father[6], 6); assert.equal(l.mother.length, 7);
   assert.equal(r22(23), 5); // 2 + 3
   assert.equal(matrix('нет'), null);
+});
+
+test('матрица пары: точки складываются и сводятся', () => {
+  const p = pairMatrix('1990-05-17', '1990-10-26');
+  assert.equal(p.points.A, r22(17 + 8));
+  assert.equal(pairMatrix('x', '1990-10-26'), null);
 });

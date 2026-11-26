@@ -10,3 +10,6 @@
 .chart__src { margin: 0 0 var(--sp-2); padding: 6px 10px; border-radius: var(--r-md); background: rgba(255, 255, 255, .05); color: var(--c-gold); font-size: var(--fs-sm); }
 .charts__form { display: grid; gap: var(--sp-2); }
 .charts__people { display: grid; gap: var(--sp-3); }
+.chart__item + .chart__item { margin-top: var(--sp-3); padding-top: var(--sp-3); border-top: 1px solid var(--c-line); }
+.chart__item p { margin: 0 0 4px; font-size: var(--fs-sm); line-height: 1.45; }
+.chart__item .caps { color: var(--c-gold); }
