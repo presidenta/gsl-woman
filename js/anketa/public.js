@@ -120,6 +120,8 @@ function drawForm() {
         marks: () => state.intim,
         setMark: (k, m) => { if (m) state.intim[k] = m; else delete state.intim[k]; save(); },
       },
+      // «Сохранить» у данных рождения: в браузере гостя пишется и так, по вводу; кнопка — подтверждение
+      save: () => { save(); alert(at('saved')); },
       love: { auto: null, href: null },
     }) : null,
     state.gender && !state.joined ? joinBox() : null,

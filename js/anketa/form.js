@@ -51,7 +51,10 @@ function chips(options, value, onChange, limit = Infinity) {
 
 function input(type, value, onChange, { max = 200, ph = '' } = {}) {
   const el = h('input', { class: 'input anketa-input', type, value: value || '', maxlength: String(max), placeholder: ph });
-  el.addEventListener('change', () => onChange(el.value.trim() || undefined));
+  // Сразу по вводу, а не только при уходе с поля: ввела город и закрыла приложение — запись была бы потеряна (26.11.2026)
+  const save = () => onChange(el.value.trim() || undefined);
+  el.addEventListener('input', save);
+  el.addEventListener('change', save);
   return el;
 }
 
@@ -153,7 +156,13 @@ export function formView(form, opts) {
   const open = opts.open || new Set();
   const blockView = (block) => {
     const count = h('span', { class: 'help__count anketa-count' });
-    const paint = () => { const [a, b] = progress(block, opts); count.textContent = at('of', { n: a, m: b }); count.classList.toggle('is-done', a >= b && b > 0); };
+    /* «7 из 20»: выбранное — зелёным, всего — как было (владелец 26.11.2026: «чтобы человек понимал, сколько уже выбрал») */
+    const paint = () => {
+      const [a, b] = progress(block, opts);
+      const [before, after] = at('of', { n: '\u0001', m: b }).split('\u0001');
+      count.replaceChildren(before, h('b', { class: `anketa-count__n${a > 0 ? ' is-some' : ''}` }, String(a)), after);
+      count.classList.toggle('is-done', a >= b && b > 0);
+    };
     const changed = () => { paint(); opts.onChange?.(); };
     let body;
     if (block.intim && !opts.intim.inline) {
@@ -164,6 +173,8 @@ export function formView(form, opts) {
         block.lead ? h('p', { class: 'help__section-lead' }, block.lead) : null,
         block.private ? h('p', { class: 'faint anketa-private' }, `🔒 ${at('privateNote')}`) : null,
         ...(block.intim ? intimInline(block, opts.intim, changed) : block.items.map((i) => itemView(i, `${block.key}.${i.key}`, opts, changed))),
+        // Личные данные (рождение) — «Сохранить»: пишется и так, по вводу, но кнопка даёт уверенность, что запомнилось
+        block.private && opts.save ? h('button', { type: 'button', class: 'btn btn--gold btn--block anketa-save', onclick: () => opts.save() }, at('saveBtn')) : null,
       ];
     }
     paint();

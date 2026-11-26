@@ -6,6 +6,9 @@
 
 .anketa-block .help__folder-body { display: grid; gap: var(--sp-3); }
 .anketa-count.is-done { color: var(--c-gold); }
+/* Сколько уже выбрано — неоновым зелёным, как «Доступ открыт» (cycle.css); ноль — цветом счётчика */
+.anketa-count__n.is-some { color: rgb(57, 255, 110); font-weight: 800; }
+.anketa-save { margin-top: var(--sp-3); }
 
 .anketa-q { display: grid; gap: var(--sp-2); padding-bottom: var(--sp-3); border-bottom: 1px solid var(--c-line); }
 .anketa-q:last-child { border-bottom: 0; padding-bottom: 0; }

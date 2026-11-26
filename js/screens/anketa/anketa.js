@@ -5,6 +5,7 @@ import * as data from '../../anketa/data.js';
 import { formView } from '../../anketa/form.js';
 import { resultView } from '../../anketa/result.js';
 import { at } from '../../anketa/texts.js';
+import { myMarks, setMark, keyOf } from '../../intim/map.js';
 
 /* ЭКРАН «ЕДИНАЯ АНКЕТА ПАРТНЁРА» (#/anketa; #/anketa?result — сразу к «Нашему итогу»). Владелец 26.11.2026: анкета — в
    «Артефактах» → «Анкеты»; «Наш итог» — с парой и с каждым, кому отправилась анкета, «даже если пара не создана»;
@@ -115,7 +116,20 @@ export function render(view, ctx) {
       get: data.get,
       set: data.set,
       open,
-      intim: { inline: false, count: data.intimCount(), href: '#/intim' },
+      /* Карта желаний — прямо здесь (владелец 26.11.2026: «в анкете — только анкета, никуда не переводить»). Отметки те
+         же, что в разделе «Интим 18⁺»: одна карта, отмечено здесь — видно и там */
+      intim: {
+        inline: true,
+        marks: myMarks,
+        setMark: (key, mark) => {
+          const cur = myMarks()[keyOf(key)];
+          if (mark === undefined) { if (cur) setMark(key, cur); } // то же ещё раз — снять
+          else if (cur !== mark) setMark(key, mark);
+        },
+      },
+      save: async () => {
+        try { await data.send(true); toast({ title: at('saved') }); } catch { toast({ title: at('savedLocal') }); }
+      },
       love: { auto: data.loveAuto(), href: '#/love' },
     }),
   );

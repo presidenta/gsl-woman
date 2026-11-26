@@ -20,11 +20,15 @@ const MAX_TEXT = 120;
    разделу — ничего отмеченного не теряется. */
 const MOVED = { sense: 'caress' };
 export const sectionOf = (section) => MOVED[section] || section;
-/** Ключ отметки «раздел.пункт» с учётом перенесённых разделов. */
+/* С 202 (владелец 26.11.2026: «массаж мышц ануса — объединить, это больше для женщины; у мужчин — массаж простаты»)
+   пункт «…для него» слит с «…для неё»: его отметки читаются под ключом оставшегося пункта. */
+const MOVED_ITEMS = { 'massage.sphincter_him': 'massage.sphincter' };
+/** Ключ отметки «раздел.пункт» с учётом перенесённых разделов и слитых пунктов. */
 export function keyOf(key) {
   const s = String(key);
   const dot = s.indexOf('.');
-  return dot < 0 ? s : sectionOf(s.slice(0, dot)) + s.slice(dot);
+  const k = dot < 0 ? s : sectionOf(s.slice(0, dot)) + s.slice(dot);
+  return MOVED_ITEMS[k] || k;
 }
 
 function local() {
