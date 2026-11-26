@@ -43,7 +43,8 @@ export function render(view, ctx) {
   const cur = all.find((p) => p.id === selected) || all[0];
   const cap = people.caption(cur);
   add(view,
-    h('h1', { class: 'screen-title' }, 'Карты рождения'),
+    h('h1', { class: 'screen-title' }, 'Разбор по дате рождения'),
+    h('p', { class: 'caps charts__sub' }, 'Твоя роль в паре и в жизни'),
     h('p', { class: 'help__intro' }, 'Квадрат Пифагора, Матрица судьбы (Ладини), Human Design. «Я» — данные из анкеты; добавь партнёра, партнёров по бизнесу, детей — расчёты сохраняются.'),
     h('section', { class: 'card charts__people' },
       h('div', { class: 'anketa-chips' }, ...all.map((p) => h('button', {

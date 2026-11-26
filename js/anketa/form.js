@@ -158,7 +158,7 @@ function itemView(item, key, opts, changed) {
     }
     case 'pick':
       return h('div', { class: 'anketa-q' }, ...label(item.label),
-        item.options.length > 4 || item.options.some(([, l]) => l.length > 40)
+        item.options.some(([, l]) => l.length > 24) // короткие варианты (1…7, часы) — в одну строку (владелец 27.11.2026)
           ? toggles(item.options, v, set, 'anketa-seg--list')
           : toggles(item.options, v, set));
     case 'multi':
