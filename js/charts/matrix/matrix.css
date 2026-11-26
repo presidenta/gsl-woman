@@ -11,3 +11,9 @@
 .mx__sum td { font-weight: 700; color: var(--c-gold); }
 .hd__cols { display: grid; grid-template-columns: 1fr 1fr; gap: var(--sp-3); }
 .hd__acts li { font-size: var(--fs-xs); }
+.mx__sign { fill: var(--c-gold); font: 700 14px var(--f-body, sans-serif); text-anchor: middle; }
+.hd__body { display: block; width: 100%; max-width: 260px; margin: var(--sp-3) auto; }
+.hd__ch { stroke: var(--c-gold); stroke-width: 4; }
+.hd__c { fill: transparent; stroke: var(--c-line-strong, var(--c-line)); stroke-width: 1.5; }
+.hd__c.is-on { fill: var(--c-gold); stroke: var(--c-gold); }
+.hd__cn { fill: var(--c-text); font: 600 8px var(--f-body, sans-serif); text-anchor: middle; }

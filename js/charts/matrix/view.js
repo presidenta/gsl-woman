@@ -36,6 +36,10 @@ function drawing(r) {
   // стороны и диагонали рода — по три точки к центру (у диагоналей — две)
   [[60, 60, R.f], [240, 60, R.g], [240, 240, R.y], [60, 240, R.k]].forEach(([x, y, q]) =>
     [q.x1, q.x2].forEach((v, i) => dot(x + (150 - x) * [0.33, 0.62][i], y + (150 - y) * [0.33, 0.62][i], v, false)));
+  // канал любви и денег — на стороне от В (справа) к Г (низ): ♥ ближе к низу, $ ближе к правому краю, Х посередине
+  const lm = r.loveMoney;
+  [[214, 214, lm.balance], [238, 190, lm.money], [190, 238, lm.love]].forEach(([x, y, v]) => dot(x, y, v, false));
+  svg.append(el('text', { x: 252, y: 180, class: 'mx__sign' }, '$'), el('text', { x: 176, y: 258, class: 'mx__sign' }, '♥'));
   [[22, 150, R.a], [150, 22, R.b], [278, 150, R.c], [150, 278, R.d]].forEach(([x, y, q]) =>
     [q.x1, q.x2, q.x3].forEach((v, i) => dot(x + (150 - x) * steps[i], y + (150 - y) * steps[i], v, false)));
   return svg;
@@ -56,6 +60,10 @@ export function matrixCard(iso, caption = null) {
     h('ul', { class: 'pyth__lines' },
       h('li', {}, h('span', {}, `Отцовская: ${r.lines.father.join(' – ')}`), h('b', {}, String(r.lines.fatherSum))),
       h('li', {}, h('span', {}, `Материнская: ${r.lines.mother.join(' – ')}`), h('b', {}, String(r.lines.motherSum)))),
+    h('h3', { class: 'caps mx__cap' }, 'Любовь и деньги'),
+    h('ul', { class: 'pyth__lines' }, h('li', {}, h('span', {}, '♥ Любовь (канал отношений)'), h('b', {}, String(r.loveMoney.love))),
+      h('li', {}, h('span', {}, '$ Деньги (денежный канал)'), h('b', {}, String(r.loveMoney.money))),
+      h('li', {}, h('span', {}, 'Точка баланса'), h('b', {}, String(r.loveMoney.balance)))),
     h('h3', { class: 'caps mx__cap' }, 'Предназначения'),
     h('ul', { class: 'pyth__lines' }, ...purposes.map(([n, v]) => h('li', {}, h('span', {}, n), h('b', {}, String(v))))),
     h('h3', { class: 'caps mx__cap' }, 'Карта здоровья'),
@@ -64,7 +72,7 @@ export function matrixCard(iso, caption = null) {
       ...r.health.rows.map((x) => h('tr', {}, h('td', {}, x.name), h('td', {}, String(x.body)), h('td', {}, String(x.energy)), h('td', {}, String(x.total)))),
       h('tr', { class: 'mx__sum' }, h('td', {}, 'Итого'), h('td', {}, String(t.body)), h('td', {}, String(t.energy)), h('td', {}, String(t.total)))),
     fold('Расшифровка арканов', ...[['А — день (личные качества)', r.points.A], ['Б — месяц (таланты)', r.points.B], ['В — год (кармическая задача)', r.points.C], ['Г — нижняя точка', r.points.D], ['Д — центр (характер, зона комфорта)', r.points.E],
-      ['Личное предназначение', P.personal], ['Социальное предназначение', P.social], ['Духовное предназначение', P.spiritual], ['Отцовский род', P.male], ['Материнский род', P.female]].map(([l, n]) => arcanaBlock(l, n))));
+      ['Личное предназначение', P.personal], ['Социальное предназначение', P.social], ['Духовное предназначение', P.spiritual], ['Отцовский род', P.male], ['Материнский род', P.female], ['♥ Любовь', r.loveMoney.love], ['$ Деньги', r.loveMoney.money]].map(([l, n]) => arcanaBlock(l, n))));
 }
 
 /** Карточка «Матрица пары»: центр пары и предназначения союза с расшифровкой. */

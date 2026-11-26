@@ -36,6 +36,8 @@ export function matrix(iso) {
       mother: [G, g.x1, g.x2, E, k.x2, k.x1, K], motherSum: female,
     },
     purposes: { sky, earth, personal, male, female, social, spiritual, planetary },
+    // Канал любви и денег (нижний правый сектор, между В2 и Г2): точка баланса Х = В2+Г2, Деньги = В2+Х, Любовь = Г2+Х
+    loveMoney: (() => { const x = r22(c.x2 + d.x2); return { balance: x, money: r22(c.x2 + x), love: r22(d.x2 + x) }; })(),
     health: { rows, total: { body: sumBody, energy: sumEnergy, total: r22(sumBody + sumEnergy) } },
   };
 }
