@@ -122,6 +122,9 @@ function drawForm() {
       },
       // «Сохранить» у данных рождения: в браузере гостя пишется и так, по вводу; кнопка — подтверждение
       save: () => { save(); alert(at('saved')); },
+      // Подсказки города рождения — тот же адрес сервера, без входа
+      geo: async (q) => (await api(`/api/geo/places?q=${encodeURIComponent(q)}&lang=ru`)).places || [],
+      lang: 'ru',
       love: { auto: null, href: null },
     }) : null,
     state.gender && !state.joined ? joinBox() : null,

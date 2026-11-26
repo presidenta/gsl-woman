@@ -2,6 +2,7 @@ import { h, add } from '../../core/dom.js';
 import { t } from '../../core/i18n.js';
 import { toast } from '../../ui/toast.js';
 import * as data from '../../anketa/data.js';
+import { request } from '../../account/session.js';
 import { formView } from '../../anketa/form.js';
 import { resultView } from '../../anketa/result.js';
 import { at } from '../../anketa/texts.js';
@@ -127,6 +128,9 @@ export function render(view, ctx) {
           else if (cur !== mark) setMark(key, mark);
         },
       },
+      // Подсказки города рождения — с сервера (planner src/geo/)
+      geo: async (q) => (await request(`/api/geo/places?q=${encodeURIComponent(q)}&lang=${ctx.lang}`)).places || [],
+      lang: ctx.lang,
       save: async () => {
         try { await data.send(true); toast({ title: at('saved') }); } catch { toast({ title: at('savedLocal') }); }
       },

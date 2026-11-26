@@ -13,7 +13,7 @@ import { at } from './texts.js';
 
 const TRI = [['+', '+'], ['-', '−'], ['?', '?']];
 const LOVE = ['words', 'time', 'gifts', 'service', 'touch'];
-const COUNTED = new Set(['tri', 'chores', 'give', 'deal', 'pick', 'multi', 'love', 'date', 'time']);
+const COUNTED = new Set(['tri', 'chores', 'give', 'deal', 'pick', 'multi', 'love', 'date', 'time', 'place']);
 
 /** Кнопки-варианты; нажать выбранное ещё раз — снять. */
 function toggles(options, value, onChange, cls = '') {
@@ -56,6 +56,65 @@ function input(type, value, onChange, { max = 200, ph = '' } = {}) {
   el.addEventListener('input', save);
   el.addEventListener('change', save);
   return el;
+}
+
+/** Название страны на языке приложения ('ua' → украинский); браузер не умеет — код страны. */
+function countryName(cc, lang) {
+  try {
+    return new Intl.DisplayNames([lang === 'ua' ? 'uk' : lang || 'ru'], { type: 'region' }).of(cc) || cc;
+  } catch {
+    return cc;
+  }
+}
+
+/* ГОРОД РОЖДЕНИЯ (владелец 26.11.2026: «база с готовыми городами, автоподбор при вводе — город, посёлок; для правильного
+   расчёта карт»). Подсказки — с сервера (planner src/geo/, GeoNames: СНГ и Балтия — все пункты с сёлами, Европа — от
+   500 жителей, мир — от 15 000). Выбрала из списка — в ответе подпись, координаты и часовой пояс; ввела своё — текст.
+   opts.geo(q) — подсказки [{ id, name, region, cc, lat, lon, tz }]; нет сети — поле просто принимает текст. */
+function placeField(item, key, opts, set) {
+  const v = opts.get(key);
+  const el = h('input', {
+    class: 'input anketa-input', type: 'text', value: typeof v === 'string' ? v : v?.text || '',
+    maxlength: '160', placeholder: at('placePh'), autocomplete: 'off',
+  });
+  const list = h('div', { class: 'anketa-geo', role: 'listbox', hidden: true });
+  const where = h('p', { class: 'faint anketa-geo__where' });
+  const showWhere = (val) => {
+    if (val && typeof val === 'object') where.textContent = `📍 ${val.lat.toFixed(2)}, ${val.lon.toFixed(2)}${val.tz ? ` · ${val.tz}` : ''}`;
+    else where.textContent = val && opts.geo ? at('placePick') : '';
+  };
+  showWhere(v);
+  let timer = null;
+  let seq = 0;
+  const pickPlace = (p, text) => {
+    el.value = text;
+    const val = { text, id: p.id, lat: p.lat, lon: p.lon, tz: p.tz, cc: p.cc };
+    set(val);
+    showWhere(val);
+    list.hidden = true;
+  };
+  el.addEventListener('input', () => {
+    const q = el.value.trim();
+    set(q || undefined);
+    showWhere(q || undefined);
+    clearTimeout(timer);
+    if (!opts.geo || q.length < 2) { list.hidden = true; return; }
+    timer = setTimeout(async () => {
+      const mine = ++seq;
+      let found = [];
+      try { found = await opts.geo(q); } catch { found = []; }
+      if (mine !== seq) return; // пришёл ответ на старые буквы — уже не нужен
+      list.replaceChildren(...found.map((p) => {
+        const sub = [p.region, countryName(p.cc, opts.lang)].filter(Boolean).join(', ');
+        const text = [p.name, sub].filter(Boolean).join(', ');
+        return h('button', { type: 'button', class: 'anketa-geo__item', role: 'option', onclick: () => pickPlace(p, text) },
+          h('span', { class: 'anketa-geo__name' }, p.name), sub ? h('span', { class: 'anketa-geo__region' }, sub) : null);
+      }));
+      list.hidden = !found.length;
+    }, 250);
+  });
+  return h('div', { class: 'anketa-q' }, ...label(item.label), el, list, where,
+    opts.geo ? h('p', { class: 'faint anketa-geo__credit' }, at('placeCredit')) : null);
 }
 
 const label = (text, hint) => [h('p', { class: 'anketa-q__label' }, text), hint ? h('p', { class: 'faint anketa-q__hint' }, hint) : null];
@@ -122,6 +181,8 @@ function itemView(item, key, opts, changed) {
     }
     case 'text':
       return h('div', { class: 'anketa-q' }, ...label(item.label), input('text', v, set, { max: item.max || 200 }));
+    case 'place':
+      return placeField(item, key, opts, set);
     case 'date':
     case 'time':
       return h('div', { class: 'anketa-q anketa-q--row' }, h('p', { class: 'anketa-q__label' }, item.label), input(item.type, v, set));
