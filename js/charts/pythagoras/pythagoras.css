@@ -7,3 +7,6 @@
 .pyth__lines { margin: 0; padding: 0; list-style: none; display: grid; gap: 4px; }
 .pyth__lines li { display: flex; justify-content: space-between; gap: var(--sp-2); font-size: var(--fs-sm); }
 .pyth__lines b { color: var(--c-gold); }
+.chart__src { margin: 0 0 var(--sp-2); padding: 6px 10px; border-radius: var(--r-md); background: rgba(255, 255, 255, .05); color: var(--c-gold); font-size: var(--fs-sm); }
+.charts__form { display: grid; gap: var(--sp-2); }
+.charts__people { display: grid; gap: var(--sp-3); }

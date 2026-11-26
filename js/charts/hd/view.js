@@ -4,11 +4,11 @@ import { zonedToUtc, chart, CENTERS, TYPES, AUTHORITIES, BODIES, BODY_RU } from 
 /* Карточка «Human Design»: тип, авторитет, профиль, крест, центры, каналы, активации Личности и Дизайна. Нужны дата, время
    и город с часовым поясом (подсказка города в анкете). Библиотека астрономии (astronomy.js, ~400 КБ) грузится только
    здесь, когда карточку открыли, — запуск приложения не тяжелеет. Бодиграф и трактовки — следующим шагом. */
-export function hdCard({ date, time, city }) {
+export function hdCard({ date, time, city, caption = null }) {
   const tz = city && typeof city === 'object' ? city.tz : null;
-  const head = h('h2', { class: 'card__title' }, 'Human Design');
+  const head = [h('h2', { class: 'card__title' }, 'Human Design'), caption ? h('p', { class: 'chart__src' }, caption) : null];
   if (!date || !time || !tz) {
-    return h('section', { class: 'card hd' }, head, h('p', { class: 'faint' }, 'Для расчёта нужны дата, время и город рождения (город — выбери из подсказки).'));
+    return h('section', { class: 'card hd' }, ...head, h('p', { class: 'faint' }, 'Для расчёта нужны дата, время и город рождения (город — выбери из подсказки).'));
   }
   const body = h('div', {}, h('p', { class: 'faint' }, 'Считаем…'));
   import('./astronomy.js').then((A) => {
@@ -29,5 +29,5 @@ export function hdCard({ date, time, city }) {
           h('div', {}, h('p', { class: 'caps' }, 'Личность'), acts(r.personality)),
           h('div', {}, h('p', { class: 'caps' }, 'Дизайн'), acts(r.design)))));
   }).catch(() => body.replaceChildren(h('p', { class: 'faint' }, 'Не получилось загрузить расчёт — открой ещё раз.')));
-  return h('section', { class: 'card hd' }, head, body);
+  return h('section', { class: 'card hd' }, ...head, body);
 }

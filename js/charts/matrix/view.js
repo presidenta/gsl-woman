@@ -24,21 +24,30 @@ function drawing(r) {
     [60, 60, p.F], [240, 60, p.G], [240, 240, p.Y], [60, 240, p.K]].forEach(([x, y, v]) => dot(x, y, v, true));
   // к центру: X1 у края, X2, X3 у центра
   const steps = [0.27, 0.5, 0.73];
+  // стороны и диагонали рода — по три точки к центру (у диагоналей — две)
+  [[60, 60, R.f], [240, 60, R.g], [240, 240, R.y], [60, 240, R.k]].forEach(([x, y, q]) =>
+    [q.x1, q.x2].forEach((v, i) => dot(x + (150 - x) * [0.33, 0.62][i], y + (150 - y) * [0.33, 0.62][i], v, false)));
   [[22, 150, R.a], [150, 22, R.b], [278, 150, R.c], [150, 278, R.d]].forEach(([x, y, q]) =>
     [q.x1, q.x2, q.x3].forEach((v, i) => dot(x + (150 - x) * steps[i], y + (150 - y) * steps[i], v, false)));
   return svg;
 }
 
-export function matrixCard(iso) {
+export function matrixCard(iso, caption = null) {
   const r = matrix(iso);
   if (!r) return null;
   const P = r.purposes;
-  const purposes = [['Небо', P.sky], ['Земля', P.earth], ['Личное предназначение', P.personal], ['Мужской род', P.male],
-    ['Женский род', P.female], ['Социальное', P.social], ['Духовное', P.spiritual], ['Планетарное', P.planetary]];
+  const purposes = [['Небо', P.sky], ['Земля', P.earth], ['Личное предназначение', P.personal], ['Мужской род (отцовский)', P.male],
+    ['Женский род (материнский)', P.female], ['Социальное', P.social], ['Духовное', P.spiritual], ['Планетарное', P.planetary]];
   const t = r.health.total;
   return h('section', { class: 'card mx' },
     h('h2', { class: 'card__title' }, 'Матрица судьбы (Ладини)'),
+    caption ? h('p', { class: 'chart__src' }, caption) : null,
     drawing(r),
+    h('h3', { class: 'caps mx__cap' }, 'Линии рода (диагонали)'),
+    h('ul', { class: 'pyth__lines' },
+      h('li', {}, h('span', {}, `Отцовская: ${r.lines.father.join(' – ')}`), h('b', {}, String(r.lines.fatherSum))),
+      h('li', {}, h('span', {}, `Материнская: ${r.lines.mother.join(' – ')}`), h('b', {}, String(r.lines.motherSum)))),
+    h('h3', { class: 'caps mx__cap' }, 'Предназначения'),
     h('ul', { class: 'pyth__lines' }, ...purposes.map(([n, v]) => h('li', {}, h('span', {}, n), h('b', {}, String(v))))),
     h('h3', { class: 'caps mx__cap' }, 'Карта здоровья'),
     h('table', { class: 'mx__table' },

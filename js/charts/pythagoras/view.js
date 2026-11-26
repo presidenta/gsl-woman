@@ -3,12 +3,13 @@ import { pythagoras, CELLS } from './calc.js';
 
 /* Карточка «Квадрат Пифагора»: рабочие числа, сетка 3×3 (столбцы 1-2-3 · 4-5-6 · 7-8-9), суммы линий.
    Трактовки — следующим шагом (тексты с сервера). Стыковка — одна строка в screens/anketa/anketa.js. */
-export function pythagorasCard(iso) {
+export function pythagorasCard(iso, caption = null) {
   const r = pythagoras(iso);
   if (!r) return null;
   const grid = [[1, 4, 7], [2, 5, 8], [3, 6, 9]];
   return h('section', { class: 'card pyth' },
     h('h2', { class: 'card__title' }, 'Квадрат Пифагора'),
+    caption ? h('p', { class: 'chart__src' }, caption) : null,
     h('p', { class: 'faint' }, `Рабочие числа: ${r.work.join(' · ')}`),
     h('div', { class: 'pyth__grid' }, ...grid.flat().map((k) => h('div', { class: `pyth__cell${r.counts[k] ? '' : ' is-empty'}` },
       h('span', { class: 'pyth__digits' }, r.cells[k]), h('span', { class: 'pyth__name' }, CELLS[k])))),

@@ -6,9 +6,6 @@ import { request } from '../../account/session.js';
 import { formView } from '../../anketa/form.js';
 import { resultView } from '../../anketa/result.js';
 import { at } from '../../anketa/texts.js';
-import { hdCard } from '../../charts/hd/view.js'; // Human Design, js/charts/hd/
-import { matrixCard } from '../../charts/matrix/view.js'; // Матрица судьбы (Ладини), js/charts/matrix/
-import { pythagorasCard } from '../../charts/pythagoras/view.js'; // квадрат Пифагора по дате рождения (js/charts/, 26.11.2026)
 import { myMarks, setMark, keyOf } from '../../intim/map.js';
 
 /* ЭКРАН «ЕДИНАЯ АНКЕТА ПАРТНЁРА» (#/anketa; #/anketa?result — сразу к «Нашему итогу»). Владелец 26.11.2026: анкета — в
@@ -116,9 +113,8 @@ export function render(view, ctx) {
         h('button', { type: 'button', class: 'btn btn--gold', onclick: share }, at('sendBtn')),
         h('button', { type: 'button', class: 'btn btn--ghost', onclick: copy }, at('copyBtn')))),
     resultsCard(ctx),
-    pythagorasCard(data.get('birth.date')),
-    matrixCard(data.get('birth.date')),
-    data.get('birth.date') ? hdCard({ date: data.get('birth.date'), time: data.get('birth.time'), city: data.get('birth.city') }) : null,
+    // Карты рождения — отдельный раздел #/charts (владелец 26.11.2026: «отдельно от анкеты»)
+    h('a', { class: 'card settings__link', href: '#/charts' }, h('span', { class: 'settings__link-text' }, h('b', {}, 'Карты рождения'), h('br'), h('span', { class: 'faint' }, 'Пифагор, Матрица Ладини, Human Design — для тебя, партнёра, детей'))),
     formView(form, {
       get: data.get,
       set: data.set,

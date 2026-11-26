@@ -198,6 +198,8 @@ export function render(view, ctx) {
     surveysPlate(ctx),
     complimentsPlate(ctx),
     libraryPlate(),
+    // «Карты рождения» (#/charts, 26.11.2026): Пифагор, Матрица Ладини, Human Design — для себя, партнёра, детей
+    plateLink({ href: '#/charts', icon: icons.sparkle, title: 'Карты рождения', lead: 'Пифагор, Матрица Ладини, Human Design — для тебя, партнёра, бизнеса, детей' }),
     // «Секретные материалы» — главы книги о чакрах (js/secret/): с 172 здесь, а не в «Тайном архиве» (владелец 22.11.2026:
     // «две книжки одинаковых в одном разделе — нелогично»; целиком книга — в архиве)
     secretPlate(ctx),
