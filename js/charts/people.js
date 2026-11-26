@@ -4,7 +4,11 @@ import { read, write } from '../core/store.js';
    «столько, сколько нужно», расчёты сохраняются. «Я» — из «Единой анкеты партнёра» (данные рождения), остальные — список
    на телефоне (ключ charts-people): { id, name, role, date, time, city: { text, tz } }. */
 const KEY = 'charts-people';
-export const ROLES = { partner: 'Партнёр', business: 'Партнёр по бизнесу', child: 'Ребёнок', family: 'Родные', other: 'Другое' };
+export const ROLES = { partner: 'Партнёр', friend: 'Друг', business: 'Партнёр по бизнесу', family: 'Родные', child: 'Ребёнок', other: 'Другое' };
+// Разделы людей (владелец 27.11.2026: «пара, друзья, бизнес, родные — как с ними взаимодействовать»)
+export const GROUPS = { partner: 'Пара', friend: 'Друзья', business: 'Бизнес', family: 'Родные', child: 'Дети', other: 'Другие' };
+/** Как называть совместимость с человеком этой роли: «пары», «в дружбе», «в бизнесе»… */
+export const WITH = { partner: 'пары', friend: 'в дружбе', business: 'в бизнесе', family: 'с родными', child: 'с ребёнком', other: 'вместе' };
 
 export const list = () => (Array.isArray(read(KEY, [])) ? read(KEY, []) : []);
 

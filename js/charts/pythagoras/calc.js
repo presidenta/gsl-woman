@@ -34,3 +34,16 @@ export function pythagoras(iso) {
     lines: LINES.map(([name, ds]) => ({ name, digits: ds, total: ds.reduce((s, k) => s + counts[k], 0) })),
   };
 }
+
+/** Квадрат пары (владелец 27.11.2026): цифры двоих складываются — общий квадрат и линии пары. */
+export function pairPythagoras(isoA, isoB) {
+  const a = pythagoras(isoA);
+  const b = pythagoras(isoB);
+  if (!a || !b) return null;
+  const counts = Object.fromEntries(Object.keys(a.counts).map((k) => [k, a.counts[k] + b.counts[k]]));
+  return {
+    counts,
+    cells: Object.fromEntries(Object.entries(counts).map(([k, n]) => [k, n ? k.repeat(n) : '—'])),
+    lines: LINES.map(([name, ds]) => ({ name, digits: ds, total: ds.reduce((s, k) => s + counts[k], 0) })),
+  };
+}

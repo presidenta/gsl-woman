@@ -2,7 +2,8 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import * as A from '../js/charts/hd/astronomy.js';
-import { CHANNELS, gateOf, zonedToUtc, chart } from '../js/charts/hd/calc.js';
+import { CHANNELS, gateOf, zonedToUtc, chart, composite } from '../js/charts/hd/calc.js';
+import { pairPythagoras } from '../js/charts/pythagoras/calc.js';
 
 test('каналов 36, без повторов; есть 57–34 и 57–10, нет 10–25', () => {
   const ids = CHANNELS.map(([a, b]) => [a, b].sort((x, y) => x - y).join('-'));
@@ -25,4 +26,12 @@ test('Ра Уру Ху (09.04.1948, 00:14, Монреаль): Манифесто
   const r = chart(A, zonedToUtc('1948-04-09', '00:14', 'America/Montreal'));
   assert.equal(r.type, 'Manifestor');
   assert.equal(r.profile, '5/1');
+});
+
+test('пара: квадрат — цифры складываются; композит — виды каналов и тип', () => {
+  assert.equal(pairPythagoras('1990-05-17', '1990-05-17').counts[1], 4);
+  const a = chart(A, zonedToUtc('1948-04-09', '00:14', 'America/Montreal'));
+  const c = composite(a, a);
+  assert.ok(c.channels.every((x) => x.kind === 'friend'), 'сам с собой — только дружба');
+  assert.equal(c.type, a.type);
 });

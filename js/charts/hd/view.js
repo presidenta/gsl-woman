@@ -1,5 +1,5 @@
 import { h } from '../../core/dom.js';
-import { zonedToUtc, chart, CENTERS, TYPES, AUTHORITIES, BODIES, BODY_RU, CHANNELS } from './calc.js';
+import { zonedToUtc, chart, composite, PAIR_KINDS, CENTERS, TYPES, AUTHORITIES, BODIES, BODY_RU, CHANNELS } from './calc.js';
 import { HD_TYPE_DB, HD_AUTHORITY_DB, HD_LINE_DB, HD_CENTER_DB, HD_CHANNEL_NAMES, HD_GATE_TITLES } from './texts.js'; // трактовки (тексты Gemini)
 const fold = (title, ...body) => h('details', { class: 'help__folder' }, h('summary', { class: 'help__folder-summary' }, h('span', { class: 'help__folder-title' }, title)), h('div', { class: 'help__folder-body' }, ...body));
 const para = (b, t) => (t ? h('p', {}, h('b', {}, b), ' ', t) : null);
@@ -94,6 +94,34 @@ export function hdCard({ date, time, city, caption = null }) {
           r.channels.length ? h('div', { class: 'chart__item' }, h('p', { class: 'caps' }, 'Каналы'), ...r.channels.map((id) => para(`${ch(id)?.name || id}:`, ch(id)?.summary))) : null,
           h('div', { class: 'chart__item' }, h('p', { class: 'caps' }, 'Инкарнационный крест — ворота'), ...r.cross.map((g) => para(`${g}:`, HD_GATE_TITLES[g] ? `${HD_GATE_TITLES[g].title} — ${HD_GATE_TITLES[g].keywords.join(', ')}` : ''))));
       })());
+  }).catch(() => body.replaceChildren(h('p', { class: 'faint' }, 'Не получилось загрузить расчёт — открой ещё раз.')));
+  return h('section', { class: 'card hd' }, ...head, body);
+}
+
+/** Human Design пары: общий бодиграф (светлое — ты, красное — партнёр, полоса — оба), тип пары, виды каналов. */
+export function pairHdCard(a, b, caption) {
+  const tzOf = (c) => (c && typeof c === 'object' ? c.tz : null);
+  const head = [h('h2', { class: 'card__title' }, 'Human Design пары'), h('p', { class: 'chart__src' }, caption)];
+  if (!a.date || !a.time || !tzOf(a.city) || !b.date || !b.time || !tzOf(b.city)) {
+    return h('section', { class: 'card hd' }, ...head, h('p', { class: 'faint' }, 'Нужны дата, время и город рождения обоих.'));
+  }
+  const body = h('div', {}, h('p', { class: 'faint' }, 'Считаем…'));
+  import('./astronomy.js').then((A) => {
+    const ra = chart(A, zonedToUtc(a.date, a.time, tzOf(a.city)));
+    const rb = chart(A, zonedToUtc(b.date, b.time, tzOf(b.city)));
+    const c = composite(ra, rb);
+    const all = (r) => Object.fromEntries([...Object.values(r.personality), ...Object.values(r.design)].map((x, i) => [i, x]));
+    const view = { personality: all(ra), design: all(rb), defined: c.defined, channels: c.channels.map((x) => x.id) };
+    const row = (n, v) => h('li', {}, h('span', {}, n), h('b', {}, v));
+    body.replaceChildren(
+      bodygraph(view, CHANNELS),
+      h('p', { class: 'faint' }, 'Светлое — ты, красное — партнёр, светлое с красным — оба.'),
+      h('ul', { class: 'pyth__lines' }, row('Тип пары', TYPES[c.type]), row('Ты', TYPES[ra.type]), row('Партнёр', TYPES[rb.type])),
+      h('p', {}, h('b', {}, 'Общие определённые центры: '), c.defined.map((x) => CENTERS[x]).join(', ') || '—'),
+      ...Object.entries(PAIR_KINDS).map(([k, label]) => {
+        const ids = c.channels.filter((x) => x.kind === k).map((x) => x.id);
+        return ids.length ? h('p', {}, h('b', {}, `${label}: `), ids.join(' · ')) : null;
+      }));
   }).catch(() => body.replaceChildren(h('p', { class: 'faint' }, 'Не получилось загрузить расчёт — открой ещё раз.')));
   return h('section', { class: 'card hd' }, ...head, body);
 }

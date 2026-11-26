@@ -119,3 +119,38 @@ export function chart(A, birth) {
     open: Object.keys(CENTERS).filter((c) => !defined.has(c)),
   };
 }
+
+/** Тип по активным каналам ([a, b, c1, c2]). */
+function typeOf(channels) {
+  const defined = new Set(channels.flatMap(([, , c1, c2]) => [c1, c2]));
+  const adj = {};
+  for (const [, , c1, c2] of channels) { (adj[c1] ||= []).push(c2); (adj[c2] ||= []).push(c1); }
+  const motorToThroat = MOTORS.some((m) => defined.has(m) && connected(adj, m, 'Throat'));
+  return { defined, type: !defined.size ? 'Reflector' : defined.has('Sacral') ? (motorToThroat ? 'ManifestingGenerator' : 'Generator') : motorToThroat ? 'Manifestor' : 'Projector' };
+}
+
+export const PAIR_KINDS = {
+  electro: 'Притяжение (электромагнит): у каждого по воротам — вместе канал целый',
+  friend: 'Дружба: канал целый у обоих',
+  lead: 'Ведущий: канал целый только у одного',
+  compromise: 'Компромисс: у одного канал целый, у другого — одни его ворота',
+};
+
+/** Композит пары (владелец 27.11.2026): ворота двоих вместе; виды каналов, общие центры, тип пары. */
+export function composite(a, b) {
+  const gatesOf = (r) => new Set([...Object.values(r.personality), ...Object.values(r.design)].map((x) => x.gate));
+  const ga = gatesOf(a);
+  const gb = gatesOf(b);
+  const list = [];
+  for (const ch of CHANNELS) {
+    const [x, y] = ch;
+    const fa = ga.has(x) && ga.has(y);
+    const fb = gb.has(x) && gb.has(y);
+    if (!((ga.has(x) || gb.has(x)) && (ga.has(y) || gb.has(y)))) continue;
+    const other = fa ? gb : ga;
+    const kind = fa && fb ? 'friend' : fa || fb ? (other.has(x) || other.has(y) ? 'compromise' : 'lead') : 'electro';
+    list.push({ ch, id: `${x}–${y}`, kind });
+  }
+  const t = typeOf(list.map((l) => l.ch));
+  return { channels: list, type: t.type, defined: Object.keys(CENTERS).filter((c) => t.defined.has(c)) };
+}

@@ -3,17 +3,18 @@ import * as people from '../../charts/people.js';
 import * as anketa from '../../anketa/data.js';
 import { pythagorasCard } from '../../charts/pythagoras/view.js';
 import { matrixCard, pairCard } from '../../charts/matrix/view.js';
-import { hdCard } from '../../charts/hd/view.js';
+import { hdCard, pairHdCard } from '../../charts/hd/view.js';
+import { pairPythCard } from '../../charts/pythagoras/view.js';
 import { platePanel } from '../../ui/plate.js';
 import { icons } from '../../ui/icons.js';
 
 /* Каждая карта — плашкой со стрелкой (владелец 27.11.2026: «три раздела, каждый открыть по потребности»): заголовок карточки
    становится названием плашки, остальное — внутри. Раскрытые помнятся между перерисовками. */
 const opened = new Set();
-function fold(id, icon, card) {
+function fold(id, icon, card, rename = null) {
   if (!card) return null;
   const title = card.querySelector('.card__title');
-  const name = title?.textContent || '';
+  const name = rename || title?.textContent || '';
   title?.remove();
   const node = platePanel({ icon, title: name, body: [...card.childNodes], open: opened.has(id) });
   node.addEventListener('toggle', () => (node.open ? opened.add(id) : opened.delete(id)));
@@ -62,10 +63,17 @@ export function render(view, ctx) {
     h('p', { class: 'caps charts__sub' }, 'Твоя роль в паре и в жизни'),
     h('p', { class: 'help__intro' }, 'Квадрат Пифагора, Матрица судьбы (Ладини), Human Design. «Я» — данные из анкеты; добавь партнёра, партнёров по бизнесу, детей — расчёты сохраняются.'),
     h('section', { class: 'card charts__people' },
-      h('div', { class: 'anketa-chips' }, ...all.map((p) => h('button', {
-        type: 'button', class: 'anketa-chip', 'aria-pressed': String(p.id === cur.id),
-        onclick: () => { selected = p.id; ctx.rerender(); },
-      }, p.id === 'me' ? 'Я' : `${p.name} · ${people.ROLES[p.role]}`))),
+      // «Я» и разделы: Пара, Друзья, Бизнес, Родные, Дети, Другие — у каждого раздела свои люди
+      ...[['me', null], ...Object.entries(people.GROUPS)].map(([g, label]) => {
+        const list = g === 'me' ? [all[0]] : all.filter((p) => p.id !== 'me' && (p.role || 'other') === g);
+        if (!list.length) return null;
+        return h('div', { class: 'charts__group' },
+          label ? h('p', { class: 'caps charts__group-title' }, label) : null,
+          h('div', { class: 'anketa-chips' }, ...list.map((p) => h('button', {
+            type: 'button', class: 'anketa-chip', 'aria-pressed': String(p.id === cur.id),
+            onclick: () => { selected = p.id; ctx.rerender(); },
+          }, p.id === 'me' ? 'Я' : p.name))));
+      }),
       cur.id === 'me' && !cur.date ? h('p', { class: 'faint' }, h('a', { href: '#/settings' }, 'Внеси свои данные рождения в настройках'), ' («Про меня»).') : null,
       cur.id !== 'me' ? h('button', { type: 'button', class: 'link-btn', onclick: () => { if (confirm(`Убрать «${cur.name}»?`)) { people.remove(cur.id); selected = 'me'; ctx.rerender(); } } }, 'Убрать этого человека') : null,
       addForm(ctx)),
@@ -74,7 +82,10 @@ export function render(view, ctx) {
       fold('matrix', icons.sparkle, matrixCard(cur.date, cap)),
       fold('hd', icons.crown, hdCard({ date: cur.date, time: cur.time, city: cur.city, caption: cap })),
       // совместимость «я + выбранный» — только по датам, считается на телефоне
-      cur.id !== 'me' && me().date ? fold('pair', icons.heart, pairCard(me().date, cur.date, `${people.caption(me())} + ${people.caption(cur).replace('Считаем по данным: ', '')}`)) : null,
+      // Пара — три карты (владелец 27.11.2026): Пифагор, Матрица, Human Design
+      cur.id !== 'me' && me().date ? fold('pairPyth', icons.heart, pairPythCard(me().date, cur.date, `${people.caption(me())} + ${people.caption(cur).replace('Считаем по данным: ', '')}`), `Квадрат Пифагора ${people.WITH[cur.role] || 'вместе'}`) : null,
+      cur.id !== 'me' && me().date ? fold('pairHd', icons.heart, pairHdCard(me(), cur, `${people.caption(me())} + ${people.caption(cur).replace('Считаем по данным: ', '')}`), `Human Design ${people.WITH[cur.role] || 'вместе'}`) : null,
+      cur.id !== 'me' && me().date ? fold('pair', icons.heart, pairCard(me().date, cur.date, `${people.caption(me())} + ${people.caption(cur).replace('Считаем по данным: ', '')}`), `Матрица судьбы ${people.WITH[cur.role] || 'вместе'}`) : null,
     ] : []),
   );
 }
