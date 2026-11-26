@@ -4,6 +4,21 @@ import * as anketa from '../../anketa/data.js';
 import { pythagorasCard } from '../../charts/pythagoras/view.js';
 import { matrixCard, pairCard } from '../../charts/matrix/view.js';
 import { hdCard } from '../../charts/hd/view.js';
+import { platePanel } from '../../ui/plate.js';
+import { icons } from '../../ui/icons.js';
+
+/* Каждая карта — плашкой со стрелкой (владелец 27.11.2026: «три раздела, каждый открыть по потребности»): заголовок карточки
+   становится названием плашки, остальное — внутри. Раскрытые помнятся между перерисовками. */
+const opened = new Set();
+function fold(id, icon, card) {
+  if (!card) return null;
+  const title = card.querySelector('.card__title');
+  const name = title?.textContent || '';
+  title?.remove();
+  const node = platePanel({ icon, title: name, body: [...card.childNodes], open: opened.has(id) });
+  node.addEventListener('toggle', () => (node.open ? opened.add(id) : opened.delete(id)));
+  return node;
+}
 
 /* ЭКРАН «КАРТЫ РОЖДЕНИЯ» (#/charts) — отдельный раздел, не анкета (владелец 26.11.2026). Наверху — люди: «Я» (данные
    рождения из анкеты), партнёр, партнёры по бизнесу, дети, родные — сколько нужно; ниже — расчёты выбранного: над каждым
@@ -55,11 +70,11 @@ export function render(view, ctx) {
       cur.id !== 'me' ? h('button', { type: 'button', class: 'link-btn', onclick: () => { if (confirm(`Убрать «${cur.name}»?`)) { people.remove(cur.id); selected = 'me'; ctx.rerender(); } } }, 'Убрать этого человека') : null,
       addForm(ctx)),
     ...(cur.date ? [
-      pythagorasCard(cur.date, cap),
-      matrixCard(cur.date, cap),
-      hdCard({ date: cur.date, time: cur.time, city: cur.city, caption: cap }),
+      fold('pyth', icons.check, pythagorasCard(cur.date, cap)),
+      fold('matrix', icons.sparkle, matrixCard(cur.date, cap)),
+      fold('hd', icons.crown, hdCard({ date: cur.date, time: cur.time, city: cur.city, caption: cap })),
       // совместимость «я + выбранный» — только по датам, считается на телефоне
-      cur.id !== 'me' && me().date ? pairCard(me().date, cur.date, `${people.caption(me())} + ${people.caption(cur).replace('Считаем по данным: ', '')}`) : null,
+      cur.id !== 'me' && me().date ? fold('pair', icons.heart, pairCard(me().date, cur.date, `${people.caption(me())} + ${people.caption(cur).replace('Считаем по данным: ', '')}`)) : null,
     ] : []),
   );
 }
