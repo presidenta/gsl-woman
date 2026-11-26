@@ -7,6 +7,8 @@ import { st } from '../../search/texts.js';
 import { platePanel } from '../../ui/plate.js';
 import { figure, highlight } from '../help/help.js';
 import { photoOf } from '../../photos/photos.js';
+import { at } from '../../anketa/texts.js';
+import { anketaLink } from '../../anketa/link.js'; // «Единая анкета партнёра» — отправить тому, с кем познакомилась (26.11.2026)
 
 /* Блоки — плашками со стрелкой, как во всём приложении (владелец 15.11.2026); раскрытые переживают перерисовку. */
 const opened = new Set();
@@ -150,6 +152,7 @@ export function render(view, ctx) {
     h('h1', { class: 'screen-title' }, data.title),
     h('p', { class: 'search__intro' }, data.intro),
     data.steps ? stepsCard(data.steps) : null,
+    anketaLink({ lead: at('searchLead') }),
     ...data.blocks.map(blockCard),
     h('a', { class: 'card settings__link search__meet', href: '#/meet' },
       h('span', { class: 'card__icon' }, svg(icons.rings)),

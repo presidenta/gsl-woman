@@ -1,0 +1,96 @@
+/* «Единая анкета партнёра» (js/anketa/): пункты, переключатели + / − / ?, матрица обмена, итог. Один вид в приложении
+   и на странице гостя (anketa.html). Цвета — токены своей части (золото у неё / у него своё). */
+
+.anketa-scale { margin: var(--sp-2) 0 var(--sp-3); font-size: var(--fs-sm); line-height: 1.5; }
+.anketa-scale b { display: inline-block; min-width: 1.2em; color: var(--c-gold); font-size: var(--fs-md); }
+
+.anketa-block .help__folder-body { display: grid; gap: var(--sp-3); }
+.anketa-count.is-done { color: var(--c-gold); }
+
+.anketa-q { display: grid; gap: var(--sp-2); padding-bottom: var(--sp-3); border-bottom: 1px solid var(--c-line); }
+.anketa-q:last-child { border-bottom: 0; padding-bottom: 0; }
+.anketa-q__label { margin: 0; color: var(--c-text); line-height: 1.35; }
+.anketa-q__hint { margin: 0; font-size: var(--fs-sm); }
+/* Короткие пункты: подпись слева, «+ − ?» справа */
+.anketa-q--row { grid-template-columns: 1fr auto; align-items: center; }
+
+.anketa-seg { grid-auto-columns: minmax(44px, auto); }
+.anketa-seg .segmented__option { min-height: 38px; padding: 0 var(--sp-2); font-size: var(--fs-sm); white-space: normal; line-height: 1.15; }
+.anketa-seg--tri .segmented__option { min-width: 44px; font-size: var(--fs-md); }
+/* Длинные варианты (бюджет, решение по деньгам) — столбиком */
+.anketa-seg--list { grid-auto-flow: row; border-radius: var(--r-md); }
+.anketa-seg--list .segmented__option { min-height: 44px; padding: var(--sp-2) var(--sp-3); border-radius: var(--r-md); text-align: left; letter-spacing: 0; font-weight: 600; }
+
+.anketa-pairrow { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: var(--sp-2); }
+.anketa-pairrow__name { color: var(--c-text-dim); font-size: var(--fs-sm); }
+
+.anketa-chips { display: flex; flex-wrap: wrap; gap: var(--sp-2); }
+.anketa-chip {
+  padding: 8px 14px; border: 1px solid var(--c-line); border-radius: var(--r-pill);
+  background: transparent; color: var(--c-text-dim); font: inherit; font-size: var(--fs-sm); cursor: pointer;
+}
+.anketa-chip[aria-pressed='true'] { background: var(--g-gold-smooth); color: var(--c-on-gold); border-color: transparent; font-weight: 700; }
+.anketa-input { width: 100%; }
+.anketa-link { justify-self: start; }
+.anketa-love-auto { margin: 0; }
+.anketa-private { margin: 0; }
+
+/* Матрица «Запрос ⇄ вклад» */
+.anketa-deal__cap { margin: var(--sp-1) 0 0; color: var(--c-gold); font-size: var(--fs-xs); font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; }
+.anketa-deal__text { margin: 0; color: var(--c-text-dim); font-size: var(--fs-sm); line-height: 1.45; }
+.anketa-deal__follow { display: grid; gap: var(--sp-2); padding-left: var(--sp-3); border-left: 2px solid var(--c-gold); }
+.anketa-deal__status { margin: 0; font-weight: 700; }
+.anketa-deal__status:empty { display: none; }
+
+/* Интим в анкете гостя — разделы карты */
+.anketa-intim { display: grid; gap: var(--sp-2); }
+.anketa-intim__title { margin: var(--sp-2) 0 0; color: var(--c-gold); }
+
+/* Статусы: баланс — зелёный, внимание — золото, перекос — роза */
+[data-status='balance'], [data-status='together'] { color: #7fd6a4; }
+[data-status='attention'], [data-status='tryIt'] { color: var(--c-gold); }
+[data-status='skew'], [data-status='talk'] { color: var(--c-rose, #f19bb0); }
+
+/* Экран в приложении */
+.anketa-send .card__actions { display: flex; flex-wrap: wrap; gap: var(--sp-2); }
+.anketa-results { display: grid; gap: var(--sp-2); }
+.anketa-tag { margin-left: var(--sp-2); vertical-align: middle; font-size: var(--fs-xs); }
+.anketa-hide { margin-top: var(--sp-3); }
+
+/* Итог */
+.anketa-res { display: grid; gap: var(--sp-2); }
+.anketa-res__totals { display: flex; flex-wrap: wrap; gap: var(--sp-2) var(--sp-4); margin: 0 0 var(--sp-2); font-weight: 700; }
+.anketa-res__num--together { color: #7fd6a4; }
+.anketa-res__num--try { color: var(--c-gold); }
+.anketa-res__num--talk { color: var(--c-rose, #f19bb0); }
+.anketa-res__part + .anketa-res__part { margin-top: var(--sp-3); }
+.anketa-res__cap { margin: 0 0 var(--sp-1); }
+.anketa-res__part--together .anketa-res__cap { color: #7fd6a4; }
+.anketa-res__part--tryIt .anketa-res__cap { color: var(--c-gold); }
+.anketa-res__part--talk .anketa-res__cap { color: var(--c-rose, #f19bb0); }
+.anketa-res__list { margin: 0; padding-left: 1.1em; display: grid; gap: var(--sp-2); }
+.anketa-res__label { color: var(--c-text); }
+.anketa-res__answers { display: flex; flex-wrap: wrap; gap: 0 var(--sp-3); color: var(--c-text-dim); font-size: var(--fs-sm); }
+.anketa-res__status { display: block; font-size: var(--fs-sm); }
+
+/* Страница гостя */
+.anketa-page { padding-bottom: var(--sp-7, 64px); }
+.anketa-page__brand { margin: 0 0 var(--sp-2); color: var(--c-gold); }
+.anketa-who { display: grid; gap: var(--sp-2); }
+.anketa-who__label { margin-top: var(--sp-2); }
+.anketa-join { margin-top: var(--sp-4); display: grid; gap: var(--sp-3); }
+.anketa-join__row { display: flex; gap: var(--sp-2); align-items: flex-start; cursor: pointer; }
+.anketa-join__row input { margin-top: 4px; width: 20px; height: 20px; flex: none; accent-color: var(--c-gold); }
+.anketa-join__fields { display: grid; gap: var(--sp-2); }
+.anketa-page .btn--block { margin-top: var(--sp-4); }
+.anketa-error { color: var(--c-rose, #f19bb0); min-height: 1.4em; }
+.anketa-ok { color: #7fd6a4; }
+.anketa-cta { margin-top: var(--sp-4); display: grid; gap: var(--sp-3); }
+.anketa-edit { margin-top: var(--sp-4); }
+
+/* Счётчик итога «совпало · попробовать · обсудить» — строкой под названием: во вложенных блоках рядом не помещается */
+.anketa-person > .help__folder-summary,
+.anketa-res__block > .help__folder-summary { flex-wrap: wrap; row-gap: 6px; }
+.anketa-person > .help__folder-summary .help__count,
+.anketa-res__block > .help__folder-summary .help__count { order: 3; flex-basis: 100%; width: fit-content; max-width: 100%; margin-left: 0; white-space: normal; }
+.anketa-res__block { min-width: 0; }

@@ -7,6 +7,8 @@ import { ApiError } from '../../account/session.js';
 import * as circles from '../../circles/circles.js';
 import { chatView } from '../../circles/chat-view.js';
 import { wishesView } from '../../circles/wishes-view.js';
+import { anketaLink } from '../../anketa/link.js';
+import { at } from '../../anketa/texts.js';
 import { childrenBlock, dreamsView } from '../../circles/family-view.js';
 // Детский кабинет глазами родителя — вкладка «Дети» (kids/, 14.11.2026)
 import { kidsView } from '../../kids/parent-view.js';
@@ -152,6 +154,8 @@ function pairView(view, ctx, circle) {
     segmented({ label: t('us.pair'), options: tabs.map((k) => ({ value: k, label: t(`us.tabs.${k}`) })), value: pairTab, onChange: (v) => { pairTab = v; ctx.rerender(); } }),
     pairTab === 'wishes' ? wishesView(circle) : chatView(circle),
     h('a', { class: 'love-card__link us-goals-link', href: '#/goals' }, t('us.goalsLink'), svg(icons.chevronRight, 'love-card__chevron')),
+    // «Наш итог» единой анкеты партнёра (js/anketa/, владелец 26.11.2026)
+    anketaLink({ href: '#/anketa?result', text: at('resultsTitle'), lead: at('pairLead') }),
     leaveButton(ctx, circle),
   ];
 }

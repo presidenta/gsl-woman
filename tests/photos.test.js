@@ -94,9 +94,15 @@ test('главы книжечки: фото по номеру главы, у н�
   assert.equal(chapter('energy', 1, 'woman'), null, 'таблица — без фото');
   assert.equal(chapter('types', 0, 'woman'), null, 'у пунктов без глав в каталоге — без фото');
   assert.equal(fixed('library', 3, 'woman'), 166, 'плашка книжечки у неё');
-  assert.equal(fixed('library', 4, 'woman'), 1, '«Кто перед тобой» — с прежним фото');
+  // 26.11.2026: после книжечки — «9 заповедей гештальта» со своим фото; «Кто перед тобой» сдвинулся, фото у него прежнее
+  assert.equal(fixed('library', 4, 'woman'), 131, '«9 заповедей гештальта» у неё');
+  assert.equal(fixed('library', 5, 'woman'), 1, '«Кто перед тобой» — с прежним фото');
   assert.equal(fixed('library', 5, 'man'), 164, 'плашка книжечки у него');
-  assert.equal(fixed('library', 6, 'man'), 7, '«Кто перед тобой» у него — с прежним фото');
+  assert.equal(fixed('library', 6, 'man'), 133, '«9 заповедей гештальта» у него');
+  assert.equal(fixed('library', 7, 'man'), 7, '«Кто перед тобой» у него — с прежним фото');
+  assert.equal(chapter('gestalt', 6, 'woman'), 97, '«Выражай чувства» — рука на груди у неё');
+  assert.equal(chapter('gestalt', 6, 'man'), 96);
+  assert.equal(chapter('gestalt', 1, 'man'), null, 'список заповедей — без фото');
 });
 
 // 22.11.2026, владелец: у «Чек-листа: 7 чакр в паре» (9-я плашка «Вопросов») — пара с чакрами, а не один человек

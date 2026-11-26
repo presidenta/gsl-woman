@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#150c11">
+  <meta name="color-scheme" content="dark">
+  <!-- Страница «Единой анкеты партнёра» по ссылке-приглашению (js/anketa/public.js): заполняется без входа. Запросы —
+       только к серверу «Кванта», как у приложения. Ссылка личная — поисковикам её не показывать. -->
+  <meta http-equiv="Content-Security-Policy"
+        content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'self' https://game.coreviaflow.com http://localhost:8580; base-uri 'self'; form-action 'none'">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="referrer" content="no-referrer">
+  <title>Единая анкета партнёра — GSL Я⁺ • Любовь</title>
+  <meta name="description" content="Заполни анкету — и сразу увидите, что у вас совпадает: что попробовать вместе и что обсудить на берегу.">
+  <link rel="icon" href="assets/icons/icon-192.png">
+  <link rel="preload" href="assets/fonts/manrope-cyrillic.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="assets/fonts/cormorant-cyrillic.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="styles/tokens.css">
+  <link rel="stylesheet" href="styles/side-man.css">
+  <link rel="stylesheet" href="styles/fonts.css">
+  <link rel="stylesheet" href="styles/base.css">
+  <link rel="stylesheet" href="styles/components/button.css">
+  <link rel="stylesheet" href="styles/components/card.css">
+  <link rel="stylesheet" href="styles/components/controls.css">
+  <link rel="stylesheet" href="styles/components/plate.css">
+  <link rel="stylesheet" href="js/screens/help/help.css">
+  <link rel="stylesheet" href="js/anketa/anketa.css">
+  <script type="module" src="js/anketa/public.js"></script>
+</head>
+<body>
+  <main class="app-view anketa-page" id="page"></main>
+  <noscript>Анкета работает с включённым JavaScript.</noscript>
+</body>
+</html>

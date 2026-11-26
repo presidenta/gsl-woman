@@ -27,7 +27,7 @@ const entriesOf = (g) => [...(g.entries || []), ...(g.sections || []).flatMap((s
 const count = (n, unit) => (unit && n ? `${n} ${plural(n, `plural.${unit}`)}` : null);
 
 // Значок каждого пункта — свой, вид один
-const ITEM_ICON = { redline: 'flag', questions: 'chat', surveys: 'check', her: 'heart', words: 'heart', kpk: 'crown', authors: 'journal', energy: 'journal', types: 'rings', topics: 'rings', rules: 'home', dates: 'calendar', compliments: 'sparkle', notfit: 'flag' };
+const ITEM_ICON = { redline: 'flag', questions: 'chat', surveys: 'check', her: 'heart', words: 'heart', kpk: 'crown', authors: 'journal', energy: 'journal', gestalt: 'journal', types: 'rings', topics: 'rings', rules: 'home', dates: 'calendar', compliments: 'sparkle', notfit: 'flag' };
 
 /* Книжечка «Библиотеки» (energy, сервер gsl/energy/, 22.11.2026) — текст как в книге: list — вид списка ('ul' — точки,
    'plain' — абзацы; иначе номера), sub — вложенный список под пунктом, after — абзац после списка. */
@@ -210,7 +210,7 @@ function questionPlates(item, verdicts, scene = null) {
 /** Раздел «Вопросов» из адреса: #/help?date или #/help?pair (плашки «Артефактов»); без него — оба раздела. */
 const sceneOf = () => ({ date: 'date', pair: 'pair' })[location.hash.split('?')[1]] || null;
 
-export function itemPlate(item, ctx, verdicts, { photo = null, extra = [], extraCount = 0 } = {}) {
+export function itemPlate(item, ctx, verdicts, { photo = null, before = [], extra = [], extraCount = 0 } = {}) {
   const rulesPart = item.editable ? rulesBody(item, () => { opened.add(item.key); ctx.rerender(); }) : null;
   // «Анкеты» — счёт по анкетам; остальное — по записям
   const n = extraCount + (rulesPart ? rulesPart.count : item.groups.every((g) => g.check) ? item.groups.length : item.groups.filter((g) => g.unit === item.unit).reduce((s, g) => s + entriesOf(g).length, 0));
@@ -229,7 +229,10 @@ export function itemPlate(item, ctx, verdicts, { photo = null, extra = [], extra
       photo,
       h('p', { class: 'card__text help__lead' }, item.lead),
       // Главы книжечки — со своим фото (photos/catalog.js → CHAPTERS, у него и у неё — разные); у прочих — без фото
+      ...before, // «Анкеты»: «Единая анкета партнёра» — первой (screens/goals/, 26.11.2026)
       ...(rulesPart ? rulesPart.nodes : item.groups.map((g, i) => folder(g, { open: !!item.openFolders, verdicts, photo: photoNode(chapter(item.key, i)) }))),
+      // «Правила нашего дома»: под списком — светофор границ, бланк «3 ⇄ 3», памятка (сервер gsl/help/agreements-ru.js, 26.11.2026)
+      ...(rulesPart && item.folders ? item.folders.map((g) => folder(g)) : []),
       ...extra, // «Анкеты»: ссылка на «Пять языков любви» (screens/goals/)
     ],
   }), item.key);

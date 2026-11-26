@@ -14,6 +14,7 @@ import { lt } from '../../letters/texts.js';
 import { photoOf, photo, fixed } from '../../photos/photos.js';
 import { plateLink, platePanel } from '../../ui/plate.js';
 import * as help from '../../help/help.js';
+import { at } from '../../anketa/texts.js';
 import { itemPlate } from '../help/help.js';
 import { intimLink } from '../intim/intim.js';
 import { secretPlate } from '../../secret/secret.js';
@@ -270,7 +271,10 @@ function surveysPlate(ctx) {
   // «Пять языков любви» — ссылкой (владелец 23.11.2026): анкеты живут на своём экране, там же сохраняется итог у каждого
   const love = h('a', { class: 'help__folder surveys__link', href: '#/love' },
     h('span', { class: 'help__folder-summary' }, svg(icons.heart, 'help__chevron'), h('span', { class: 'help__folder-title' }, t('help.loveLink')), svg(icons.chevronRight, 'surveys__arrow')));
-  return item ? itemPlate(item, ctx, null, { photo: photo(fixed('surveys', 0)), extra: [love], extraCount: 2 }) : null;
+  // «Единая анкета партнёра» — первой (владелец 26.11.2026: «в артефакты, в раздел анкеты 100%»); свой экран #/anketa
+  const anketa = h('a', { class: 'help__folder surveys__link', href: '#/anketa' },
+    h('span', { class: 'help__folder-summary' }, svg(icons.check, 'help__chevron'), h('span', { class: 'help__folder-title' }, at('plateTitle')), svg(icons.chevronRight, 'surveys__arrow')));
+  return item ? itemPlate(item, ctx, null, { photo: photo(fixed('surveys', 0)), before: [anketa], extra: [love], extraCount: 3 }) : null;
 }
 
 function libraryPlate() {

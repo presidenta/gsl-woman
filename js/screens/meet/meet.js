@@ -8,6 +8,8 @@ import { flagRow, flagTotal, picked } from '../../ui/flags.js';
 import { platePanel } from '../../ui/plate.js';
 import { folderBody } from '../help/help.js';
 import { photoOf } from '../../photos/photos.js';
+import { anketaLink } from '../../anketa/link.js'; // «Единая анкета партнёра» — отправить после знакомства (26.11.2026)
+import { at } from '../../anketa/texts.js';
 
 /* ЭКРАН «ЗНАКОМСТВО» (#/meet, владелец 14.11.2026) — технология знакомства по «темам-опознавателям»:
      1. Перед встречей — шпаргалка.
@@ -137,6 +139,7 @@ export function render(view, ctx) {
   add(view,
     h('h1', { class: 'screen-title' }, data.title),
     h('p', { class: 'meet__intro' }, data.intro),
+    anketaLink({ lead: at('searchLead') }),
     data.before ? listCard(data.before.title, data.before.items, '', icons.check) : null,
     themes?.node,
     data.time ? listCard(data.time.title, data.time.items, '', icons.week) : null,

@@ -42,6 +42,7 @@ import * as libraryScreen from './screens/library/library.js';
 import * as redflagScreen from './screens/redflag/redflag.js';
 import * as intimScreen from './screens/intim/intim.js'; // «Интим 18⁺» (js/intim/, 21.11.2026)
 import * as usScreen from './screens/us/us.js';
+import * as anketaScreen from './screens/anketa/anketa.js'; // «Единая анкета партнёра» (js/anketa/, 26.11.2026)
 import * as circles from './circles/circles.js';
 import { watchHabits } from './circles/goals-model.js';
 // Детский кабинет: телефон ребёнка или его дела ждут родителя — красная точка на «Мы» (kids/alerts.js)
@@ -92,6 +93,7 @@ router.define('library', libraryScreen);
 router.define('redflag', redflagScreen);
 router.define('intim', intimScreen);
 router.define('us', usScreen);
+router.define('anketa', anketaScreen);
 
 const root = document.getElementById('app');
 let shell = null;
@@ -337,11 +339,11 @@ function draw() {
   // Каркас пересобирается целиком, чтобы смена языка сразу дошла до шапки и панели
   shell = buildShell();
   const name = router.currentRoute() || router.routeName();
-  const screen = { today, week, journal: journalScreen, path, goals: goalsScreen, settings: settingsScreen, love: loveScreen, meet: meetScreen, search: searchScreen, help: helpScreen, library: libraryScreen, redflag: redflagScreen, intim: intimScreen, us: usScreen }[name] || today;
+  const screen = { today, week, journal: journalScreen, path, goals: goalsScreen, settings: settingsScreen, love: loveScreen, meet: meetScreen, search: searchScreen, help: helpScreen, library: libraryScreen, redflag: redflagScreen, intim: intimScreen, us: usScreen, anketa: anketaScreen }[name] || today;
 
   // Шапка: везде — кто вошёл (фото, имя, кабинет) и название; в настройках — «назад» вместо себя
   // «Пять языков любви» — тоже подэкран: «назад» вместо себя
-  const sub = name === 'settings' || name === 'love' || name === 'meet' || name === 'search' || name === 'help' || name === 'library' || name === 'redflag' || name === 'intim' || name === 'us';
+  const sub = name === 'settings' || name === 'love' || name === 'meet' || name === 'search' || name === 'help' || name === 'library' || name === 'redflag' || name === 'intim' || name === 'us' || name === 'anketa';
   // «Назад» — на всех экранах, кроме «Сегодня» (владелец 14.11.2026)
   noteRoute(name);
   shell.back.hidden = name === 'today';
