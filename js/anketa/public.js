@@ -4,6 +4,24 @@ import { formView } from './form.js';
 import { resultView } from './result.js';
 import { at } from './texts.js';
 
+/* Язык страницы гостя (владелец 26.11.2026: анкета — на русском, украинском и английском): выбранный раньше на этом
+   устройстве, иначе — язык браузера (украинский → UA, английский и прочие → EN, русский → RU). Переключатель — вверху. */
+const LANG_KEY = 'gsl-anketa-lang';
+const LANGS = [['ru', 'RU'], ['ua', 'UA'], ['en', 'EN']];
+function guessLang() {
+  try { const saved = localStorage.getItem(LANG_KEY); if (LANGS.some(([l]) => l === saved)) return saved; } catch { /* приватное окно */ }
+  for (const l of navigator.languages || [navigator.language || '']) {
+    const p = String(l).toLowerCase().slice(0, 2);
+    if (p === 'uk') return 'ua';
+    if (p === 'ru') return 'ru';
+    if (p === 'en') return 'en';
+  }
+  return 'ru';
+}
+let lang = guessLang();
+const applyLang = () => { document.documentElement.lang = lang === 'ua' ? 'uk' : lang; };
+applyLang();
+
 /* СТРАНИЦА ГОСТЯ «ЕДИНОЙ АНКЕТЫ ПАРТНЁРА» (anketa.html#<ссылка>). Владелец 26.11.2026: анкету отправляют ссылкой, «как
    реферальную»; кто открыл — заполняет без входа и сразу видит итог, может сразу оставить заявку на доступ к приложению.
 
@@ -46,9 +64,27 @@ function paintSide() {
   else document.documentElement.removeAttribute('data-side');
 }
 
+/** Маленький переключатель языка, как на входе в приложение: «RU ▾» без рамки. */
+function langSwitch() {
+  const sel = h('select', { class: 'anketa-lang', 'aria-label': at('guestLang') },
+    ...LANGS.map(([l, label]) => h('option', { value: l, selected: l === lang }, label)));
+  sel.addEventListener('change', async () => {
+    lang = sel.value;
+    try { localStorage.setItem(LANG_KEY, lang); } catch { /* приватное окно */ }
+    applyLang();
+    // Вопросы и подписи итога — с сервера на новом языке; ответы — те же (ключи на всех языках одни)
+    try {
+      info = await api(`/api/anketa/${token}?lang=${lang}`);
+      if (state.id) result = (await api(`/api/anketa/${token}/${state.id}`, { secret: state.secret, lang })).result;
+    } catch { /* без сети — надписи сменятся, вопросы останутся прежними */ }
+    draw();
+  });
+  return sel;
+}
+
 function header() {
   return [
-    h('p', { class: 'caps anketa-page__brand' }, 'GSL Я⁺ • Любовь'),
+    h('div', { class: 'anketa-page__top' }, h('p', { class: 'caps anketa-page__brand' }, at('brand')), langSwitch()),
     h('h1', { class: 'screen-title' }, at('guestFrom', { name: info.from.name, gender: info.from.gender })),
   ];
 }
@@ -75,7 +111,7 @@ async function submit(btn, err) {
   btn.disabled = true;
   btn.textContent = at('guestSaving');
   try {
-    const body = { name: state.name.trim(), gender: state.gender, answers: state.answers, intim: state.intim };
+    const body = { name: state.name.trim(), gender: state.gender, answers: state.answers, intim: state.intim, lang };
     if (state.id) Object.assign(body, { id: state.id, secret: state.secret });
     if (state.join) Object.assign(body, { join: true, email: state.email, ...(state.phone ? { phone: state.phone } : {}) });
     const r = await api(`/api/anketa/${token}`, body);
@@ -123,8 +159,8 @@ function drawForm() {
       // «Сохранить» у данных рождения: в браузере гостя пишется и так, по вводу; кнопка — подтверждение
       save: () => { save(); alert(at('saved')); },
       // Подсказки города рождения — тот же адрес сервера, без входа
-      geo: async (q) => (await api(`/api/geo/places?q=${encodeURIComponent(q)}&lang=ru`)).places || [],
-      lang: 'ru',
+      geo: async (q) => (await api(`/api/geo/places?q=${encodeURIComponent(q)}&lang=${lang}`)).places || [],
+      lang,
       love: { auto: null, href: null },
     }) : null,
     state.gender && !state.joined ? joinBox() : null,
@@ -157,7 +193,7 @@ async function start() {
   page.replaceChildren(h('p', { class: 'faint' }, '…'));
   if (!token) { page.replaceChildren(h('p', { class: 'card__text' }, at('guestNotFound'))); return; }
   try {
-    info = await api(`/api/anketa/${token}`);
+    info = await api(`/api/anketa/${token}?lang=${lang}`);
   } catch (e) {
     page.replaceChildren(h('p', { class: 'card__text' }, e.status === 404 ? at('guestNotFound') : at('guestError')));
     return;
@@ -166,7 +202,7 @@ async function start() {
   if (!state.gender && info.from.gender) state.gender = info.from.gender === 'female' ? 'male' : 'female';
   if (state.id) {
     try {
-      const r = await api(`/api/anketa/${token}/${state.id}`, { secret: state.secret });
+      const r = await api(`/api/anketa/${token}/${state.id}`, { secret: state.secret, lang });
       result = r.result;
       state.joined = r.joined;
     } catch {

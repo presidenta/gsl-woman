@@ -3,6 +3,7 @@ import { request } from '../account/session.js';
 import { langData } from '../program/source.js';
 import { choices as loveChoices } from '../love/love.js';
 import { myMarks, KEY_NAME as INTIM_KEY } from '../intim/map.js';
+import { anketaLang } from './texts.js';
 
 /* ДАННЫЕ «ЕДИНОЙ АНКЕТЫ ПАРТНЁРА» в приложении (README.md). Ответы — на телефоне (ключ anketa: { answers, at }) и
    копия на сервере (POST /api/gsl/anketa): итог считает сервер, у второго человека — свой телефон. Пишется тихо
@@ -102,6 +103,7 @@ export async function link() {
   return linkUrl(token);
 }
 
-export const results = () => request('/api/gsl/anketa/results');
+// Подписи итога — на языке приложения (сервер: ?lang=, 26.11.2026)
+export const results = () => request(`/api/gsl/anketa/results?lang=${anketaLang()}`);
 export const hide = (id) => request(`/api/gsl/anketa/guests/${id}/hide`, { body: {} });
 export const KEY_NAME = KEY;

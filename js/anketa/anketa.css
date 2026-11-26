@@ -10,6 +10,11 @@
 .anketa-count__n.is-some { color: rgb(57, 255, 110); font-weight: 800; }
 .anketa-save { margin-top: var(--sp-3); }
 
+/* Страница гостя: бренд и переключатель языка в одну строку; переключатель — маленький, без рамки (как на входе) */
+.anketa-page__top { display: flex; align-items: center; justify-content: space-between; gap: var(--sp-3); }
+.anketa-lang { border: 0; background: transparent; color: var(--c-gold); font: inherit; font-size: var(--fs-sm); font-weight: 700; cursor: pointer; padding: 4px 0; }
+.anketa-lang option { color: #000; }
+
 /* Город рождения: подсказки под полем (form.js → placeField) */
 .anketa-geo { display: grid; margin-top: 4px; border: 1px solid var(--c-line-strong); border-radius: var(--r-md); overflow: hidden; background: var(--c-surface); }
 .anketa-geo[hidden] { display: none; }
