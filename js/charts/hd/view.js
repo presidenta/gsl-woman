@@ -1,8 +1,49 @@
 import { h } from '../../core/dom.js';
 import { zonedToUtc, chart, composite, PAIR_KINDS, CENTERS, TYPES, AUTHORITIES, BODIES, BODY_RU, CHANNELS } from './calc.js';
-import { HD_TYPE_DB, HD_AUTHORITY_DB, HD_LINE_DB, HD_CENTER_DB, HD_CHANNEL_NAMES, HD_GATE_TITLES } from './texts.js'; // трактовки (тексты Gemini)
+import { HD_SOURCE, HD_TYPE_DB, HD_AUTHORITY_DB, HD_LINE_DB, HD_PROFILE_DB, HD_CENTER_DB, HD_GATES, HD_CHANNELS, CIRCUIT_NOTE,
+  HD_DEFINITION_DB, HD_ANGLE_DB, CROSS_NOTE, HD_PAIR_DB } from './texts.js'; // расшифровка по системе Ра Уру Ху (216)
 const fold = (title, ...body) => h('details', { class: 'help__folder' }, h('summary', { class: 'help__folder-summary' }, h('span', { class: 'help__folder-title' }, title)), h('div', { class: 'help__folder-body' }, ...body));
 const para = (b, t) => (t ? h('p', {}, h('b', {}, b), ' ', t) : null);
+const item = (title, ...rows) => h('div', { class: 'chart__item' }, h('p', { class: 'caps' }, title), ...rows);
+const gateText = (g) => (HD_GATES[g] ? `${HD_GATES[g][0]} — ${HD_GATES[g][1]}` : '');
+const channelOf = (id) => { const [a, b] = id.split('–'); return HD_CHANNELS[`${a}-${b}`] || HD_CHANNELS[`${b}-${a}`]; };
+
+/** Расшифровка карты: тип, авторитет, профиль, определённость, крест, центры, каналы, все ворота. */
+function decoding(r) {
+  const T = HD_TYPE_DB[r.type] || {};
+  const Au = HD_AUTHORITY_DB[r.authority] || {};
+  const [l1, l2] = r.profile.split('/').map(Number);
+  const Pr = HD_PROFILE_DB[r.profile];
+  const Df = HD_DEFINITION_DB[Math.min(r.definition, 4)];
+  const An = HD_ANGLE_DB[r.angle];
+  // ворота → где стоят: «Солнце Л» (Личность), «Луна Д» (Дизайн)
+  const at = {};
+  for (const [src, mark] of [[r.personality, 'Л'], [r.design, 'Д']]) {
+    for (const b of BODIES) (at[src[b].gate] ||= []).push(`${BODY_RU[b]} ${mark} ${src[b].gate}.${src[b].line}`);
+  }
+  return fold('Расшифровка',
+    h('p', { class: 'faint' }, HD_SOURCE),
+    item(`Тип: ${TYPES[r.type]}`, para('Роль:', T.role), para('Энергия:', T.howEnergyWorks), para('Стратегия:', T.strategy),
+      para('Подпись (когда живёт по себе):', T.signature), para('Сигнал сбоя:', T.notSelfTheme), para('Аура:', T.aura),
+      para('Как с ним общаться:', T.withThem), para('На практике:', T.practicalGuidance)),
+    item(`Авторитет: ${AUTHORITIES[r.authority]}`, para('Как ощущается:', Au.feel), para('Как решать:', Au.howToDecide), para('Ловушка:', Au.pitfalls)),
+    item(`Профиль ${r.profile}${Pr ? ` — ${Pr.name}` : ''}`, Pr ? h('p', {}, Pr.text) : null,
+      para('Личность (как знает себя):', HD_LINE_DB[l1]), para('Дизайн (как его видят, тело):', HD_LINE_DB[l2])),
+    Df ? item(`Определённость: ${Df[0]}`, h('p', {}, Df[1])) : null,
+    item(`Инкарнационный крест: ${An ? An[0] : ''}`, h('p', { class: 'faint' }, CROSS_NOTE), An ? h('p', {}, An[1]) : null,
+      ...[['Солнце Личности', r.cross[0]], ['Земля Личности', r.cross[1]], ['Солнце Дизайна', r.cross[2]], ['Земля Дизайна', r.cross[3]]]
+        .map(([n, g]) => para(`${n} — ${g}:`, gateText(g)))),
+    item('Центры', ...Object.keys(CENTERS).map((c) => {
+      const on = r.defined.includes(c);
+      const x = HD_CENTER_DB[c] || {};
+      return h('div', {}, para(`${CENTERS[c]} — ${on ? 'определён' : 'открыт'}:`, `${x.theme || ''} ${on ? x.definedMeaning : x.undefinedMeaning}`),
+        on ? null : para('Вопрос себе:', `«${x.question}»`));
+    })),
+    r.channels.length ? item('Каналы', h('p', { class: 'faint' }, CIRCUIT_NOTE),
+      ...r.channels.map((id) => { const c = channelOf(id); return para(`${id} — канал ${c ? c[0] : ''} (${c ? c[1] : ''}):`, c ? c[2] : ''); })) : null,
+    item('Ворота', h('p', { class: 'faint' }, 'Все активные ворота: где стоит планета (Л — Личность, сознательное; Д — Дизайн, тело) и что они дают.'),
+      ...Object.keys(at).map(Number).sort((a, b) => a - b).map((g) => para(`${g} (${at[g].join(', ')}):`, gateText(g)))));
+}
 
 
 /* Карточка «Human Design»: тип, авторитет, профиль, крест, центры, каналы, активации Личности и Дизайна. Нужны дата, время
@@ -84,16 +125,7 @@ export function hdCard({ date, time, city, caption = null }) {
         h('div', { class: 'help__folder-body hd__cols' },
           h('div', {}, h('p', { class: 'caps' }, 'Личность'), acts(r.personality)),
           h('div', {}, h('p', { class: 'caps' }, 'Дизайн'), acts(r.design)))),
-      (() => { const T = HD_TYPE_DB[r.type] || {}; const Au = HD_AUTHORITY_DB[r.authority] || {}; const [l1, l2] = r.profile.split('/').map(Number);
-        const ch = (id) => { const [a, b] = id.split('–'); return HD_CHANNEL_NAMES[`${a}-${b}`] || HD_CHANNEL_NAMES[`${b}-${a}`]; };
-        return fold('Расшифровка',
-          h('div', { class: 'chart__item' }, h('p', { class: 'caps' }, `Тип: ${TYPES[r.type]}`), para('Роль:', T.role), para('Энергия:', T.howEnergyWorks), para('Стратегия:', T.strategy), para('Подпись (когда всё верно):', T.signature), para('Тема не-себя:', T.notSelfTheme), para('На практике:', T.practicalGuidance)),
-          h('div', { class: 'chart__item' }, h('p', { class: 'caps' }, `Авторитет: ${AUTHORITIES[r.authority]}`), para('Как решать:', Au.howToDecide), para('Ловушки:', Au.pitfalls)),
-          h('div', { class: 'chart__item' }, h('p', { class: 'caps' }, `Профиль ${r.profile}`), para(`Линия ${l1}:`, HD_LINE_DB[l1]), para(`Линия ${l2}:`, HD_LINE_DB[l2])),
-          h('div', { class: 'chart__item' }, h('p', { class: 'caps' }, 'Центры'), ...Object.keys(CENTERS).map((c) => para(`${CENTERS[c]} (${r.defined.includes(c) ? 'определён' : 'открыт'}):`, r.defined.includes(c) ? HD_CENTER_DB[c]?.definedMeaning : HD_CENTER_DB[c]?.undefinedMeaning))),
-          r.channels.length ? h('div', { class: 'chart__item' }, h('p', { class: 'caps' }, 'Каналы'), ...r.channels.map((id) => para(`${ch(id)?.name || id}:`, ch(id)?.summary))) : null,
-          h('div', { class: 'chart__item' }, h('p', { class: 'caps' }, 'Инкарнационный крест — ворота'), ...r.cross.map((g) => para(`${g}:`, HD_GATE_TITLES[g] ? `${HD_GATE_TITLES[g].title} — ${HD_GATE_TITLES[g].keywords.join(', ')}` : ''))));
-      })());
+      decoding(r));
   }).catch(() => body.replaceChildren(h('p', { class: 'faint' }, 'Не получилось загрузить расчёт — открой ещё раз.')));
   return h('section', { class: 'card hd' }, ...head, body);
 }
@@ -120,8 +152,8 @@ export function pairHdCard(a, b, caption) {
       h('p', {}, h('b', {}, 'Общие определённые центры: '), c.defined.map((x) => CENTERS[x]).join(', ') || '—'),
       ...Object.entries(PAIR_KINDS).map(([k, label]) => {
         const ids = c.channels.filter((x) => x.kind === k).map((x) => x.id);
-        return ids.length ? h('p', {}, h('b', {}, `${label}: `), ids.join(' · ')) : null;
-      }));
+        return ids.length ? h('div', {}, h('p', {}, h('b', {}, `${label}: `), ids.join(' · ')), h('p', { class: 'faint' }, HD_PAIR_DB[k])) : null;
+      }).filter(Boolean)); // replaceChildren(null) печатает «null» — пустые виды убираем
   }).catch(() => body.replaceChildren(h('p', { class: 'faint' }, 'Не получилось загрузить расчёт — открой ещё раз.')));
   return h('section', { class: 'card hd' }, ...head, body);
 }

@@ -86,6 +86,24 @@ function connected(adj, from, to) {
   return false;
 }
 
+/** Определённость (216): сколько отдельных областей у определённых центров (0 — Рефлектор, 1 — одна, 2 — сплит…). */
+export function areas(defined, adj) {
+  const left = new Set(defined);
+  let n = 0;
+  while (left.size) {
+    n += 1;
+    const queue = [left.values().next().value];
+    while (queue.length) {
+      const c = queue.shift();
+      if (left.delete(c)) queue.push(...(adj[c] || []));
+    }
+  }
+  return n;
+}
+
+/** Угол креста по профилю: 4/1 — джакстапозиция, 5/x и 6/x — левый угол, остальные — правый. */
+export const angleOf = (profile) => (profile === '4/1' ? 'juxta' : /^[56]\//.test(profile) ? 'left' : 'right');
+
 /** Карта: birth — Date (UTC); A — astronomy-engine. */
 export function chart(A, birth) {
   const design = designDate(A, birth);
@@ -106,13 +124,17 @@ export function chart(A, birth) {
   else if (defined.has('Spleen')) authority = 'Splenic';
   else if (defined.has('Heart')) authority = connected(adj, 'Heart', 'Throat') ? 'EgoManifested' : 'EgoProjected';
   else if (defined.has('G') && connected(adj, 'G', 'Throat')) authority = 'SelfProjected';
+  const definition = areas(defined, adj);
+  const profile = `${personality.Sun.line}/${des.Sun.line}`;
   return {
     designUtc: design.toISOString(),
+    definition,
+    angle: angleOf(profile),
     personality,
     design: des,
     type,
     authority,
-    profile: `${personality.Sun.line}/${des.Sun.line}`,
+    profile,
     cross: [personality.Sun.gate, personality.Earth.gate, des.Sun.gate, des.Earth.gate],
     channels: channels.map(([a, b]) => `${a}–${b}`),
     defined: Object.keys(CENTERS).filter((c) => defined.has(c)),
