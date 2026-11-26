@@ -124,7 +124,7 @@ function catchUp(ctx, summary) {
   /* Полоска человека «Прошедшие 7 дней» — первой в карточке (js/preview/, владелец 24.11.2026). Пока человек смотрит
      прошедший день, карточка остаётся и без пропусков — чтобы листать дальше и вернуться к сегодняшнему. */
   const strip = pastBar(ctx.realDay);
-  if (!summary.catchUp.length && !(strip && ctx.day !== ctx.realDay)) return null;
+  // С 26.11.2026 карточка у всех всегда (владелец: «у Яны его нету… чтобы он у всех был»): пропусков нет — строка об этом и полоска дней
   /* Свёрнуто в одну строку (владелец 17.11.2026: «огромное, каждый день видно… нажал — открылось, догнал, если хочет»):
      на виду только «Ещё можно доработать N%», дни — по стрелке. */
   return foldCard({
@@ -135,7 +135,7 @@ function catchUp(ctx, summary) {
     lead: summary.catchUp.length ? t('today.catchText', {
       percent: summary.lagPercent,
       days: `${summary.lagDays} ${plural(summary.lagDays, 'plural.days')}`,
-    }) : '',
+    }) : t('today.catchNone'),
     keepLead: true,
     body: [strip, h('div', { class: 'catch-list' },
       ...summary.catchUp.map((day) => {

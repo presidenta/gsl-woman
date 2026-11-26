@@ -13,7 +13,12 @@
 .hd__acts li { font-size: var(--fs-xs); }
 .mx__sign { fill: var(--c-gold); font: 700 14px var(--f-body, sans-serif); text-anchor: middle; }
 .hd__body { display: block; width: 100%; max-width: 260px; margin: var(--sp-3) auto; }
-.hd__ch { stroke: var(--c-gold); stroke-width: 4; }
 .hd__c { fill: transparent; stroke: var(--c-line-strong, var(--c-line)); stroke-width: 1.5; }
 .hd__c.is-on { fill: var(--c-gold); stroke: var(--c-gold); }
 .hd__cn { fill: var(--c-text); font: 600 8px var(--f-body, sans-serif); text-anchor: middle; }
+.hd__off { stroke: rgba(255, 255, 255, .12); stroke-width: 3; }
+.hd__des { stroke: #e0483e; stroke-width: 3.5; }
+.hd__per { stroke: #f3e9d6; stroke-width: 3.5; }
+.hd__per--both { stroke-dasharray: 3 3; }
+.hd__g { fill: var(--c-text-dim); font: 600 6px var(--f-body, sans-serif); text-anchor: middle; paint-order: stroke; stroke: #111; stroke-width: 2px; }
+.hd__g.is-on { fill: var(--c-gold); font-weight: 800; }

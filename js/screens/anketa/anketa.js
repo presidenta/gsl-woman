@@ -116,6 +116,7 @@ export function render(view, ctx) {
     // Карты рождения — отдельный раздел #/charts (владелец 26.11.2026: «отдельно от анкеты»)
     h('a', { class: 'card settings__link', href: '#/charts' }, h('span', { class: 'settings__link-text' }, h('b', {}, 'Карты рождения'), h('br'), h('span', { class: 'faint' }, 'Пифагор, Матрица Ладини, Human Design — для тебя, партнёра, детей'))),
     formView(form, {
+      skip: ['birth'], // данные рождения — в настройках «Про меня» (владелец 26.11.2026: «нелогично, где её вводить»)
       get: data.get,
       set: data.set,
       open,

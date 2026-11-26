@@ -78,6 +78,7 @@ export default {
     reviewText: 'End of the month: share live what has changed and how the month feels.',
     catchTitle: 'You can catch up',
     catchText: 'You can still do {percent}% more. Catch up {days} — you’ve got this.',
+    catchNone: 'All done on time — you can browse past days.', // карточка видна всегда (владелец 26.11.2026)
     catchDay: 'Day {day} · {date}',
     beforeTitle: 'Starting soon',
     beforeText: 'Your quest begins on {date}. {left} to go.',

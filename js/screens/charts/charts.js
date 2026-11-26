@@ -50,7 +50,7 @@ export function render(view, ctx) {
         type: 'button', class: 'anketa-chip', 'aria-pressed': String(p.id === cur.id),
         onclick: () => { selected = p.id; ctx.rerender(); },
       }, p.id === 'me' ? 'Я' : `${p.name} · ${people.ROLES[p.role]}`))),
-      cur.id === 'me' && !cur.date ? h('p', { class: 'faint' }, h('a', { href: '#/anketa' }, 'Внеси свои данные рождения в анкете'), ' (блок «Данные для расчёта карт»).') : null,
+      cur.id === 'me' && !cur.date ? h('p', { class: 'faint' }, h('a', { href: '#/settings' }, 'Внеси свои данные рождения в настройках'), ' («Про меня»).') : null,
       cur.id !== 'me' ? h('button', { type: 'button', class: 'link-btn', onclick: () => { if (confirm(`Убрать «${cur.name}»?`)) { people.remove(cur.id); selected = 'me'; ctx.rerender(); } } }, 'Убрать этого человека') : null,
       addForm(ctx)),
     ...(cur.date ? [

@@ -246,8 +246,11 @@ export function formView(form, opts) {
     node.addEventListener('toggle', () => (node.open ? open.add(block.key) : open.delete(block.key)));
     return node;
   };
-  const core = form.blocks.filter((b) => b.core);
-  const extra = form.blocks.filter((b) => !b.core);
+  // only — только эти блоки, раскрытыми (данные рождения в настройках «Про меня»); skip — без них (анкета, 26.11.2026)
+  if (opts.only) return h('div', { class: 'anketa-form anketa-form--only' }, ...form.blocks.filter((b) => opts.only.includes(b.key)).map((b) => { open.add(b.key); return blockView(b); }));
+  const keep = (b) => !(opts.skip || []).includes(b.key);
+  const core = form.blocks.filter((b) => b.core && keep(b));
+  const extra = form.blocks.filter((b) => !b.core && keep(b));
   return h('div', { class: 'anketa-form' },
     h('p', { class: 'faint anketa-scale' }, ...Object.entries(form.scale).flatMap(([k, v]) => [h('b', {}, k === '-' ? '−' : k), ` — ${v}`, h('br')])),
     h('h2', { class: 'caps plates__heading' }, form.coreTitle || at('core')),

@@ -24,6 +24,10 @@ import { checkNow } from '../../core/updates.js';
 import { PROFILES } from '../../profile/profile.js';
 import { langData } from '../../program/source.js';
 import { questMark } from '../../quest/quest.js';
+// Данные рождения для «Карт рождения» — здесь, в «Про меня» (владелец 26.11.2026); хранятся в анкете (js/anketa/)
+import * as anketaData from '../../anketa/data.js';
+import { formView } from '../../anketa/form.js';
+import { request } from '../../account/session.js';
 
 /* ЭКРАН «НАСТРОЙКИ»: аккаунт «Кванта» (фото, имя, кабинет), значок на экран, мои отношения (профиль программы),
    «Пять языков любви», обо мне (имя, язык), дата старта, время трёх напоминаний, уведомления, данные.
@@ -219,6 +223,12 @@ export function render(view, ctx) {
           settings.update({ lang: value });
         });
         return h('div', { class: 'field' }, h('label', { class: 'field__label', for: lang.id }, t('settings.lang')), lang.node);
+      })(),
+      (() => {
+        const form = anketaData.formOf(ctx.lang);
+        return form ? formView(form, { only: ['birth'], get: anketaData.get, set: anketaData.set, open: new Set(), lang: ctx.lang,
+          geo: async (q) => (await request(`/api/geo/places?q=${encodeURIComponent(q)}&lang=${ctx.lang}`)).places || [],
+          save: async () => { try { await anketaData.send(true); } catch { /* без сети — уйдёт позже */ } } }) : null;
       })(),
       start.node,
     ),

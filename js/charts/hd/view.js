@@ -20,16 +20,41 @@ function shape([x, y, f], s = 17) {
     dia: [[x, y - s], [x + s, y], [x, y + s], [x - s, y]], sq: [[x - s, y - s], [x + s, y - s], [x + s, y + s], [x - s, y + s]] }[f];
   return pts.map((p) => p.join(',')).join(' ');
 }
-/** Бодиграф рисунком: определённые центры — золотом, активные каналы — линиями между центрами. */
+/** Бодиграф (владелец 26.11.2026, по образцу): канал — две половины, каждая по своим воротам: Личность — светлая,
+    Дизайн — красная, обе — полосой; ворот нет — бледная. Целый канал — обе половины цветные, «висящие» ворота — одна.
+    Несколько каналов между одной парой центров разведены; номера ворот — у центров, активные — золотом. */
 function bodygraph(r, CH) {
   const svg = el('svg', { viewBox: '0 0 200 300', class: 'hd__body', role: 'img', 'aria-label': 'Бодиграф' });
-  for (const [a, b, c1, c2] of CH) {
-    if (!r.channels.includes(`${a}–${b}`)) continue;
-    const [x1, y1] = POS[c1]; const [x2, y2] = POS[c2];
-    svg.append(el('line', { x1, y1, x2, y2, class: 'hd__ch' }));
+  const pg = new Set(Object.values(r.personality).map((x) => x.gate));
+  const dg = new Set(Object.values(r.design).map((x) => x.gate));
+  const pairs = {};
+  CH.forEach((c) => { const k = [c[2], c[3]].sort().join(); (pairs[k] ||= []).push(c); });
+  const half = (x1, y1, x2, y2, g) => {
+    const p = pg.has(g), d = dg.has(g);
+    if (!p && !d) { svg.append(el('line', { x1, y1, x2, y2, class: 'hd__off' })); return; }
+    if (d) svg.append(el('line', { x1, y1, x2, y2, class: 'hd__des' }));
+    if (p) svg.append(el('line', { x1, y1, x2, y2, class: d ? 'hd__per hd__per--both' : 'hd__per' }));
+  };
+  const labels = [];
+  for (const list of Object.values(pairs)) {
+    list.forEach(([a, b, c1, c2], i) => {
+      const [x1, y1] = POS[c1]; const [x2, y2] = POS[c2];
+      const len = Math.hypot(x2 - x1, y2 - y1) || 1;
+      const o = (i - (list.length - 1) / 2) * 6;
+      const ox = (-(y2 - y1) / len) * o, oy = ((x2 - x1) / len) * o;
+      const sx = x1 + ox, sy = y1 + oy, ex = x2 + ox, ey = y2 + oy, mx = (sx + ex) / 2, my = (sy + ey) / 2;
+      half(sx, sy, mx, my, a);
+      half(mx, my, ex, ey, b);
+      // номер ворот — на линии у своего центра
+      labels.push([sx + (ex - sx) * 0.24, sy + (ey - sy) * 0.24, a], [sx + (ex - sx) * 0.76, sy + (ey - sy) * 0.76, b]);
+    });
   }
   for (const [c, p] of Object.entries(POS)) {
     svg.append(el('polygon', { points: shape(p), class: `hd__c${r.defined.includes(c) ? ' is-on' : ''}` }), el('text', { x: p[0], y: p[1] + 3, class: 'hd__cn' }, SHORT[c]));
+  }
+  for (const [x, y, g] of labels) {
+    const on = pg.has(g) || dg.has(g);
+    svg.append(el('text', { x, y: y + 2, class: `hd__g${on ? ' is-on' : ''}` }, String(g)));
   }
   return svg;
 }
