@@ -267,7 +267,7 @@ export default {
   week: {
     title: 'Квест недели',
     done: 'выполнено',
-    lag: 'Отстаёшь на {percent}%',
+    lag: 'Ещё можно доработать {percent}%',
     onTrack: 'Ты в ритме',
     status: { done: 'Сделано', missed: 'Пропущено', today: 'Сегодня', future: 'Впереди' },
     call: 'Итог и созвон',

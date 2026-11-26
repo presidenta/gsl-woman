@@ -262,7 +262,7 @@ export default {
   week: {
     title: 'Квест тижня',
     done: 'виконано',
-    lag: 'Відстаєш на {percent}%',
+    lag: 'Ще можна допрацювати {percent}%',
     onTrack: 'Ти в ритмі',
     status: { done: 'Зроблено', missed: 'Пропущено', today: 'Сьогодні', future: 'Попереду' },
     call: 'Підсумок і дзвінок',

@@ -263,7 +263,7 @@ export default {
   week: {
     title: 'Quest of the week',
     done: 'done',
-    lag: 'You are {percent}% behind',
+    lag: 'You can still do {percent}% more',
     onTrack: 'You are in rhythm',
     status: { done: 'Done', missed: 'Missed', today: 'Today', future: 'Ahead' },
     call: 'Review and call',
