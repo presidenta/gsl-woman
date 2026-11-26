@@ -78,7 +78,7 @@ export default {
     reviewTitle: 'Відгук місяця',
     reviewText: 'Кінець місяця: в ефірі розкажи, що змінилося і які відчуття за підсумком місяця.',
     catchTitle: 'Можна надолужити',
-    catchText: 'Відстаєш на {percent}%. Наздожени {days} — у тебе все вийде.',
+    catchText: 'Ще можна допрацювати {percent}%. Наздожени {days} — у тебе все вийде.',
     catchDay: 'День {day} · {date}',
     beforeTitle: 'Скоро старт',
     beforeText: 'Квест почнеться {date}. Залишилося {left}.',

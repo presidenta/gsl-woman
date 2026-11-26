@@ -126,7 +126,7 @@ function catchUp(ctx, summary) {
   const strip = pastBar(ctx.realDay);
   if (!summary.catchUp.length && !(strip && ctx.day !== ctx.realDay)) return null;
   /* Свёрнуто в одну строку (владелец 17.11.2026: «огромное, каждый день видно… нажал — открылось, догнал, если хочет»):
-     на виду только «Отстаёшь на N%», дни — по стрелке. */
+     на виду только «Ещё можно доработать N%», дни — по стрелке. */
   return foldCard({
     id: 'catchup',
     cls: 'catchup',

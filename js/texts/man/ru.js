@@ -82,7 +82,7 @@ export default {
     reviewTitle: 'Отзыв месяца',
     reviewText: 'Конец месяца: в эфире расскажи, что поменялось и какие ощущения по итогу месяца.',
     catchTitle: 'Можно наверстать',
-    catchText: 'Отстаёшь на {percent}%. Догони {days} — у тебя всё получится.',
+    catchText: 'Ещё можно доработать {percent}%. Догони {days} — у тебя всё получится.',
     catchDay: 'День {day} · {date}',
     beforeTitle: 'Скоро старт',
     beforeText: 'Квест начнётся {date}. Осталось {left}.',

@@ -78,7 +78,7 @@ export default {
     reviewTitle: 'Monthly testimonial',
     reviewText: 'End of the month: share live what has changed and how the month feels.',
     catchTitle: 'You can catch up',
-    catchText: 'You are {percent}% behind. Catch up {days} — you’ve got this.',
+    catchText: 'You can still do {percent}% more. Catch up {days} — you’ve got this.',
     catchDay: 'Day {day} · {date}',
     beforeTitle: 'Starting soon',
     beforeText: 'Your quest begins on {date}. {left} to go.',
