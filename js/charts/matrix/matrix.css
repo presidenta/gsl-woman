@@ -9,3 +9,5 @@
 .mx__table th, .mx__table td { padding: 4px 6px; border-bottom: 1px solid var(--c-line); text-align: center; }
 .mx__table th:first-child, .mx__table td:first-child { text-align: left; }
 .mx__sum td { font-weight: 700; color: var(--c-gold); }
+.hd__cols { display: grid; grid-template-columns: 1fr 1fr; gap: var(--sp-3); }
+.hd__acts li { font-size: var(--fs-xs); }

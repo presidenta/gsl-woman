@@ -6,6 +6,7 @@ import { request } from '../../account/session.js';
 import { formView } from '../../anketa/form.js';
 import { resultView } from '../../anketa/result.js';
 import { at } from '../../anketa/texts.js';
+import { hdCard } from '../../charts/hd/view.js'; // Human Design, js/charts/hd/
 import { matrixCard } from '../../charts/matrix/view.js'; // Матрица судьбы (Ладини), js/charts/matrix/
 import { pythagorasCard } from '../../charts/pythagoras/view.js'; // квадрат Пифагора по дате рождения (js/charts/, 26.11.2026)
 import { myMarks, setMark, keyOf } from '../../intim/map.js';
@@ -117,6 +118,7 @@ export function render(view, ctx) {
     resultsCard(ctx),
     pythagorasCard(data.get('birth.date')),
     matrixCard(data.get('birth.date')),
+    data.get('birth.date') ? hdCard({ date: data.get('birth.date'), time: data.get('birth.time'), city: data.get('birth.city') }) : null,
     formView(form, {
       get: data.get,
       set: data.set,
