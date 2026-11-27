@@ -56,6 +56,15 @@ function workBlock(n) {
   return h('div', { class: 'chart__item' }, h('p', { class: 'caps' }, `${X.ui.title}: ${n}`), h('p', { class: 'faint' }, X.ui.lead), h('p', {}, X.text[n]));
 }
 
+/** Вход в денежный канал (В2): только текст о деньгах (ячейка places/money, 231). Пол человека матрица не знает,
+   поэтому у 3 и 4 — оба текста: для женщины и для мужчины. */
+function moneyBlock(T, n) {
+  const X = PL('money');
+  const M = X.text[n];
+  return h('div', { class: 'chart__item' }, h('p', { class: 'caps' }, `${X.ui.title}: ${short(T, n)}`), h('p', { class: 'faint' }, X.ui.lead),
+    M.intro ? h('p', {}, M.intro) : null, para(X.ui.prof, M.prof), para(X.ui.woman, M.woman), para(X.ui.man, M.man), para(X.ui.block, M.block));
+}
+
 /** Расшифровка личной матрицы: главные точки, предназначения, род, любовь и деньги, хвост, таланты, возрасты, чакры. */
 function decoding(r, T) {
   const p = r.points;
@@ -77,6 +86,7 @@ function decoding(r, T) {
     cap(U.loveMoney),
     arcanaBlock(T, U.love, r.loveMoney.love, T.special.love), arcanaBlock(T, U.money, r.loveMoney.money, T.special.money),
     arcanaBlock(T, U.balance, r.loveMoney.balance, T.special.balance),
+    moneyBlock(T, r.rays.c.x2), // вход в денежный канал — свой текст (231)
     cap(U.tailCap),
     tailBlock(T, tail),
     h('div', { class: 'chart__item' }, h('p', { class: 'caps' }, `${U.talents}: ${talents.join(' · ')}`), h('p', { class: 'faint' }, T.special.talents),
