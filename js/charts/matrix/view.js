@@ -1,6 +1,7 @@
 import { h } from '../../core/dom.js';
 import { matrix, pairMatrix } from './calc.js';
-import { TX } from './texts/index.js'; // тексты на языке приложения (218)
+import { TX } from './texts/index.js';
+import { PL } from './places/index.js'; // тексты по местам матрицы: хвост, работа… (229) // тексты на языке приложения (218)
 const fold = (title, ...body) => h('details', { class: 'help__folder' }, h('summary', { class: 'help__folder-summary' }, h('span', { class: 'help__folder-title' }, title)), h('div', { class: 'help__folder-body' }, ...body));
 const para = (b, t) => (t ? h('p', {}, h('b', {}, b), ' ', t) : null);
 const cap = (t) => h('h3', { class: 'caps mx__cap' }, t);
@@ -23,13 +24,22 @@ function arcanaBlock(T, label, n, about = null) {
 }
 const short = (T, n) => `${n} — ${T.arcana[n].name}`;
 
-/** Кармический хвост «Г2-Г1-Г»: классическая программа, если есть, и минус/выход каждого аркана. */
+/** Кармический хвост «Г2-Г1-Г»: вступление, классическая программа (если есть) и у каждого числа — только текст хвоста
+   (ячейка places/tail, 229): что принесено из прошлого и как проработать. */
 function tailBlock(T, tail) {
   const U = T.ui;
+  const X = PL('tail');
   const prog = T.tails[tail.join('-')];
-  return h('div', { class: 'chart__item' }, h('p', { class: 'caps' }, `${U.tail}: ${tail.join(' · ')}`), h('p', { class: 'faint' }, T.special.tail),
+  return h('div', { class: 'chart__item' }, h('p', { class: 'caps' }, `${X.ui.title}: ${tail.join(' · ')}`),
+    ...X.intro.map((t) => h('p', { class: 'faint' }, t)),
     prog ? h('div', {}, h('p', {}, h('b', {}, `${U.program} «${prog[0]}»`)), para(U.was, prog[1]), para(U.task, prog[2])) : h('p', { class: 'faint' }, U.noProgram),
-    ...tail.map((n) => para(`${short(T, n)}:`, `${U.inMinus} ${low(T.arcana[n].minus)} ${U.way} ${low(T.arcana[n].howTo)}`)));
+    ...tail.map((n) => h('div', {}, h('p', {}, h('b', {}, short(T, n))), para(X.ui.past, X.text[n].past), para(X.ui.how, X.text[n].how))));
+}
+
+/** Работа — третья цифра сверху (Б2): только текст о работе (ячейка places/work, 229). */
+function workBlock(n) {
+  const X = PL('work');
+  return h('div', { class: 'chart__item' }, h('p', { class: 'caps' }, `${X.ui.title}: ${n}`), h('p', { class: 'faint' }, X.ui.lead), h('p', {}, X.text[n]));
 }
 
 /** Расшифровка личной матрицы: главные точки, предназначения, род, любовь и деньги, хвост, таланты, возрасты, чакры. */
@@ -56,6 +66,7 @@ function decoding(r, T) {
     tailBlock(T, tail),
     h('div', { class: 'chart__item' }, h('p', { class: 'caps' }, `${U.talents}: ${talents.join(' · ')}`), h('p', { class: 'faint' }, T.special.talents),
       ...talents.map((n) => para(`${short(T, n)}:`, T.arcana[n].plus))),
+    workBlock(r.rays.b.x2),
     cap(U.ages),
     h('p', { class: 'faint' }, U.agesNote),
     h('ul', { class: 'pyth__lines' }, ...ageKeys.map((k, i) => row(T.ages[i], short(T, p[k])))),

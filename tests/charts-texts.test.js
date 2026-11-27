@@ -111,3 +111,12 @@ test('Пифагор: текст для любого числа цифр 0…8, 
 test('экран: подписи всех ролей на трёх языках', () => {
   for (const l of ['ru', 'ua', 'en']) for (const k of ROLES) assert.ok(SCR[l].roles[k] && SCR[l].groups[k] && SCR[l].with[k], `${l} ${k}`);
 });
+
+// Тексты по местам матрицы (229): у каждой ячейки три языка с одинаковыми ключами и текст для всех 22 чисел
+import { PLACES } from '../js/charts/matrix/places/index.js';
+test('Матрица, места: хвост и работа — 22 числа, ru / ua / en одинаковы', () => {
+  for (const [name, sets] of Object.entries(PLACES)) {
+    sameKeys(sets, `место ${name}`);
+    for (let n = 1; n <= 22; n++) assert.ok(sets.ru.text[n], `${name}: нет числа ${n}`);
+  }
+});
