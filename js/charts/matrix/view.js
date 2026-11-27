@@ -4,7 +4,7 @@ import { TX } from './texts/index.js'; // тексты на языке прил�
 const fold = (title, ...body) => h('details', { class: 'help__folder' }, h('summary', { class: 'help__folder-summary' }, h('span', { class: 'help__folder-title' }, title)), h('div', { class: 'help__folder-body' }, ...body));
 const para = (b, t) => (t ? h('p', {}, h('b', {}, b), ' ', t) : null);
 const cap = (t) => h('h3', { class: 'caps mx__cap' }, t);
-const row = (n, v) => h('li', {}, h('span', {}, n), h('b', {}, String(v)));
+const row = (n, v, keys = null) => h('li', keys ? { 'data-keys': keys, tabindex: '0' } : {}, h('span', {}, n), h('b', {}, String(v)));
 const low = (s) => s.charAt(0).toLowerCase() + s.slice(1);
 
 /* Карточка «Матрица судьбы (Ладини)»: схема точек (SVG), род, любовь и деньги, предназначения, карта здоровья,
@@ -61,6 +61,8 @@ function decoding(r, T) {
     ...r.health.rows.map((x) => para(`${T.chakras[x.id][0]} (${U.agesTotal} ${short(T, x.total)}):`, T.chakras[x.id][1])));
 }
 
+// Карта здоровья: из каких точек рисунка строка (тело | энергия)
+const CHAKRA_KEYS = { sahasrara: 'A B', ajna: 'a1 b1', vishuddha: 'a2 b2', anahata: 'a3 b3', manipura: 'E', svadhisthana: 'c2 d2', muladhara: 'C D' };
 const NS = 'http://www.w3.org/2000/svg';
 function el(tag, attrs, text) {
   const n = document.createElementNS(NS, tag);
@@ -74,27 +76,60 @@ function drawing(r, T) {
   const R = r.rays;
   const svg = el('svg', { viewBox: '0 0 300 300', class: 'mx__svg', role: 'img', 'aria-label': T.ui.aria });
   svg.append(el('rect', { x: 60, y: 60, width: 180, height: 180, class: 'mx__line' }), el('polygon', { points: '150,22 278,150 150,278 22,150', class: 'mx__line' }));
-  const dot = (x, y, v, big) => svg.append(
-    el('circle', { cx: x, cy: y, r: big ? 15 : 11, class: big ? 'mx__dot mx__dot--big' : 'mx__dot' }),
-    el('text', { x, y: y + 4, class: 'mx__num' }, String(v)));
+  const at = {}; // ключ точки → [x, y, кружок]
+  let id = '';
+  const dot = (x, y, v, big) => {
+    const c = el('circle', { cx: x, cy: y, r: big ? 15 : 11, class: big ? 'mx__dot mx__dot--big' : 'mx__dot' });
+    at[id] = [x, y, c];
+    svg.append(c, el('text', { x, y: y + 4, class: 'mx__num' }, String(v)));
+  };
+  const named = (key, ...a) => { id = key; dot(...a); };
   // А слева, Б сверху, В справа, Г снизу, Д в центре; род — углы квадрата
-  [[22, 150, p.A], [150, 22, p.B], [278, 150, p.C], [150, 278, p.D], [150, 150, p.E],
-    [60, 60, p.F], [240, 60, p.G], [240, 240, p.Y], [60, 240, p.K]].forEach(([x, y, v]) => dot(x, y, v, true));
+  [['A', 22, 150], ['B', 150, 22], ['C', 278, 150], ['D', 150, 278], ['E', 150, 150],
+    ['F', 60, 60], ['G', 240, 60], ['Y', 240, 240], ['K', 60, 240]].forEach(([k, x, y]) => named(k, x, y, p[k], true));
   // к центру: X1 у края, X2, X3 у центра
   const steps = [0.27, 0.5, 0.73];
   // стороны и диагонали рода — по три точки к центру (у диагоналей — две)
-  [[60, 60, R.f], [240, 60, R.g], [240, 240, R.y], [60, 240, R.k]].forEach(([x, y, q]) =>
-    [q.x1, q.x2].forEach((v, i) => dot(x + (150 - x) * [0.27, 0.7][i], y + (150 - y) * [0.27, 0.7][i], v, false)));
+  [['f', 60, 60], ['g', 240, 60], ['y', 240, 240], ['k', 60, 240]].forEach(([k, x, y]) =>
+    [R[k].x1, R[k].x2].forEach((v, i) => named(`${k}${i + 1}`, x + (150 - x) * [0.27, 0.7][i], y + (150 - y) * [0.27, 0.7][i], v, false)));
   // канал любви и денег — на стороне от В (справа) к Г (низ): ♥ ближе к низу, $ ближе к правому краю, Х посередине
   const lm = r.loveMoney;
   // кружки не налегают на точки диагонали Ы (владелец 27.11.2026: «11 и 19 накладываются»): канал — поперёк диагонали,
   // точка баланса — между её точками, $ — к В, ♥ — к Г
   svg.append(el('line', { x1: 226, y1: 166, x2: 166, y2: 226, class: 'mx__line mx__line--dash' }));
-  [[196, 196, lm.balance], [220, 172, lm.money], [172, 220, lm.love]].forEach(([x, y, v]) => dot(x, y, v, false));
+  [['bal', 196, 196, lm.balance], ['money', 220, 172, lm.money], ['love', 172, 220, lm.love]].forEach(([k, x, y, v]) => named(k, x, y, v, false));
   svg.append(el('text', { x: 240, y: 182, class: 'mx__sign' }, '$'), el('text', { x: 182, y: 244, class: 'mx__sign' }, '♥'));
-  [[22, 150, R.a], [150, 22, R.b], [278, 150, R.c], [150, 278, R.d]].forEach(([x, y, q]) =>
-    [q.x1, q.x2, q.x3].forEach((v, i) => dot(x + (150 - x) * steps[i], y + (150 - y) * steps[i], v, false)));
+  [['a', 22, 150], ['b', 150, 22], ['c', 278, 150], ['d', 150, 278]].forEach(([k, x, y]) =>
+    [R[k].x1, R[k].x2, R[k].x3].forEach((v, i) => named(`${k}${i + 1}`, x + (150 - x) * steps[i], y + (150 - y) * steps[i], v, false)));
+  // Подсветка (владелец 27.11.2026: «нажимаешь на цифры — подсвечивается, откуда они берутся, в самой матрице»)
+  const path = el('polyline', { class: 'mx__path' });
+  svg.insertBefore(path, svg.querySelector('circle')); // линия под кружками — числа видны
+  svg.light = (keys) => {
+    Object.values(at).forEach(([, , c]) => c.classList.remove('is-lit'));
+    svg.classList.toggle('is-tracing', Boolean(keys));
+    const pts = (keys || []).map((k) => at[k]).filter(Boolean);
+    pts.forEach(([, , c]) => c.classList.add('is-lit'));
+    path.setAttribute('points', pts.map(([x, y]) => `${x},${y}`).join(' '));
+  };
   return svg;
+}
+
+/** Строки с data-keys (и строки таблицы) подсвечивают на рисунке точки, из которых сложено число: мышь — наведение,
+   палец — касание (второе касание гасит). */
+function wire(card, svg) {
+  let active = null;
+  const show = (node) => {
+    active?.classList.remove('is-on');
+    active = node;
+    node?.classList.add('is-on');
+    svg.light(node ? node.dataset.keys.split(' ') : null);
+  };
+  card.querySelectorAll('[data-keys]').forEach((n) => {
+    n.addEventListener('pointerenter', (e) => { if (e.pointerType === 'mouse') show(n); });
+    n.addEventListener('pointerleave', (e) => { if (e.pointerType === 'mouse' && active === n) show(null); });
+    n.addEventListener('click', () => show(active === n ? null : n));
+  });
+  return card;
 }
 
 export function matrixCard(iso, caption = null) {
@@ -104,25 +139,26 @@ export function matrixCard(iso, caption = null) {
   const U = T.ui;
   const P = r.purposes;
   const t = r.health.total;
-  return h('section', { class: 'card mx' },
+  const pic = drawing(r, T);
+  return wire(h('section', { class: 'card mx' },
     h('h2', { class: 'card__title' }, U.title),
     caption ? h('p', { class: 'chart__src' }, caption) : null,
-    drawing(r, T),
+    pic,
     cap(U.rod),
     h('ul', { class: 'pyth__lines' },
-      row(`${U.father}: ${r.lines.father.join(' – ')}`, r.lines.fatherSum),
-      row(`${U.mother}: ${r.lines.mother.join(' – ')}`, r.lines.motherSum)),
+      row(`${U.father}: ${r.lines.father.join(' – ')}`, r.lines.fatherSum, 'F f1 f2 E y2 y1 Y'),
+      row(`${U.mother}: ${r.lines.mother.join(' – ')}`, r.lines.motherSum, 'G g1 g2 E k2 k1 K')),
     cap(U.loveMoney),
-    h('ul', { class: 'pyth__lines' }, row(U.love, r.loveMoney.love), row(U.money, r.loveMoney.money), row(U.balance, r.loveMoney.balance)),
+    h('ul', { class: 'pyth__lines' }, row(U.love, r.loveMoney.love, 'd2 love bal'), row(U.money, r.loveMoney.money, 'c2 money bal'), row(U.balance, r.loveMoney.balance, 'c2 bal d2')),
     cap(U.purposes),
-    h('ul', { class: 'pyth__lines' }, row(T.purposes.sky[0], P.sky), row(T.purposes.earth[0], P.earth), row(T.purposes.personal[0], P.personal),
-      row(U.male, P.male), row(U.female, P.female), row(U.social, P.social), row(U.spiritual, P.spiritual), row(T.purposes.planetary[0], P.planetary)),
+    h('ul', { class: 'pyth__lines' }, row(T.purposes.sky[0], P.sky, 'B D'), row(T.purposes.earth[0], P.earth, 'A C'), row(T.purposes.personal[0], P.personal, 'B A D C'),
+      row(U.male, P.male, 'F Y'), row(U.female, P.female, 'G K'), row(U.social, P.social, 'F G Y K'), row(U.spiritual, P.spiritual, 'A B C D F G Y K'), row(T.purposes.planetary[0], P.planetary, 'A B C D F G Y K')),
     cap(U.health),
     h('table', { class: 'mx__table' },
       h('tr', {}, h('th', {}, U.chakra), h('th', {}, U.body), h('th', {}, U.energy), h('th', {}, U.total)),
-      ...r.health.rows.map((x) => h('tr', {}, h('td', {}, T.chakras[x.id][0]), h('td', {}, String(x.body)), h('td', {}, String(x.energy)), h('td', {}, String(x.total)))),
+      ...r.health.rows.map((x) => h('tr', { 'data-keys': CHAKRA_KEYS[x.id] }, h('td', {}, T.chakras[x.id][0]), h('td', {}, String(x.body)), h('td', {}, String(x.energy)), h('td', {}, String(x.total)))),
       h('tr', { class: 'mx__sum' }, h('td', {}, U.sum), h('td', {}, String(t.body)), h('td', {}, String(t.energy)), h('td', {}, String(t.total)))),
-    decoding(r, T));
+    decoding(r, T)), pic);
 }
 
 /** Карточка «Матрица пары»: рисунок союза (точки двоих сложены), точки ромба, любовь и деньги, предназначения с формулой
@@ -139,17 +175,18 @@ export function pairCard(isoA, isoB, caption) {
   const pp = T.pair;
   const f = (label, formula) => `${label} (${formula})`;
   const items = [
-    ['center', U.center, p.E], ['a', pp.a[0], p.A], ['b', pp.b[0], p.B], ['c', pp.c[0], p.C], ['d', pp.d[0], p.D],
-    ['love', pp.love[0], lm.love], ['money', pp.money[0], lm.money],
-    ['sky', f(pp.sky[0], `${pp.skyF}: ${p.B} + ${p.D}`), P.sky], ['earth', f(pp.earth[0], `${pp.earthF}: ${p.A} + ${p.C}`), P.earth],
-    ['personal', f(pp.personal[0], pp.personalF), P.personal], ['social', f(pp.social[0], pp.socialF), P.social],
-    ['spiritual', f(pp.spiritual[0], pp.spiritualF), P.spiritual],
+    ['center', U.center, p.E, 'E'], ['a', pp.a[0], p.A, 'A'], ['b', pp.b[0], p.B, 'B'], ['c', pp.c[0], p.C, 'C'], ['d', pp.d[0], p.D, 'D'],
+    ['love', pp.love[0], lm.love, 'd2 love bal'], ['money', pp.money[0], lm.money, 'c2 money bal'],
+    ['sky', f(pp.sky[0], `${pp.skyF}: ${p.B} + ${p.D}`), P.sky, 'B D'], ['earth', f(pp.earth[0], `${pp.earthF}: ${p.A} + ${p.C}`), P.earth, 'A C'],
+    ['personal', f(pp.personal[0], pp.personalF), P.personal, 'B A D C'], ['social', f(pp.social[0], pp.socialF), P.social, 'F G Y K'],
+    ['spiritual', f(pp.spiritual[0], pp.spiritualF), P.spiritual, 'A B C D F G Y K'],
   ];
-  return h('section', { class: 'card mx' },
+  const pic = drawing(r, T);
+  return wire(h('section', { class: 'card mx' },
     h('h2', { class: 'card__title' }, U.pairTitle),
     h('p', { class: 'chart__src' }, caption),
     h('p', { class: 'faint' }, pp.lead),
-    drawing(r, T),
-    h('ul', { class: 'pyth__lines' }, ...items.map(([, label, n]) => row(label, n))),
-    fold(U.pairDecoding, ...items.map(([k, label, n]) => arcanaBlock(T, label, n, pp[k][1]))));
+    pic,
+    h('ul', { class: 'pyth__lines' }, ...items.map(([, label, n, keys]) => row(label, n, keys))),
+    fold(U.pairDecoding, ...items.map(([k, label, n]) => arcanaBlock(T, label, n, pp[k][1])))), pic);
 }
