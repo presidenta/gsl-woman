@@ -78,7 +78,21 @@ function drawing(r, T) {
   const p = r.points;
   const R = r.rays;
   const svg = el('svg', { viewBox: '0 0 300 300', class: 'mx__svg', role: 'img', 'aria-label': T.ui.aria });
-  svg.append(el('rect', { x: 60, y: 60, width: 180, height: 180, class: 'mx__line' }), el('polygon', { points: '150,22 278,150 150,278 22,150', class: 'mx__line' }));
+  /* Геометрия по образцу владельца (27.11.2026: «как на рисунке — линии диагональные, цифры на своих уровнях, круг,
+     наружные круги соединить»): восемь наружных точек на радиусе 128 (А, Б, В, Г — по сторонам света, род — по углам);
+     второе число луча стоит ровно на стороне второго квадрата (радиус 90), третье — посередине (64), ближние к центру —
+     на внутреннем круге (38), который их ограничивает. */
+  const O = 150;
+  const DIR = { a: [-1, 0], b: [0, -1], c: [1, 0], d: [0, 1], f: [-1, -1], g: [1, -1], y: [1, 1], k: [-1, 1] };
+  const pos = (k, rad) => { const [dx, dy] = DIR[k]; const n = Math.hypot(dx, dy); return [O + (dx / n) * rad, O + (dy / n) * rad]; };
+  const RING = [128, 90, 64, 38];
+  const outer = ['a', 'f', 'b', 'g', 'c', 'y', 'd', 'k'].map((k) => pos(k, RING[0]).join(',')).join(' ');
+  svg.append(
+    el('polygon', { points: outer, class: 'mx__line' }), // наружный восьмиугольник через все внешние кружки
+    el('polygon', { points: ['f', 'g', 'y', 'k'].map((k) => pos(k, RING[0]).join(',')).join(' '), class: 'mx__line' }), // квадрат рода
+    el('polygon', { points: ['b', 'c', 'd', 'a'].map((k) => pos(k, RING[0]).join(',')).join(' '), class: 'mx__line' }), // ромб А–Б–В–Г
+    ...Object.keys(DIR).map((k) => { const [x, y] = pos(k, RING[0]); return el('line', { x1: x, y1: y, x2: O, y2: O, class: 'mx__line' }); }), // лучи
+    el('circle', { cx: O, cy: O, r: RING[3], class: 'mx__line mx__ring' })); // внутренний круг
   const at = {}; // ключ точки → [x, y, кружок]
   let id = '';
   const dot = (x, y, v, big) => {
@@ -88,22 +102,19 @@ function drawing(r, T) {
   };
   const named = (key, ...a) => { id = key; dot(...a); };
   // А слева, Б сверху, В справа, Г снизу, Д в центре; род — углы квадрата
-  [['A', 22, 150], ['B', 150, 22], ['C', 278, 150], ['D', 150, 278], ['E', 150, 150],
-    ['F', 60, 60], ['G', 240, 60], ['Y', 240, 240], ['K', 60, 240]].forEach(([k, x, y]) => named(k, x, y, p[k], true));
-  // к центру: X1 у края, X2, X3 у центра
-  const steps = [0.27, 0.5, 0.73];
-  // стороны и диагонали рода — по три точки к центру (у диагоналей — две)
-  [['f', 60, 60], ['g', 240, 60], ['y', 240, 240], ['k', 60, 240]].forEach(([k, x, y]) =>
-    [R[k].x1, R[k].x2].forEach((v, i) => named(`${k}${i + 1}`, x + (150 - x) * [0.27, 0.7][i], y + (150 - y) * [0.27, 0.7][i], v, false)));
+  [['A', 'a'], ['B', 'b'], ['C', 'c'], ['D', 'd'], ['F', 'f'], ['G', 'g'], ['Y', 'y'], ['K', 'k']].forEach(([K, k]) => named(K, ...pos(k, RING[0]), p[K], true));
+  named('E', O, O, p.E, true);
+  // род (диагонали): первое число — на стороне ромба, второе — на внутреннем круге
+  ['f', 'g', 'y', 'k'].forEach((k) => [R[k].x1, R[k].x2].forEach((v, i) => named(`${k}${i + 1}`, ...pos(k, [RING[1], RING[3]][i]), v, false)));
   // канал любви и денег — на стороне от В (справа) к Г (низ): ♥ ближе к низу, $ ближе к правому краю, Х посередине
   const lm = r.loveMoney;
   // кружки не налегают на точки диагонали Ы (владелец 27.11.2026: «11 и 19 накладываются»): канал — поперёк диагонали,
   // точка баланса — между её точками, $ — к В, ♥ — к Г
   svg.append(el('line', { x1: 226, y1: 166, x2: 166, y2: 226, class: 'mx__line mx__line--dash' }));
-  [['bal', 196, 196, lm.balance], ['money', 220, 172, lm.money], ['love', 172, 220, lm.love]].forEach(([k, x, y, v]) => named(k, x, y, v, false));
+  [['bal', 196, 196, lm.balance], ['money', 219, 173, lm.money], ['love', 173, 219, lm.love]].forEach(([k, x, y, v]) => named(k, x, y, v, false));
   svg.append(el('text', { x: 240, y: 182, class: 'mx__sign' }, '$'), el('text', { x: 182, y: 244, class: 'mx__sign' }, '♥'));
-  [['a', 22, 150], ['b', 150, 22], ['c', 278, 150], ['d', 150, 278]].forEach(([k, x, y]) =>
-    [R[k].x1, R[k].x2, R[k].x3].forEach((v, i) => named(`${k}${i + 1}`, x + (150 - x) * steps[i], y + (150 - y) * steps[i], v, false)));
+  // стороны: первое число — на стороне квадрата рода, второе — посередине, третье — на внутреннем круге
+  ['a', 'b', 'c', 'd'].forEach((k) => [R[k].x1, R[k].x2, R[k].x3].forEach((v, i) => named(`${k}${i + 1}`, ...pos(k, RING[i + 1]), v, false)));
   // Подсветка (владелец 27.11.2026: «нажимаешь на цифры — подсвечивается, откуда они берутся, в самой матрице»)
   const path = el('polyline', { class: 'mx__path' });
   svg.insertBefore(path, svg.querySelector('circle')); // линия под кружками — числа видны
