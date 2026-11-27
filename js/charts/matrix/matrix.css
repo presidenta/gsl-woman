@@ -22,3 +22,4 @@
 .hd__per--both { stroke-dasharray: 3 3; }
 .hd__g { fill: var(--c-text-dim); font: 600 6px var(--f-body, sans-serif); text-anchor: middle; paint-order: stroke; stroke: #111; stroke-width: 2px; }
 .hd__g.is-on { fill: var(--c-gold); font-weight: 800; }
+.mx__line--dash { stroke-dasharray: 4 3; }

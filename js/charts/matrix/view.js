@@ -84,11 +84,14 @@ function drawing(r, T) {
   const steps = [0.27, 0.5, 0.73];
   // стороны и диагонали рода — по три точки к центру (у диагоналей — две)
   [[60, 60, R.f], [240, 60, R.g], [240, 240, R.y], [60, 240, R.k]].forEach(([x, y, q]) =>
-    [q.x1, q.x2].forEach((v, i) => dot(x + (150 - x) * [0.33, 0.62][i], y + (150 - y) * [0.33, 0.62][i], v, false)));
+    [q.x1, q.x2].forEach((v, i) => dot(x + (150 - x) * [0.27, 0.7][i], y + (150 - y) * [0.27, 0.7][i], v, false)));
   // канал любви и денег — на стороне от В (справа) к Г (низ): ♥ ближе к низу, $ ближе к правому краю, Х посередине
   const lm = r.loveMoney;
-  [[214, 214, lm.balance], [238, 190, lm.money], [190, 238, lm.love]].forEach(([x, y, v]) => dot(x, y, v, false));
-  svg.append(el('text', { x: 252, y: 180, class: 'mx__sign' }, '$'), el('text', { x: 176, y: 258, class: 'mx__sign' }, '♥'));
+  // кружки не налегают на точки диагонали Ы (владелец 27.11.2026: «11 и 19 накладываются»): канал — поперёк диагонали,
+  // точка баланса — между её точками, $ — к В, ♥ — к Г
+  svg.append(el('line', { x1: 226, y1: 166, x2: 166, y2: 226, class: 'mx__line mx__line--dash' }));
+  [[196, 196, lm.balance], [220, 172, lm.money], [172, 220, lm.love]].forEach(([x, y, v]) => dot(x, y, v, false));
+  svg.append(el('text', { x: 240, y: 182, class: 'mx__sign' }, '$'), el('text', { x: 182, y: 244, class: 'mx__sign' }, '♥'));
   [[22, 150, R.a], [150, 22, R.b], [278, 150, R.c], [150, 278, R.d]].forEach(([x, y, q]) =>
     [q.x1, q.x2, q.x3].forEach((v, i) => dot(x + (150 - x) * steps[i], y + (150 - y) * steps[i], v, false)));
   return svg;
@@ -122,22 +125,31 @@ export function matrixCard(iso, caption = null) {
     decoding(r, T));
 }
 
-/** Карточка «Матрица пары»: центр пары и предназначения союза с расшифровкой. */
+/** Карточка «Матрица пары»: рисунок союза (точки двоих сложены), точки ромба, любовь и деньги, предназначения с формулой
+   (владелец 27.11.2026: «Небо пары 5» рядом с «17» наверху путало — Небо пары = верх + низ, подписано), полная расшифровка
+   каждой точки по всем сферам. */
 export function pairCard(isoA, isoB, caption) {
   const r = pairMatrix(isoA, isoB);
   if (!r) return null;
   const T = TX();
   const U = T.ui;
+  const p = r.points;
   const P = r.purposes;
+  const lm = r.loveMoney;
   const pp = T.pair;
+  const f = (label, formula) => `${label} (${formula})`;
+  const items = [
+    ['center', U.center, p.E], ['a', pp.a[0], p.A], ['b', pp.b[0], p.B], ['c', pp.c[0], p.C], ['d', pp.d[0], p.D],
+    ['love', pp.love[0], lm.love], ['money', pp.money[0], lm.money],
+    ['sky', f(pp.sky[0], `${pp.skyF}: ${p.B} + ${p.D}`), P.sky], ['earth', f(pp.earth[0], `${pp.earthF}: ${p.A} + ${p.C}`), P.earth],
+    ['personal', f(pp.personal[0], pp.personalF), P.personal], ['social', f(pp.social[0], pp.socialF), P.social],
+    ['spiritual', f(pp.spiritual[0], pp.spiritualF), P.spiritual],
+  ];
   return h('section', { class: 'card mx' },
     h('h2', { class: 'card__title' }, U.pairTitle),
     h('p', { class: 'chart__src' }, caption),
-    drawing(r, T), // рисунок матрицы союза (владелец 27.11.2026: «обязательно рисовать, что получилось у двоих»)
-    h('ul', { class: 'pyth__lines' }, row(U.center, r.points.E), row(pp.sky[0], P.sky), row(pp.earth[0], P.earth), row(U.personal, P.personal),
-      row(U.pairSocial, P.social), row(U.pairSpiritual, P.spiritual)),
-    fold(U.pairDecoding,
-      h('p', { class: 'faint' }, pp.lead),
-      ...[['center', r.points.E], ['sky', P.sky], ['earth', P.earth], ['personal', P.personal], ['social', P.social], ['spiritual', P.spiritual]]
-        .map(([k, n]) => arcanaBlock(T, pp[k][0], n, pp[k][1]))));
+    h('p', { class: 'faint' }, pp.lead),
+    drawing(r, T),
+    h('ul', { class: 'pyth__lines' }, ...items.map(([, label, n]) => row(label, n))),
+    fold(U.pairDecoding, ...items.map(([k, label, n]) => arcanaBlock(T, label, n, pp[k][1]))));
 }

@@ -86,6 +86,14 @@ export default {
   },
   healthNote: 'Columns: physical — the body, energy — strength and state, total — emotions and the overall background. The minus of the arcana in a row hints at which area to pay attention to. These are themes for self-care, not a diagnosis: if you feel unwell, see a doctor.',
   pair: {
+    // Points of the couple's diamond and the love/money channel (owner 27.11.2026, Ladini compatibility charts)
+    a: ['The couple’s calling card (left)', 'How people see you as a couple: the impression you make together.'],
+    b: ['The couple’s inspiration (top)', 'The union’s highest motivation: what inspires you and moves you forward.'],
+    c: ['The couple’s task (right)', 'What the union is learning: what the two of you need to work through in life.'],
+    d: ['The couple’s karmic tasks (bottom)', 'Lessons the couple brings from past experience: what you need to go through and work off together.'],
+    love: ['How to behave in the relationship', 'The couple’s love channel: what strengthens your relationship and where it is vulnerable.'],
+    money: ['Shared finances', 'The couple’s money channel: how to handle money together.'],
+    skyF: 'top + bottom', earthF: 'left + right', personalF: 'Sky + Earth', socialF: 'male + female line of the family', spiritualF: 'Union + Social',
     lead: 'The points of two matrices are added: the result is a third matrix — the union itself, with its own character and task.',
     center: ['Centre of the couple', 'The union’s comfort zone: the state in which the couple feels good together.'],
     sky: ['Sky of the couple', 'What the couple is to grow in spiritually together.'],

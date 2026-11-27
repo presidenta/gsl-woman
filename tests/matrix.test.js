@@ -33,3 +33,10 @@ test('матрица пары: точки складываются и сводя
   assert.ok(p.rays.a.x1 && p.loveMoney.love && p.lines.father.length === 7, 'у пары всё для рисунка: лучи, род, любовь/деньги');
   assert.equal(pairMatrix('x', '1990-10-26'), null);
 });
+
+test('пара 26.10.1981 + 28.07.1986: лево 18, верх 17, право 7, низ 15, центр 21; Небо пары = верх + низ = 5', () => {
+  // 26.10.1981: А 8 (26→8), Б 10, В 19, Г 10, Д 11; 28.07.1986: А 10 (28→10), Б 7, В 6 (24→6), Г 5, Д 10
+  const p = pairMatrix('1981-10-26', '1986-07-28');
+  assert.deepEqual([p.points.A, p.points.B, p.points.C, p.points.D, p.points.E], [18, 17, 7, 15, 21]);
+  assert.equal(p.purposes.sky, 5);
+});
