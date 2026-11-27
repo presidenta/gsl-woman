@@ -1,4 +1,5 @@
 import { h } from '../../core/dom.js';
+import { bodygraph } from './bodygraph.js'; // рисунок по образцу: силуэт, плавные каналы, планеты по бокам (226)
 import { zonedToUtc, chart, composite, PAIR_KINDS, CENTERS, BODIES, CHANNELS } from './calc.js';
 import { crossKey } from './crosses.js';
 import { TX, crossName } from './texts/index.js'; // тексты на языке приложения (218)
@@ -52,61 +53,6 @@ function decoding(r, T) {
 /* Карточка «Human Design»: тип, авторитет, профиль, крест, центры, каналы, активации Личности и Дизайна. Нужны дата, время
    и город с часовым поясом (подсказка города в анкете). Библиотека астрономии (astronomy.js, ~400 КБ) грузится только
    здесь, когда карточку открыли, — запуск приложения не тяжелеет. */
-const NS = 'http://www.w3.org/2000/svg';
-function el(tag, attrs, text) {
-  const n = document.createElementNS(NS, tag);
-  for (const [k, v] of Object.entries(attrs)) n.setAttribute(k, v);
-  if (text != null) n.textContent = text;
-  return n;
-}
-// Центры бодиграфа: [x, y, форма]; ▲ — треугольник вершиной вверх, ▼ — вниз, ◀/▶ — вбок, ■ — квадрат, ◆ — ромб
-const POS = { Head: [100, 22, 'up'], Ajna: [100, 64, 'down'], Throat: [100, 108, 'sq'], G: [100, 152, 'dia'], Heart: [140, 168, 'up'],
-  Spleen: [34, 206, 'right'], Sacral: [100, 216, 'sq'], SolarPlexus: [166, 206, 'left'], Root: [100, 270, 'sq'] };
-function shape([x, y, f], s = 17) {
-  const pts = { up: [[x, y - s], [x + s, y + s * 0.8], [x - s, y + s * 0.8]], down: [[x - s, y - s * 0.8], [x + s, y - s * 0.8], [x, y + s]],
-    left: [[x + s, y - s], [x + s, y + s], [x - s, y]], right: [[x - s, y - s], [x - s, y + s], [x + s, y]],
-    dia: [[x, y - s], [x + s, y], [x, y + s], [x - s, y]], sq: [[x - s, y - s], [x + s, y - s], [x + s, y + s], [x - s, y + s]] }[f];
-  return pts.map((p) => p.join(',')).join(' ');
-}
-/** Бодиграф (владелец 26.11.2026, по образцу): канал — две половины, каждая по своим воротам: Личность — светлая,
-    Дизайн — красная, обе — полосой; ворот нет — бледная. Целый канал — обе половины цветные, «висящие» ворота — одна.
-    Несколько каналов между одной парой центров разведены; номера ворот — у центров, активные — золотом. */
-function bodygraph(r, CH, T) {
-  const svg = el('svg', { viewBox: '0 0 200 300', class: 'hd__body', role: 'img', 'aria-label': T.ui.bodygraph });
-  const pg = new Set(Object.values(r.personality).map((x) => x.gate));
-  const dg = new Set(Object.values(r.design).map((x) => x.gate));
-  const pairs = {};
-  CH.forEach((c) => { const k = [c[2], c[3]].sort().join(); (pairs[k] ||= []).push(c); });
-  const half = (x1, y1, x2, y2, g) => {
-    const p = pg.has(g), d = dg.has(g);
-    if (!p && !d) { svg.append(el('line', { x1, y1, x2, y2, class: 'hd__off' })); return; }
-    if (d) svg.append(el('line', { x1, y1, x2, y2, class: 'hd__des' }));
-    if (p) svg.append(el('line', { x1, y1, x2, y2, class: d ? 'hd__per hd__per--both' : 'hd__per' }));
-  };
-  const labels = [];
-  for (const list of Object.values(pairs)) {
-    list.forEach(([a, b, c1, c2], i) => {
-      const [x1, y1] = POS[c1]; const [x2, y2] = POS[c2];
-      const len = Math.hypot(x2 - x1, y2 - y1) || 1;
-      const o = (i - (list.length - 1) / 2) * 6;
-      const ox = (-(y2 - y1) / len) * o, oy = ((x2 - x1) / len) * o;
-      const sx = x1 + ox, sy = y1 + oy, ex = x2 + ox, ey = y2 + oy, mx = (sx + ex) / 2, my = (sy + ey) / 2;
-      half(sx, sy, mx, my, a);
-      half(mx, my, ex, ey, b);
-      // номер ворот — на линии у своего центра
-      labels.push([sx + (ex - sx) * 0.24, sy + (ey - sy) * 0.24, a], [sx + (ex - sx) * 0.76, sy + (ey - sy) * 0.76, b]);
-    });
-  }
-  for (const [c, p] of Object.entries(POS)) {
-    svg.append(el('polygon', { points: shape(p), class: `hd__c${r.defined.includes(c) ? ' is-on' : ''}` }), el('text', { x: p[0], y: p[1] + 3, class: 'hd__cn' }, T.centers[c].short));
-  }
-  for (const [x, y, g] of labels) {
-    const on = pg.has(g) || dg.has(g);
-    svg.append(el('text', { x, y: y + 2, class: `hd__g${on ? ' is-on' : ''}` }, String(g)));
-  }
-  return svg;
-}
-
 export function hdCard({ date, time, city, caption = null }) {
   const T = TX();
   const U = T.ui;
@@ -157,7 +103,7 @@ export function pairHdCard(a, b, caption) {
     const all = (r) => Object.fromEntries([...Object.values(r.personality), ...Object.values(r.design)].map((x, i) => [i, x]));
     const view = { personality: all(ra), design: all(rb), defined: c.defined, channels: c.channels.map((x) => x.id) };
     body.replaceChildren(
-      bodygraph(view, CHANNELS, T),
+      bodygraph(view, CHANNELS, T, { cols: false }),
       h('p', { class: 'faint' }, U.pairLegend),
       h('ul', { class: 'pyth__lines' }, row(U.pairType, T.types[c.type].name), row(U.you, T.types[ra.type].name), row(U.partner, T.types[rb.type].name)),
       h('p', {}, h('b', {}, U.commonCenters), centerList(T, c.defined)),

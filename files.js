@@ -226,6 +226,7 @@ self.GSL_FILES = [
   './js/chakra-check/score.js',
   './js/chakra-check/texts.js',
   './js/charts/hd/astronomy.js',
+  './js/charts/hd/bodygraph.js',
   './js/charts/hd/calc.js',
   './js/charts/hd/crosses.js',
   './js/charts/hd/texts/en.js',
