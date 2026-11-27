@@ -1,0 +1,33 @@
+/* PLACE “CENTRE” (E) — build 230, translation of ru.js, same keys. */
+export default {
+  ui: {
+    title: 'Centre (E) — the main number of the matrix',
+    lead: 'The centre is the core of character and the comfort zone: the state in which a person feels good and where they return for strength.',
+    power: 'Where they draw strength:',
+    work: 'Suitable work:',
+  },
+  text: {
+    1: 'Magician: they draw strength and gain energy when they learn something new, in pioneering. In travel. In being able to open up and believe in the wonderful protection of higher powers in their destiny.',
+    2: 'Harmony: a contemplative state. Meditative trust in the world. Contact with nature, animals, water. When they are in the flow of unity with the Universe, unity with the whole world.',
+    3: 'Mistress of the house: in a state of order and structure. Surrounded by beautiful, quality things. Try to see yourself in meditation sitting on a throne in a huge hall, in majestic royal clothes, with jewels and a sceptre in your hand, with many people around bowing to you — you are their queen. The soul should be in a state of abundance: the Earth is fertile, there is enough for everyone, and there will certainly be enough for you. You may enjoy sorting through jewellery. If a man has 3 in the comfort zone, he draws strength in the company of women (the more women, the better), when his inner man and inner woman are in harmony, when he understands what women want — men with 3 are the only ones who know it. It is very important for such a man to consciously develop the energy of arcanum 4, the masculine one.',
+    4: 'Energy of the master, of power: men draw strength from order and structure. From responsibility, from the feeling of caring for the whole world. From the state in which you know you can always help those close to you, when you are that strong shoulder people can lean on. Women with 4 feel at ease in the company of men and like being under the protection of a male leader. And it is very important for such women to consciously work with the energy of arcanum 3 — to be strong in a feminine way.',
+    5: 'Energy of the teacher, of “law”: they draw strength from learning and passing on knowledge (speaking to an audience, showing the gift of eloquence). When they are recognised as an authority. When they write and publish books.',
+    6: 'Energy of relationships: they get energy from communication. Doing what they love. Watching beauty. They love being sincerely praised: they bask in the energy of adoration and love. Hosting guests, the feeling of celebration and beauty. It is very important to learn to feel and accept the love of God, of the Universe — knowing “I am loved” fills them with energy.',
+    7: 'Energy of movement, “the winner”: they get energy from moving towards a goal, from dynamics, from the triumph of victory. Travel, active rest, driving a car. Team sports — and winning. It is important to learn relaxation and meditation: the body also needs rest and comfort.',
+    8: 'Divine justice, balance: they get energy when they are in balance. When they understand everything and accept the law of cause and effect.',
+    9: 'Wisdom, healing: they draw strength from solitude. They simply need personal space: it is in solitude that the sage’s most intimate thoughts and insights come. Do not disturb them when they want to be alone — when they are ready, they will come out themselves. Time in nature also gives them strength.',
+    10: 'Flow of luck: they get energy when they fit into a happy flow, from the drive of the flow. When they feel the Universe carrying them in its arms. When they are in a team of like-minded people.',
+    11: 'Energy of potential and strength: from work they love and from positivity. It is important to do what you love or love what you do. They also get energy from the satisfaction of doing what others cannot — from realising “yes, I can do it!”. So it is important to learn to relax: the body also needs comfort and rest.',
+    12: 'Energy of “new vision”, mission and service: in the novelty of knowledge, in contact with higher powers. Experiment here — your place of power may well seem strange to others. Travel, active rest.',
+    13: 'Energy of rebirth: draws strength from extreme states, between life and death. Or from giving life to old things — restoration and the like.',
+    14: 'Energy of the mature soul, healing, art: draws strength from love. In creativity — music, drawing.',
+    15: 'Energy of temptation and earthly pleasures: draws strength from working on their inner flaws. The strength of inner radiance, the strength of one’s own inner work.',
+    16: 'Energy of spiritual awakening: from the state of unity with God. Living in awareness, living life in the moment, “here and now”.',
+    17: 'Energy of the “star” and creativity: in union with God, when the channels are open to Heaven.',
+    18: 'Energy of the Moon, “the hidden”: from their intuition, mysticism, belief in miracles, knowledge of the laws of energy.',
+    19: 'Energy of the Sun: draws strength from public activity. The Sun needs to shine, but if it shines on one spot, it turns it into a desert, so it is important to find a wide field of activity to shine on everyone a little.',
+    20: 'Energy of clairvoyance, clear knowing, connection with the family line and ancestors: they draw strength from their connection with the family line. When they work through ancestral tasks. From contact with teachers and angels.',
+    21: 'Energy of the Universe: they draw strength from peacemaking and global projects. From the feeling that the whole world is helping them. They care about the whole planet — in meditations for healing the planet.',
+    22: 'Energy of supreme spiritual freedom: they draw strength from the feeling of freedom and union with God.',
+  },
+};

@@ -7,10 +7,18 @@ import tailEn from './tail/en.js';
 import workRu from './work/ru.js';
 import workUa from './work/ua.js';
 import workEn from './work/en.js';
+import centerRu from './center/ru.js';
+import centerUa from './center/ua.js';
+import centerEn from './center/en.js';
+import codesRu from './codes/ru.js';
+import codesUa from './codes/ua.js';
+import codesEn from './codes/en.js';
 
 export const PLACES = {
   tail: { ru: tailRu, ua: tailUa, en: tailEn }, // кармический хвост: Г2 · Г1 · Г
   work: { ru: workRu, ua: workUa, en: workEn }, // работа: третья сверху, Б2
+  center: { ru: centerRu, ua: centerUa, en: centerEn }, // центр Д: где черпает силы (230)
+  codes: { ru: codesRu, ua: codesUa, en: codesEn }, // полное описание аркана из PDF — для центра и выдержек (230)
 };
 /** Тексты места на языке приложения: PL('tail').text[n]. */
 export const PL = (place) => pick(PLACES[place]);

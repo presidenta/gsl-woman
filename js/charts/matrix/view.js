@@ -36,6 +36,20 @@ function tailBlock(T, tail) {
     ...tail.map((n) => h('div', {}, h('p', {}, h('b', {}, short(T, n))), para(X.ui.past, X.text[n].past), para(X.ui.how, X.text[n].how))));
 }
 
+/** Центр (Д) — главная цифра матрицы (владелец 27.11.2026: «то, что там есть, и ещё полное описание аркана»): где черпает
+   силы (ячейка center) + полное описание аркана (ячейка codes: описание, рекомендации, над чем работать) + занятия (work). */
+function centerBlock(T, n) {
+  const C = PL('center');
+  const X = PL('codes');
+  const W = PL('work');
+  const A = X.text[n];
+  return h('div', { class: 'chart__item' }, h('p', { class: 'caps' }, `${C.ui.title}: ${short(T, n)}`), h('p', { class: 'faint' }, C.ui.lead),
+    para(C.ui.power, C.text[n]),
+    h('p', {}, h('b', {}, `${X.ui.title}: ${A.title}`)),
+    h('p', {}, h('b', {}, X.ui.about)), ...A.about.map((t) => h('p', {}, t)),
+    para(X.ui.recs, A.recs), para(X.ui.minus, A.minus), para(C.ui.work, W.text[n]));
+}
+
 /** Работа — третья цифра сверху (Б2): только текст о работе (ячейка places/work, 229). */
 function workBlock(n) {
   const X = PL('work');
@@ -53,8 +67,9 @@ function decoding(r, T) {
   const pur = (k) => arcanaBlock(T, T.purposes[k][0], P[k], T.purposes[k][1]);
   return fold(U.decoding,
     h('p', { class: 'faint' }, T.source),
+    centerBlock(T, p.E), // центр — первым и полностью (230)
     cap(U.mainPoints),
-    ...['A', 'B', 'C', 'D', 'E'].map((k) => arcanaBlock(T, T.points[k][0], p[k], T.points[k][1])),
+    ...['A', 'B', 'C', 'D'].map((k) => arcanaBlock(T, T.points[k][0], p[k], T.points[k][1])),
     cap(U.purposes),
     ...['personal', 'sky', 'earth', 'social', 'spiritual', 'planetary'].map(pur),
     cap(U.rodCap),

@@ -114,7 +114,7 @@ test('экран: подписи всех ролей на трёх языках'
 
 // Тексты по местам матрицы (229): у каждой ячейки три языка с одинаковыми ключами и текст для всех 22 чисел
 import { PLACES } from '../js/charts/matrix/places/index.js';
-test('Матрица, места: хвост и работа — 22 числа, ru / ua / en одинаковы', () => {
+test('Матрица, места: хвост, работа, центр, полное описание — 22 числа, ru / ua / en одинаковы', () => {
   for (const [name, sets] of Object.entries(PLACES)) {
     sameKeys(sets, `место ${name}`);
     for (let n = 1; n <= 22; n++) assert.ok(sets.ru.text[n], `${name}: нет числа ${n}`);
