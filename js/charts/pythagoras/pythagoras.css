@@ -1,5 +1,5 @@
 /* Квадрат Пифагора (js/charts/pythagoras/) */
-.pyth__grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; margin: var(--sp-3) 0; }
+.pyth__grid { position: relative; display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; margin: var(--sp-3) 0; }
 .pyth__cell { display: grid; gap: 2px; place-items: center; min-height: 72px; padding: 6px; border: 1px solid var(--c-line); border-radius: var(--r-md); text-align: center; }
 .pyth__cell.is-empty { opacity: .55; }
 .pyth__digits { color: var(--c-gold); font-size: var(--fs-lg, 1.25rem); font-weight: 700; letter-spacing: .04em; word-break: break-all; }
@@ -21,3 +21,13 @@
 .charts__del { flex: none; width: 36px; height: 36px; border: 1px solid var(--c-line); border-radius: 50%; background: none; color: var(--c-text-dim); font-size: 1rem; cursor: pointer; }
 .charts__head { display: flex; align-items: center; justify-content: space-between; gap: var(--sp-2); }
 .charts__back { margin-bottom: var(--sp-2); }
+/* Итоги линий — два столбика, число сразу за названием; наведение/касание подсвечивает клетки и линию (220) */
+.pyth__sums { margin: 0; padding: 0; list-style: none; display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: repeat(4, auto); grid-auto-flow: column; gap: 4px var(--sp-2); margin-bottom: var(--sp-3); }
+.pyth__sums li { display: flex; align-items: baseline; gap: 6px; padding: 4px 6px; border-radius: var(--r-sm, 6px); font-size: var(--fs-xs, .8rem); line-height: 1.25; cursor: pointer; }
+.pyth__sums b { color: var(--c-gold); font-size: var(--fs-sm); }
+.pyth__sums li.is-on, .pyth__sums li:hover { background: rgba(255, 215, 120, .12); }
+.pyth__cell { transition: opacity .15s, border-color .15s, background .15s; }
+.pyth__grid.is-tracing .pyth__cell { opacity: .35; }
+.pyth__grid.is-tracing .pyth__cell.is-lit { opacity: 1; border-color: var(--c-gold); background: rgba(255, 215, 120, .1); }
+.pyth__over { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+.pyth__path { fill: none; stroke: var(--c-gold); stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; opacity: .85; }
