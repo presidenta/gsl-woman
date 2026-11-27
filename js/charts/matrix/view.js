@@ -4,6 +4,9 @@ import { TX } from './texts/index.js'; // тексты на языке прил�
 const fold = (title, ...body) => h('details', { class: 'help__folder' }, h('summary', { class: 'help__folder-summary' }, h('span', { class: 'help__folder-title' }, title)), h('div', { class: 'help__folder-body' }, ...body));
 const para = (b, t) => (t ? h('p', {}, h('b', {}, b), ' ', t) : null);
 const cap = (t) => h('h3', { class: 'caps mx__cap' }, t);
+/* Раздел под рисунком — свёрнут (владелец 27.11.2026: «экран короткий, не видно, откуда цифры»); открыт только один,
+   поэтому числа всегда рядом с рисунком. */
+const sec = (title, ...body) => h('details', { class: 'help__folder', name: 'mx-sec' }, h('summary', { class: 'help__folder-summary' }, h('span', { class: 'help__folder-title' }, title)), h('div', { class: 'help__folder-body' }, ...body));
 const row = (n, v, keys = null) => h('li', keys ? { 'data-keys': keys, tabindex: '0' } : {}, h('span', {}, n), h('b', {}, String(v)));
 const low = (s) => s.charAt(0).toLowerCase() + s.slice(1);
 
@@ -144,20 +147,16 @@ export function matrixCard(iso, caption = null) {
     h('h2', { class: 'card__title' }, U.title),
     caption ? h('p', { class: 'chart__src' }, caption) : null,
     pic,
-    cap(U.rod),
-    h('ul', { class: 'pyth__lines' },
+    sec(U.rod, h('ul', { class: 'pyth__lines' },
       row(`${U.father}: ${r.lines.father.join(' – ')}`, r.lines.fatherSum, 'F f1 f2 E y2 y1 Y'),
-      row(`${U.mother}: ${r.lines.mother.join(' – ')}`, r.lines.motherSum, 'G g1 g2 E k2 k1 K')),
-    cap(U.loveMoney),
-    h('ul', { class: 'pyth__lines' }, row(U.love, r.loveMoney.love, 'd2 love bal'), row(U.money, r.loveMoney.money, 'c2 money bal'), row(U.balance, r.loveMoney.balance, 'c2 bal d2')),
-    cap(U.purposes),
-    h('ul', { class: 'pyth__lines' }, row(T.purposes.sky[0], P.sky, 'B D'), row(T.purposes.earth[0], P.earth, 'A C'), row(T.purposes.personal[0], P.personal, 'B A D C'),
-      row(U.male, P.male, 'F Y'), row(U.female, P.female, 'G K'), row(U.social, P.social, 'F G Y K'), row(U.spiritual, P.spiritual, 'A B C D F G Y K'), row(T.purposes.planetary[0], P.planetary, 'A B C D F G Y K')),
-    cap(U.health),
-    h('table', { class: 'mx__table' },
+      row(`${U.mother}: ${r.lines.mother.join(' – ')}`, r.lines.motherSum, 'G g1 g2 E k2 k1 K'))),
+    sec(U.loveMoney, h('ul', { class: 'pyth__lines' }, row(U.love, r.loveMoney.love, 'd2 love bal'), row(U.money, r.loveMoney.money, 'c2 money bal'), row(U.balance, r.loveMoney.balance, 'c2 bal d2'))),
+    sec(U.purposes, h('ul', { class: 'pyth__lines' }, row(T.purposes.sky[0], P.sky, 'B D'), row(T.purposes.earth[0], P.earth, 'A C'), row(T.purposes.personal[0], P.personal, 'B A D C'),
+      row(U.male, P.male, 'F Y'), row(U.female, P.female, 'G K'), row(U.social, P.social, 'F G Y K'), row(U.spiritual, P.spiritual, 'A B C D F G Y K'), row(T.purposes.planetary[0], P.planetary, 'A B C D F G Y K'))),
+    sec(U.health, h('table', { class: 'mx__table' },
       h('tr', {}, h('th', {}, U.chakra), h('th', {}, U.body), h('th', {}, U.energy), h('th', {}, U.total)),
       ...r.health.rows.map((x) => h('tr', { 'data-keys': CHAKRA_KEYS[x.id] }, h('td', {}, T.chakras[x.id][0]), h('td', {}, String(x.body)), h('td', {}, String(x.energy)), h('td', {}, String(x.total)))),
-      h('tr', { class: 'mx__sum' }, h('td', {}, U.sum), h('td', {}, String(t.body)), h('td', {}, String(t.energy)), h('td', {}, String(t.total)))),
+      h('tr', { class: 'mx__sum' }, h('td', {}, U.sum), h('td', {}, String(t.body)), h('td', {}, String(t.energy)), h('td', {}, String(t.total))))),
     decoding(r, T)), pic);
 }
 
@@ -187,6 +186,7 @@ export function pairCard(isoA, isoB, caption) {
     h('p', { class: 'chart__src' }, caption),
     h('p', { class: 'faint' }, pp.lead),
     pic,
-    h('ul', { class: 'pyth__lines' }, ...items.map(([, label, n, keys]) => row(label, n, keys))),
+    ...[[U.mainPoints, 0, 5], [U.loveMoney, 5, 7], [U.purposes, 7, 12]].map(([title, from, to]) =>
+      sec(title, h('ul', { class: 'pyth__lines' }, ...items.slice(from, to).map(([, label, n, keys]) => row(label, n, keys))))),
     fold(U.pairDecoding, ...items.map(([k, label, n]) => arcanaBlock(T, label, n, pp[k][1])))), pic);
 }
