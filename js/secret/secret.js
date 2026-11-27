@@ -60,7 +60,7 @@ export function secretCard(ctx) {
   return foldCard({
     id: `secret-${n}`,
     cls: 'secret-card',
-    icon: icons.journal,
+    icon: icons.sealed,
     above: stamp(sec.stamp),
     title: `${sec.title} · ${st('chapter', { n })}`,
     lead: sec.book,
@@ -92,7 +92,7 @@ export function secretPlate(ctx) {
     return h('p', { class: 'secret__locked' }, stamp(sec.stamp), h('span', {}, `${st('chapter', { n: i + 1 })} · ${ch.chakra} — ${d == null ? st('notYet') : d <= 1 ? st('closedTomorrow') : st('closed', { d })}`));
   });
   return platePanel({
-    icon: icons.journal,
+    icon: icons.sealed,
     stamp: sec.stamp,
     title: sec.title,
     lead: n ? st('of', { n }) : st('notYet'),

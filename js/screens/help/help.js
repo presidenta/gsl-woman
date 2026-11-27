@@ -27,7 +27,7 @@ const entriesOf = (g) => [...(g.entries || []), ...(g.sections || []).flatMap((s
 const count = (n, unit) => (unit && n ? `${n} ${plural(n, `plural.${unit}`)}` : null);
 
 // Значок каждого пункта — свой, вид один
-const ITEM_ICON = { redline: 'flag', questions: 'chat', surveys: 'check', her: 'heart', words: 'heart', kpk: 'crown', authors: 'journal', energy: 'journal', gestalt: 'journal', types: 'rings', topics: 'rings', rules: 'home', dates: 'calendar', compliments: 'sparkle', notfit: 'flag' };
+const ITEM_ICON = { redline: 'flag', questions: 'chat', surveys: 'check', her: 'heart', words: 'heart', kpk: 'crown', authors: 'journal', energy: 'journal', gestalt: 'journal', types: 'rings', topics: 'rings', rules: 'home', dates: 'calendar', compliments: 'wink', notfit: 'flag' };
 
 /* Книжечка «Библиотеки» (energy, сервер gsl/energy/, 22.11.2026) — текст как в книге: list — вид списка ('ul' — точки,
    'plain' — абзацы; иначе номера), sub — вложенный список под пунктом, after — абзац после списка. */

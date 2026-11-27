@@ -7,6 +7,11 @@
   box-sizing: border-box;
 }
 
+/* Подмигивающий смайлик «Комплиментов» (icons.wink): правый глаз раз в несколько секунд закрывается */
+.icon-wink { transform-box: fill-box; transform-origin: center; animation: icon-wink 4.5s ease-in-out infinite; }
+@keyframes icon-wink { 0%, 86%, 100% { transform: scaleY(1); } 90%, 94% { transform: scaleY(0.12); } }
+@media (prefers-reduced-motion: reduce) { .icon-wink { animation: none; } }
+
 html {
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;

@@ -199,7 +199,7 @@ export function render(view, ctx) {
     complimentsPlate(ctx),
     libraryPlate(),
     // «Карты рождения» (#/charts, 26.11.2026): Пифагор, Матрица Ладини, Human Design — для себя, партнёра, детей
-    plateLink({ href: '#/charts', icon: icons.sparkle, title: 'Разбор по дате рождения', lead: 'Твоя роль в паре и в жизни · Пифагор, Матрица Ладини, Human Design' }),
+    plateLink({ href: '#/charts', icon: icons.natal, title: 'Разбор по дате рождения', lead: 'Твоя роль в паре и в жизни · Пифагор, Матрица Ладини, Human Design' }),
     // «Секретные материалы» — главы книги о чакрах (js/secret/): с 172 здесь, а не в «Тайном архиве» (владелец 22.11.2026:
     // «две книжки одинаковых в одном разделе — нелогично»; целиком книга — в архиве)
     secretPlate(ctx),
@@ -259,7 +259,8 @@ function meetPlate(ctx) {
 }
 
 function helpPlate(scene) {
-  return plateLink({ href: `#/help?${scene}`, icon: icons.chat, title: t(`help.${scene}Title`), lead: t(`help.${scene}Lead`) });
+  // Свой значок у каждой: первое свидание — облачко с вопросом, для пары — два облачка (владелец 27.11.2026)
+  return plateLink({ href: `#/help?${scene}`, icon: scene === 'pair' ? icons.chats : icons.chatAsk, title: t(`help.${scene}Title`), lead: t(`help.${scene}Lead`) });
 }
 
 // Комплименты — те же, что были в «Помощи»; плашка раскрывается прямо здесь (itemPlate из screens/help/)
@@ -280,7 +281,7 @@ function surveysPlate(ctx) {
 }
 
 function libraryPlate() {
-  return plateLink({ href: '#/library', icon: icons.journal, title: t('library.title'), lead: t('library.lead') });
+  return plateLink({ href: '#/library', icon: icons.archive, title: t('library.title'), lead: t('library.lead') });
 }
 
 function lettersPlate(ctx) {
