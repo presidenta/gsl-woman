@@ -15,3 +15,9 @@
 .chart__item .caps { color: var(--c-gold); }
 .charts__group-title { margin: 0 0 6px; color: var(--c-gold); }
 .charts__sub { margin: 0 0 var(--sp-3); color: var(--c-text-dim); }
+.charts__person { display: flex; align-items: center; gap: var(--sp-2); }
+.charts__person + .charts__person { margin-top: 6px; }
+.charts__open { flex: 1; display: flex; justify-content: space-between; gap: var(--sp-2); padding: 10px 12px; border: 1px solid var(--c-line); border-radius: var(--r-md); background: none; color: inherit; font: inherit; text-align: left; cursor: pointer; }
+.charts__del { flex: none; width: 36px; height: 36px; border: 1px solid var(--c-line); border-radius: 50%; background: none; color: var(--c-text-dim); font-size: 1rem; cursor: pointer; }
+.charts__head { display: flex; align-items: center; justify-content: space-between; gap: var(--sp-2); }
+.charts__back { margin-bottom: var(--sp-2); }

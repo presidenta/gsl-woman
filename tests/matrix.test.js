@@ -30,5 +30,6 @@ test('карта здоровья: Сахасрара — А|Б, Муладха�
 test('матрица пары: точки складываются и сводятся', () => {
   const p = pairMatrix('1990-05-17', '1990-10-26');
   assert.equal(p.points.A, r22(17 + 8));
+  assert.ok(p.rays.a.x1 && p.loveMoney.love && p.lines.father.length === 7, 'у пары всё для рисунка: лучи, род, любовь/деньги');
   assert.equal(pairMatrix('x', '1990-10-26'), null);
 });

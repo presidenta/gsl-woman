@@ -133,6 +133,7 @@ export function pairCard(isoA, isoB, caption) {
   return h('section', { class: 'card mx' },
     h('h2', { class: 'card__title' }, U.pairTitle),
     h('p', { class: 'chart__src' }, caption),
+    drawing(r, T), // рисунок матрицы союза (владелец 27.11.2026: «обязательно рисовать, что получилось у двоих»)
     h('ul', { class: 'pyth__lines' }, row(U.center, r.points.E), row(pp.sky[0], P.sky), row(pp.earth[0], P.earth), row(U.personal, P.personal),
       row(U.pairSocial, P.social), row(U.pairSpiritual, P.spiritual)),
     fold(U.pairDecoding,

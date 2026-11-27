@@ -14,9 +14,13 @@ export function matrix(iso) {
   if (!m) return null;
   const A = r22(Number(m[3])), B = r22(Number(m[2])), C = r22(ds(m[1]));
   const D = r22(A + B + C), E = r22(A + B + C + D);
+  return build({ A, B, C, D, E, F: r22(A + B), G: r22(B + C), Y: r22(C + D), K: r22(D + A) });
+}
+
+/** Всё остальное — от девяти точек: так же строится и матрица пары (точки двоих сложены), чтобы её можно было нарисовать. */
+function build({ A, B, C, D, E, F, G, Y, K }) {
   const ray = (x) => { const x2 = r22(x + E); return { x1: r22(x + x2), x2, x3: r22(x2 + E) }; };
   const a = ray(A), b = ray(B), c = ray(C), d = ray(D);
-  const F = r22(A + B), G = r22(B + C), Y = r22(C + D), K = r22(D + A);
   // Диагонали рода (владелец 26.11.2026): отцовская Ф → Ы (слева сверху вниз направо), материнская Ш → К; к центру — как у сторон
   const f = ray(F), g = ray(G), y = ray(Y), k = ray(K);
   const sky = r22(B + D), earth = r22(A + C), personal = r22(sky + earth);
@@ -47,8 +51,6 @@ export function pairMatrix(isoA, isoB) {
   const a = matrix(isoA);
   const b = matrix(isoB);
   if (!a || !b) return null;
-  const P = Object.fromEntries(Object.keys(a.points).map((k) => [k, r22(a.points[k] + b.points[k])]));
-  const sky = r22(P.B + P.D), earth = r22(P.A + P.C), personal = r22(sky + earth);
-  const social = r22(r22(P.F + P.Y) + r22(P.G + P.K));
-  return { points: P, purposes: { sky, earth, personal, social, spiritual: r22(personal + social) } };
+  // Каждая точка пары — сумма точек двоих (сведена к 22); лучи, род, любовь/деньги — от них, как у одного человека
+  return build(Object.fromEntries(Object.keys(a.points).map((k) => [k, r22(a.points[k] + b.points[k])])));
 }
