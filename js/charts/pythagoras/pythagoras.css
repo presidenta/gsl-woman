@@ -24,7 +24,7 @@
 /* Итоги линий — два столбика, число сразу за названием; наведение/касание подсвечивает клетки и линию (220) */
 .pyth__sums { margin: 0; padding: 0; list-style: none; display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: repeat(4, auto); grid-auto-flow: column; gap: 4px var(--sp-2); margin-bottom: var(--sp-3); }
 .pyth__sums li { display: flex; align-items: baseline; gap: 6px; padding: 4px 6px; border-radius: var(--r-sm, 6px); font-size: var(--fs-xs, .8rem); line-height: 1.25; cursor: pointer; }
-.pyth__sums b { color: var(--c-gold); font-size: var(--fs-sm); }
+.pyth__sums b { flex: none; color: var(--c-gold); font-size: var(--fs-sm); white-space: nowrap; }
 .pyth__sums li.is-on, .pyth__sums li:hover { background: rgba(255, 215, 120, .12); }
 .pyth__cell { transition: opacity .15s, border-color .15s, background .15s; }
 .pyth__grid.is-tracing .pyth__cell { opacity: .35; }
