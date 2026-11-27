@@ -491,6 +491,8 @@ self.GSL_FILES = [
   './js/water/water-log.js',
   './js/water/water.css',
   './js/water/water.js',
+  './js/zoom/zoom.css',
+  './js/zoom/zoom.js',
   './manifest.webmanifest',
   './styles/base.css',
   './styles/components/ask.css',

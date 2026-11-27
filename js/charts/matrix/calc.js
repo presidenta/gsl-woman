@@ -30,6 +30,15 @@ function build({ A, B, C, D, E, F, G, Y, K }) {
     ['Сахасрара', A, B, 'sahasrara'], ['Аджна', a.x1, b.x1, 'ajna'], ['Вишудха', a.x2, b.x2, 'vishuddha'], ['Анахата', a.x3, b.x3, 'anahata'],
     ['Манипура', E, E, 'manipura'], ['Свадхистана', c.x2, d.x2, 'svadhisthana'], ['Муладхара', C, D, 'muladhara'],
   ].map(([name, body, energy, id]) => ({ id, name, body, energy, total: r22(body + energy) })); // id — ключ текстов (texts/*.js → chakras)
+  /* Круг возрастов (235, по образцу владельца): восемь наружных точек — 0, 10, … 70 лет от А по часовой; между соседними
+     X (возраст n) и Y (n+10) — семь чисел: 5 лет = X+Y, 2,5 = X+(5), 1,25 = X+(2,5), 3,75 = (2,5)+(5), 7,5 = (5)+Y,
+     6,25 = (5)+(7,5), 8,75 = (7,5)+Y. Порядок в массиве — по возрасту. */
+  const main = [A, F, B, G, C, Y, D, K];
+  const ages = main.map((x, i) => {
+    const yv = main[(i + 1) % 8];
+    const m = r22(x + yv), q2 = r22(x + m), q6 = r22(m + yv);
+    return [r22(x + q2), q2, r22(q2 + m), m, r22(m + q6), q6, r22(q6 + yv)];
+  });
   const sumBody = r22(rows.reduce((s, r) => s + r.body, 0));
   const sumEnergy = r22(rows.reduce((s, r) => s + r.energy, 0));
   return {
@@ -43,6 +52,7 @@ function build({ A, B, C, D, E, F, G, Y, K }) {
     // Канал любви и денег (нижний правый сектор, между В2 и Г2): точка баланса Х = В2+Г2, Деньги = В2+Х, Любовь = Г2+Х
     loveMoney: (() => { const x = r22(c.x2 + d.x2); return { balance: x, money: r22(c.x2 + x), love: r22(d.x2 + x) }; })(),
     health: { rows, total: { body: sumBody, energy: sumEnergy, total: r22(sumBody + sumEnergy) } },
+    ages, // круг возрастов: ages[i] — семь чисел между точкой i (i·10 лет) и следующей
   };
 }
 

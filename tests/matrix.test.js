@@ -40,3 +40,12 @@ test('пара 26.10.1981 + 28.07.1986: лево 18, верх 17, право 7, 
   assert.deepEqual([p.points.A, p.points.B, p.points.C, p.points.D, p.points.E], [18, 17, 7, 15, 21]);
   assert.equal(p.purposes.sky, 5);
 });
+
+test('круг возрастов (235): 8 отрезков по 7 чисел; образец владельца 01.03.2017 — от 0 до 10 лет', () => {
+  const r = matrix('2017-03-01');
+  assert.deepEqual([r.points.A, r.points.B, r.points.C, r.points.D, r.points.E], [1, 3, 10, 14, 10]);
+  // А 1 → Ф 4: 5 лет = 1+4, 2,5 = 1+5, 1,25 = 1+6, 3,75 = 6+5, 7,5 = 5+4, 6,25 = 5+9, 8,75 = 9+4
+  assert.deepEqual(r.ages[0], [7, 6, 11, 5, 14, 9, 13]);
+  assert.equal(r.ages.length, 8);
+  r.ages.forEach((a) => { assert.equal(a.length, 7); a.forEach((n) => assert.ok(n >= 1 && n <= 22)); });
+});

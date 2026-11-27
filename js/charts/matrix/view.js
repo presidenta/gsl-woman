@@ -1,6 +1,7 @@
 import { h } from '../../core/dom.js';
 import { matrix, pairMatrix } from './calc.js';
 import { TX } from './texts/index.js';
+import { openZoom } from '../../zoom/zoom.js'; // рисунок на весь экран с увеличением (235)
 import { PL } from './places/index.js'; // тексты по местам матрицы: хвост, работа… (229) // тексты на языке приложения (218)
 const fold = (title, ...body) => h('details', { class: 'help__folder' }, h('summary', { class: 'help__folder-summary' }, h('span', { class: 'help__folder-title' }, title)), h('div', { class: 'help__folder-body' }, ...body));
 const para = (b, t) => (t ? h('p', {}, h('b', {}, b), ' ', t) : null);
@@ -142,10 +143,45 @@ function el(tag, attrs, text) {
   return n;
 }
 
-function drawing(r, T) {
+/* Цвета чакр по образцу владельца (28.11.2026: «цветные кружочки, те, что по краям, как тут, а остальные оставь как
+   есть»): сверху и слева от края к центру — фиолетовый, синий, голубой, зелёный; центр — жёлтый; справа и снизу — красный
+   на краю и оранжевый рядом с ним. */
+const DOT_COLOR = {
+  A: 'violet', B: 'violet', a1: 'blue', b1: 'blue', a2: 'sky', b2: 'sky', a3: 'green', b3: 'green',
+  E: 'yellow', c1: 'orange', d1: 'orange', C: 'red', D: 'red',
+};
+// Возраст на круге: семь чисел между точками, подписи как на образце (1–2,5 … 8,5–9), к ним прибавляется десяток
+const AGE_STEPS = [[1, 2.5], [2.5, 3.5], [3.5, 4], [5], [6, 7.5], [7.5, 8.5], [8.5, 9]];
+
+/** Круг возрастов вокруг матрицы (владелец 28.11.2026: «обязательно внешний круг с годами жизни»): у восьми наружных
+    точек — «0 лет», «10 лет»…; между ними — семь чисел (calc.js → ages) и их возраст, подписанный вдоль радиуса. */
+function ageRing(svg, r, T, O) {
+  const RL = 147; // линия круга — сразу за наружными кружками (их край — 143)
+  const at = (deg, rad) => [O + rad * Math.cos(deg * Math.PI / 180), O + rad * Math.sin(deg * Math.PI / 180)];
+  const fmt = (v) => String(v).replace('.', T.ui.dec);
+  svg.append(el('circle', { cx: O, cy: O, r: RL, class: 'mx__line mx__age-ring' }));
+  r.ages.forEach((nums, i) => {
+    const base = 180 + 45 * i; // А слева (0 лет), дальше по часовой — каждые 45° десять лет
+    const [lx, ly] = at(base, 172);
+    svg.append(el('text', { x: lx, y: ly + 3, class: 'mx__age-main' }, T.ages[i]));
+    nums.forEach((v, j) => {
+      const deg = base + 45 * (j + 1) / 8;
+      const [nx, ny] = at(deg, 155);
+      svg.append(el('text', { x: nx, y: ny + 2.5, class: 'mx__age-num' }, String(v)));
+      const label = AGE_STEPS[j].map((a) => fmt(a + 10 * i)).join('–');
+      const flip = Math.cos(deg * Math.PI / 180) < 0; // левая половина — текст не вверх ногами
+      const [ax, ay] = at(deg, 162);
+      svg.append(el('text', { x: ax, y: ay, class: 'mx__age-yr', 'text-anchor': flip ? 'end' : 'start', 'dominant-baseline': 'middle',
+        transform: `rotate(${flip ? deg + 180 : deg} ${ax} ${ay})` }, label));
+    });
+  });
+}
+
+function drawing(r, T, { ring = false } = {}) {
   const p = r.points;
   const R = r.rays;
-  const svg = el('svg', { viewBox: '0 0 300 300', class: 'mx__svg', role: 'img', 'aria-label': T.ui.aria });
+  // с кругом возрастов поле шире: подписи лет выходят за наружные точки
+  const svg = el('svg', { viewBox: ring ? '-38 -38 376 376' : '0 0 300 300', class: 'mx__svg', role: 'img', 'aria-label': T.ui.aria });
   /* Геометрия по образцу владельца (27.11.2026: «как на рисунке — линии диагональные, цифры на своих уровнях, круг,
      наружные круги соединить»): восемь наружных точек на радиусе 128 (А, Б, В, Г — по сторонам света, род — по углам);
      второе число луча стоит ровно на стороне второго квадрата (радиус 90), третье — посередине (64), ближние к центру —
@@ -161,12 +197,14 @@ function drawing(r, T) {
     el('polygon', { points: ['b', 'c', 'd', 'a'].map((k) => pos(k, RING[0]).join(',')).join(' '), class: 'mx__line' }), // ромб А–Б–В–Г
     ...Object.keys(DIR).map((k) => { const [x, y] = pos(k, RING[0]); return el('line', { x1: x, y1: y, x2: O, y2: O, class: 'mx__line' }); }), // лучи
     el('circle', { cx: O, cy: O, r: RING[3], class: 'mx__line mx__ring' })); // внутренний круг
+  if (ring) ageRing(svg, r, T, O);
   const at = {}; // ключ точки → [x, y, кружок]
   let id = '';
   const dot = (x, y, v, big) => {
-    const c = el('circle', { cx: x, cy: y, r: big ? 15 : 11, class: big ? 'mx__dot mx__dot--big' : 'mx__dot' });
+    const col = DOT_COLOR[id];
+    const c = el('circle', { cx: x, cy: y, r: big ? 15 : 11, class: `mx__dot${big ? ' mx__dot--big' : ''}${col ? ` mx__dot--${col}` : ''}` });
     at[id] = [x, y, c];
-    svg.append(c, el('text', { x, y: y + 4, class: 'mx__num' }, String(v)));
+    svg.append(c, el('text', { x, y: y + 4, class: `mx__num${col ? ` mx__num--${col === 'yellow' ? 'dark' : 'light'}` : ''}` }, String(v)));
   };
   const named = (key, ...a) => { id = key; dot(...a); };
   // А слева, Б сверху, В справа, Г снизу, Д в центре; род — углы квадрата
@@ -206,12 +244,24 @@ function wire(card, svg) {
     node?.classList.add('is-on');
     svg.light(node ? node.dataset.keys.split(' ') : null);
   };
+  // Раздел свернули (или открыли другой — прежний закрывается сам) — рисунок возвращается к начальному виду
+  // (владелец 28.11.2026: «выделение цифр, чтобы забиралось после того, как закрывается раздел»)
+  card.querySelectorAll('details').forEach((d) => d.addEventListener('toggle', () => { if (!d.open && active && d.contains(active)) show(null); }));
   card.querySelectorAll('[data-keys]').forEach((n) => {
     n.addEventListener('pointerenter', (e) => { if (e.pointerType === 'mouse') show(n); });
     n.addEventListener('pointerleave', (e) => { if (e.pointerType === 'mouse' && active === n) show(null); });
     n.addEventListener('click', () => show(active === n ? null : n));
   });
   return card;
+}
+
+/** Рисунок + кнопка «Увеличить рисунок»: касание рисунка или кнопки — на весь экран, там растянуть пальцами
+    (владелец 28.11.2026: «возможность увеличивать картинку, если не видит, какая цифра в круге»). */
+function zoomable(pic, T) {
+  const open = () => openZoom(pic.cloneNode(true));
+  pic.classList.add('mx__svg--zoom');
+  pic.addEventListener('click', open);
+  return h('div', { class: 'mx__pic' }, pic, h('button', { type: 'button', class: 'mx__zoom', onclick: open }, T.ui.zoom));
 }
 
 export function matrixCard(iso, caption = null) {
@@ -221,11 +271,11 @@ export function matrixCard(iso, caption = null) {
   const U = T.ui;
   const P = r.purposes;
   const t = r.health.total;
-  const pic = drawing(r, T);
+  const pic = drawing(r, T, { ring: true });
   return wire(h('section', { class: 'card mx' },
     h('h2', { class: 'card__title' }, U.title),
     caption ? h('p', { class: 'chart__src' }, caption) : null,
-    pic,
+    zoomable(pic, T),
     sec(U.rod, h('ul', { class: 'pyth__lines' },
       row(`${U.father}: ${r.lines.father.join(' – ')}`, r.lines.fatherSum, 'F f1 f2 E y2 y1 Y'),
       row(`${U.mother}: ${r.lines.mother.join(' – ')}`, r.lines.motherSum, 'G g1 g2 E k2 k1 K'))),
@@ -264,7 +314,7 @@ export function pairCard(isoA, isoB, caption) {
     h('h2', { class: 'card__title' }, U.pairTitle),
     h('p', { class: 'chart__src' }, caption),
     h('p', { class: 'faint' }, pp.lead),
-    pic,
+    zoomable(pic, T),
     ...[[U.mainPoints, 0, 5], [U.loveMoney, 5, 7], [U.purposes, 7, 12]].map(([title, from, to]) =>
       sec(title, h('ul', { class: 'pyth__lines' }, ...items.slice(from, to).map(([, label, n, keys]) => row(label, n, keys))))),
     fold(U.pairDecoding, ...items.map(([k, label, n]) => arcanaBlock(T, label, n, pp[k][1])))), pic);

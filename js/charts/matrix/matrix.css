@@ -31,3 +31,25 @@
 .mx__path { fill: none; stroke: var(--c-gold); stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; opacity: .85; pointer-events: none; }
 [data-keys] { cursor: pointer; border-radius: 6px; }
 [data-keys].is-on, li[data-keys]:hover, tr[data-keys]:hover { background: rgba(255, 215, 120, .12); }
+/* Цветные точки по чакрам (235, образец владельца): цвет — заливка кружка, число белое (на жёлтом — тёмное);
+   в подсветке цвет остаётся, обводка белая */
+.mx__dot--violet, .mx__dot--violet.is-lit { fill: #8e3fd6; }
+.mx__dot--blue, .mx__dot--blue.is-lit { fill: #2c63d8; }
+.mx__dot--sky, .mx__dot--sky.is-lit { fill: #1fa9dc; }
+.mx__dot--green, .mx__dot--green.is-lit { fill: #4fb53a; }
+.mx__dot--yellow, .mx__dot--yellow.is-lit { fill: #f1c232; }
+.mx__dot--orange, .mx__dot--orange.is-lit { fill: #f08a24; }
+.mx__dot--red, .mx__dot--red.is-lit { fill: #e0392f; }
+:is(.mx__dot--violet, .mx__dot--blue, .mx__dot--sky, .mx__dot--green, .mx__dot--yellow, .mx__dot--orange, .mx__dot--red).is-lit { stroke: #fff; }
+.mx__num--light { fill: #fff; }
+.mx__num--dark { fill: #1b1405; }
+/* Круг возрастов (235): линия, «N лет» золотом, числа между точками, возраст вдоль радиуса */
+.mx__age-ring { stroke: var(--c-gold, #d4af37); opacity: .55; }
+.mx__age-main { fill: var(--c-gold); font: 700 8px var(--f-body, sans-serif); text-anchor: middle; }
+.mx__age-num { fill: var(--c-text); font: 700 7px var(--f-body, sans-serif); text-anchor: middle; }
+.mx__age-yr { fill: var(--c-text-dim, #a89f8a); font: 500 4.4px var(--f-body, sans-serif); }
+/* Увеличение рисунка (235): касание рисунка или кнопки — на весь экран (js/zoom/) */
+.mx__pic { text-align: center; }
+.mx__svg { max-width: 400px; }
+.mx__svg--zoom { cursor: zoom-in; }
+.mx__zoom { margin: 0 auto var(--sp-3); padding: 6px 14px; border: 1px solid rgba(212, 175, 55, .45); border-radius: 999px; background: none; color: var(--c-gold); font: inherit; font-size: var(--fs-sm); }

@@ -106,6 +106,7 @@ export default {
     title: 'Destiny Matrix (Ladini)',
     pairTitle: 'Matrix of the couple (compatibility)',
     aria: 'Destiny Matrix',
+    zoom: 'Enlarge the chart', dec: '.', // кнопка увеличения рисунка и знак дробной части возраста на круге (235)
     rod: 'Family lines (diagonals)', father: 'Father’s', mother: 'Mother’s',
     loveMoney: 'Love and money', love: '♥ Love (relationship channel)', money: '$ Money (money channel)', balance: 'Balance point',
     purposes: 'Purposes', male: 'Male line (father’s)', female: 'Female line (mother’s)', social: 'Social', spiritual: 'Spiritual',

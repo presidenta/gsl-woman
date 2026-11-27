@@ -69,7 +69,7 @@ export function hdCard({ date, time, city, caption = null }) {
     body.replaceChildren(
       bodygraph(r, CHANNELS, T),
       h('ul', { class: 'pyth__lines' },
-        row(U.type, T.types[r.type].name), row(U.authority, T.authorities[r.authority].name), row(U.profile, r.profile),
+        row(U.type, T.types[r.type].name), row(U.authority, T.authorities[r.authority].name), row(U.profile, T.profiles[r.profile] ? `${r.profile} ${T.profiles[r.profile][0]}` : r.profile), // сразу с названием (владелец 28.11.2026: «1/3 — и название»)
         row(U.cross, `${r.cross[0]}/${r.cross[1]} | ${r.cross[2]}/${r.cross[3]}`)),
       cross ? h('p', { class: 'faint' }, cross) : null,
       h('h3', { class: 'caps mx__cap' }, U.centers),
