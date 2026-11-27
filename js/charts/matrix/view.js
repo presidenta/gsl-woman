@@ -1,53 +1,66 @@
 import { h } from '../../core/dom.js';
 import { matrix, pairMatrix } from './calc.js';
-import { ARCANA_DB, MATRIX_SOURCE, POINTS_DB, AGES, PURPOSES_DB, SPECIAL_DB, CHAKRAS_DB, HEALTH_NOTE } from './arcana.js'; // расшифровка по Ладини (216)
+import { TX } from './texts/index.js'; // тексты на языке приложения (218)
 const fold = (title, ...body) => h('details', { class: 'help__folder' }, h('summary', { class: 'help__folder-summary' }, h('span', { class: 'help__folder-title' }, title)), h('div', { class: 'help__folder-body' }, ...body));
 const para = (b, t) => (t ? h('p', {}, h('b', {}, b), ' ', t) : null);
 const cap = (t) => h('h3', { class: 'caps mx__cap' }, t);
+const row = (n, v) => h('li', {}, h('span', {}, n), h('b', {}, String(v)));
+const low = (s) => s.charAt(0).toLowerCase() + s.slice(1);
+
+/* Карточка «Матрица судьбы (Ладини)»: схема точек (SVG), род, любовь и деньги, предназначения, карта здоровья,
+   расшифровка. Тексты — texts/<язык>.js. */
+
 /** Аркан в позиции: что значит позиция (about), затем энергия — суть, плюс, минус, любовь, деньги, тело, как вывести в плюс. */
-function arcanaBlock(label, n, about = null) {
-  const x = ARCANA_DB[n];
+function arcanaBlock(T, label, n, about = null) {
+  const x = T.arcana[n];
+  const U = T.ui;
   return h('div', { class: 'chart__item' }, h('p', { class: 'caps' }, `${label}: ${n} — ${x.name}`), about ? h('p', { class: 'faint' }, about) : null,
-    para('Суть:', x.essence), para('В плюсе:', x.plus), para('В минусе:', x.minus), para('Любовь и семья:', x.love),
-    para('Деньги и дело:', x.money), para('Тело:', x.health), para('Как вывести в плюс:', x.howTo));
+    para(U.essence, x.essence), para(U.plus, x.plus), para(U.minus, x.minus), para(U.loveL, x.love),
+    para(U.moneyL, x.money), para(U.healthL, x.health), para(U.howTo, x.howTo));
 }
-const short = (n) => `${n} — ${ARCANA_DB[n].name}`;
+const short = (T, n) => `${n} — ${T.arcana[n].name}`;
+
+/** Кармический хвост «Г2-Г1-Г»: классическая программа, если есть, и минус/выход каждого аркана. */
+function tailBlock(T, tail) {
+  const U = T.ui;
+  const prog = T.tails[tail.join('-')];
+  return h('div', { class: 'chart__item' }, h('p', { class: 'caps' }, `${U.tail}: ${tail.join(' · ')}`), h('p', { class: 'faint' }, T.special.tail),
+    prog ? h('div', {}, h('p', {}, h('b', {}, `${U.program} «${prog[0]}»`)), para(U.was, prog[1]), para(U.task, prog[2])) : h('p', { class: 'faint' }, U.noProgram),
+    ...tail.map((n) => para(`${short(T, n)}:`, `${U.inMinus} ${low(T.arcana[n].minus)} ${U.way} ${low(T.arcana[n].howTo)}`)));
+}
 
 /** Расшифровка личной матрицы: главные точки, предназначения, род, любовь и деньги, хвост, таланты, возрасты, чакры. */
-function decoding(r) {
+function decoding(r, T) {
   const p = r.points;
   const P = r.purposes;
-  const tail = [p.D, r.rays.d.x1, r.rays.d.x2];
+  const U = T.ui;
+  const tail = [r.rays.d.x2, r.rays.d.x1, p.D]; // классическая запись Г2-Г1-Г
   const talents = [p.B, r.rays.b.x1, r.rays.b.x2];
-  return fold('Расшифровка арканов',
-    h('p', { class: 'faint' }, MATRIX_SOURCE),
-    cap('Главные точки'),
-    ...['A', 'B', 'C', 'D', 'E'].map((k) => arcanaBlock(POINTS_DB[k].label, p[k], POINTS_DB[k].meaning)),
-    cap('Предназначения'),
-    ...[['Личное предназначение', P.personal, PURPOSES_DB.personal], ['Небо', P.sky, PURPOSES_DB.sky], ['Земля', P.earth, PURPOSES_DB.earth],
-      ['Социальное предназначение', P.social, PURPOSES_DB.social], ['Духовное предназначение', P.spiritual, PURPOSES_DB.spiritual],
-      ['Планетарное', P.planetary, PURPOSES_DB.planetary]].map(([l, n, a]) => arcanaBlock(l, n, a)),
-    cap('Род'),
-    arcanaBlock('Отцовский род', P.male, PURPOSES_DB.male), arcanaBlock('Материнский род', P.female, PURPOSES_DB.female),
-    cap('Любовь и деньги'),
-    arcanaBlock('♥ Любовь', r.loveMoney.love, SPECIAL_DB.love), arcanaBlock('$ Деньги', r.loveMoney.money, SPECIAL_DB.money),
-    arcanaBlock('Точка баланса', r.loveMoney.balance, SPECIAL_DB.balance),
-    cap('Кармический хвост и таланты'),
-    h('div', { class: 'chart__item' }, h('p', { class: 'caps' }, `Кармический хвост: ${tail.join(' · ')}`), h('p', { class: 'faint' }, SPECIAL_DB.tail),
-      ...tail.map((n) => para(`${short(n)}:`, `в минусе — ${ARCANA_DB[n].minus.charAt(0).toLowerCase()}${ARCANA_DB[n].minus.slice(1)} Выход — ${ARCANA_DB[n].howTo.charAt(0).toLowerCase()}${ARCANA_DB[n].howTo.slice(1)}`))),
-    h('div', { class: 'chart__item' }, h('p', { class: 'caps' }, `Линия талантов: ${talents.join(' · ')}`), h('p', { class: 'faint' }, SPECIAL_DB.talents),
-      ...talents.map((n) => para(`${short(n)}:`, ARCANA_DB[n].plus))),
-    cap('Возрасты'),
-    h('p', { class: 'faint' }, 'Круг Ладини: каждая точка — энергия, которая ярче всего звучит в этом возрасте (от точки до следующей — 10 лет).'),
-    h('ul', { class: 'pyth__lines' }, ...AGES.map(([age, k]) => h('li', {}, h('span', {}, age), h('b', {}, short(p[k]))))),
-    cap('Карта здоровья'),
-    h('p', { class: 'faint' }, HEALTH_NOTE),
-    ...r.health.rows.map((x) => para(`${x.name} (итог ${short(x.total)}):`, CHAKRAS_DB[x.name])));
+  const ageKeys = ['A', 'F', 'B', 'G', 'C', 'Y', 'D', 'K']; // круг Ладини: от А по часовой, каждые 10 лет
+  const pur = (k) => arcanaBlock(T, T.purposes[k][0], P[k], T.purposes[k][1]);
+  return fold(U.decoding,
+    h('p', { class: 'faint' }, T.source),
+    cap(U.mainPoints),
+    ...['A', 'B', 'C', 'D', 'E'].map((k) => arcanaBlock(T, T.points[k][0], p[k], T.points[k][1])),
+    cap(U.purposes),
+    ...['personal', 'sky', 'earth', 'social', 'spiritual', 'planetary'].map(pur),
+    cap(U.rodCap),
+    pur('male'), pur('female'),
+    cap(U.loveMoney),
+    arcanaBlock(T, U.love, r.loveMoney.love, T.special.love), arcanaBlock(T, U.money, r.loveMoney.money, T.special.money),
+    arcanaBlock(T, U.balance, r.loveMoney.balance, T.special.balance),
+    cap(U.tailCap),
+    tailBlock(T, tail),
+    h('div', { class: 'chart__item' }, h('p', { class: 'caps' }, `${U.talents}: ${talents.join(' · ')}`), h('p', { class: 'faint' }, T.special.talents),
+      ...talents.map((n) => para(`${short(T, n)}:`, T.arcana[n].plus))),
+    cap(U.ages),
+    h('p', { class: 'faint' }, U.agesNote),
+    h('ul', { class: 'pyth__lines' }, ...ageKeys.map((k, i) => row(T.ages[i], short(T, p[k])))),
+    cap(U.health),
+    h('p', { class: 'faint' }, T.healthNote),
+    ...r.health.rows.map((x) => para(`${T.chakras[x.id][0]} (${U.agesTotal} ${short(T, x.total)}):`, T.chakras[x.id][1])));
 }
 
-
-/* Карточка «Матрица судьбы (Ладини)»: схема точек (SVG), предназначения, карта здоровья. Трактовки арканов — следующим
-   шагом. Стыковка — одна строка в screens/anketa/anketa.js. */
 const NS = 'http://www.w3.org/2000/svg';
 function el(tag, attrs, text) {
   const n = document.createElementNS(NS, tag);
@@ -56,10 +69,10 @@ function el(tag, attrs, text) {
   return n;
 }
 
-function drawing(r) {
+function drawing(r, T) {
   const p = r.points;
   const R = r.rays;
-  const svg = el('svg', { viewBox: '0 0 300 300', class: 'mx__svg', role: 'img', 'aria-label': 'Матрица судьбы' });
+  const svg = el('svg', { viewBox: '0 0 300 300', class: 'mx__svg', role: 'img', 'aria-label': T.ui.aria });
   svg.append(el('rect', { x: 60, y: 60, width: 180, height: 180, class: 'mx__line' }), el('polygon', { points: '150,22 278,150 150,278 22,150', class: 'mx__line' }));
   const dot = (x, y, v, big) => svg.append(
     el('circle', { cx: x, cy: y, r: big ? 15 : 11, class: big ? 'mx__dot mx__dot--big' : 'mx__dot' }),
@@ -84,48 +97,46 @@ function drawing(r) {
 export function matrixCard(iso, caption = null) {
   const r = matrix(iso);
   if (!r) return null;
+  const T = TX();
+  const U = T.ui;
   const P = r.purposes;
-  const purposes = [['Небо', P.sky], ['Земля', P.earth], ['Личное предназначение', P.personal], ['Мужской род (отцовский)', P.male],
-    ['Женский род (материнский)', P.female], ['Социальное', P.social], ['Духовное', P.spiritual], ['Планетарное', P.planetary]];
   const t = r.health.total;
   return h('section', { class: 'card mx' },
-    h('h2', { class: 'card__title' }, 'Матрица судьбы (Ладини)'),
+    h('h2', { class: 'card__title' }, U.title),
     caption ? h('p', { class: 'chart__src' }, caption) : null,
-    drawing(r),
-    h('h3', { class: 'caps mx__cap' }, 'Линии рода (диагонали)'),
+    drawing(r, T),
+    cap(U.rod),
     h('ul', { class: 'pyth__lines' },
-      h('li', {}, h('span', {}, `Отцовская: ${r.lines.father.join(' – ')}`), h('b', {}, String(r.lines.fatherSum))),
-      h('li', {}, h('span', {}, `Материнская: ${r.lines.mother.join(' – ')}`), h('b', {}, String(r.lines.motherSum)))),
-    h('h3', { class: 'caps mx__cap' }, 'Любовь и деньги'),
-    h('ul', { class: 'pyth__lines' }, h('li', {}, h('span', {}, '♥ Любовь (канал отношений)'), h('b', {}, String(r.loveMoney.love))),
-      h('li', {}, h('span', {}, '$ Деньги (денежный канал)'), h('b', {}, String(r.loveMoney.money))),
-      h('li', {}, h('span', {}, 'Точка баланса'), h('b', {}, String(r.loveMoney.balance)))),
-    h('h3', { class: 'caps mx__cap' }, 'Предназначения'),
-    h('ul', { class: 'pyth__lines' }, ...purposes.map(([n, v]) => h('li', {}, h('span', {}, n), h('b', {}, String(v))))),
-    h('h3', { class: 'caps mx__cap' }, 'Карта здоровья'),
+      row(`${U.father}: ${r.lines.father.join(' – ')}`, r.lines.fatherSum),
+      row(`${U.mother}: ${r.lines.mother.join(' – ')}`, r.lines.motherSum)),
+    cap(U.loveMoney),
+    h('ul', { class: 'pyth__lines' }, row(U.love, r.loveMoney.love), row(U.money, r.loveMoney.money), row(U.balance, r.loveMoney.balance)),
+    cap(U.purposes),
+    h('ul', { class: 'pyth__lines' }, row(T.purposes.sky[0], P.sky), row(T.purposes.earth[0], P.earth), row(T.purposes.personal[0], P.personal),
+      row(U.male, P.male), row(U.female, P.female), row(U.social, P.social), row(U.spiritual, P.spiritual), row(T.purposes.planetary[0], P.planetary)),
+    cap(U.health),
     h('table', { class: 'mx__table' },
-      h('tr', {}, h('th', {}, 'Чакра'), h('th', {}, 'Физика'), h('th', {}, 'Энергия'), h('th', {}, 'Итог')),
-      ...r.health.rows.map((x) => h('tr', {}, h('td', {}, x.name), h('td', {}, String(x.body)), h('td', {}, String(x.energy)), h('td', {}, String(x.total)))),
-      h('tr', { class: 'mx__sum' }, h('td', {}, 'Итого'), h('td', {}, String(t.body)), h('td', {}, String(t.energy)), h('td', {}, String(t.total)))),
-    decoding(r));
+      h('tr', {}, h('th', {}, U.chakra), h('th', {}, U.body), h('th', {}, U.energy), h('th', {}, U.total)),
+      ...r.health.rows.map((x) => h('tr', {}, h('td', {}, T.chakras[x.id][0]), h('td', {}, String(x.body)), h('td', {}, String(x.energy)), h('td', {}, String(x.total)))),
+      h('tr', { class: 'mx__sum' }, h('td', {}, U.sum), h('td', {}, String(t.body)), h('td', {}, String(t.energy)), h('td', {}, String(t.total)))),
+    decoding(r, T));
 }
 
 /** Карточка «Матрица пары»: центр пары и предназначения союза с расшифровкой. */
 export function pairCard(isoA, isoB, caption) {
   const r = pairMatrix(isoA, isoB);
   if (!r) return null;
+  const T = TX();
+  const U = T.ui;
   const P = r.purposes;
+  const pp = T.pair;
   return h('section', { class: 'card mx' },
-    h('h2', { class: 'card__title' }, 'Матрица пары (совместимость)'),
+    h('h2', { class: 'card__title' }, U.pairTitle),
     h('p', { class: 'chart__src' }, caption),
-    h('ul', { class: 'pyth__lines' }, ...[['Центр пары', r.points.E], ['Небо пары', P.sky], ['Земля пары', P.earth], ['Личное предназначение союза', P.personal],
-      ['Социальное', P.social], ['Духовное', P.spiritual]].map(([n, v]) => h('li', {}, h('span', {}, n), h('b', {}, String(v))))),
-    fold('Расшифровка',
-      h('p', { class: 'faint' }, 'Точки двух матриц складываются: получается третья матрица — сам союз, со своим характером и задачей.'),
-      arcanaBlock('Центр пары', r.points.E, 'Зона комфорта союза: состояние, в котором паре хорошо вместе.'),
-      arcanaBlock('Небо пары', P.sky, 'Чему паре расти вместе духовно.'),
-      arcanaBlock('Земля пары', P.earth, 'Что пара строит в материальном мире: дом, дело, деньги.'),
-      arcanaBlock('Предназначение союза', P.personal, 'Зачем эти двое встретились: главная общая задача.'),
-      arcanaBlock('Социальное предназначение пары', P.social, 'Что пара даёт людям, семье и роду.'),
-      arcanaBlock('Духовное предназначение пары', P.spiritual, 'Итог союза: мудрость, которую двое выносят вместе.')));
+    h('ul', { class: 'pyth__lines' }, row(U.center, r.points.E), row(pp.sky[0], P.sky), row(pp.earth[0], P.earth), row(U.personal, P.personal),
+      row(U.pairSocial, P.social), row(U.pairSpiritual, P.spiritual)),
+    fold(U.pairDecoding,
+      h('p', { class: 'faint' }, pp.lead),
+      ...[['center', r.points.E], ['sky', P.sky], ['earth', P.earth], ['personal', P.personal], ['social', P.social], ['spiritual', P.spiritual]]
+        .map(([k, n]) => arcanaBlock(T, pp[k][0], n, pp[k][1]))));
 }

@@ -1,0 +1,85 @@
+/* Надписи экрана «Разбор по дате рождения» (#/charts) и людей (js/charts/people.js) на трёх языках (сборка 218).
+   Язык — из <html lang> (js/charts/lang.js); ключи одинаковые, сверяет tests/charts-texts.test.js. */
+import { pick } from '../../charts/lang.js';
+
+const ru = {
+  title: 'Разбор по дате рождения',
+  sub: 'Твоя роль в паре и в жизни',
+  tileLead: 'Твоя роль в паре и в жизни · Пифагор, Матрица Ладини, Human Design',
+  intro: 'Квадрат Пифагора, Матрица судьбы (Ладини), Human Design. «Я» — данные из анкеты; добавь партнёра, партнёров по бизнесу, детей — расчёты сохраняются.',
+  me: 'Я',
+  enterData: 'Внеси свои данные рождения в настройках',
+  enterDataTail: ' («Про меня»).',
+  remove: 'Убрать этого человека',
+  removeAsk: 'Убрать «{name}»?',
+  add: '＋ Добавить человека',
+  name: 'Имя',
+  date: 'Дата рождения',
+  time: 'Время рождения (для Human Design)',
+  city: 'Город рождения',
+  tz: 'Часовой пояс города',
+  addBtn: 'Добавить и рассчитать',
+  noName: 'Без имени',
+  calcBy: 'Считаем по данным: ',
+  noDate: 'дата не указана',
+  roles: { partner: 'Партнёр', friend: 'Друг', business: 'Партнёр по бизнесу', family: 'Родные', child: 'Ребёнок', other: 'Другое' },
+  groups: { partner: 'Пара', friend: 'Друзья', business: 'Бизнес', family: 'Родные', child: 'Дети', other: 'Другие' },
+  with: { partner: 'пары', friend: 'в дружбе', business: 'в бизнесе', family: 'с родными', child: 'с ребёнком', other: 'вместе' },
+  pairPyth: 'Квадрат Пифагора', pairHd: 'Human Design', pairMatrix: 'Матрица судьбы',
+};
+
+const ua = {
+  title: 'Розбір за датою народження',
+  sub: 'Твоя роль у парі й у житті',
+  tileLead: 'Твоя роль у парі й у житті · Піфагор, Матриця Ладіні, Human Design',
+  intro: 'Квадрат Піфагора, Матриця долі (Ладіні), Human Design. «Я» — дані з анкети; додай партнера, партнерів у бізнесі, дітей — розрахунки зберігаються.',
+  me: 'Я',
+  enterData: 'Внеси свої дані народження в налаштуваннях',
+  enterDataTail: ' («Про мене»).',
+  remove: 'Прибрати цю людину',
+  removeAsk: 'Прибрати «{name}»?',
+  add: '＋ Додати людину',
+  name: 'Ім’я',
+  date: 'Дата народження',
+  time: 'Час народження (для Human Design)',
+  city: 'Місто народження',
+  tz: 'Часовий пояс міста',
+  addBtn: 'Додати й розрахувати',
+  noName: 'Без імені',
+  calcBy: 'Рахуємо за даними: ',
+  noDate: 'дату не вказано',
+  roles: { partner: 'Партнер', friend: 'Друг', business: 'Партнер у бізнесі', family: 'Рідні', child: 'Дитина', other: 'Інше' },
+  groups: { partner: 'Пара', friend: 'Друзі', business: 'Бізнес', family: 'Рідні', child: 'Діти', other: 'Інші' },
+  with: { partner: 'пари', friend: 'у дружбі', business: 'у бізнесі', family: 'з рідними', child: 'з дитиною', other: 'разом' },
+  pairPyth: 'Квадрат Піфагора', pairHd: 'Human Design', pairMatrix: 'Матриця долі',
+};
+
+const en = {
+  title: 'Reading by date of birth',
+  sub: 'Your role in a couple and in life',
+  tileLead: 'Your role in a couple and in life · Pythagoras, Ladini Matrix, Human Design',
+  intro: 'Pythagorean square, Destiny Matrix (Ladini), Human Design. “Me” uses your questionnaire data; add a partner, business partners, children — the calculations are saved.',
+  me: 'Me',
+  enterData: 'Enter your birth details in the settings',
+  enterDataTail: ' (“About me”).',
+  remove: 'Remove this person',
+  removeAsk: 'Remove “{name}”?',
+  add: '＋ Add a person',
+  name: 'Name',
+  date: 'Date of birth',
+  time: 'Time of birth (for Human Design)',
+  city: 'City of birth',
+  tz: 'City time zone',
+  addBtn: 'Add and calculate',
+  noName: 'No name',
+  calcBy: 'Calculated from: ',
+  noDate: 'no date given',
+  roles: { partner: 'Partner', friend: 'Friend', business: 'Business partner', family: 'Family', child: 'Child', other: 'Other' },
+  groups: { partner: 'Couple', friend: 'Friends', business: 'Business', family: 'Family', child: 'Children', other: 'Others' },
+  with: { partner: 'of the couple', friend: 'in friendship', business: 'in business', family: 'with family', child: 'with the child', other: 'together' },
+  pairPyth: 'Pythagorean square', pairHd: 'Human Design', pairMatrix: 'Destiny Matrix',
+};
+
+export const SETS = { ru, ua, en };
+/** Надписи текущего языка. */
+export const STX = () => pick(SETS);

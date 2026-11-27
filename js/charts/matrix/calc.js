@@ -23,9 +23,9 @@ export function matrix(iso) {
   const male = r22(F + Y), female = r22(G + K), social = r22(male + female);
   const spiritual = r22(personal + social), planetary = r22(social + spiritual);
   const rows = [
-    ['Сахасрара', A, B], ['Аджна', a.x1, b.x1], ['Вишудха', a.x2, b.x2], ['Анахата', a.x3, b.x3],
-    ['Манипура', E, E], ['Свадхистана', c.x2, d.x2], ['Муладхара', C, D],
-  ].map(([name, body, energy]) => ({ name, body, energy, total: r22(body + energy) }));
+    ['Сахасрара', A, B, 'sahasrara'], ['Аджна', a.x1, b.x1, 'ajna'], ['Вишудха', a.x2, b.x2, 'vishuddha'], ['Анахата', a.x3, b.x3, 'anahata'],
+    ['Манипура', E, E, 'manipura'], ['Свадхистана', c.x2, d.x2, 'svadhisthana'], ['Муладхара', C, D, 'muladhara'],
+  ].map(([name, body, energy, id]) => ({ id, name, body, energy, total: r22(body + energy) })); // id — ключ текстов (texts/*.js → chakras)
   const sumBody = r22(rows.reduce((s, r) => s + r.body, 0));
   const sumEnergy = r22(rows.reduce((s, r) => s + r.energy, 0));
   return {

@@ -4,25 +4,24 @@ import { read, write } from '../core/store.js';
    «столько, сколько нужно», расчёты сохраняются. «Я» — из «Единой анкеты партнёра» (данные рождения), остальные — список
    на телефоне (ключ charts-people): { id, name, role, date, time, city: { text, tz } }. */
 const KEY = 'charts-people';
-export const ROLES = { partner: 'Партнёр', friend: 'Друг', business: 'Партнёр по бизнесу', family: 'Родные', child: 'Ребёнок', other: 'Другое' };
-// Разделы людей (владелец 27.11.2026: «пара, друзья, бизнес, родные — как с ними взаимодействовать»)
-export const GROUPS = { partner: 'Пара', friend: 'Друзья', business: 'Бизнес', family: 'Родные', child: 'Дети', other: 'Другие' };
-/** Как называть совместимость с человеком этой роли: «пары», «в дружбе», «в бизнесе»… */
-export const WITH = { partner: 'пары', friend: 'в дружбе', business: 'в бизнесе', family: 'с родными', child: 'с ребёнком', other: 'вместе' };
+/* Роли (они же разделы: пара, друзья, бизнес, родные, дети, другие — владелец 27.11.2026). Подписи ролей, разделов и
+   «пары / в дружбе / в бизнесе» — на трёх языках в screens/charts/texts.js (сборка 218). */
+export const ROLES = ['partner', 'friend', 'business', 'family', 'child', 'other'];
 
 export const list = () => (Array.isArray(read(KEY, [])) ? read(KEY, []) : []);
 
+/** p.noName — подпись «без имени» на языке экрана. */
 export function add(p) {
-  const item = { id: `p${Date.now().toString(36)}`, name: String(p.name || '').trim().slice(0, 40) || 'Без имени', role: ROLES[p.role] ? p.role : 'other', date: p.date || '', time: p.time || '', city: p.city || null };
+  const item = { id: `p${Date.now().toString(36)}`, name: String(p.name || '').trim().slice(0, 40) || p.noName || '—', role: ROLES.includes(p.role) ? p.role : 'other', date: p.date || '', time: p.time || '', city: p.city || null };
   write(KEY, [...list(), item]);
   return item;
 }
 
 export const remove = (id) => write(KEY, list().filter((p) => p.id !== id));
 
-/** Подпись данных над расчётом: «Имя · 26.10.1990 · 14:30 · Киев». */
-export function caption(p) {
+/** Данные над расчётом: «Имя · 26.10.1990 · 14:30 · Киев»; noDate — «дата не указана» на языке экрана. */
+export function dataLine(p, noDate) {
   const d = /^(\d{4})-(\d{2})-(\d{2})$/.exec(p.date || '');
   const city = p.city && typeof p.city === 'object' ? p.city.text : p.city;
-  return `Считаем по данным: ${[p.name, d ? `${d[3]}.${d[2]}.${d[1]}` : 'дата не указана', p.time || null, city || null].filter(Boolean).join(' · ')}`;
+  return [p.name, d ? `${d[3]}.${d[2]}.${d[1]}` : noDate, p.time || null, city || null].filter(Boolean).join(' · ');
 }

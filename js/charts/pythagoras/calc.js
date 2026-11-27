@@ -5,13 +5,14 @@
 
 const sum = (n) => String(Math.abs(n)).split('').reduce((s, c) => s + Number(c), 0);
 
+/** Русские подписи клеток (для проверок); на экране — texts/*.js → cells. */
 export const CELLS = { 1: 'Характер, воля', 2: 'Энергия', 3: 'Порядок, науки', 4: 'Здоровье', 5: 'Логика, интуиция', 6: 'Труд', 7: 'Талант, удача', 8: 'Долг', 9: 'Память, ум' };
 
-/** Линии: строки, столбцы, диагонали — названия по классике. */
+/** Линии: строки, столбцы, диагонали — названия по классике; третье — ключ текстов (texts/*.js → lines). */
 export const LINES = [
-  ['Самооценка', [1, 2, 3]], ['Работа, деньги', [4, 5, 6]], ['Талант', [7, 8, 9]],
-  ['Целеустремлённость', [1, 4, 7]], ['Семья', [2, 5, 8]], ['Привычки, стабильность', [3, 6, 9]],
-  ['Духовность', [1, 5, 9]], ['Темперамент', [3, 5, 7]],
+  ['Самооценка', [1, 2, 3], 'self'], ['Работа, деньги', [4, 5, 6], 'money'], ['Талант', [7, 8, 9], 'talent'],
+  ['Целеустремлённость', [1, 4, 7], 'goal'], ['Семья', [2, 5, 8], 'family'], ['Привычки, стабильность', [3, 6, 9], 'habits'],
+  ['Духовность', [1, 5, 9], 'spirit'], ['Темперамент', [3, 5, 7], 'temper'],
 ];
 
 /** iso — «ГГГГ-ММ-ДД». Вернёт { work: [w1..w4], counts: {1..9}, cells: {1..9: '111'}, lines: [{ name, digits, total }] } или null. */
@@ -31,7 +32,7 @@ export function pythagoras(iso) {
     work: [w1, w2, w3, w4],
     counts,
     cells: Object.fromEntries(Object.entries(counts).map(([k, n]) => [k, n ? k.repeat(n) : '—'])),
-    lines: LINES.map(([name, ds]) => ({ name, digits: ds, total: ds.reduce((s, k) => s + counts[k], 0) })),
+    lines: LINES.map(([name, ds, id]) => ({ id, name, digits: ds, total: ds.reduce((s, k) => s + counts[k], 0) })),
   };
 }
 
@@ -44,6 +45,6 @@ export function pairPythagoras(isoA, isoB) {
   return {
     counts,
     cells: Object.fromEntries(Object.entries(counts).map(([k, n]) => [k, n ? k.repeat(n) : '—'])),
-    lines: LINES.map(([name, ds]) => ({ name, digits: ds, total: ds.reduce((s, k) => s + counts[k], 0) })),
+    lines: LINES.map(([name, ds, id]) => ({ id, name, digits: ds, total: ds.reduce((s, k) => s + counts[k], 0) })),
   };
 }

@@ -25,6 +25,7 @@ import { goalAudioField, deleteGoalAudio, getGoalAudioMeta } from '../../goals/g
 import { formatDuration } from '../../goals/audio.js';
 import { draft, setDraft, resetDraft } from '../../goals/draft.js';
 import { now as syncNow } from '../../sync/sync.js';
+import { STX as chartsText } from '../charts/texts.js';
 
 /* ЭКРАН «ЦЕЛИ»: вкладки «Мои · Пара · Семья» (владелец 13.11.2026: «цели у женщины, если она одна, и цели пары,
    если они вместе; и семьи»). «Мои» — сверху строка «Новая цель» и золотой «+», ниже — цели в работе, внизу —
@@ -199,7 +200,7 @@ export function render(view, ctx) {
     complimentsPlate(ctx),
     libraryPlate(),
     // «Карты рождения» (#/charts, 26.11.2026): Пифагор, Матрица Ладини, Human Design — для себя, партнёра, детей
-    plateLink({ href: '#/charts', icon: icons.natal, title: 'Разбор по дате рождения', lead: 'Твоя роль в паре и в жизни · Пифагор, Матрица Ладини, Human Design' }),
+    plateLink({ href: '#/charts', icon: icons.natal, title: chartsText().title, lead: chartsText().tileLead }), // надписи на трёх языках (218)
     // «Секретные материалы» — главы книги о чакрах (js/secret/): с 172 здесь, а не в «Тайном архиве» (владелец 22.11.2026:
     // «две книжки одинаковых в одном разделе — нелогично»; целиком книга — в архиве)
     secretPlate(ctx),
