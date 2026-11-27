@@ -21,3 +21,13 @@ test('день с нулём: первая цифра дня — значаща�
   assert.deepEqual(pythagoras('1985-11-04').work, [29, 11, 21, 3]); // 29 − 2·4 = 21
   assert.equal(pythagoras('не дата'), null);
 });
+
+test('пара 26.10.1981 + 28.07.1986: два квадрата сравниваются, а не складываются', async () => {
+  const { pairPythagoras } = await import('../js/charts/pythagoras/calc.js');
+  const r = pairPythagoras('1981-10-26', '1986-07-28');
+  // 26.10.1981: 28 · 10 · 24 · 6 → единиц 4 (одна — из «10»); 28.07.1986: 41 · 5 · 37 · 10 → единиц 3
+  assert.equal(r.a.cells[1], '1111');
+  assert.equal(r.b.cells[1], '111');
+  const st = Object.fromEntries(r.compare.map((c) => [c.digit, c.status]));
+  assert.deepEqual(st, { 1: 'even', 2: 'tilt', 3: 'comp', 4: 'even', 5: 'comp', 6: 'even', 7: 'comp', 8: 'both', 9: 'even' });
+});

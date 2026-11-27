@@ -1,5 +1,5 @@
 import { h } from '../../core/dom.js';
-import { pythagoras, pairPythagoras } from './calc.js';
+import { pythagoras, pairPythagoras, level } from './calc.js';
 import { TX, lineBand, countText } from './texts/index.js'; // тексты на языке приложения (218)
 const fold = (title, ...body) => h('details', { class: 'help__folder' }, h('summary', { class: 'help__folder-summary' }, h('span', { class: 'help__folder-title' }, title)), h('div', { class: 'help__folder-body' }, ...body));
 const para = (b, t) => (t ? h('p', {}, h('b', {}, b), ' ', t) : null);
@@ -58,7 +58,7 @@ function decoding(r, T) {
       const x = T.db[k];
       const n = r.counts[k];
       return h('div', { class: 'chart__item' }, h('p', { class: 'caps' }, `${k} — ${x.title} (${n ? r.cells[k] : U.none})`),
-        para(U.essence, x.essence), para(U.shows, countText(T, k, n)), para(U.grow, x.grow));
+        para(U.essence, x.essence), para(U.shows, countText(T, k, n)), para(U.act, T.advice[k].act[level(k, n)]), para(U.grow, x.grow));
     }),
     h('h3', { class: 'caps mx__cap' }, U.lines),
     h('p', { class: 'faint' }, U.scale),
@@ -82,21 +82,28 @@ export function pythagorasCard(iso, caption = null) {
     ...square(r, T), decoding(r, T));
 }
 
-/** Квадрат пары: общая сетка (цифры двоих вместе) и линии пары. */
-export function pairPythCard(isoA, isoB, caption) {
+/** Маленький квадрат одного человека — для сравнения рядом. */
+const mini = (r, T, name) => h('div', { class: 'pyth__mini' }, h('p', { class: 'caps pyth__mini-name' }, name),
+  h('div', { class: 'pyth__grid pyth__grid--mini' }, ...GRID.map((k) => h('div', { class: `pyth__cell${r.counts[k] ? '' : ' is-empty'}` },
+    h('span', { class: 'pyth__digits' }, r.cells[k]), h('span', { class: 'pyth__name' }, T.cells[k])))));
+
+/** Пара: два квадрата рядом, сравнение по каждой цифре с советом паре, линии обоих; сумма — свёрнутым «общим ресурсом». */
+export function pairPythCard(isoA, isoB, caption, names = ['A', 'B']) {
   const r = pairPythagoras(isoA, isoB);
   if (!r) return null;
   const T = TX();
   const U = T.ui;
-  const empty = DIGITS.filter((k) => !r.counts[k]);
-  const level = (n) => (n >= 10 ? U.pairStrong : n <= 4 ? U.pairWeak : U.pairMid);
+  const cell = (x, k) => (x.counts[k] ? x.cells[k] : '—');
   return h('section', { class: 'card pyth' },
     h('h2', { class: 'card__title' }, U.pairTitle),
     h('p', { class: 'chart__src' }, caption),
     h('p', { class: 'faint' }, U.pairLead),
-    ...square(r, T),
-    fold(U.decoding,
-      h('p', {}, T.pairNote),
-      para(U.bothNone, empty.length ? `${empty.map((k) => `${k} — ${T.db[k].title.toLowerCase()}`).join('; ')}.` : U.allPresent),
-      ...r.lines.map((l) => h('p', {}, h('b', {}, `${T.lines[l.id].name}: ${l.total}`), ' — ', level(l.total)))));
+    h('div', { class: 'pyth__pair' }, mini(r.a, T, names[0]), mini(r.b, T, names[1])),
+    h('h3', { class: 'caps mx__cap' }, U.pairLines),
+    h('ul', { class: 'pyth__lines' }, ...r.a.lines.map((l, i) => h('li', {},
+      h('span', {}, `${T.lines[l.id].name} (${l.digits.join('-')})`), h('b', {}, `${l.total} · ${r.b.lines[i].total}`)))),
+    fold(U.compare, ...r.compare.map((c) => h('div', { class: 'chart__item' },
+      h('p', { class: 'caps' }, `${c.digit} — ${T.db[c.digit].title}: ${names[0]} ${cell(r.a, c.digit)} · ${names[1]} ${cell(r.b, c.digit)} — ${U.status[c.status]}`),
+      para(U.pairAdvice, T.advice[c.digit].pair[c.status])))),
+    fold(U.resource, h('p', { class: 'faint' }, U.resourceNote), ...square(r, T)));
 }

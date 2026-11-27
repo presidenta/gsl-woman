@@ -112,7 +112,7 @@ function personView(view, ctx, S, mine, cur) {
       fold('matrix', icons.sparkle, matrixCard(cur.date, cap)),
       fold('hd', icons.crown, hdCard({ date: cur.date, time: cur.time, city: cur.city, caption: cap })),
       // Союз двоих — три карты, у каждой рисунок того, что получилось вместе (владелец 27.11.2026)
-      pair ? fold('pairPyth', icons.heart, pairPythCard(mine.date, cur.date, pairCap), `${S.pairPyth} ${withWho}`) : null,
+      pair ? fold('pairPyth', icons.heart, pairPythCard(mine.date, cur.date, pairCap, [S.me, cur.name]), `${S.pairPyth} ${withWho}`) : null,
       pair ? fold('pair', icons.heart, pairCard(mine.date, cur.date, pairCap), `${S.pairMatrix} ${withWho}`) : null,
       pair ? fold('pairHd', icons.heart, pairHdCard(mine, cur, pairCap), `${S.pairHd} ${withWho}`) : null,
     ] : []));

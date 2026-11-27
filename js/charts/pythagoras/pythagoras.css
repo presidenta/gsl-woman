@@ -31,3 +31,10 @@
 .pyth__grid.is-tracing .pyth__cell.is-lit { opacity: 1; border-color: var(--c-gold); background: rgba(255, 215, 120, .1); }
 .pyth__over { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
 .pyth__path { fill: none; stroke: var(--c-gold); stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; opacity: .85; }
+/* Пара — два квадрата рядом (222) */
+.pyth__pair { display: grid; grid-template-columns: 1fr 1fr; gap: var(--sp-2); margin: var(--sp-2) 0; }
+.pyth__mini-name { margin: 0 0 4px; color: var(--c-gold); text-align: center; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pyth__grid--mini { gap: 3px; margin: 0; }
+.pyth__grid--mini .pyth__cell { min-height: 52px; padding: 3px; }
+.pyth__grid--mini .pyth__digits { font-size: var(--fs-sm); }
+.pyth__grid--mini .pyth__name { font-size: .62rem; }
