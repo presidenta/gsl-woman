@@ -50,6 +50,20 @@ function centerBlock(T, n) {
     para(X.ui.recs, A.recs), para(X.ui.minus, A.minus), para(C.ui.work, W.text[n]));
 }
 
+/** Предназначения (личное, Небо, Земля, социальное, духовное, планетарное): что значит предназначение (texts) + духовное
+   послание его числа (ячейка places/purpose, 233). Число уже было выше — послание не повторяется. */
+function purposeBlocks(T, P) {
+  const X = PL('purpose');
+  const seen = new Set();
+  return ['personal', 'sky', 'earth', 'social', 'spiritual', 'planetary'].map((k) => {
+    const n = P[k];
+    const first = !seen.has(n);
+    seen.add(n);
+    return h('div', { class: 'chart__item' }, h('p', { class: 'caps' }, `${T.purposes[k][0]}: ${short(T, n)}`), h('p', { class: 'faint' }, T.purposes[k][1]),
+      ...(first ? [h('p', {}, h('b', {}, X.ui.title)), ...X.text[n].about.map((t) => h('p', {}, t))] : [h('p', { class: 'faint' }, X.ui.same)]));
+  });
+}
+
 /** Верх матрицы — Б и Б1 (таланты, ангелы: что даётся сейчас): только текст верха (ячейка places/top, 232).
    Третья сверху (Б2) — отдельный блок «работа» сразу после. */
 function topBlock(T, b, b1) {
@@ -88,7 +102,7 @@ function decoding(r, T) {
     cap(U.mainPoints),
     ...['A', 'B', 'C', 'D'].map((k) => arcanaBlock(T, T.points[k][0], p[k], T.points[k][1])),
     cap(U.purposes),
-    ...['personal', 'sky', 'earth', 'social', 'spiritual', 'planetary'].map(pur),
+    ...purposeBlocks(T, P), // предназначения — духовные послания своим текстом (233)
     cap(U.rodCap),
     pur('male'), pur('female'),
     cap(U.loveMoney),
