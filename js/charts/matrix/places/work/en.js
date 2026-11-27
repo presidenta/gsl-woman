@@ -1,7 +1,7 @@
 /* МЕСТО «РАБОТА» — третья цифра сверху (Б2) — сборка 229. Ячейка: только текст о работе. Источник — «Рекомендуемая
    деятельность» из «Расшифровки 22-х кодов судьбы» (Д. Воронов по книге Н. Ладини), почти дословно. Язык: en. */
 export default {
-  ui: { title: 'Work and money — third from the top (B2)', lead: 'The third number from the top is about work: in what kind of activity a person opens up and earns.' },
+  ui: { cap: 'Work — third from the top (B2)', title: 'Work and money — third from the top (B2)', lead: 'The third number from the top is about work: in what kind of activity a person opens up and earns.' },
   text: {
     1: 'As a rule, people who work with their hands: massage therapists, jewellers, tailors, craftspeople, sculptors. Leadership professions linked with the power of thought suit them well. Introducing new ideas and knowledge: inventors, researchers. People linked with magic, bioenergy, healers.',
     2: 'Diplomacy, psychology, medicine, healing, bioenergy, science, observing natural processes: botany, zoology. Astrology, astronomy, meteorology. Acting. Work in search and surveillance services, forensics.',

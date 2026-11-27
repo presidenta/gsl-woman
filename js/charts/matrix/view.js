@@ -4,7 +4,6 @@ import { TX } from './texts/index.js';
 import { PL } from './places/index.js'; // тексты по местам матрицы: хвост, работа… (229) // тексты на языке приложения (218)
 const fold = (title, ...body) => h('details', { class: 'help__folder' }, h('summary', { class: 'help__folder-summary' }, h('span', { class: 'help__folder-title' }, title)), h('div', { class: 'help__folder-body' }, ...body));
 const para = (b, t) => (t ? h('p', {}, h('b', {}, b), ' ', t) : null);
-const cap = (t) => h('h3', { class: 'caps mx__cap' }, t);
 /* Раздел под рисунком — свёрнут (владелец 27.11.2026: «экран короткий, не видно, откуда цифры»); открыт только один,
    поэтому числа всегда рядом с рисунком. */
 const sec = (title, ...body) => h('details', { class: 'help__folder', name: 'mx-sec' }, h('summary', { class: 'help__folder-summary' }, h('span', { class: 'help__folder-title' }, title)), h('div', { class: 'help__folder-body' }, ...body));
@@ -88,7 +87,22 @@ function moneyBlock(T, n) {
     M.intro ? h('p', {}, M.intro) : null, para(X.ui.prof, M.prof), para(X.ui.woman, M.woman), para(X.ui.man, M.man), para(X.ui.block, M.block));
 }
 
-/** Расшифровка личной матрицы: главные точки, предназначения, род, любовь и деньги, хвост, таланты, возрасты, чакры. */
+/** Минус главных точек (А, Б, В, Г): текст «над чем работать» (ячейка places/minus, 234) + «как проработать» —
+   рекомендации из полного описания аркана (ячейка codes). Одно число на нескольких точках — текст один раз. */
+function minusBlocks(T, p) {
+  const X = PL('minus');
+  const C = PL('codes');
+  const keys = ['A', 'B', 'C', 'D'];
+  const nums = [...new Set(keys.map((k) => p[k]))];
+  return [h('p', { class: 'faint' }, X.ui.lead), ...nums.map((n) => {
+    const where = keys.filter((k) => p[k] === n).map((k) => T.points[k][0]).join(', ');
+    return h('div', { class: 'chart__item' }, h('p', { class: 'caps' }, `${where}: ${short(T, n)}`),
+      ...X.text[n].about.map((t) => h('p', {}, t)), para(X.ui.how, C.text[n].recs));
+  })];
+}
+
+/** Расшифровка личной матрицы: центр, главные точки, минус, ангелы сверху, работа, деньги, предназначения, хвост, род,
+   любовь и деньги, возрасты, чакры — каждое место своей папкой. */
 function decoding(r, T) {
   const p = r.points;
   const P = r.purposes;
@@ -96,29 +110,26 @@ function decoding(r, T) {
   const tail = [r.rays.d.x2, r.rays.d.x1, p.D]; // классическая запись Г2-Г1-Г
   const ageKeys = ['A', 'F', 'B', 'G', 'C', 'Y', 'D', 'K']; // круг Ладини: от А по часовой, каждые 10 лет
   const pur = (k) => arcanaBlock(T, T.purposes[k][0], P[k], T.purposes[k][1]);
+  const PLc = (k) => PL(k).ui.cap;
+  /* Каждое место — своя папка (владелец 27.11.2026: «чтобы каждый раздел был отдельно и было видно»). */
   return fold(U.decoding,
     h('p', { class: 'faint' }, T.source),
-    centerBlock(T, p.E), // центр — первым и полностью (230)
-    cap(U.mainPoints),
-    ...['A', 'B', 'C', 'D'].map((k) => arcanaBlock(T, T.points[k][0], p[k], T.points[k][1])),
-    cap(U.purposes),
-    ...purposeBlocks(T, P), // предназначения — духовные послания своим текстом (233)
-    cap(U.rodCap),
-    pur('male'), pur('female'),
-    cap(U.loveMoney),
-    arcanaBlock(T, U.love, r.loveMoney.love, T.special.love), arcanaBlock(T, U.money, r.loveMoney.money, T.special.money),
-    arcanaBlock(T, U.balance, r.loveMoney.balance, T.special.balance),
-    moneyBlock(T, r.rays.c.x2), // вход в денежный канал — свой текст (231)
-    cap(U.tailCap),
-    tailBlock(T, tail),
-    topBlock(T, p.B, r.rays.b.x1), // верх Б · Б1 — что даётся сейчас, своим текстом (232)
-    workBlock(r.rays.b.x2),
-    cap(U.ages),
-    h('p', { class: 'faint' }, U.agesNote),
-    h('ul', { class: 'pyth__lines' }, ...ageKeys.map((k, i) => row(T.ages[i], short(T, p[k])))),
-    cap(U.health),
-    h('p', { class: 'faint' }, T.healthNote),
-    ...r.health.rows.map((x) => para(`${T.chakras[x.id][0]} (${U.agesTotal} ${short(T, x.total)}):`, T.chakras[x.id][1])));
+    fold(PLc('center'), centerBlock(T, p.E)), // центр — первым и полностью (230)
+    fold(U.mainPoints, ...['A', 'B', 'C', 'D'].map((k) => arcanaBlock(T, T.points[k][0], p[k], T.points[k][1]))),
+    fold(PLc('minus'), ...minusBlocks(T, p)), // минус главных точек (234)
+    fold(PLc('top'), topBlock(T, p.B, r.rays.b.x1)), // ангелы сверху: Б · Б1 (232)
+    fold(PLc('work'), workBlock(r.rays.b.x2)), // работа: Б2 (229)
+    fold(PLc('money'), moneyBlock(T, r.rays.c.x2)), // деньги: вход в денежный канал В2 (231)
+    fold(PLc('purpose'), ...purposeBlocks(T, P)), // предназначения — духовные послания (233)
+    fold(PLc('tail'), tailBlock(T, tail)), // кармический хвост (229)
+    fold(U.rodCap, pur('male'), pur('female')),
+    fold(U.loveMoney,
+      arcanaBlock(T, U.love, r.loveMoney.love, T.special.love), arcanaBlock(T, U.money, r.loveMoney.money, T.special.money),
+      arcanaBlock(T, U.balance, r.loveMoney.balance, T.special.balance)),
+    fold(U.ages, h('p', { class: 'faint' }, U.agesNote),
+      h('ul', { class: 'pyth__lines' }, ...ageKeys.map((k, i) => row(T.ages[i], short(T, p[k]))))),
+    fold(U.health, h('p', { class: 'faint' }, T.healthNote),
+      ...r.health.rows.map((x) => para(`${T.chakras[x.id][0]} (${U.agesTotal} ${short(T, x.total)}):`, T.chakras[x.id][1]))));
 }
 
 // Карта здоровья: из каких точек рисунка строка (тело | энергия)

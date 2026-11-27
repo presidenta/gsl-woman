@@ -1,6 +1,7 @@
 /* PLACE “TOP” — B and B1 (talents, angels: what is given now) — build 232, translation of ru.js, same keys. */
 export default {
   ui: {
+    cap: 'Angels at the top — what is given now (B · B1)',
     title: 'Top of the matrix — what is given now',
     lead: 'The top numbers are the positive side of the energy: the talents and strength given to a person in this life, their guardian angels. The third number from the top is about work — see below.',
     b: 'B (top)',

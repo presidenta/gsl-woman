@@ -13,6 +13,9 @@ import centerEn from './center/en.js';
 import codesRu from './codes/ru.js';
 import codesUa from './codes/ua.js';
 import codesEn from './codes/en.js';
+import minusRu from './minus/ru.js';
+import minusUa from './minus/ua.js';
+import minusEn from './minus/en.js';
 import purposeRu from './purpose/ru.js';
 import purposeUa from './purpose/ua.js';
 import purposeEn from './purpose/en.js';
@@ -27,6 +30,7 @@ export const PLACES = {
   tail: { ru: tailRu, ua: tailUa, en: tailEn }, // кармический хвост: Г2 · Г1 · Г
   work: { ru: workRu, ua: workUa, en: workEn }, // работа: третья сверху, Б2
   center: { ru: centerRu, ua: centerUa, en: centerEn }, // центр Д: где черпает силы (230)
+  minus: { ru: minusRu, ua: minusUa, en: minusEn }, // минус главных точек А·Б·В·Г: над чем работать (234)
   purpose: { ru: purposeRu, ua: purposeUa, en: purposeEn }, // предназначения: духовные послания (233)
   top: { ru: topRu, ua: topUa, en: topEn }, // верх: Б и Б1 — что даётся сейчас (232)
   money: { ru: moneyRu, ua: moneyUa, en: moneyEn }, // вход в денежный канал: В2 (231)

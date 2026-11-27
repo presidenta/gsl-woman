@@ -2,7 +2,7 @@
    3–22 — документ «Кармический хвост» почти дословно; 1–2 — «Негативная, неотработанная карма» и «Рекомендации»
    из «Расшифровки 22-х кодов судьбы» (Д. Воронов по книге Н. Ладини). Язык: en. Ключи во всех языках одинаковы. */
 export default {
-  ui: { title: 'Karmic tail', past: 'Brought from the past:', how: 'How to work it through:' },
+  ui: { cap: 'Karmic tail — what we bring from the past (D2 · D1 · D)', title: 'Karmic tail', past: 'Brought from the past:', how: 'How to work it through:' },
   intro: [
     'The three energies at the bottom of the matrix are called the “karmic tail”. It is the karmic baggage a person brings from past lives. At birth these energies are always in the minus. How each energy in the tail reads depends on the arcana next to it.',
     'By the law of “karmic rakes” a person can drag negative traits or a pattern of behaviour from a past incarnation — and build up even more negative karma.',

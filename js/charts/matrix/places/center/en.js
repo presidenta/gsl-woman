@@ -1,6 +1,7 @@
 /* PLACE “CENTRE” (E) — build 230, translation of ru.js, same keys. */
 export default {
   ui: {
+    cap: 'Centre (E) — the main number',
     title: 'Centre (E) — the main number of the matrix',
     lead: 'The centre is the core of character and the comfort zone: the state in which a person feels good and where they return for strength.',
     power: 'Where they draw strength:',

@@ -1,6 +1,7 @@
 /* PLACE “ENTRANCE TO THE MONEY CHANNEL” (C2) — build 231, translation of ru.js, same keys. */
 export default {
   ui: {
+    cap: 'Money — entrance to the money channel (C2)',
     title: 'Entrance to the money channel (C2)',
     lead: 'The energy at the entrance to the money channel may point to the profession that will become the main source of income. If there are problems with money, most likely one of the energies (or more than one) has gone into the minus. Be honest with yourself, find your weak points and start working on yourself.',
     prof: 'Professions:',
