@@ -13,6 +13,9 @@ import centerEn from './center/en.js';
 import codesRu from './codes/ru.js';
 import codesUa from './codes/ua.js';
 import codesEn from './codes/en.js';
+import topRu from './top/ru.js';
+import topUa from './top/ua.js';
+import topEn from './top/en.js';
 import moneyRu from './money/ru.js';
 import moneyUa from './money/ua.js';
 import moneyEn from './money/en.js';
@@ -21,6 +24,7 @@ export const PLACES = {
   tail: { ru: tailRu, ua: tailUa, en: tailEn }, // кармический хвост: Г2 · Г1 · Г
   work: { ru: workRu, ua: workUa, en: workEn }, // работа: третья сверху, Б2
   center: { ru: centerRu, ua: centerUa, en: centerEn }, // центр Д: где черпает силы (230)
+  top: { ru: topRu, ua: topUa, en: topEn }, // верх: Б и Б1 — что даётся сейчас (232)
   money: { ru: moneyRu, ua: moneyUa, en: moneyEn }, // вход в денежный канал: В2 (231)
   codes: { ru: codesRu, ua: codesUa, en: codesEn }, // полное описание аркана из PDF — для центра и выдержек (230)
 };

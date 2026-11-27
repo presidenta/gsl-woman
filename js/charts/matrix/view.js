@@ -50,6 +50,15 @@ function centerBlock(T, n) {
     para(X.ui.recs, A.recs), para(X.ui.minus, A.minus), para(C.ui.work, W.text[n]));
 }
 
+/** Верх матрицы — Б и Б1 (таланты, ангелы: что даётся сейчас): только текст верха (ячейка places/top, 232).
+   Третья сверху (Б2) — отдельный блок «работа» сразу после. */
+function topBlock(T, b, b1) {
+  const X = PL('top');
+  const one = (label, n) => h('div', {}, h('p', {}, h('b', {}, `${label}: ${short(T, n)}`)), ...X.text[n].about.map((t) => h('p', {}, t)));
+  return h('div', { class: 'chart__item' }, h('p', { class: 'caps' }, `${X.ui.title}: ${b} · ${b1}`), h('p', { class: 'faint' }, X.ui.lead),
+    ...(b1 === b ? [one(`${X.ui.b} · ${X.ui.b1}`, b)] : [one(X.ui.b, b), one(X.ui.b1, b1)])); // одно число на обоих местах — текст один раз
+}
+
 /** Работа — третья цифра сверху (Б2): только текст о работе (ячейка places/work, 229). */
 function workBlock(n) {
   const X = PL('work');
@@ -71,7 +80,6 @@ function decoding(r, T) {
   const P = r.purposes;
   const U = T.ui;
   const tail = [r.rays.d.x2, r.rays.d.x1, p.D]; // классическая запись Г2-Г1-Г
-  const talents = [p.B, r.rays.b.x1, r.rays.b.x2];
   const ageKeys = ['A', 'F', 'B', 'G', 'C', 'Y', 'D', 'K']; // круг Ладини: от А по часовой, каждые 10 лет
   const pur = (k) => arcanaBlock(T, T.purposes[k][0], P[k], T.purposes[k][1]);
   return fold(U.decoding,
@@ -89,8 +97,7 @@ function decoding(r, T) {
     moneyBlock(T, r.rays.c.x2), // вход в денежный канал — свой текст (231)
     cap(U.tailCap),
     tailBlock(T, tail),
-    h('div', { class: 'chart__item' }, h('p', { class: 'caps' }, `${U.talents}: ${talents.join(' · ')}`), h('p', { class: 'faint' }, T.special.talents),
-      ...talents.map((n) => para(`${short(T, n)}:`, T.arcana[n].plus))),
+    topBlock(T, p.B, r.rays.b.x1), // верх Б · Б1 — что даётся сейчас, своим текстом (232)
     workBlock(r.rays.b.x2),
     cap(U.ages),
     h('p', { class: 'faint' }, U.agesNote),
