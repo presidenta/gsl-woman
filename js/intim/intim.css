@@ -7,7 +7,7 @@
 .plate--adult .plate__icon {
   color: var(--c-red-flag);
 }
-.plate--adult .plate__icon svg { width: 28px; height: 28px; }
+.plate--adult .plate__icon svg { width: 30px; height: 30px; }
 
 /* Карта желаний: те же строки, что «Желания на выходные» (circles.css: .wish, .wish__marks) */
 .intim-map { display: grid; gap: var(--sp-3); }
