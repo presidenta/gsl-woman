@@ -82,3 +82,47 @@
 .pyth__dot--low { background: #e9b949; box-shadow: 0 0 6px #e9b949; }
 .pyth__dot--ok { background: #3fcf8e; box-shadow: 0 0 6px #3fcf8e; }
 .pyth__nb { white-space: nowrap; } /* «(1-4-7)» переносится только целиком */
+
+/* Пара в цвете (владелец 28.11.2026: «тоже цветной, как личный, но без кубиков — на маленьких не читается»):
+   два квадрата на золотистой подложке; у клетки — полоска снизу и рамка цвета шкалы: красный — нет, жёлтый — мало,
+   зелёный — норма и больше; числа линий «7 · 5» — тем же цветом. Откат — убрать класс pyth__pair--color. */
+.pyth__pair--color {
+  --py-none: #e5534b; --py-low: #e9b949; --py-ok: #3fcf8e;
+  gap: 8px; padding: 8px; border: 1px solid rgba(212, 175, 55, .42); border-radius: 16px;
+  background: linear-gradient(155deg, rgba(212, 175, 55, .2), rgba(212, 175, 55, .05) 55%, rgba(150, 95, 30, .16));
+  box-shadow: inset 0 1px 0 rgba(255, 230, 160, .18), 0 10px 26px rgba(0, 0, 0, .35);
+}
+.pyth__pair--color + .pyth__legend { margin-top: var(--sp-2); }
+.pyth__pair--color .pyth__cell {
+  position: relative; padding: 4px 2px 8px;
+  background: radial-gradient(120% 90% at 50% 0%, #15131a, #050507 70%);
+}
+.pyth__pair--color .pyth__cell::after { content: ''; position: absolute; left: 6px; right: 6px; bottom: 3px; height: 3px; border-radius: 2px; }
+.pyth__pair--color .pyth__cell--none { border-color: rgba(229, 83, 75, .55); }
+.pyth__pair--color .pyth__cell--low { border-color: rgba(233, 185, 73, .55); }
+.pyth__pair--color .pyth__cell--ok { border-color: rgba(63, 207, 142, .5); }
+.pyth__pair--color .pyth__cell--none::after { background: var(--py-none); box-shadow: 0 0 6px var(--py-none); }
+.pyth__pair--color .pyth__cell--low::after { background: var(--py-low); box-shadow: 0 0 6px var(--py-low); }
+.pyth__pair--color .pyth__cell--ok::after { background: var(--py-ok); box-shadow: 0 0 6px var(--py-ok); }
+.pyth__pair--color .pyth__grid:not(.is-tracing) .pyth__cell.is-empty { opacity: 1; }
+.pyth__pair--color .pyth__cell--none .pyth__digits { color: var(--py-none); }
+.pyth__pair--color .pyth__cell.is-lit { border-color: var(--c-gold); }
+.pyth__v--none { color: #e5534b; }
+.pyth__v--low { color: #e9b949; }
+.pyth__v--ok { color: #3fcf8e; }
+/* узкий экран: подписи клеток целыми словами — шрифт чуть меньше, поля клетки тоньше; подложка тоньше */
+@media (max-width: 440px) {
+  .pyth__pair--color { gap: 6px; padding: 6px; }
+  .pyth__pair--color .pyth__grid--mini { gap: 2px; }
+  .pyth__pair--color .pyth__cell { padding: 4px 0 8px; }
+  .pyth__pair--color .pyth__name { font-size: .53rem; line-height: 1.1; letter-spacing: -.01em; }
+}
+/* колонки не шире своей доли: длинное слово («Обов’язок») не выталкивает квадрат за подложку */
+.pyth__pair--color { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+.pyth__pair--color .pyth__grid--mini { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.pyth__pair--color .pyth__name { max-width: 100%; overflow-wrap: break-word; }
+@media (max-width: 379px) {
+  .pyth__pair--color .pyth__name { font-size: .5rem; }
+  .pyth__pair--color .pyth__digits { font-size: .8rem; }
+}
+

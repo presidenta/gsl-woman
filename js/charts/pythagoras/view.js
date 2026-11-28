@@ -64,6 +64,7 @@ function makeGrid(r, T, cls = '', board = false, caption = null) {
 }
 
 /** Под доской — что значат цвета шкалы. */
+const toneNum = (n) => h('span', { class: `pyth__v pyth__v--${lineTone(n)}` }, String(n)); // число линии в цвет шкалы
 const legend = (T) => h('p', { class: 'pyth__legend' }, ...['none', 'low', 'ok'].map((tone, i) =>
   h('span', {}, h('i', { class: `pyth__dot pyth__dot--${tone}` }), T.ui.legend[i])));
 
@@ -145,11 +146,14 @@ export function pairPythCard(isoA, isoB, caption, names = ['A', 'B']) {
     h('h2', { class: 'card__title' }, U.pairTitle),
     h('p', { class: 'chart__src' }, caption),
     h('p', { class: 'faint' }, U.pairLead),
-    h('div', { class: 'pyth__pair' },
+    // цвет, как у личного квадрата (владелец 28.11.2026): золотистая подложка, у клетки — цветная полоска и рамка
+    // вместо кубиков (на маленьких клетках кубики не читаются), под квадратами — что значат цвета
+    h('div', { class: 'pyth__pair pyth__pair--color' },
       h('div', {}, h('p', { class: 'caps pyth__mini-name' }, names[0]), ga.grid),
       h('div', {}, h('p', { class: 'caps pyth__mini-name' }, names[1]), gb.grid)),
-    // линии обоих — как в одиночном квадрате: два столбика, наведение подсвечивает клетки в обоих квадратах
-    sums([ga, gb], r.a.lines, T, (i) => `${r.a.lines[i].total} · ${r.b.lines[i].total}`),
+    legend(T),
+    // линии обоих — как в одиночном квадрате: два столбика, наведение подсвечивает клетки в обоих квадратах; числа — в цвет
+    sums([ga, gb], r.a.lines, T, (i) => [toneNum(r.a.lines[i].total), ' · ', toneNum(r.b.lines[i].total)]),
     fold(U.compare, ...r.compare.map((c) => h('div', { class: 'chart__item' },
       h('p', { class: 'caps' }, `${c.digit} — ${T.db[c.digit].title}: ${names[0]} ${cell(r.a, c.digit)} · ${names[1]} ${cell(r.b, c.digit)} — ${U.status[c.status]}`),
       para(U.pairAdvice, T.advice[c.digit].pair[c.status])))),
