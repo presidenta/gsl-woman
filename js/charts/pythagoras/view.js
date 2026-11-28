@@ -26,7 +26,7 @@ const FIELDS = [['temper', 1, 4], ['goal', 2, 4], ['family', 3, 4], ['habits', 4
 
 /** Сетка 3×3 с наложенной линией: light(digits) подсвечивает клетки и проводит через них линию, light(null) — гасит.
     board — доска с полями линий вокруг и рабочими числами сверху (квадрат одного человека); без неё — малая сетка пары. */
-function makeGrid(r, T, cls = '', board = false) {
+function makeGrid(r, T, cls = '', board = false, caption = null) {
   const cells = Object.fromEntries(GRID.map((k, i) => [k, h('div', {
     class: `pyth__cell pyth__cell--${cellTone(k, r.counts[k])}${r.counts[k] ? '' : ' is-empty'}`,
     style: board ? { gridRow: String(Math.floor(i / 3) + 2), gridColumn: String((i % 3) + 1) } : null,
@@ -48,7 +48,9 @@ function makeGrid(r, T, cls = '', board = false) {
     return [id, h('div', { class: `pyth__field pyth__field--${lineTone(l.total)}`, tabindex: '0', style: { gridRow: String(row), gridColumn: String(col) } },
       h('span', { class: 'pyth__field-name' }, T.ui.fields?.[id] ?? T.lines[id].name), h('b', { class: 'pyth__field-sum' }, String(l.total)), scale(l.total, lineTone(l.total)))];
   })) : {};
-  const head = board && r.work ? h('p', { class: 'pyth__head' }, h('span', {}, T.ui.work), h('b', {}, r.work.join(' · '))) : null;
+  // верхняя строка доски: по каким данным считали и рабочие числа (владелец 28.11.2026: подпись — внутрь квадрата, строка лишняя)
+  const head = board && r.work ? h('div', { class: 'pyth__head' }, caption ? h('span', { class: 'pyth__src' }, caption) : null,
+    h('span', { class: 'pyth__work' }, h('span', {}, T.ui.work), h('b', {}, r.work.join(' · ')))) : null;
   const grid = h('div', { class: `pyth__grid ${board ? 'pyth__grid--board' : ''} ${cls}`.trim() }, head, ...GRID.map((k) => cells[k]), ...Object.values(fields), over);
   const light = (digits) => {
     Object.values(cells).forEach((c) => c.classList.remove('is-lit'));
@@ -91,8 +93,8 @@ function sums(grids, lines, T, value) {
 }
 
 /** Квадрат одного человека (или общий ресурс пары): доска с полями линий и шкалами, подпись цветов, итоги линий. */
-function square(r, T) {
-  const g = makeGrid(r, T, '', true);
+function square(r, T, caption = null) {
+  const g = makeGrid(r, T, '', true, caption);
   return [g.grid, legend(T), sums([g], r.lines, T, (i) => String(r.lines[i].total))];
 }
 
@@ -125,8 +127,7 @@ export function pythagorasCard(iso, caption = null) {
   const T = TX();
   return h('section', { class: 'card pyth' },
     h('h2', { class: 'card__title' }, T.ui.title),
-    caption ? h('p', { class: 'chart__src' }, caption) : null,
-    ...square(r, T), decoding(r, T)); // рабочие числа — в верхней строке доски, как в классической таблице
+    ...square(r, T, caption), decoding(r, T)); // подпись данных и рабочие числа — в верхней строке доски
 }
 
 /** Пара: два квадрата рядом, сравнение по каждой цифре с советом паре, линии обоих; сумма — свёрнутым «общим ресурсом». */
