@@ -216,5 +216,7 @@ export default {
     pairStrong: 'the couple’s support',
     pairWeak: 'a topic to agree on',
     pairMid: 'ordinary level',
+    legend: ['none', 'little', 'normal and more'], // colour scale of cells and fields: red · amber · green
+    fields: { temper: 'Tempera­ment', goal: 'Purpose­fulness', family: 'Family', habits: 'Habits, stabi­lity', self: 'Self-esteem', money: 'Work, money', talent: 'Talent', spirit: 'Spiritu­ality' }, // board fields: soft hyphens
   },
 };

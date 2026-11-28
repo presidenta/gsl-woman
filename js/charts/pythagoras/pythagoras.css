@@ -38,3 +38,42 @@
 .pyth__grid--mini .pyth__cell { min-height: 52px; padding: 3px; }
 .pyth__grid--mini .pyth__digits { font-size: var(--fs-sm); }
 .pyth__grid--mini .pyth__name { font-size: .62rem; }
+/* Доска квадрата (238): чёрный квадрат на золотистой подложке, справа и снизу — поля линий, в углах — диагонали;
+   у клеток и полей — шкала кубиков: красный — нет, жёлтый — мало, зелёный — норма и больше */
+.pyth__grid--board {
+  --py-none: #e5534b; --py-low: #e9b949; --py-ok: #3fcf8e;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) minmax(0, .92fr);
+  gap: 5px; padding: 8px; border: 1px solid rgba(212, 175, 55, .42); border-radius: 16px;
+  background: linear-gradient(155deg, rgba(212, 175, 55, .2), rgba(212, 175, 55, .05) 55%, rgba(150, 95, 30, .16));
+  box-shadow: inset 0 1px 0 rgba(255, 230, 160, .18), 0 10px 26px rgba(0, 0, 0, .35);
+}
+.pyth__grid--board .pyth__over { grid-area: 2 / 1 / 5 / 4; }
+.pyth__head { grid-row: 1; grid-column: 1 / 4; align-self: center; display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 8px; margin: 0; padding: 0 4px; font-size: var(--fs-xs, .8rem); color: var(--c-text-dim); }
+.pyth__head b { color: var(--c-gold); font-size: var(--fs-sm); letter-spacing: .04em; }
+.pyth__grid--board .pyth__cell {
+  min-height: 78px; gap: 3px; padding: 7px 5px 6px; border-color: rgba(212, 175, 55, .3);
+  background: radial-gradient(120% 90% at 50% 0%, #15131a, #050507 70%);
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .6);
+}
+.pyth__grid--board:not(.is-tracing) .pyth__cell.is-empty { opacity: 1; } /* при подсветке пустые притухают, как все */
+.pyth__grid--board .pyth__cell--none .pyth__digits { color: var(--py-none); opacity: .8; }
+.pyth__field {
+  display: grid; align-content: space-between; justify-items: center; gap: 3px; min-width: 0; padding: 6px 4px;
+  border: 1px solid rgba(212, 175, 55, .3); border-radius: var(--r-md); text-align: center; cursor: pointer;
+  background: linear-gradient(180deg, rgba(255, 236, 190, .1), rgba(255, 236, 190, .03));
+  transition: background .15s, border-color .15s;
+}
+.pyth__field-name { color: var(--c-gold); font-size: .62rem; line-height: 1.15; hyphens: manual; }
+.pyth__field-sum { color: var(--c-text); font-size: var(--fs-lg, 1.25rem); line-height: 1; }
+.pyth__field.is-on, .pyth__field:hover { border-color: var(--c-gold); background: rgba(255, 215, 120, .16); }
+.pyth__scale { display: flex; gap: 2px; width: 100%; max-width: 64px; }
+.pyth__scale i { flex: 1; height: 5px; border-radius: 2px; background: rgba(255, 255, 255, .09); }
+.pyth__scale--none i.is-on { background: var(--py-none); box-shadow: 0 0 6px var(--py-none); }
+.pyth__scale--low i.is-on { background: var(--py-low); box-shadow: 0 0 6px var(--py-low); }
+.pyth__scale--ok i.is-on { background: var(--py-ok); box-shadow: 0 0 6px var(--py-ok); }
+.pyth__legend { display: flex; flex-wrap: wrap; justify-content: center; gap: 4px 14px; margin: -4px 0 var(--sp-3); font-size: var(--fs-xs, .8rem); color: var(--c-text-dim); }
+.pyth__legend span { display: inline-flex; align-items: center; gap: 6px; }
+.pyth__dot { width: 14px; height: 5px; border-radius: 2px; }
+.pyth__dot--none { background: #e5534b; box-shadow: 0 0 6px #e5534b; }
+.pyth__dot--low { background: #e9b949; box-shadow: 0 0 6px #e9b949; }
+.pyth__dot--ok { background: #3fcf8e; box-shadow: 0 0 6px #3fcf8e; }

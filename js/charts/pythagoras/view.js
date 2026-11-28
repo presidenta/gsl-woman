@@ -9,10 +9,30 @@ const GRID = [1, 4, 7, 2, 5, 8, 3, 6, 9]; // столбцы 1-2-3 · 4-5-6 · 7-
 const NS = 'http://www.w3.org/2000/svg';
 const at = (k) => { const i = GRID.indexOf(k); return [(i % 3) + 0.5, Math.floor(i / 3) + 0.5]; }; // центр клетки в сетке 3×3
 
-/** Сетка 3×3 с наложенной линией: light(digits) подсвечивает клетки и проводит через них линию, light(null) — гасит. */
-function makeGrid(r, T, cls = '') {
-  const cells = Object.fromEntries(GRID.map((k) => [k, h('div', { class: `pyth__cell${r.counts[k] ? '' : ' is-empty'}` },
-    h('span', { class: 'pyth__digits' }, r.cells[k]), h('span', { class: 'pyth__name' }, T.cells[k]))]));
+/* ЦВЕТ И ШКАЛА (владелец 28.11.2026 по образцу: «квадрат какой-то скучный, мёртвый текст — сделать в цветах, шкала
+   кубиков: нет цифры — красная, одна-две — жёлтая, достаточно и много — зелёные; поля вокруг квадрата — за что
+   отвечают; премиум-стиль сохранить»). Клетка: нет цифры — красный; «мало» — жёлтый, по тем же порогам level(), что и
+   советы «что делать» (у единиц мало 1–2, у двоек 1, у остальных одна цифра — уже норма); иначе — зелёный.
+   Поле линии: 0 — красный, 1–2 — жёлтый, 3 и больше — зелёный. Кубиков — сколько цифр (не больше шести). */
+const SEGS = 6;
+const cellTone = (d, n) => (!n ? 'none' : level(d, n) === 'low' ? 'low' : 'ok');
+const lineTone = (t) => (!t ? 'none' : t <= 2 ? 'low' : 'ok');
+const scale = (n, tone) => h('span', { class: `pyth__scale pyth__scale--${tone}`, 'aria-hidden': 'true' },
+  ...Array.from({ length: SEGS }, (_, i) => h('i', { class: i < Math.max(1, Math.min(n, SEGS)) ? 'is-on' : '' })));
+
+/* Поля вокруг квадрата, как в классической таблице: справа — строки, снизу — столбцы, в углах — диагонали
+   (сверху справа 3-5-7 «Темперамент», снизу справа 1-5-9 «Духовность»). [ключ линии, строка, столбец] доски 4×5. */
+const FIELDS = [['temper', 1, 4], ['goal', 2, 4], ['family', 3, 4], ['habits', 4, 4], ['self', 5, 1], ['money', 5, 2], ['talent', 5, 3], ['spirit', 5, 4]];
+
+/** Сетка 3×3 с наложенной линией: light(digits) подсвечивает клетки и проводит через них линию, light(null) — гасит.
+    board — доска с полями линий вокруг и рабочими числами сверху (квадрат одного человека); без неё — малая сетка пары. */
+function makeGrid(r, T, cls = '', board = false) {
+  const cells = Object.fromEntries(GRID.map((k, i) => [k, h('div', {
+    class: `pyth__cell pyth__cell--${cellTone(k, r.counts[k])}${r.counts[k] ? '' : ' is-empty'}`,
+    style: board ? { gridRow: String(Math.floor(i / 3) + 2), gridColumn: String((i % 3) + 1) } : null,
+  },
+  h('span', { class: 'pyth__digits' }, r.cells[k]), h('span', { class: 'pyth__name' }, T.cells[k]),
+  board ? scale(r.counts[k], cellTone(k, r.counts[k])) : null)]));
   const path = document.createElementNS(NS, 'polyline');
   path.setAttribute('class', 'pyth__path');
   path.setAttribute('vector-effect', 'non-scaling-stroke');
@@ -22,15 +42,26 @@ function makeGrid(r, T, cls = '') {
   over.setAttribute('preserveAspectRatio', 'none');
   over.setAttribute('aria-hidden', 'true');
   over.append(path);
-  const grid = h('div', { class: `pyth__grid ${cls}`.trim() }, ...GRID.map((k) => cells[k]), over);
+  // поля линий: название, сумма, шкала; касание поля — как касание строки в списке итогов (подсветка клеток)
+  const fields = board ? Object.fromEntries(FIELDS.map(([id, row, col]) => {
+    const l = r.lines.find((x) => x.id === id);
+    return [id, h('div', { class: `pyth__field pyth__field--${lineTone(l.total)}`, tabindex: '0', style: { gridRow: String(row), gridColumn: String(col) } },
+      h('span', { class: 'pyth__field-name' }, T.ui.fields?.[id] ?? T.lines[id].name), h('b', { class: 'pyth__field-sum' }, String(l.total)), scale(l.total, lineTone(l.total)))];
+  })) : {};
+  const head = board && r.work ? h('p', { class: 'pyth__head' }, h('span', {}, T.ui.work), h('b', {}, r.work.join(' · '))) : null;
+  const grid = h('div', { class: `pyth__grid ${board ? 'pyth__grid--board' : ''} ${cls}`.trim() }, head, ...GRID.map((k) => cells[k]), ...Object.values(fields), over);
   const light = (digits) => {
     Object.values(cells).forEach((c) => c.classList.remove('is-lit'));
     grid.classList.toggle('is-tracing', Boolean(digits));
     path.setAttribute('points', digits ? digits.map((k) => at(k).join(',')).join(' ') : '');
     digits?.forEach((k) => cells[k].classList.add('is-lit'));
   };
-  return { grid, light };
+  return { grid, light, fields };
 }
+
+/** Под доской — что значат цвета шкалы. */
+const legend = (T) => h('p', { class: 'pyth__legend' }, ...['none', 'low', 'ok'].map((tone, i) =>
+  h('span', {}, h('i', { class: `pyth__dot pyth__dot--${tone}` }), T.ui.legend[i])));
 
 /* Итоги линий в два столбика (1-2-3…1-4-7 и 2-5-8…3-5-7), число сразу за названием (владелец 27.11.2026); наведение
    мышью или касание пальцем подсвечивает клетки, из которых сложен итог, во ВСЕХ квадратах блока (у пары — в обоих)
@@ -43,21 +74,26 @@ function sums(grids, lines, T, value) {
     li?.classList.toggle('is-on', Boolean(l));
     grids.forEach((g) => g.light(l ? l.digits : null));
   };
+  // строка списка и поле линии на доске (если есть) ведут себя одинаково
+  const bind = (node, l) => {
+    node.addEventListener('pointerenter', (e) => { if (e.pointerType === 'mouse') show(l, node); });
+    node.addEventListener('pointerleave', (e) => { if (e.pointerType === 'mouse') show(null, node); });
+    node.addEventListener('focus', () => show(l, node));
+    node.addEventListener('blur', () => show(null, node));
+    node.addEventListener('click', () => (active === node ? show(null, node) : show(l, node))); // на телефоне — касание включает и выключает
+  };
+  grids.forEach((g) => lines.forEach((l) => { if (g.fields?.[l.id]) bind(g.fields[l.id], l); }));
   return h('ul', { class: 'pyth__sums' }, ...lines.map((l, i) => {
     const li = h('li', { tabindex: '0' }, h('span', {}, `${T.lines[l.id].name} (${l.digits.join('-')})`), h('b', {}, value(i)));
-    li.addEventListener('pointerenter', (e) => { if (e.pointerType === 'mouse') show(l, li); });
-    li.addEventListener('pointerleave', (e) => { if (e.pointerType === 'mouse') show(null, li); });
-    li.addEventListener('focus', () => show(l, li));
-    li.addEventListener('blur', () => show(null, li));
-    li.addEventListener('click', () => (active === li ? show(null, li) : show(l, li))); // на телефоне — касание включает и выключает
+    bind(li, l);
     return li;
   }));
 }
 
-/** Квадрат одного человека (или общий ресурс пары) с итогами линий. */
+/** Квадрат одного человека (или общий ресурс пары): доска с полями линий и шкалами, подпись цветов, итоги линий. */
 function square(r, T) {
-  const g = makeGrid(r, T);
-  return [g.grid, sums([g], r.lines, T, (i) => String(r.lines[i].total))];
+  const g = makeGrid(r, T, '', true);
+  return [g.grid, legend(T), sums([g], r.lines, T, (i) => String(r.lines[i].total))];
 }
 
 /** Расшифровка: 9 цифр по числу вхождений, затем 8 линий по сумме. */
@@ -90,8 +126,7 @@ export function pythagorasCard(iso, caption = null) {
   return h('section', { class: 'card pyth' },
     h('h2', { class: 'card__title' }, T.ui.title),
     caption ? h('p', { class: 'chart__src' }, caption) : null,
-    h('p', { class: 'faint' }, `${T.ui.work}: ${r.work.join(' · ')}`),
-    ...square(r, T), decoding(r, T));
+    ...square(r, T), decoding(r, T)); // рабочие числа — в верхней строке доски, как в классической таблице
 }
 
 /** Пара: два квадрата рядом, сравнение по каждой цифре с советом паре, линии обоих; сумма — свёрнутым «общим ресурсом». */
