@@ -69,7 +69,7 @@ export function secretCard(ctx) {
       h('h3', { class: 'secret__title' }, ch.chakra),
       ...chapterBody(ch),
       h('p', { class: 'secret__next' }, nextLine(n, ctx.day, days, sec)),
-      h('a', { class: 'secret__all', href: '#/library' }, st('openAll')),
+      h('a', { class: 'secret__all', href: '#/archive' }, st('openAll')),
     ],
   }).node;
 }

@@ -203,9 +203,10 @@ export function render(view, ctx) {
 /** Пришли на экран — сразу сверить с сервером. */
 export function onEnter() {
   joining = false;
-  // Пришли со своей кнопки «Чат пары» / «Семейный чат» (#/us?pair, #/us?family, 239) — сразу эта переписка
-  const want = location.hash.split('?')[1];
-  if (want === 'pair') { kind = 'pair'; pairTab = 'chat'; }
-  if (want === 'family') { kind = 'family'; familyTab = 'chat'; }
+  // Пришли с «Моей кнопки» (239–240): #/us?pair — чат пары, ?pair=wishes — желания, ?family — семейный чат,
+  // ?family=dreams — мечты детей
+  const [want, sub] = (location.hash.split('?')[1] || '').split('=');
+  if (want === 'pair') { kind = 'pair'; pairTab = sub === 'wishes' ? 'wishes' : 'chat'; }
+  if (want === 'family') { kind = 'family'; familyTab = ['kids', 'dreams'].includes(sub) ? sub : 'chat'; }
   circles.refresh().catch(() => {});
 }

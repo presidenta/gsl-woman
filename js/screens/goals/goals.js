@@ -15,7 +15,7 @@ import { photoOf, photo, fixed } from '../../photos/photos.js';
 import { plateLink, platePanel } from '../../ui/plate.js';
 import * as help from '../../help/help.js';
 import { at } from '../../anketa/texts.js';
-import { itemPlate } from '../help/help.js';
+import { itemPlate, openPlate } from '../help/help.js';
 import { intimLink } from '../intim/intim.js';
 import { secretPlate } from '../../secret/secret.js';
 import { photoStrip } from '../../media/photo-field.js';
@@ -198,13 +198,13 @@ export function render(view, ctx) {
     // анкеты — отдельный пункт… и вынести в артефакты»); раскрывается прямо здесь
     surveysPlate(ctx),
     complimentsPlate(ctx),
-    libraryPlate(),
+    archivePlate(),
     // «Карты рождения» (#/charts, 26.11.2026): Пифагор, Матрица Ладини, Human Design — для себя, партнёра, детей
     plateLink({ href: '#/charts', icon: icons.natal, title: chartsText().title, lead: chartsText().tileLead }), // надписи на трёх языках (218)
     // «Секретные материалы» — главы книги о чакрах (js/secret/): с 172 здесь, а не в «Тайном архиве» (владелец 22.11.2026:
     // «две книжки одинаковых в одном разделе — нелогично»; целиком книга — в архиве)
-    secretPlate(ctx),
-    // «Если постучишь в мою тайную дверь» — раздел 18+ (#/intim): с 161 здесь, под «Библиотекой» (владелец 22.11.2026)
+    keep(secretPlate(ctx), 'secret'),
+    // «Если постучишь в мою тайную дверь» — раздел 18+ (#/intim): с 161 здесь, под «Тайным архивом» (владелец 22.11.2026)
     intimLink(ctx.lang),
     lettersPlate(ctx),
   );
@@ -281,8 +281,8 @@ function surveysPlate(ctx) {
   return item ? itemPlate(item, ctx, null, { photo: photo(fixed('surveys', 0)), before: [anketa], extra: [love], extraCount: 3 }) : null;
 }
 
-function libraryPlate() {
-  return plateLink({ href: '#/library', icon: icons.archive, title: t('library.title'), lead: t('library.lead') });
+function archivePlate() {
+  return plateLink({ href: '#/archive', icon: icons.archive, title: t('archive.title'), lead: t('archive.lead') });
 }
 
 function lettersPlate(ctx) {
@@ -296,5 +296,28 @@ function lettersPlate(ctx) {
       lettersBody(ownBox, { rerender: () => { lettersOpen = true; ctx.rerender(); } })),
   });
   node.addEventListener('toggle', () => { lettersOpen = node.open; });
+  node.dataset.plate = 'letters'; // «Моя кнопка» → «Письмо себе в будущее»
   return node;
+}
+
+/* «Моя кнопка» (239–240): #/goals?tab=pair | family — цели пары или семьи; #/goals?open=<плашка> — плашка раскрыта и
+   видна сразу (анкеты, комплименты — через openPlate «Помощи»; секретные материалы, письмо — свои флаги). */
+let secretOpen = false;
+const keep = (node, id) => {
+  if (!node) return null;
+  node.dataset.plate = id;
+  if (id === 'secret' && secretOpen) node.open = true;
+  node.addEventListener('toggle', () => { if (id === 'secret') secretOpen = node.open; });
+  return node;
+};
+
+export function onEnter() {
+  const q = new URLSearchParams(location.hash.split('?')[1] || '');
+  if (['mine', 'pair', 'family'].includes(q.get('tab'))) tab = q.get('tab');
+  const key = q.get('open');
+  if (!key) return;
+  tab = 'mine'; // плашки — на вкладке «Мои»
+  if (key === 'secret') secretOpen = true;
+  if (key === 'letters') lettersOpen = true;
+  openPlate(key);
 }

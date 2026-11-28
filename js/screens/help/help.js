@@ -3,7 +3,7 @@ import { t, plural } from '../../core/i18n.js';
 import { icons } from '../../ui/icons.js';
 import { toast } from '../../ui/toast.js';
 import { photo as photoNode, fixed, chapter } from '../../photos/photos.js';
-import { plateLink, platePanel } from '../../ui/plate.js';
+import { platePanel } from '../../ui/plate.js';
 import { flagRow, flagTotal, picked } from '../../ui/flags.js';
 import * as help from '../../help/help.js';
 import * as rules from '../../help/rules.js';
@@ -12,7 +12,7 @@ import { LANGS } from '../../config.js';
 import { chakraCheck } from '../../chakra-check/check.js';
 
 /* ЭКРАН «ПОМОЩЬ» (#/help, владелец 14–15.11.2026) — быстрое: первое свидание и вопросы для разговора. С 15.11.2026
-   остальные пункты — на экране «Библиотека» (screens/library/), «Красный флаг» — отдельный экран (screens/redflag/);
+   остальные пункты — на экране «Тайный архив» (screens/archive/), «Красный флаг» — отдельный экран (screens/redflag/);
    их плашки и папки — отсюда (itemPlate, folder). Все пункты — одним видом (ui/plate.js): значок в
    круге, название, число, стрелка («на экране всё в одном стиле, без хаоса»).
    - Сверху «Первое свидание» — переход в «Знакомство».
@@ -208,8 +208,12 @@ function questionPlates(item, verdicts, scene = null) {
   ];
 }
 
-/** Открыть плашку при следующей отрисовке (своя кнопка «Архетипы», 239). */
-export const openPlate = (id) => opened.add(id);
+/** Открыть плашку при следующей отрисовке и показать её («Моя кнопка», 239–240: архетипы, правила дома, анкеты…).
+    Зовут из onEnter — до отрисовки, поэтому плашку ищем, когда экран уже построен. */
+export function openPlate(id) {
+  opened.add(id);
+  setTimeout(() => document.querySelector(`[data-plate="${CSS.escape(id)}"]`)?.scrollIntoView({ block: 'start' }), 0);
+}
 
 /** Раздел «Вопросов» из адреса: #/help?date или #/help?pair (плашки «Артефактов»); без него — оба раздела. */
 const sceneOf = () => ({ date: 'date', pair: 'pair' })[location.hash.split('?')[1]] || null;

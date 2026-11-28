@@ -22,7 +22,7 @@ import { careersView, stepTitle, doStep } from './careers.js';
 import { KID_LETTER_PROMPTS } from './dreams-catalog.js';
 import { lettersCard } from '../letters/letters-view.js';
 import { ask } from '../ui/ask.js';
-import { groupOf, shown, titleFor, powerCard } from './ages.js';
+import { shown, titleFor, powerCard } from './ages.js';
 
 /* ДЕТСКИЙ КАБИНЕТ НА ТЕЛЕФОНЕ РЕБЁНКА (владелец 14.11.2026, ТЗ — docs/TZ-deti.md). Своё приложение внутри GSL:
    js/boot.js открывает его вместо взрослого, когда на телефоне вход ребёнка или пришла ссылка #kid=КОД.

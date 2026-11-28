@@ -9,7 +9,7 @@ export default {
     sharedTagline: 'A quest for men and women — and their parents',
   },
 
-  nav: { today: 'Today', week: 'Week', goals: 'Artifacts', journal: 'Achievements', soon: 'Coming soon', path: 'Quest' },
+  nav: { today: 'Today', goals: 'Artifacts', journal: 'Achievements', path: 'Quest' },
   fold: { open: 'Open', close: 'Close' },
   score: {
     totalTitle: 'Total for the day',
@@ -895,7 +895,7 @@ export default {
     tier: { month: 'monthly', two: 'every 2 months', three: 'every 3 months' },
   },
   // «Библиотека» и «Красный флаг» — свои экраны (владелец 15.11.2026)
-  library: {
+  archive: {
     title: 'Secret archive', // было «Library» — владелец 22.11.2026: «выбивается из контекста»
     lead: 'To read and come back to: what she needs from you, authors for the men’s side, topics, house rules, date ideas.',
   },
@@ -931,7 +931,6 @@ export default {
     pairLead: 'For a talk together: about work, dreams and feelings — brief or for a whole evening',
     loveLink: 'The five love languages — questionnaires about yourself and your loved ones',
     meetTitle: 'First date',
-    library: 'Secret archive',
     draft: 'draft',
     waiting: 'This section arrives together with the programme — open the app online.',
   },

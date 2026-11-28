@@ -1,7 +1,7 @@
 import * as resume from './resume.js';
 import { reveal } from './settings-card.js';
 
-/* СВОЯ КНОПКА — стыковка с приложением (README.md рядом). main.js: navItem() на месте бывшей «В разработке» и
+/* «МОЯ КНОПКА» — стыковка с приложением (README.md рядом). main.js: navItem() на месте бывшей «В разработке» и
    entered(name) после каждого перехода; настройки: shortcutCard(ctx). */
 export { navItem } from './nav.js';
 export { shortcutCard } from './settings-card.js';

@@ -1,4 +1,4 @@
-import { h, svg } from '../core/dom.js';
+import { h } from '../core/dom.js';
 import { t } from '../core/i18n.js';
 import { icons } from '../ui/icons.js';
 import { foldCard } from '../ui/fold.js';

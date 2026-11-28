@@ -1,4 +1,4 @@
-import { WEEK_DAYS, TASK_DAYS, LEVELS } from '../config.js';
+import { WEEK_DAYS, LEVELS } from '../config.js';
 import { firstDayOfWeek } from '../core/dates.js';
 
 /* ПРОГРЕСС НЕДЕЛИ — считается из записей, ничего своего не хранит.

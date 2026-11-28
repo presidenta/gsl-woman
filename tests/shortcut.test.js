@@ -13,6 +13,8 @@ test('варианты: «Недели» нет (владелец 28.11.2026), �
   assert.equal(new Set(ids).size, ids.length);
   assert.ok(!ids.includes('week') && !OPTIONS.some((o) => o.hash?.startsWith('#/week')));
   assert.ok(option('resume')?.resume);
+  // разделы, которые владелец назвал (28.11.2026): первое свидание, вопросы, анкеты, комплименты, тайный архив
+  for (const id of ['meet', 'questionsDate', 'questionsPair', 'surveys', 'compliments', 'archive']) assert.ok(option(id), id);
   assert.equal(option('нет такого'), null);
   assert.equal(option(null), null);
 });

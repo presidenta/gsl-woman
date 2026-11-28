@@ -1,4 +1,4 @@
-import { h, svg, add } from '../../core/dom.js';
+import { h, svg } from '../../core/dom.js';
 import { t, formatDate, weekdayShort } from '../../core/i18n.js';
 import { WEEKS } from '../../config.js';
 import { weekOf, dateOfDay } from '../../core/dates.js';
@@ -7,12 +7,9 @@ import { weekSummary } from '../../progress/progress.js';
 import { icons } from '../../ui/icons.js';
 import { weekRing, levelDots } from '../../ui/ring.js';
 import { openEntry } from '../entry/entry-sheet.js';
-import { summarize } from '../../insights/insights.js';
-import { summaryCard } from '../../insights/summary-card.js';
-import { habits, DAY } from '../../insights/habits.js';
-import { habitsCard } from '../../insights/habits-card.js';
 
-/* ЭКРАН «НЕДЕЛЯ»: кольцо из семи дней с процентом в центре, под ним — дни списком. Стрелками
+/* «НЕДЕЛЯ» — часть «Достижений» (journal.js берёт weekParts и onEnter; отдельного экрана #/week нет с 240, кнопки на
+   панели — с 26.11.2026): кольцо из семи дней с процентом в центре, под ним — дни списком. Стрелками
    листаются прошлые недели (вперёд — не дальше текущей). Пропущенный день текущей недели можно
    нажать и записать задним числом: это и есть «наверстать». */
 
@@ -84,18 +81,4 @@ export function weekParts(ctx, { heading = 'h1' } = {}) {
     h('ul', { class: 'week-days' }, ...summary.days.map((d) => dayRow(ctx, d, summary))),
   ];
   return { nodes, range: { from: (shown - 1) * 7 + 1, to: shown * 7 } };
-}
-
-export function render(view, ctx) {
-  const parts = weekParts(ctx);
-  add(view,
-    ...parts.nodes,
-    // Утро недели: стакан тёплой воды и утренняя минута — кружок на каждый день (владелец 13.11.2026)
-    ...(() => {
-      const s = habits(parts.range, ctx.day, ctx.settings.startDate);
-      return [habitsCard(s), habitsCard(s, { title: t('insights.habits.dayTitle'), list: DAY })];
-    })(),
-    // Итоги недели: реакции мужчин по дням и что получилось
-    summaryCard(summarize(ctx.entries, parts.range, ctx.lang), { title: t('insights.title.week') }),
-  );
 }

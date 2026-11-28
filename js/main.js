@@ -25,7 +25,6 @@ import { isOpen as sheetOpen } from './ui/sheet.js';
 import { toast } from './ui/toast.js';
 import { icons } from './ui/icons.js';
 import * as today from './screens/today/today.js';
-import * as week from './screens/week/week.js';
 import * as journalScreen from './screens/journal/journal.js';
 import * as path from './screens/path/path.js';
 import * as settingsScreen from './screens/settings/settings.js';
@@ -38,7 +37,7 @@ import * as loveScreen from './screens/love/love.js';
 import * as meetScreen from './screens/meet/meet.js';
 import * as searchScreen from './screens/search/search.js';
 import * as helpScreen from './screens/help/help.js';
-import * as libraryScreen from './screens/library/library.js';
+import * as archiveScreen from './screens/archive/archive.js';
 import * as redflagScreen from './screens/redflag/redflag.js';
 import * as intimScreen from './screens/intim/intim.js'; // «Интим 18⁺» (js/intim/, 21.11.2026)
 import * as usScreen from './screens/us/us.js';
@@ -84,7 +83,6 @@ const NAV = [
 ];
 
 router.define('today', today);
-router.define('week', week);
 router.define('journal', journalScreen);
 router.define('path', path);
 router.define('goals', goalsScreen);
@@ -93,7 +91,7 @@ router.define('love', loveScreen);
 router.define('meet', meetScreen);
 router.define('search', searchScreen);
 router.define('help', helpScreen);
-router.define('library', libraryScreen);
+router.define('archive', archiveScreen);
 router.define('redflag', redflagScreen);
 router.define('intim', intimScreen);
 router.define('us', usScreen);
@@ -346,11 +344,11 @@ function draw() {
   // Каркас пересобирается целиком, чтобы смена языка сразу дошла до шапки и панели
   shell = buildShell();
   const name = router.currentRoute() || router.routeName();
-  const screen = { today, week, journal: journalScreen, path, goals: goalsScreen, settings: settingsScreen, love: loveScreen, meet: meetScreen, search: searchScreen, help: helpScreen, library: libraryScreen, redflag: redflagScreen, intim: intimScreen, us: usScreen, anketa: anketaScreen, charts: chartsScreen }[name] || today;
+  const screen = { today, journal: journalScreen, path, goals: goalsScreen, settings: settingsScreen, love: loveScreen, meet: meetScreen, search: searchScreen, help: helpScreen, archive: archiveScreen, redflag: redflagScreen, intim: intimScreen, us: usScreen, anketa: anketaScreen, charts: chartsScreen }[name] || today;
 
   // Шапка: везде — кто вошёл (фото, имя, кабинет) и название; в настройках — «назад» вместо себя
   // «Пять языков любви» — тоже подэкран: «назад» вместо себя
-  const sub = name === 'settings' || name === 'love' || name === 'meet' || name === 'search' || name === 'help' || name === 'library' || name === 'redflag' || name === 'intim' || name === 'us' || name === 'anketa' || name === 'charts';
+  const sub = name === 'settings' || name === 'love' || name === 'meet' || name === 'search' || name === 'help' || name === 'archive' || name === 'redflag' || name === 'intim' || name === 'us' || name === 'anketa' || name === 'charts';
   // «Назад» — на всех экранах, кроме «Сегодня» (владелец 14.11.2026)
   noteRoute(name);
   shell.back.hidden = name === 'today';
@@ -366,7 +364,7 @@ function draw() {
     if (a.dataset.route === name) a.setAttribute('aria-current', 'page');
     else a.removeAttribute('aria-current');
   }
-  if (name === 'today' || name === 'week') {
+  if (name === 'today') {
     const strip = preview.bar(ctx.realDay);
     if (strip) shell.view.append(strip);
   }
