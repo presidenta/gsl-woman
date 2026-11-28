@@ -50,6 +50,7 @@
 .mx__age-yr { fill: var(--c-text-dim, #a89f8a); font: 500 4.4px var(--f-body, sans-serif); }
 /* Увеличение рисунка (235): касание рисунка или кнопки — на весь экран (js/zoom/) */
 .mx__pic { text-align: center; }
-.mx__svg { max-width: 400px; }
+.mx__svg { max-width: none; } /* во всю ширину карточки (владелец 28.11.2026: «увеличь круг максимально») */
+.mx__num--sm { font-size: 8.5px; }
 .mx__svg--zoom { cursor: zoom-in; }
 .mx__zoom { margin: 0 auto var(--sp-3); padding: 6px 14px; border: 1px solid rgba(212, 175, 55, .45); border-radius: 999px; background: none; color: var(--c-gold); font: inherit; font-size: var(--fs-sm); }

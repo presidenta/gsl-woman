@@ -157,21 +157,21 @@ const AGE_STEPS = [[1, 2.5], [2.5, 3.5], [3.5, 4], [5], [6, 7.5], [7.5, 8.5], [8
 /** Круг возрастов вокруг матрицы (владелец 28.11.2026: «обязательно внешний круг с годами жизни»): у восьми наружных
     точек — «0 лет», «10 лет»…; между ними — семь чисел (calc.js → ages) и их возраст, подписанный вдоль радиуса. */
 function ageRing(svg, r, T, O) {
-  const RL = 147; // линия круга — сразу за наружными кружками (их край — 143)
+  const RL = 159; // линия круга — сразу за наружными кружками (их край — 155)
   const at = (deg, rad) => [O + rad * Math.cos(deg * Math.PI / 180), O + rad * Math.sin(deg * Math.PI / 180)];
   const fmt = (v) => String(v).replace('.', T.ui.dec);
   svg.append(el('circle', { cx: O, cy: O, r: RL, class: 'mx__line mx__age-ring' }));
   r.ages.forEach((nums, i) => {
     const base = 180 + 45 * i; // А слева (0 лет), дальше по часовой — каждые 45° десять лет
-    const [lx, ly] = at(base, 172);
+    const [lx, ly] = at(base, 186);
     svg.append(el('text', { x: lx, y: ly + 3, class: 'mx__age-main' }, T.ages[i]));
     nums.forEach((v, j) => {
       const deg = base + 45 * (j + 1) / 8;
-      const [nx, ny] = at(deg, 155);
+      const [nx, ny] = at(deg, 167);
       svg.append(el('text', { x: nx, y: ny + 2.5, class: 'mx__age-num' }, String(v)));
       const label = AGE_STEPS[j].map((a) => fmt(a + 10 * i)).join('–');
       const flip = Math.cos(deg * Math.PI / 180) < 0; // левая половина — текст не вверх ногами
-      const [ax, ay] = at(deg, 162);
+      const [ax, ay] = at(deg, 174);
       svg.append(el('text', { x: ax, y: ay, class: 'mx__age-yr', 'text-anchor': flip ? 'end' : 'start', 'dominant-baseline': 'middle',
         transform: `rotate(${flip ? deg + 180 : deg} ${ax} ${ay})` }, label));
     });
@@ -182,15 +182,16 @@ function drawing(r, T, { ring = false } = {}) {
   const p = r.points;
   const R = r.rays;
   // с кругом возрастов поле шире: подписи лет выходят за наружные точки
-  const svg = el('svg', { viewBox: ring ? '-38 -38 376 376' : '0 0 300 300', class: 'mx__svg', role: 'img', 'aria-label': T.ui.aria });
+  const svg = el('svg', { viewBox: ring ? '-50 -50 400 400' : '-8 -8 316 316', class: 'mx__svg', role: 'img', 'aria-label': T.ui.aria });
   /* Геометрия по образцу владельца (27.11.2026: «как на рисунке — линии диагональные, цифры на своих уровнях, круг,
-     наружные круги соединить»): восемь наружных точек на радиусе 128 (А, Б, В, Г — по сторонам света, род — по углам);
-     второе число луча стоит ровно на стороне второго квадрата (радиус 90), третье — посередине (64), ближние к центру —
-     на внутреннем круге (38), который их ограничивает. */
+     наружные круги соединить»; 28.11.2026: «круг больше, промежутки больше; три первые цифры в каждом направлении — на
+     одном уровне, у линий рода тоже»): восемь наружных точек на радиусе 140 (А, Б, В, Г — по сторонам света, род — по
+     углам); во всех восьми направлениях второе число — на стороне квадрата или ромба (99), третье — посередине (72);
+     у А, Б, В, Г четвёртое — на внутреннем круге (42). */
   const O = 150;
   const DIR = { a: [-1, 0], b: [0, -1], c: [1, 0], d: [0, 1], f: [-1, -1], g: [1, -1], y: [1, 1], k: [-1, 1] };
   const pos = (k, rad) => { const [dx, dy] = DIR[k]; const n = Math.hypot(dx, dy); return [O + (dx / n) * rad, O + (dy / n) * rad]; };
-  const RING = [128, 90, 64, 38];
+  const RING = [140, 99, 72, 42];
   const outer = ['a', 'f', 'b', 'g', 'c', 'y', 'd', 'k'].map((k) => pos(k, RING[0]).join(',')).join(' ');
   svg.append(
     el('polygon', { points: outer, class: 'mx__line' }), // наружный восьмиугольник через все внешние кружки
@@ -201,26 +202,33 @@ function drawing(r, T, { ring = false } = {}) {
   if (ring) ageRing(svg, r, T, O);
   const at = {}; // ключ точки → [x, y, кружок]
   let id = '';
-  const dot = (x, y, v, big) => {
+  // size: true — наружная/центр (15), false — обычная (11), 'sm' — точка канала любви и денег (8)
+  const dot = (x, y, v, size) => {
     const col = DOT_COLOR[id];
-    const c = el('circle', { cx: x, cy: y, r: big ? 15 : 11, class: `mx__dot${big ? ' mx__dot--big' : ''}${col ? ` mx__dot--${col}` : ''}` });
+    const sm = size === 'sm';
+    const c = el('circle', { cx: x, cy: y, r: sm ? 8 : size ? 15 : 11, class: `mx__dot${size === true ? ' mx__dot--big' : ''}${col ? ` mx__dot--${col}` : ''}` });
     at[id] = [x, y, c];
-    svg.append(c, el('text', { x, y: y + 4, class: `mx__num${col ? ` mx__num--${col === 'yellow' ? 'dark' : 'light'}` : ''}` }, String(v)));
+    svg.append(c, el('text', { x, y: y + (sm ? 3 : 4), class: `mx__num${sm ? ' mx__num--sm' : ''}${col ? ` mx__num--${col === 'yellow' ? 'dark' : 'light'}` : ''}` }, String(v)));
   };
   const named = (key, ...a) => { id = key; dot(...a); };
   // А слева, Б сверху, В справа, Г снизу, Д в центре; род — углы квадрата
   [['A', 'a'], ['B', 'b'], ['C', 'c'], ['D', 'd'], ['F', 'f'], ['G', 'g'], ['Y', 'y'], ['K', 'k']].forEach(([K, k]) => named(K, ...pos(k, RING[0]), p[K], true));
   named('E', O, O, p.E, true);
-  // род (диагонали): первое число — на стороне ромба, второе — на внутреннем круге
-  ['f', 'g', 'y', 'k'].forEach((k) => [R[k].x1, R[k].x2].forEach((v, i) => named(`${k}${i + 1}`, ...pos(k, [RING[1], RING[3]][i]), v, false)));
-  // канал любви и денег — на стороне от В (справа) к Г (низ): ♥ ближе к низу, $ ближе к правому краю, Х посередине
+  // род (диагонали): на тех же уровнях, что и у сторон — на стороне ромба и посередине
+  ['f', 'g', 'y', 'k'].forEach((k) => [R[k].x1, R[k].x2].forEach((v, i) => named(`${k}${i + 1}`, ...pos(k, RING[i + 1]), v, false)));
+  /* Канал любви и денег — как у Ладини, пунктир от входа в денежный канал (В+Д, справа посередине) к входу в канал
+     отношений (Г+Д, снизу посередине); точка баланса — где он пересекает диагональ, $ — ближе к В, ♥ — ближе к Г.
+     Точки канала мелкие (как на образце), чтобы не налегали на соседние. */
   const lm = r.loveMoney;
-  // кружки не налегают на точки диагонали Ы (владелец 27.11.2026: «11 и 19 накладываются»): канал — поперёк диагонали,
-  // точка баланса — между её точками, $ — к В, ♥ — к Г
-  svg.append(el('line', { x1: 226, y1: 166, x2: 166, y2: 226, class: 'mx__line mx__line--dash' }));
-  [['bal', 196, 196, lm.balance], ['money', 219, 173, lm.money], ['love', 173, 219, lm.love]].forEach(([k, x, y, v]) => named(k, x, y, v, false));
-  svg.append(el('text', { x: 240, y: 182, class: 'mx__sign' }, '$'), el('text', { x: 182, y: 244, class: 'mx__sign' }, '♥'));
-  // стороны: первое число — на стороне квадрата рода, второе — посередине, третье — на внутреннем круге
+  const [cx2, cy2] = pos('c', RING[2]);
+  const [dx2, dy2] = pos('d', RING[2]);
+  const on = (t) => [cx2 + (dx2 - cx2) * t, cy2 + (dy2 - cy2) * t]; // точка на пунктире: 0 — у В+Д, 1 — у Г+Д
+  svg.append(el('line', { x1: cx2, y1: cy2, x2: dx2, y2: dy2, class: 'mx__line mx__line--dash' }));
+  [['money', 0.25, lm.money], ['bal', 0.5, lm.balance], ['love', 0.75, lm.love]].forEach(([k, t, v]) => named(k, ...on(t), v, 'sm'));
+  const [mx, my] = on(0.25);
+  const [lx, ly] = on(0.75);
+  svg.append(el('text', { x: mx + 11, y: my + 15, class: 'mx__sign' }, '$'), el('text', { x: lx + 15, y: ly + 11, class: 'mx__sign' }, '♥'));
+  // стороны: второе число — на стороне квадрата рода, третье — посередине, четвёртое — на внутреннем круге
   ['a', 'b', 'c', 'd'].forEach((k) => [R[k].x1, R[k].x2, R[k].x3].forEach((v, i) => named(`${k}${i + 1}`, ...pos(k, RING[i + 1]), v, false)));
   // Подсветка (владелец 27.11.2026: «нажимаешь на цифры — подсвечивается, откуда они берутся, в самой матрице»)
   const path = el('polyline', { class: 'mx__path' });
