@@ -19,7 +19,7 @@ export function navItem(choice) {
   const icon = o ? svg(o.icon) : h('span', { class: 'app-nav__ask', 'aria-hidden': 'true' }, '?');
   const main = h('a', { class: 'app-nav__mine-open', href: o?.hash || (o ? '#/' : SETTINGS_HASH) }, h('span', { class: 'app-nav__mine-icon' }, icon), h('span', {}, label));
   if (o?.list) main.addEventListener('click', (e) => { e.preventDefault(); openList(); }); // «Мои закладки» — список
-  const gear = h('a', { class: 'app-nav__mine-gear', href: SETTINGS_HASH, 'aria-label': T.gear }, svg(icons.gear));
+  const gear = h('a', { class: 'app-nav__mine-gear', href: SETTINGS_HASH, 'aria-label': T.gear }, svg(icons.gearSolid));
   const route = o?.route; // подсветка «я здесь», как у соседних кнопок (у «Моих закладок» — нет)
   return h('div', { class: `app-nav__item app-nav__mine${o ? '' : ' is-empty'}`, dataset: route ? { route } : {} }, main, gear);
 }

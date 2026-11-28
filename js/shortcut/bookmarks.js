@@ -1,6 +1,5 @@
 import { h, svg } from '../core/dom.js';
 import { icons } from '../ui/icons.js';
-import { toast } from '../ui/toast.js';
 import { openSheet, closeSheet } from '../ui/sheet.js';
 import { read, writeQuiet } from '../core/store.js';
 import { ST } from './texts.js';
@@ -49,23 +48,59 @@ export function save() {
   // Глава — последняя раскрытая, чьё начало выше середины экрана
   const chapter = inner.filter((d) => d.open && d.getBoundingClientRect().top < innerHeight / 2).pop();
   const top = plate ? plate.getBoundingClientRect().top + scrollY : 0;
+  // Без книги и главы ленточка ляжет на блок раздела, который сейчас посередине экрана
+  const kids = [...view().children].filter((c) => !c.matches('.bm-here, .bm-fab'));
+  const child = plate || chapter ? -1 : kids.reduce((k, c, i) => (c.getBoundingClientRect().top < innerHeight / 2 ? i : k), 0);
   const hash = place();
   const key = plate ? `${hash}#${plate.dataset.plate}` : hash;
   const bm = {
     key, hash, plate: plate?.dataset.plate || null, open, offset: Math.round(scrollY - top), // может быть и меньше нуля: стоял чуть выше начала книги
     title: text(plate ? plate.querySelector('.plate__title') : view()?.querySelector('.screen-title')),
     chapter: chapter ? text(chapter.querySelector('summary')) : '', at: new Date().toISOString(),
+    mark: chapter ? inner.indexOf(chapter) : -1, child, // на чём висит ленточка
   };
   const list = { ...all(), [key]: bm };
   const keys = Object.keys(list).sort((a, b) => list[b].at.localeCompare(list[a].at)).slice(0, MAX);
   writeQuiet(KEY, Object.fromEntries(keys.map((k) => [k, list[k]])));
-  toast({ title: ST().bm.saved, text: label(bm) });
+  hang(bm, true); // золотая ленточка опускается на читаемый текст и остаётся на нём
+  navigator.vibrate?.(12);
 }
+
+/* ЛЕНТОЧКА НА ТЕКСТЕ (владелец 28.11.2026: «при нажатии — золотая ленточка поверх того, что читаешь, и фиксируется;
+   как закладка в книге; лакшери, лаконично»). Висит на заголовке главы, которую читали; глава свёрнута — на заголовке
+   книги; нет книги — на блоке раздела. Заголовок (summary) виден всегда, даже у свёрнутой главы, — поэтому ленточка
+   на нём, а не внутри главы. Новая — опускается сверху с покачиванием и бликом, рядом на миг — «Место отмечено». */
+const shown = (el) => !!el && el.getClientRects().length > 0;
+function anchorOf(bm, v) {
+  const plate = bm.plate ? v.querySelector(`[data-plate="${CSS.escape(bm.plate)}"]`) : null;
+  if (bm.plate && !plate) return null;
+  const scope = plate || v;
+  const head = (d) => d?.querySelector(':scope > summary');
+  const chapter = bm.mark >= 0 ? head(scope.querySelectorAll('details')[bm.mark]) : null;
+  if (shown(chapter)) return chapter;
+  if (plate) return head(plate);
+  return [...v.children].filter((c) => !c.matches('.bm-here, .bm-fab'))[bm.child ?? 0] || null;
+}
+
+function hang(bm, fresh = false) {
+  const v = view();
+  if (!v) return;
+  document.querySelectorAll(`.bm-ribbon[data-key="${CSS.escape(bm.key)}"]`).forEach((r) => r.remove());
+  const at = anchorOf(bm, v);
+  if (!at) return;
+  const note = fresh ? h('span', { class: 'bm-ribbon__note' }, ST().bm.marked) : null;
+  at.classList.add('bm-anchor');
+  at.append(h('span', { class: `bm-ribbon${fresh ? ' is-new' : ''}`, dataset: { key: bm.key }, 'aria-hidden': 'true' }, note));
+  if (note) setTimeout(() => note.remove(), 3200);
+}
+
+const hangAll = () => Object.values(all()).filter((bm) => bm.hash === place()).forEach((bm) => hang(bm));
 
 export function remove(key) {
   const list = all();
   delete list[key];
   writeQuiet(KEY, list);
+  document.querySelectorAll(`.bm-ribbon[data-key="${CSS.escape(key)}"]`).forEach((r) => r.remove());
 }
 
 const label = (bm) => [bm.title, bm.chapter].filter(Boolean).join(' · ');
@@ -79,6 +114,7 @@ function apply(bm) {
   const scope = plate || view();
   // По порядку: раскрытая глава может принести свои вложенные — их номера идут следом
   for (const i of bm.open || []) { const d = scope?.querySelectorAll('details')[i]; if (d) d.open = true; }
+  hangAll(); // главы раскрылись — ленточки переезжают на свои главы
   const back = () => scrollTo({ top: (plate ? plate.getBoundingClientRect().top + scrollY : 0) + (bm.offset || 0) });
   setTimeout(back, 60); // после прокрутки экрана к началу и к открытой плашке
   setTimeout(back, 450); // картинки догрузились и сдвинули страницу — ещё раз на то же место
@@ -140,6 +176,7 @@ export function decorate(name, v) {
     fill();
     v.prepend(box);
   }
+  hangAll();
   v.append(h('button', { type: 'button', class: 'bm-fab', 'aria-label': T.save, title: T.save, onclick: save }, svg(icons.bookmark)));
 }
 

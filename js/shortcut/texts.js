@@ -14,7 +14,7 @@ const TX = {
     bmHint: 'Кнопка откроет список твоих закладок. У каждой книги и анкеты своя закладка: в разделах для чтения и в анкетах справа внизу золотая ленточка — нажми, и место сохранится.',
     bm: {
       save: 'Закладка — запомнить это место',
-      saved: 'Закладка сохранена',
+      marked: 'Место отмечено',
       continue: 'Продолжить с закладки',
       listTitle: 'Мои закладки',
       drop: 'Убрать закладку',
@@ -58,7 +58,7 @@ const TX = {
     bmHint: 'Кнопка відкриє список твоїх закладок. У кожної книги й анкети своя закладка: у розділах для читання та в анкетах праворуч унизу золота стрічка — натисни, і місце збережеться.',
     bm: {
       save: 'Закладка — запам’ятати це місце',
-      saved: 'Закладку збережено',
+      marked: 'Місце позначено',
       continue: 'Продовжити із закладки',
       listTitle: 'Мої закладки',
       drop: 'Прибрати закладку',
@@ -102,7 +102,7 @@ const TX = {
     bmHint: 'The button opens the list of your bookmarks. Every book and questionnaire has its own: in reading sections and questionnaires there is a gold ribbon at the bottom right — tap it and the spot is saved.',
     bm: {
       save: 'Bookmark — remember this spot',
-      saved: 'Bookmark saved',
+      marked: 'Spot marked',
       continue: 'Continue from the bookmark',
       listTitle: 'My bookmarks',
       drop: 'Remove the bookmark',

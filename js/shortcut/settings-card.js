@@ -21,7 +21,7 @@ export function shortcutCard(ctx) {
   select.addEventListener('change', () => settings.update({ shortcut: select.value || null })); // панель перерисуется сама
   const look = h('span', { class: 'shortcut-card__look', 'aria-hidden': 'true' },
     current ? svg(current.icon) : h('span', { class: 'app-nav__ask' }, '?'),
-    h('span', { class: 'shortcut-card__gear' }, svg(icons.gear)));
+    h('span', { class: 'shortcut-card__gear' }, svg(icons.gearSolid)));
   return h('section', { class: 'card shortcut-card', id: CARD_ID },
     h('div', { class: 'shortcut-card__head' }, look, h('div', {},
       h('h2', { class: 'caps settings__heading shortcut-card__title' }, T.title),
