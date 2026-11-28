@@ -28,6 +28,7 @@ import { questMark } from '../../quest/quest.js';
 import * as anketaData from '../../anketa/data.js';
 import { formView } from '../../anketa/form.js';
 import { request } from '../../account/session.js';
+import { shortcutCard } from '../../shortcut/shortcut.js'; // своя кнопка на панели (239)
 
 /* ЭКРАН «НАСТРОЙКИ»: аккаунт «Кванта» (фото, имя, кабинет), значок на экран, мои отношения (профиль программы),
    «Пять языков любви», обо мне (имя, язык), дата старта, время трёх напоминаний, уведомления, данные.
@@ -197,6 +198,7 @@ export function render(view, ctx) {
   add(view,
     // «Настройка «Я⁺ • Любовь»» (владелец 18.11.2026)
     h('h1', { class: 'screen-title quest-title' }, t('settings.title'), questMark({ quoted: true })),
+    shortcutCard(ctx), // своя кнопка — первой и золотом (владелец 28.11.2026: «отдельно светится»)
 
     accountCard({ onLogout: ctx.logout, update: updateButton() }),
     partCard(ctx),

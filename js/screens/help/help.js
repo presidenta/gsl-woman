@@ -184,6 +184,7 @@ function rulesBody(item, rerender) {
 // Какие плашки раскрыты — переживают перерисовку экрана (правила, отметки флагов)
 const opened = new Set();
 function remember(node, id) {
+  node.dataset.plate = id; // по нему своя кнопка находит плашку («Архетипы» → types, 239)
   if (opened.has(id)) node.open = true;
   node.addEventListener('toggle', () => (node.open ? opened.add(id) : opened.delete(id)));
   return node;
@@ -206,6 +207,9 @@ function questionPlates(item, verdicts, scene = null) {
     }), `q${i}`))).filter(Boolean),
   ];
 }
+
+/** Открыть плашку при следующей отрисовке (своя кнопка «Архетипы», 239). */
+export const openPlate = (id) => opened.add(id);
 
 /** Раздел «Вопросов» из адреса: #/help?date или #/help?pair (плашки «Артефактов»); без него — оба раздела. */
 const sceneOf = () => ({ date: 'date', pair: 'pair' })[location.hash.split('?')[1]] || null;

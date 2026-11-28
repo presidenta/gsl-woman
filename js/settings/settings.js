@@ -25,6 +25,8 @@ const DEFAULTS = {
   waterNight: [],
   // Профиль отношений (js/profile/, владелец 14.11.2026): married · together · dating · single
   profile: 'married',
+  // Своя кнопка на панели (js/shortcut/, 239): ключ варианта; null — ещё не выбрана (знак вопроса)
+  shortcut: null,
 };
 const PROFILE_KEYS = ['married', 'together', 'dating', 'single'];
 
@@ -45,6 +47,7 @@ export function get() {
     water: Array.isArray(saved.water) ? saved.water.filter((x) => typeof x === 'string').slice(0, 12) : [],
     waterNight: Array.isArray(saved.waterNight) ? saved.waterNight.filter((x) => typeof x === 'string').slice(0, 12) : [],
     profile: PROFILE_KEYS.includes(saved.profile) ? saved.profile : DEFAULTS.profile,
+    shortcut: typeof saved.shortcut === 'string' && saved.shortcut ? saved.shortcut.slice(0, 24) : null,
   };
 }
 

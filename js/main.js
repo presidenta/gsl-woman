@@ -45,6 +45,7 @@ import * as usScreen from './screens/us/us.js';
 import * as chartsScreen from './screens/charts/charts.js'; // «Карты рождения» (js/charts/, 26.11.2026)
 import * as anketaScreen from './screens/anketa/anketa.js'; // «Единая анкета партнёра» (js/anketa/, 26.11.2026)
 import * as circles from './circles/circles.js';
+import * as shortcut from './shortcut/shortcut.js'; // своя кнопка на панели (239)
 import { watchHabits } from './circles/goals-model.js';
 // Детский кабинет: телефон ребёнка или его дела ждут родителя — красная точка на «Мы» (kids/alerts.js)
 import { kidAlerts } from './kids/alerts.js';
@@ -74,7 +75,8 @@ const VERSION = globalThis.GSL_VERSION || 'dev';
 
 const NAV = [
   { route: 'today', icon: icons.today },
-  // Вместо «Недели» — «В разработке» (владелец 26.11.2026: «Неделя» есть в «Записях»; что поставить — решим позже)
+  // Своя кнопка (js/shortcut/, 239; было «В разработке», ещё раньше «Неделя» — владелец 28.11.2026: «Неделю» точно не
+  // нужно): что она открывает, человек выбирает сам
   { placeholder: true },
   { route: 'goals', icon: icons.goals },
   { route: 'journal', icon: icons.journal },
@@ -156,7 +158,7 @@ function buildShell() {
   const view = h('main', { class: 'app-view', id: 'view', tabindex: '-1' });
   const nav = h('nav', { class: 'app-nav', 'aria-label': t('app.name') },
     ...NAV.map((item) => item.placeholder
-      ? h('span', { class: 'app-nav__item app-nav__item--empty', 'aria-hidden': 'true' }, h('span', { class: 'app-nav__blank' }), h('span', {}, t('nav.soon')))
+      ? shortcut.navItem(settings.get().shortcut) // своя кнопка (239): значок выбранного раздела + шестерёнка
       : h('a', { class: 'app-nav__item', href: `#/${item.route}`, dataset: { route: item.route } },
       svg(item.icon),
       h('span', {}, t(`nav.${item.route}`)),
@@ -443,6 +445,7 @@ router.start((name, screen) => {
   if (sheetOpen()) return;
   draw();
   scrollTo({ top: 0 });
+  shortcut.entered(name); // «Продолжить с того же места»: запомнить раздел или вернуть место; шестерёнка — к карточке
 });
 
 // Звук напоминания на открытом приложении: телефон разрешает его только после касания (ui/tick.js)

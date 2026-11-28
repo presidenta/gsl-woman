@@ -203,5 +203,9 @@ export function render(view, ctx) {
 /** Пришли на экран — сразу сверить с сервером. */
 export function onEnter() {
   joining = false;
+  // Пришли со своей кнопки «Чат пары» / «Семейный чат» (#/us?pair, #/us?family, 239) — сразу эта переписка
+  const want = location.hash.split('?')[1];
+  if (want === 'pair') { kind = 'pair'; pairTab = 'chat'; }
+  if (want === 'family') { kind = 'family'; familyTab = 'chat'; }
   circles.refresh().catch(() => {});
 }

@@ -2,13 +2,22 @@ import { h, add } from '../../core/dom.js';
 import { t } from '../../core/i18n.js';
 import * as help from '../../help/help.js';
 import * as meet from '../../meet/meet.js';
-import { itemPlate } from '../help/help.js';
+import { itemPlate, openPlate } from '../help/help.js';
 import { photo, fixed } from '../../photos/photos.js';
 
 /* ЭКРАН «БИБЛИОТЕКА» (#/library, владелец 15.11.2026: «библиотеку вынесем отдельно — это немножко библиотека, это не
    помощь; в помощи — что-то быстрое»). Те же пункты, что были в «Помощи» под заголовком «Библиотека»: слова, КПК /
    «Что ей нужно», авторы, темы, правила дома, идеи свиданий, комплименты. Данные — те же (поле help программы),
    плашки — из screens/help/help.js. Без вопросов (они в «Помощи») и без «Красного флага» (свой экран). */
+
+/** Пришли со своей кнопки «Архетипы» (#/library?open=types, 239) — плашка открыта и видна сразу. */
+export function onEnter() {
+  const key = new URLSearchParams(location.hash.split('?')[1] || '').get('open');
+  if (!key) return;
+  openPlate(key);
+  // onEnter зовут до отрисовки — плашку ищем, когда экран уже построен
+  setTimeout(() => document.querySelector(`[data-plate="${CSS.escape(key)}"]`)?.scrollIntoView({ block: 'start' }), 0);
+}
 
 export function render(view, ctx) {
   const data = help.content(ctx.lang);
