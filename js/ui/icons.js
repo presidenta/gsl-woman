@@ -46,6 +46,7 @@ export const icons = {
   wink: wrap('<circle cx="7.2" cy="8.2" r="2.1" fill="currentColor" stroke="none"/><circle class="icon-wink" cx="16.8" cy="8.2" r="2.1" fill="currentColor" stroke="none"/><path d="M3.6 13.4c2 3.7 5 5.6 8.4 5.6s6.4-1.9 8.4-5.6" stroke-width="2"/>'),
   chatAsk: wrap('<path d="M4.5 6.5A2.5 2.5 0 0 1 7 4h10a2.5 2.5 0 0 1 2.5 2.5v7A2.5 2.5 0 0 1 17 16h-6.5L6 19.5V16H7a2.5 2.5 0 0 1-2.5-2.5z"/><path d="M10.2 8.3a1.9 1.9 0 1 1 2.6 1.8c-.5.2-.8.6-.8 1.1v.3"/><path d="M12 13.4v.01"/>'),
   chats: wrap('<path d="M3.5 6a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2H9.2l-3.4 2.8V13h-.3a2 2 0 0 1-2-2z"/><path d="M15.5 8.5h3a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-.3v2.8l-3.4-2.8H11a2 2 0 0 1-2-2V15"/>'),
+  bookmark: wrap('<path d="M7 3.5h10a1 1 0 0 1 1 1v16l-6-4-6 4v-16a1 1 0 0 1 1-1z"/>'), // закладка (js/shortcut/bookmarks.js)
   archive: wrap('<rect x="3.5" y="4" width="17" height="4.5" rx="1"/><path d="M5 8.5v10A1.5 1.5 0 0 0 6.5 20h11a1.5 1.5 0 0 0 1.5-1.5v-10"/><path d="M10 12.5h4"/>'),
   natal: wrap('<path d="M9.5 3.2l1.9 4.5 4.8.4-3.7 3.2 1.1 4.7-4.1-2.5-4.1 2.5 1.1-4.7-3.7-3.2 4.8-.4z"/><path d="M18.6 13.4l.75 1.9 1.9.75-1.9.75-.75 1.9-.75-1.9-1.9-.75 1.9-.75z"/><path d="M18.4 3.6l.45 1.15 1.15.45-1.15.45-.45 1.15-.45-1.15-1.15-.45 1.15-.45z"/><path d="M6.5 20.2v.01M3.4 17.6v.01"/>'),
   sealed: wrap('<path d="M6 3.5h8l4 4V19a1.5 1.5 0 0 1-1.5 1.5h-11A1.5 1.5 0 0 1 4 19V5a1.5 1.5 0 0 1 1.5-1.5z"/><path d="M14 3.5v4h4"/><rect x="8.8" y="13" width="6.4" height="4.6" rx="1"/><path d="M10.2 13v-1.1a1.8 1.8 0 0 1 3.6 0V13"/>'),

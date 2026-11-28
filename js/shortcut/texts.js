@@ -2,7 +2,7 @@ import { getLang } from '../core/i18n.js';
 
 /* Тексты «Моей кнопки» на трёх языках (владелец 28.11.2026: «лучше написать „Моя кнопка“, а не „Своя“»).
    names[id] = [полное название — в настройках, короткое — под значком на панели]; полные — те же, что в приложении.
-   groups — подписи групп выпадающего списка. Слова нейтральные к полу. */
+   groups — подписи групп выпадающего списка. Слова нейтральные к полу. bm — закладки (bookmarks.js). */
 const TX = {
   ru: {
     title: 'Моя кнопка',
@@ -11,11 +11,18 @@ const TX = {
     none: '— не выбрано —',
     empty: 'Моя кнопка',
     gear: 'Настроить мою кнопку',
-    resumeHint: 'Кнопка откроет последний раздел, который ты смотришь: ту же книгу, те же открытые главы и то же место на странице.',
-    resumeEmpty: 'Пока нечего продолжать: открой книгу или раздел — кнопка запомнит место.',
+    bmHint: 'Кнопка откроет список твоих закладок. У каждой книги и анкеты своя закладка: в разделах для чтения и в анкетах справа внизу золотая ленточка — нажми, и место сохранится.',
+    bm: {
+      save: 'Закладка — запомнить это место',
+      saved: 'Закладка сохранена',
+      continue: 'Продолжить с закладки',
+      listTitle: 'Мои закладки',
+      drop: 'Убрать закладку',
+      empty: 'Закладок пока нет. В книге, анкете или разделе для чтения нажми золотую ленточку справа внизу — место сохранится, и отсюда ты вернёшься туда же.',
+    },
     groups: { quick: 'Быстро', us: 'Мы: пара и семья', date: 'Свидание и разговор', archive: 'Тайный архив и знания' },
     names: {
-      resume: ['Продолжить с того же места', 'Продолжить'],
+      bookmarks: ['Мои закладки', 'Закладки'],
       chatPair: ['Чат пары', 'Чат пары'],
       wishes: ['Желания пары', 'Желания'],
       chatFamily: ['Семейный чат', 'Чат семьи'],
@@ -48,11 +55,18 @@ const TX = {
     none: '— не обрано —',
     empty: 'Моя кнопка',
     gear: 'Налаштувати мою кнопку',
-    resumeHint: 'Кнопка відкриє останній розділ, який ти переглядаєш: ту саму книгу, ті самі відкриті глави й те саме місце на сторінці.',
-    resumeEmpty: 'Поки нічого продовжувати: відкрий книгу чи розділ — кнопка запам’ятає місце.',
+    bmHint: 'Кнопка відкриє список твоїх закладок. У кожної книги й анкети своя закладка: у розділах для читання та в анкетах праворуч унизу золота стрічка — натисни, і місце збережеться.',
+    bm: {
+      save: 'Закладка — запам’ятати це місце',
+      saved: 'Закладку збережено',
+      continue: 'Продовжити із закладки',
+      listTitle: 'Мої закладки',
+      drop: 'Прибрати закладку',
+      empty: 'Закладок поки немає. У книзі, анкеті чи розділі для читання натисни золоту стрічку праворуч унизу — місце збережеться, і звідси ти повернешся туди ж.',
+    },
     groups: { quick: 'Швидко', us: 'Ми: пара й родина', date: 'Побачення й розмова', archive: 'Таємний архів і знання' },
     names: {
-      resume: ['Продовжити з того ж місця', 'Продовжити'],
+      bookmarks: ['Мої закладки', 'Закладки'],
       chatPair: ['Чат пари', 'Чат пари'],
       wishes: ['Бажання пари', 'Бажання'],
       chatFamily: ['Сімейний чат', 'Чат родини'],
@@ -85,11 +99,18 @@ const TX = {
     none: '— not chosen —',
     empty: 'My button',
     gear: 'Set up my button',
-    resumeHint: 'The button opens the last section you were viewing: the same book, the same open chapters and the same spot on the page.',
-    resumeEmpty: 'Nothing to continue yet: open a book or a section and the button will remember the spot.',
+    bmHint: 'The button opens the list of your bookmarks. Every book and questionnaire has its own: in reading sections and questionnaires there is a gold ribbon at the bottom right — tap it and the spot is saved.',
+    bm: {
+      save: 'Bookmark — remember this spot',
+      saved: 'Bookmark saved',
+      continue: 'Continue from the bookmark',
+      listTitle: 'My bookmarks',
+      drop: 'Remove the bookmark',
+      empty: 'No bookmarks yet. In a book, questionnaire or reading section tap the gold ribbon at the bottom right — the spot is saved, and from here you get straight back to it.',
+    },
     groups: { quick: 'Quick', us: 'Us: couple and family', date: 'Dates and talks', archive: 'Secret archive and knowledge' },
     names: {
-      resume: ['Continue where I left off', 'Continue'],
+      bookmarks: ['My bookmarks', 'Bookmarks'],
       chatPair: ['Couple chat', 'Couple chat'],
       wishes: ['Couple’s wishes', 'Wishes'],
       chatFamily: ['Family chat', 'Family chat'],

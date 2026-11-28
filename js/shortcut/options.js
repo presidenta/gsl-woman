@@ -5,11 +5,11 @@ import { icons } from '../ui/icons.js';
    — серьёзно отнесись к разделам»). Названия — те же, что человек видит в приложении («Артефакты», «Тайный архив»,
    «Мы»). Группы — для выпадающего списка в настройках.
    id — ключ в настройках (settings.shortcut) и в текстах (texts.js); hash — куда ведёт; route — имя экрана (подсветка
-   на панели); resume — «Продолжить с того же места» (адрес берётся из запомненного места, resume.js).
+   на панели); list — «Мои закладки»: не переход, а список сохранённых мест (bookmarks.js).
    ?open=<плашка> — плашка раскрыта и видна сразу; #/us?pair=wishes — нужная вкладка «Мы»; #/goals?tab=pair — цели пары. */
 export const GROUPS = [
   { id: 'quick', items: [
-    { id: 'resume', icon: icons.play, resume: true },
+    { id: 'bookmarks', icon: icons.bookmark, list: true }, // «Мои закладки» — список сохранённых мест (bookmarks.js)
   ] },
   { id: 'us', items: [
     { id: 'chatPair', icon: icons.chat, hash: '#/us?pair', route: 'us' },

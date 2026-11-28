@@ -1,9 +1,8 @@
 import { h, svg } from '../core/dom.js';
 import { icons } from '../ui/icons.js';
-import { toast } from '../ui/toast.js';
 import { option } from './options.js';
 import { ST } from './texts.js';
-import * as resume from './resume.js';
+import { openList } from './bookmarks.js';
 
 /* «МОЯ КНОПКА» НА ПАНЕЛИ (место бывшей «В разработке»). Большой значок — того раздела, который человек выбрал (книга,
    чат…), под ним короткое название; в правом верхнем углу значка — маленькая шестерёнка: нажал — настройки этой кнопки
@@ -19,14 +18,8 @@ export function navItem(choice) {
   const label = o ? T.names[o.id][1] : T.empty;
   const icon = o ? svg(o.icon) : h('span', { class: 'app-nav__ask', 'aria-hidden': 'true' }, '?');
   const main = h('a', { class: 'app-nav__mine-open', href: o?.hash || (o ? '#/' : SETTINGS_HASH) }, h('span', { class: 'app-nav__mine-icon' }, icon), h('span', {}, label));
-  if (o?.resume) {
-    main.addEventListener('click', (e) => {
-      e.preventDefault();
-      if (!resume.go()) toast({ title: T.resumeEmpty });
-    });
-  }
+  if (o?.list) main.addEventListener('click', (e) => { e.preventDefault(); openList(); }); // «Мои закладки» — список
   const gear = h('a', { class: 'app-nav__mine-gear', href: SETTINGS_HASH, 'aria-label': T.gear }, svg(icons.gear));
-  // Подсветка «я здесь», как у соседних кнопок: у «Продолжить» — раздел запомненного места
-  const route = o?.resume ? resume.place()?.hash?.replace(/^#\/?/, '').split('?')[0] : o?.route;
+  const route = o?.route; // подсветка «я здесь», как у соседних кнопок (у «Моих закладок» — нет)
   return h('div', { class: `app-nav__item app-nav__mine${o ? '' : ' is-empty'}`, dataset: route ? { route } : {} }, main, gear);
 }

@@ -28,7 +28,7 @@ export function shortcutCard(ctx) {
       h('p', { class: 'card__text shortcut-card__lead' }, T.lead))),
     h('div', { class: 'field' }, h('label', { class: 'field__label', for: id }, T.pick),
       h('div', { class: 'select' }, select, svg(icons.chevronRight, 'select__chevron'))),
-    current?.resume ? h('p', { class: 'faint shortcut-card__hint' }, T.resumeHint) : null);
+    current?.list ? h('p', { class: 'faint shortcut-card__hint' }, T.bmHint) : null);
 }
 
 /** Пришли по шестерёнке с панели — карточку видно сразу и она коротко вспыхивает. */

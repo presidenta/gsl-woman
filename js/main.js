@@ -369,6 +369,7 @@ function draw() {
     if (strip) shell.view.append(strip);
   }
   screen.render(shell.view, ctx);
+  shortcut.decorate(name, shell.view); // в разделах для чтения и анкетах: ленточка закладки и «Продолжить с закладки»
   // Пришли из «Кванта» за значком — лист с кнопкой, как только вход и первая настройка позади
   install.offerIfRequested();
 }
@@ -443,7 +444,7 @@ router.start((name, screen) => {
   if (sheetOpen()) return;
   draw();
   scrollTo({ top: 0 });
-  shortcut.entered(name); // «Продолжить с того же места»: запомнить раздел или вернуть место; шестерёнка — к карточке
+  shortcut.entered(name); // переход к закладке — вернуть место; пришли по шестерёнке — к карточке «Моя кнопка»
 });
 
 // Звук напоминания на открытом приложении: телефон разрешает его только после касания (ui/tick.js)
