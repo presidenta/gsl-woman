@@ -81,3 +81,4 @@
 .pyth__dot--none { background: #e5534b; box-shadow: 0 0 6px #e5534b; }
 .pyth__dot--low { background: #e9b949; box-shadow: 0 0 6px #e9b949; }
 .pyth__dot--ok { background: #3fcf8e; box-shadow: 0 0 6px #3fcf8e; }
+.pyth__nb { white-space: nowrap; } /* «(1-4-7)» переносится только целиком */

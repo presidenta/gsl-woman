@@ -3,6 +3,8 @@ import { pythagoras, pairPythagoras, level } from './calc.js';
 import { TX, lineBand, countText } from './texts/index.js'; // тексты на языке приложения (218)
 const fold = (title, ...body) => h('details', { class: 'help__folder' }, h('summary', { class: 'help__folder-summary' }, h('span', { class: 'help__folder-title' }, title)), h('div', { class: 'help__folder-body' }, ...body));
 const para = (b, t) => (t ? h('p', {}, h('b', {}, b), ' ', t) : null);
+// скобки с цифрами линии — одним куском, «(1-4-7)» не разрывается (владелец 28.11.2026)
+const nb = (s) => h('span', { class: 'pyth__nb' }, s);
 const DIGITS = [1, 2, 3, 4, 5, 6, 7, 8, 9];
 const GRID = [1, 4, 7, 2, 5, 8, 3, 6, 9]; // столбцы 1-2-3 · 4-5-6 · 7-8-9
 
@@ -86,7 +88,7 @@ function sums(grids, lines, T, value) {
   };
   grids.forEach((g) => lines.forEach((l) => { if (g.fields?.[l.id]) bind(g.fields[l.id], l); }));
   return h('ul', { class: 'pyth__sums' }, ...lines.map((l, i) => {
-    const li = h('li', { tabindex: '0' }, h('span', {}, `${T.lines[l.id].name} (${l.digits.join('-')})`), h('b', {}, value(i)));
+    const li = h('li', { tabindex: '0' }, h('span', {}, `${T.lines[l.id].name} `, h('span', { class: 'pyth__nb' }, `(${l.digits.join('-')}) `, h('b', {}, value(i)))));
     bind(li, l);
     return li;
   }));
@@ -115,7 +117,7 @@ function decoding(r, T) {
     ...r.lines.map((l) => {
       const x = T.lines[l.id];
       const b = lineBand(l.total);
-      return h('div', { class: 'chart__item' }, h('p', { class: 'caps' }, `${x.name} (${l.digits.join('-')}): ${l.total} — ${T.bands[b]}`),
+      return h('div', { class: 'chart__item' }, h('p', { class: 'caps' }, `${x.name} `, nb(`(${l.digits.join('-')}):`), ` ${l.total} — ${T.bands[b]}`),
         para(U.what, x.essence), para(U.shows, x.levels[b]));
     }));
 }
