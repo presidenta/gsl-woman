@@ -107,11 +107,12 @@
    «Место отмечено». Уже сохранённые — просто висят. */
 .bm-anchor { position: relative; }
 .bm-ribbon {
-  position: absolute; top: -2px; right: 56px; z-index: 4; width: 20px; height: 60px; pointer-events: none; /* левее стрелки заголовка */
+  position: absolute; top: -6px; left: -22px; z-index: 4; width: 20px; height: 60px; pointer-events: none;
   filter: drop-shadow(0 4px 5px rgba(0, 0, 0, .5));
 }
-.plate__head > .bm-ribbon { right: 60px; } /* у книги стрелка в кружке — чуть дальше */
-.bm-anchor:not(summary) > .bm-ribbon { top: -6px; right: 4px; } /* на абзаце — у правого края, как закладка между страниц */
+/* СЛЕВА — там, где начинают читать (владелец 28.11.2026: «справа нелогично; закладка — в начале строки»): в левом поле
+   перед текстом — у абзаца, галочки, заголовков книги и главы; у пункта списка — на месте точки */
+li.bm-anchor > .bm-ribbon { left: -23px; }
 .bm-ribbon::before, .bm-ribbon::after {
   content: ''; position: absolute; inset: 0; clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 79%, 0 100%);
 }
@@ -140,13 +141,13 @@
 .bm-ribbon.is-gone { transform-origin: 50% 0; animation: bm-lift .45s cubic-bezier(.5, 0, .75, .2) forwards; }
 @keyframes bm-lift { to { transform: translateY(-80%) scaleY(.5); opacity: 0; } }
 .bm-ribbon__note {
-  position: absolute; top: 16px; right: calc(100% + 10px); white-space: nowrap; padding: 5px 12px;
+  position: absolute; top: 16px; left: calc(100% + 10px); white-space: nowrap; padding: 5px 12px;
   border: 1px solid rgba(var(--rgb-gold), .6); border-radius: 999px; background: rgba(var(--rgb-bg), .94);
   color: var(--c-gold); font-size: var(--fs-2xs, .72rem); font-weight: 700; letter-spacing: .05em;
   box-shadow: 0 6px 16px rgba(0, 0, 0, .4); animation: bm-note 3s ease both;
 }
 @keyframes bm-note {
-  0%, 22% { opacity: 0; transform: translateX(8px); }
+  0%, 22% { opacity: 0; transform: translateX(-8px); }
   34%, 82% { opacity: 1; transform: none; }
   100% { opacity: 0; transform: none; }
 }
