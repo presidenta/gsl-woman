@@ -6,9 +6,9 @@ import { ST } from './texts.js';
 
 /* ЗАКЛАДКИ (владелец 28.11.2026: «в разделах, где книжки и анкеты, кнопка постоянно на экране: надо прерваться —
    нажал, закрыл, потом открываешь на этом же месте»; «у каждой книги и анкеты своя закладка — практично и понятно»).
-   - В разделах для чтения и анкетах справа внизу — золотая ленточка. Нажал — место сохранено: раздел, книга (плашка,
-     которая сейчас на экране), открытые в ней главы и докуда пролистано. У каждой книги — своя закладка: новая
-     закладка в той же книге заменяет прежнюю.
+   - В разделах для чтения и анкетах справа внизу — золотая ленточка. Нажал, затем коснулся места в тексте — место
+     сохранено: раздел, книга, открытые в ней главы и сам абзац. У каждой книги — своя закладка: новая закладка в той
+     же книге заменяет прежнюю.
    - Открыл раздел снова — сверху «Продолжить с закладки»: нажал — там же, где остановился.
    - «Моя кнопка» → «Мои закладки»: список всех сохранённых мест.
    - Снять закладку: золотой крестик на самой ленте, крестик у строки «Продолжить с закладки» или в «Моих закладках».
@@ -26,7 +26,16 @@ export function place(hash = location.hash) {
   const keep = query.split('&').filter((p) => p && !p.startsWith('open='));
   return keep.length ? `${base}?${keep.join('&')}` : base;
 }
-const text = (node) => (node?.textContent || '').replace(/\s+/g, ' ').trim().slice(0, 70);
+/** Текст узла без ленточек на нём: подпись «Место отмечено» не должна попасть в «где закладка». */
+function text(node) {
+  if (!node) return '';
+  let n = node;
+  if (node.querySelector('.bm-ribbon')) {
+    n = node.cloneNode(true);
+    n.querySelectorAll('.bm-ribbon').forEach((r) => r.remove());
+  }
+  return (n.textContent || '').replace(/\s+/g, ' ').trim().slice(0, 70);
+}
 
 /* КНИГА = плашка раздела (details.plate). Имя книги — data-plate, где экран его дал («Помощь», «Тайный архив»); у
    остальных («Первое свидание», «Разбор», «Интим»…) — её название. Так у каждой книги своя закладка в любом разделе и
@@ -36,65 +45,64 @@ const plates = (v) => [...(v?.querySelectorAll('details.plate') || [])];
 const plateId = (d) => d.dataset.plate || `t:${text(d.querySelector('.plate__title'))}`;
 const plateOf = (v, id) => plates(v).find((d) => plateId(d) === id) || null;
 
-/** Книга, которую читает человек: раскрытая на экране (их несколько — та, что ближе к середине экрана). Раскрытых
-    нет — свёрнутая, ближайшая к середине. Вложенная книга идёт в порядке позже внешней и при равенстве побеждает (<=). */
-function plateInView() {
-  const mid = innerHeight / 2;
-  let found = null;
-  let gap = Infinity;
-  for (const d of plates(view())) {
-    const r = d.getBoundingClientRect();
-    if (r.bottom < 80 || r.top > innerHeight) continue; // не на экране
-    const g = (d.open ? 0 : innerHeight) // любая раскрытая важнее свёрнутой
-      + (r.top <= mid && r.bottom >= mid ? 0 : Math.min(Math.abs(r.top - mid), Math.abs(r.bottom - mid)));
-    if (g <= gap) { found = d; gap = g; }
-  }
-  return found;
+/* МЕСТО В ТЕКСТЕ (владелец 28.11.2026: «ленточка появляется в заголовке, а в книжке текст очень длинный — надо
+   в середине текста; подумай, как на телефоне, где пальцем тыкаешь»). Нажал ленточку справа внизу → «Коснись места
+   в тексте» → коснулся абзаца, вопроса, галочки или заголовка главы — лента опускается на него. Перетаскивать пальцем
+   на телефоне неудобно: спорит с листанием, — поэтому касание. Место = номер блока в книге и его первые слова: текст
+   поменялся и номер сдвинулся — блок ищется по словам. */
+const BLOCKS = 'p, li, h2, h3, h4, h5, blockquote, summary, label, dt, dd';
+const blocksOf = (scope) => [...scope.querySelectorAll(BLOCKS)].filter((b) => !b.closest('.bm-here'));
+function spotOf(bm, scope) {
+  if (!(bm.spot >= 0) || !scope) return null;
+  const blocks = blocksOf(scope);
+  const el = blocks[bm.spot];
+  if (el && text(el) === bm.spotText) return el;
+  return blocks.find((b) => text(b) === bm.spotText) || null;
 }
 
-/** Нажали ленточку: сохранить это место. */
-export function save() {
-  const plate = plateInView();
-  const scope = plate || view();
-  if (!scope) return;
+/** Коснулись места spot: закладка книги, в которой оно лежит (без книги — раздела). */
+function save(spot) {
+  const v = view();
+  const plate = spot.closest('details.plate');
+  const scope = plate || v;
   const inner = [...scope.querySelectorAll('details')];
   const open = inner.flatMap((d, i) => (d.open ? [i] : []));
-  // Глава — последняя раскрытая, чьё начало выше середины экрана
-  const chapter = inner.filter((d) => d.open && d.getBoundingClientRect().top < innerHeight / 2).pop();
+  const around = spot.closest('details'); // глава вокруг места (у заголовка главы — сама глава)
+  const chapter = around && around !== plate && scope.contains(around) ? around : null;
   const top = plate ? plate.getBoundingClientRect().top + scrollY : 0;
-  // Без книги и главы ленточка ляжет на блок раздела, который сейчас посередине экрана
-  const kids = [...view().children].filter((c) => !c.matches('.bm-here, .bm-fab'));
-  const child = plate || chapter ? -1 : kids.reduce((k, c, i) => (c.getBoundingClientRect().top < innerHeight / 2 ? i : k), 0);
-  const hash = place();
   const id = plate ? plateId(plate) : null;
+  const hash = place();
   const key = id ? `${hash}#${id}` : hash;
   const bm = {
-    key, hash, plate: id, open, offset: Math.round(scrollY - top), // может быть и меньше нуля: стоял чуть выше начала книги
-    title: text(plate ? plate.querySelector('.plate__title') : view()?.querySelector('.screen-title')),
-    chapter: chapter ? text(chapter.querySelector('summary')) : '', at: new Date().toISOString(),
-    mark: chapter ? inner.indexOf(chapter) : -1, child, // на чём висит ленточка
+    key, hash, plate: id, open,
+    // Запас, если место не найдётся: экран — туда же (место в верхней трети, как при возврате)
+    offset: Math.round(spot.getBoundingClientRect().top + scrollY - innerHeight * 0.3 - top),
+    title: text(plate ? plate.querySelector('.plate__title') : v.querySelector('.screen-title')),
+    chapter: chapter ? text(chapter.querySelector(':scope > summary')) : '', at: new Date().toISOString(),
+    mark: chapter ? inner.indexOf(chapter) : -1, spot: blocksOf(scope).indexOf(spot), spotText: text(spot),
   };
   const list = { ...all(), [key]: bm };
   const keys = Object.keys(list).sort((a, b) => list[b].at.localeCompare(list[a].at)).slice(0, MAX);
   writeQuiet(KEY, Object.fromEntries(keys.map((k) => [k, list[k]])));
-  hang(bm, true); // золотая ленточка опускается на читаемый текст и остаётся на нём
+  hang(bm, true); // золотая ленточка опускается на это место и остаётся на нём
   navigator.vibrate?.(12);
 }
 
 /* ЛЕНТОЧКА НА ТЕКСТЕ (владелец 28.11.2026: «при нажатии — золотая ленточка поверх того, что читаешь, и фиксируется;
-   как закладка в книге; лакшери, лаконично»). Висит на заголовке главы, которую читали; глава свёрнута — на заголовке
-   книги; нет книги — на блоке раздела. Заголовок (summary) виден всегда, даже у свёрнутой главы, — поэтому ленточка
-   на нём, а не внутри главы. Новая — опускается сверху с покачиванием и бликом, рядом на миг — «Место отмечено». */
+   как закладка в книге; лакшери, лаконично»). Висит на месте в тексте; глава свёрнута — на заголовке главы; книга
+   свёрнута — на заголовке книги (заголовок виден всегда). Новая — опускается сверху с покачиванием и бликом, рядом
+   на миг — «Место отмечено». */
 const shown = (el) => !!el && el.getClientRects().length > 0;
 function anchorOf(bm, v) {
   const plate = bm.plate ? plateOf(v, bm.plate) : null;
   if (bm.plate && !plate) return null;
   const scope = plate || v;
+  const spot = spotOf(bm, scope);
+  if (shown(spot)) return spot;
   const head = (d) => d?.querySelector(':scope > summary');
   const chapter = bm.mark >= 0 ? head(scope.querySelectorAll('details')[bm.mark]) : null;
   if (shown(chapter)) return chapter;
-  if (plate) return head(plate);
-  return [...v.children].filter((c) => !c.matches('.bm-here, .bm-fab'))[bm.child ?? 0] || null;
+  return plate ? head(plate) : null;
 }
 
 function hang(bm, fresh = false) {
@@ -149,8 +157,15 @@ function apply(bm) {
   const scope = plate || view();
   // По порядку: раскрытая глава может принести свои вложенные — их номера идут следом
   for (const i of bm.open || []) { const d = scope?.querySelectorAll('details')[i]; if (d) d.open = true; }
-  hangAll(); // главы раскрылись — ленточки переезжают на свои главы
-  const back = () => scrollTo({ top: (plate ? plate.getBoundingClientRect().top + scrollY : 0) + (bm.offset || 0) });
+  // И все главы вокруг места — даже если их свернули уже после закладки
+  for (let d = spotOf(bm, scope)?.closest('details'); d && scope.contains(d); d = d.parentElement?.closest('details')) d.open = true;
+  hangAll(); // главы раскрылись — ленточки переезжают на свои места
+  // Место — в верхней трети экрана, где начинают читать; не нашлось — по запасу
+  const back = () => {
+    const spot = spotOf(bm, scope);
+    scrollTo({ top: shown(spot) ? spot.getBoundingClientRect().top + scrollY - innerHeight * 0.3
+      : (plate ? plate.getBoundingClientRect().top + scrollY : 0) + (bm.offset || 0) });
+  };
   setTimeout(back, 60); // после прокрутки экрана к началу и к открытой плашке
   setTimeout(back, 450); // картинки догрузились и сдвинули страницу — ещё раз на то же место
 }
@@ -197,8 +212,50 @@ export function openList() {
   openSheet({ title: T.listTitle, content: body });
 }
 
+/* ВЫБОР МЕСТА: внизу подсказка, ленточка становится крестиком «отмена». Касание в тексте не нажимает галочки и не
+   сворачивает главы — только ставит закладку (перехват на окне раньше всех кнопок). Касание вне текста (панель,
+   шапка) — выход из выбора, а само касание срабатывает как обычно. Листать в это время можно. */
+let picking = null;
+function stopPick() {
+  picking?.();
+  picking = null;
+}
+function startPick(fab) {
+  if (picking) { stopPick(); return; }
+  const T = ST().bm;
+  const hint = h('div', { class: 'bm-hint', role: 'status' }, T.pick);
+  const onClick = (e) => {
+    if (e.target.closest('.bm-fab')) return; // сама ленточка — отмена, своим нажатием
+    const v = view();
+    if (!v?.contains(e.target) || e.target.closest('.bm-here')) { stopPick(); return; }
+    e.preventDefault();
+    e.stopPropagation();
+    const spot = e.target.closest(BLOCKS);
+    if (!spot || !v.contains(spot)) return; // мимо текста (фото, поле) — ждём касания в тексте
+    stopPick();
+    save(spot);
+  };
+  const onKey = (e) => { if (e.key === 'Escape') stopPick(); };
+  const look = (icon, label) => { fab.replaceChildren(svg(icon)); fab.setAttribute('aria-label', label); fab.title = label; };
+  addEventListener('click', onClick, true);
+  addEventListener('keydown', onKey);
+  document.body.classList.add('bm-picking');
+  document.body.append(hint);
+  fab.classList.add('is-picking');
+  look(icons.close, T.cancel);
+  picking = () => {
+    removeEventListener('click', onClick, true);
+    removeEventListener('keydown', onKey);
+    document.body.classList.remove('bm-picking');
+    hint.remove();
+    fab.classList.remove('is-picking');
+    look(icons.bookmark, T.save);
+  };
+}
+
 /** Каждая отрисовка раздела для чтения: ленточка справа внизу и сверху — закладки этого раздела. */
 export function decorate(name, v) {
+  stopPick(); // экран перерисован или сменился — выбор места дальше не тянется
   if (!READING.has(name) || !v) return;
   const T = ST().bm;
   if (Object.values(all()).some((bm) => bm.hash === place())) {
@@ -207,6 +264,6 @@ export function decorate(name, v) {
     v.prepend(h('div', { class: 'bm-here' }, ...list.map((bm) => row(bm, () => go(bm), () => remove(bm.key)))));
   }
   hangAll();
-  v.append(h('button', { type: 'button', class: 'bm-fab', 'aria-label': T.save, title: T.save, onclick: save }, svg(icons.bookmark)));
+  v.append(h('button', { type: 'button', class: 'bm-fab', 'aria-label': T.save, title: T.save, onclick: (e) => startPick(e.currentTarget) }, svg(icons.bookmark)));
 }
 

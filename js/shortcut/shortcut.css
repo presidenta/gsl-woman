@@ -60,6 +60,25 @@
 }
 .bm-fab svg { width: 22px; height: 22px; }
 .bm-fab:active { transform: scale(.94); }
+/* Выбор места (244): ленточка — золотой кружок с крестиком «отмена», мягко пульсирует; над ней подсказка */
+.bm-fab.is-picking { background: var(--c-gold); color: rgb(var(--rgb-bg)); animation: bm-pulse 1.6s ease-in-out infinite; }
+@keyframes bm-pulse {
+  0%, 100% { box-shadow: 0 6px 18px rgba(0, 0, 0, .45), 0 0 0 0 rgba(var(--rgb-gold), .55); }
+  50% { box-shadow: 0 6px 18px rgba(0, 0, 0, .45), 0 0 0 10px rgba(var(--rgb-gold), 0); }
+}
+.bm-hint {
+  position: fixed; right: 14px; left: 14px; bottom: calc(var(--nav-h) + env(safe-area-inset-bottom) + 72px); z-index: 25;
+  margin: 0 auto; max-width: 420px; padding: 10px 16px; border: 1px solid rgba(var(--rgb-gold), .7); border-radius: 999px;
+  background: rgba(var(--rgb-bg), .94); color: var(--c-gold); font-size: var(--fs-sm); font-weight: 600; text-align: center;
+  box-shadow: 0 8px 22px rgba(0, 0, 0, .5), 0 0 18px rgba(var(--rgb-gold), .25); pointer-events: none;
+  -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); animation: bm-hint-in .3s ease both;
+}
+@keyframes bm-hint-in { from { opacity: 0; transform: translateY(8px); } }
+/* Пока выбирают — место под пальцем (мышью — под курсором) подсвечивается золотом */
+.bm-picking #view { cursor: crosshair; }
+.bm-picking #view :is(p, li, h2, h3, h4, h5, blockquote, summary, label, dt, dd):is(:hover, :active) {
+  border-radius: 6px; background-color: rgba(var(--rgb-gold), .1); box-shadow: inset 3px 0 0 var(--c-gold);
+}
 /* Сверху раздела — «Продолжить с закладки»; в листе «Мои закладки» — те же строки */
 .bm-here { display: grid; gap: 6px; margin-bottom: var(--sp-3); }
 .bm-list { display: grid; gap: 8px; }
@@ -92,6 +111,7 @@
   filter: drop-shadow(0 4px 5px rgba(0, 0, 0, .5));
 }
 .plate__head > .bm-ribbon { right: 60px; } /* у книги стрелка в кружке — чуть дальше */
+.bm-anchor:not(summary) > .bm-ribbon { top: -6px; right: 4px; } /* на абзаце — у правого края, как закладка между страниц */
 .bm-ribbon::before, .bm-ribbon::after {
   content: ''; position: absolute; inset: 0; clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 79%, 0 100%);
 }
@@ -131,6 +151,6 @@
   100% { opacity: 0; transform: none; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .bm-ribbon.is-new, .bm-ribbon.is-new::after, .bm-ribbon.is-gone { animation: none; }
+  .bm-ribbon.is-new, .bm-ribbon.is-new::after, .bm-ribbon.is-gone, .bm-fab.is-picking, .bm-hint { animation: none; }
   .bm-ribbon__note { animation-duration: .01s; animation-delay: 2.5s; }
 }
