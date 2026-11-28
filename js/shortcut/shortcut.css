@@ -107,6 +107,18 @@
   100% { transform: none; }
 }
 @keyframes bm-sheen { from { background-position: 0 -120%; } to { background-position: 0 160%; } }
+/* Крестик на ленте (243): тёмный кружок с золотым крестиком у верха ленты; зона нажатия шире кружка (лента узкая) */
+.bm-ribbon__x {
+  position: absolute; top: 6px; left: 50%; z-index: 1; display: grid; place-items: center; width: 20px; height: 20px;
+  margin-left: -10px; padding: 0; border: 1px solid rgba(var(--rgb-gold), .85); border-radius: 50%;
+  background: rgba(var(--rgb-bg), .92); color: var(--c-gold); cursor: pointer; pointer-events: auto;
+}
+.bm-ribbon__x::before { content: ''; position: absolute; inset: -10px -12px; }
+.bm-ribbon__x svg { width: 12px; height: 12px; stroke-width: 2.8; }
+.bm-ribbon__x:active { transform: scale(.88); }
+/* Сняли — лента уходит вверх и тает */
+.bm-ribbon.is-gone { transform-origin: 50% 0; animation: bm-lift .45s cubic-bezier(.5, 0, .75, .2) forwards; }
+@keyframes bm-lift { to { transform: translateY(-80%) scaleY(.5); opacity: 0; } }
 .bm-ribbon__note {
   position: absolute; top: 16px; right: calc(100% + 10px); white-space: nowrap; padding: 5px 12px;
   border: 1px solid rgba(var(--rgb-gold), .6); border-radius: 999px; background: rgba(var(--rgb-bg), .94);
@@ -119,6 +131,6 @@
   100% { opacity: 0; transform: none; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .bm-ribbon.is-new, .bm-ribbon.is-new::after { animation: none; }
+  .bm-ribbon.is-new, .bm-ribbon.is-new::after, .bm-ribbon.is-gone { animation: none; }
   .bm-ribbon__note { animation-duration: .01s; animation-delay: 2.5s; }
 }

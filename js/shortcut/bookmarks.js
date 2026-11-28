@@ -11,6 +11,7 @@ import { ST } from './texts.js';
      закладка в той же книге заменяет прежнюю.
    - Открыл раздел снова — сверху «Продолжить с закладки»: нажал — там же, где остановился.
    - «Моя кнопка» → «Мои закладки»: список всех сохранённых мест.
+   - Снять закладку: золотой крестик на самой ленте, крестик у строки «Продолжить с закладки» или в «Моих закладках».
    Хранится на этом телефоне, тихо (writeQuiet) — без перерисовки экрана. */
 const KEY = 'bookmarks';
 const MAX = 30;
@@ -35,13 +36,18 @@ const plates = (v) => [...(v?.querySelectorAll('details.plate') || [])];
 const plateId = (d) => d.dataset.plate || `t:${text(d.querySelector('.plate__title'))}`;
 const plateOf = (v, id) => plates(v).find((d) => plateId(d) === id) || null;
 
-/** Книга на экране: последняя плашка, чьё начало выше середины экрана (раскрытая — читают её; свёрнутая — на ней остановились). */
+/** Книга, которую читает человек: раскрытая на экране (их несколько — та, что ближе к середине экрана). Раскрытых
+    нет — свёрнутая, ближайшая к середине. Вложенная книга идёт в порядке позже внешней и при равенстве побеждает (<=). */
 function plateInView() {
   const mid = innerHeight / 2;
   let found = null;
+  let gap = Infinity;
   for (const d of plates(view())) {
     const r = d.getBoundingClientRect();
-    if (r.top < mid && r.bottom > 80) found = d;
+    if (r.bottom < 80 || r.top > innerHeight) continue; // не на экране
+    const g = (d.open ? 0 : innerHeight) // любая раскрытая важнее свёрнутой
+      + (r.top <= mid && r.bottom >= mid ? 0 : Math.min(Math.abs(r.top - mid), Math.abs(r.bottom - mid)));
+    if (g <= gap) { found = d; gap = g; }
   }
   return found;
 }
@@ -97,19 +103,39 @@ function hang(bm, fresh = false) {
   document.querySelectorAll(`.bm-ribbon[data-key="${CSS.escape(bm.key)}"]`).forEach((r) => r.remove());
   const at = anchorOf(bm, v);
   if (!at) return;
-  const note = fresh ? h('span', { class: 'bm-ribbon__note' }, ST().bm.marked) : null;
+  const T = ST().bm;
+  const note = fresh ? h('span', { class: 'bm-ribbon__note', 'aria-hidden': 'true' }, T.marked) : null;
+  // Золотой крестик на самой ленте — снять закладку (владелец 28.11.2026: «как их забирать? крестик прямо на полосочке»).
+  // Лента лежит на заголовке книги: нажатие крестика не должно раскрывать и сворачивать книгу.
+  const x = h('button', { type: 'button', class: 'bm-ribbon__x', 'aria-label': T.drop, title: T.drop,
+    onclick: (e) => { e.preventDefault(); e.stopPropagation(); remove(bm.key); } }, svg(icons.close));
   at.classList.add('bm-anchor');
-  at.append(h('span', { class: `bm-ribbon${fresh ? ' is-new' : ''}`, dataset: { key: bm.key }, 'aria-hidden': 'true' }, note));
+  at.append(h('span', { class: `bm-ribbon${fresh ? ' is-new' : ''}`, dataset: { key: bm.key } }, x, note));
   if (note) setTimeout(() => note.remove(), 3200);
 }
 
 const hangAll = () => Object.values(all()).filter((bm) => bm.hash === place()).forEach((bm) => hang(bm));
 
+/** Лента уходит вверх, как вынутая из книги (без анимации в телефоне — сразу). */
+function lift(r) {
+  if (r.classList.contains('is-gone')) return;
+  r.classList.add('is-gone');
+  r.addEventListener('animationend', () => r.remove(), { once: true });
+  setTimeout(() => r.remove(), 600);
+}
+
+/** Снять закладку: из памяти, ленту с книги и строку «Продолжить с закладки» сверху раздела. */
 export function remove(key) {
   const list = all();
   delete list[key];
   writeQuiet(KEY, list);
-  document.querySelectorAll(`.bm-ribbon[data-key="${CSS.escape(key)}"]`).forEach((r) => r.remove());
+  const k = CSS.escape(key);
+  document.querySelectorAll(`.bm-ribbon[data-key="${k}"]`).forEach(lift);
+  document.querySelectorAll(`.bm-here .bm-row[data-key="${k}"]`).forEach((r) => {
+    const box = r.parentElement;
+    r.remove();
+    if (!box.children.length) box.remove();
+  });
 }
 
 const label = (bm) => [bm.title, bm.chapter].filter(Boolean).join(' · ');
@@ -151,7 +177,7 @@ function afterSheet(fn) {
 
 function row(bm, onPick, onDrop) {
   const T = ST().bm;
-  return h('div', { class: 'bm-row' },
+  return h('div', { class: 'bm-row', dataset: { key: bm.key } },
     h('button', { type: 'button', class: 'bm-row__open', onclick: onPick },
       svg(icons.bookmark, 'bm-row__icon'),
       h('span', { class: 'bm-row__text' }, h('span', { class: 'caps bm-row__cap' }, T.continue), h('span', { class: 'bm-row__title' }, label(bm)))),
@@ -176,14 +202,9 @@ export function decorate(name, v) {
   if (!READING.has(name) || !v) return;
   const T = ST().bm;
   if (Object.values(all()).some((bm) => bm.hash === place())) {
-    const box = h('div', { class: 'bm-here' });
-    const fill = () => {
-      const list = Object.values(all()).filter((bm) => bm.hash === place()).sort((a, b) => b.at.localeCompare(a.at));
-      box.replaceChildren(...list.map((bm) => row(bm, () => go(bm), () => { remove(bm.key); fill(); })));
-      if (!list.length) box.remove();
-    };
-    fill();
-    v.prepend(box);
+    const list = Object.values(all()).filter((bm) => bm.hash === place()).sort((a, b) => b.at.localeCompare(a.at));
+    // Крестик у строки снимает и ленту с книги — remove() убирает строку сам
+    v.prepend(h('div', { class: 'bm-here' }, ...list.map((bm) => row(bm, () => go(bm), () => remove(bm.key)))));
   }
   hangAll();
   v.append(h('button', { type: 'button', class: 'bm-fab', 'aria-label': T.save, title: T.save, onclick: save }, svg(icons.bookmark)));
