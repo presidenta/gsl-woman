@@ -27,11 +27,19 @@ export function place(hash = location.hash) {
 }
 const text = (node) => (node?.textContent || '').replace(/\s+/g, ' ').trim().slice(0, 70);
 
-/** Книга на экране: раскрытая плашка, которая занимает середину экрана (или последняя выше середины). */
+/* КНИГА = плашка раздела (details.plate). Имя книги — data-plate, где экран его дал («Помощь», «Тайный архив»); у
+   остальных («Первое свидание», «Разбор», «Интим»…) — её название. Так у каждой книги своя закладка в любом разделе и
+   в одном разделе их может быть сколько угодно (владелец 28.11.2026: «поставил в „Комплименты“, потом в „Как держаться
+   с женщиной“ — в „Комплиментах“ исчезла; должна быть в каждом разделе, где её отметили»). */
+const plates = (v) => [...(v?.querySelectorAll('details.plate') || [])];
+const plateId = (d) => d.dataset.plate || `t:${text(d.querySelector('.plate__title'))}`;
+const plateOf = (v, id) => plates(v).find((d) => plateId(d) === id) || null;
+
+/** Книга на экране: последняя плашка, чьё начало выше середины экрана (раскрытая — читают её; свёрнутая — на ней остановились). */
 function plateInView() {
   const mid = innerHeight / 2;
   let found = null;
-  for (const d of view()?.querySelectorAll('details[data-plate][open]') || []) {
+  for (const d of plates(view())) {
     const r = d.getBoundingClientRect();
     if (r.top < mid && r.bottom > 80) found = d;
   }
@@ -52,9 +60,10 @@ export function save() {
   const kids = [...view().children].filter((c) => !c.matches('.bm-here, .bm-fab'));
   const child = plate || chapter ? -1 : kids.reduce((k, c, i) => (c.getBoundingClientRect().top < innerHeight / 2 ? i : k), 0);
   const hash = place();
-  const key = plate ? `${hash}#${plate.dataset.plate}` : hash;
+  const id = plate ? plateId(plate) : null;
+  const key = id ? `${hash}#${id}` : hash;
   const bm = {
-    key, hash, plate: plate?.dataset.plate || null, open, offset: Math.round(scrollY - top), // может быть и меньше нуля: стоял чуть выше начала книги
+    key, hash, plate: id, open, offset: Math.round(scrollY - top), // может быть и меньше нуля: стоял чуть выше начала книги
     title: text(plate ? plate.querySelector('.plate__title') : view()?.querySelector('.screen-title')),
     chapter: chapter ? text(chapter.querySelector('summary')) : '', at: new Date().toISOString(),
     mark: chapter ? inner.indexOf(chapter) : -1, child, // на чём висит ленточка
@@ -72,7 +81,7 @@ export function save() {
    на нём, а не внутри главы. Новая — опускается сверху с покачиванием и бликом, рядом на миг — «Место отмечено». */
 const shown = (el) => !!el && el.getClientRects().length > 0;
 function anchorOf(bm, v) {
-  const plate = bm.plate ? v.querySelector(`[data-plate="${CSS.escape(bm.plate)}"]`) : null;
+  const plate = bm.plate ? plateOf(v, bm.plate) : null;
   if (bm.plate && !plate) return null;
   const scope = plate || v;
   const head = (d) => d?.querySelector(':scope > summary');
@@ -108,7 +117,7 @@ const label = (bm) => [bm.title, bm.chapter].filter(Boolean).join(' · ');
 /* Переход к закладке: тот же экран — вернуть место сразу; другой — после отрисовки (entered). */
 let pending = null;
 function apply(bm) {
-  const plate = bm.plate ? view()?.querySelector(`[data-plate="${CSS.escape(bm.plate)}"]`) : null;
+  const plate = bm.plate ? plateOf(view(), bm.plate) : null;
   if (bm.plate && !plate) return; // книги больше нет (программа сменилась) — просто раздел
   if (plate) plate.open = true;
   const scope = plate || view();
