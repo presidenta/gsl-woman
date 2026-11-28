@@ -49,3 +49,14 @@ test('круг возрастов (235): 8 отрезков по 7 чисел; �
   assert.equal(r.ages.length, 8);
   r.ages.forEach((a) => { assert.equal(a.length, 7); a.forEach((n) => assert.ok(n >= 1 && n <= 22)); });
 });
+
+test('одно правило Ладини (236): Свадхистана = вход в денежный канал = В+Д, Г+Д; пример 23.06.1992 (mind.university)', () => {
+  const r = matrix('1992-06-23');
+  assert.deepEqual([r.points.A, r.points.B, r.points.C, r.points.D, r.points.E], [5, 6, 21, 5, 10]);
+  assert.equal(r.rays.c.x2, 4); // вход в денежный канал: 21 + 10 = 31 → 4
+  assert.equal(r.rays.d.x2, 15); // вход в канал отношений: 5 + 10
+  assert.deepEqual([r.loveMoney.balance, r.loveMoney.money], [19, 5]);
+  const sv = r.health.rows.find((x) => x.id === 'svadhisthana');
+  assert.deepEqual([sv.body, sv.energy], [4, 15]); // Свадхистана — те же точки
+  assert.equal(r.rays.c.x1, 7); // соседняя с краем: 21 + 4 = 25 → 7 — это не Свадхистана
+});
